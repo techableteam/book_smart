@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   scroll: {
-    marginTop: 77,
+    marginTop: 97,
   },
   modal: {
     width: '90%',
@@ -297,10 +297,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   drinksButton: {
-    fontSize: 18,
+    fontSize: 16,
     padding: 15,
     borderWidth: 3,
     borderColor: 'white',
+    borderRadius: 0
 
   },
   checkbox: {

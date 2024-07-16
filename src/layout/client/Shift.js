@@ -79,7 +79,7 @@ export default function Shift ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar />
-        <ScrollView style={{width: '100%', marginTop: 119}}
+        <ScrollView style={{width: '100%', marginTop: 139}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -115,7 +115,7 @@ export default function Shift ({ navigation }) {
                     <Text style={{color: 'white'}}> Upload Timesheet</Text>
                   </TouchableOpacity>
                   <View style={{backgroundColor: "#C0D1DD", width: '100%', height: 5}}/>
-                  <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#3d94f6', width: '45%'}]} onPress = {() => handleEdit()}>
+                  <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#3d94f6', width: '60%'}]} onPress = {() => handleEdit()}>
                     <Text style={{color: 'white'}}> CLOCK IN / OUT</Text>
                   </TouchableOpacity>
                     <View style={{flexDirection: 'row', width: '100%', gap: 20}}>

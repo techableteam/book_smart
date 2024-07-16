@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   shadow: {
     borderRadius: 0,
     backgroundColor: 'hsl(0, 0%, 80%)',
-    top: 78,
+    top: 98,
     position:'absolute',
     width: '100%',
     flexDirection: 'row',

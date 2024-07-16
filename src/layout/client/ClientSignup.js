@@ -1,4 +1,4 @@
-import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
+import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import { CheckBox } from 'react-native-elements';
 import images from '../../assets/images';
@@ -96,7 +96,10 @@ export default function ClientSignUp({ navigation }) {
   const [showModal, setShowModal] = useState(false);
   const handleItemPress = (text) => {
     handleCredentials('title', text);
-    setShowModal(false);
+    setShowModal(!showModal);
+  }
+  const handleTitles = () => {
+    setShowModal(!showModal);
   }
 
   //-------------------------------------------Date Picker---------------------------------------
@@ -246,8 +249,7 @@ export default function ClientSignUp({ navigation }) {
       credentials.address.city ==='' || 
       credentials.address.state ==='' || 
       credentials.address.zip ==='' || 
-      credentials.password ==='' || 
-      credentials.signature ==='') {
+      credentials.password ==='') {
         showAlerts('all gaps')
     }
     else {
@@ -288,7 +290,7 @@ export default function ClientSignUp({ navigation }) {
             </View>
           </View>
           <View style={styles.authInfo}>
-            <Text style={styles.subject}> CONTACT INFORMATION </Text>
+            <Text style={styles.subject} onPress={handleTitles}> CONTACT INFORMATION </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Name <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
@@ -337,24 +339,16 @@ export default function ClientSignUp({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Title <Text style={{color: 'red'}}>*</Text> </Text>
-              <View style={{position: 'relative', width: '100%', gap: 5, height: 50}}>
-                {/* <RNSPickerSelect
-                  placeholder={placeholder}
-                  items={items}
-                  onValueChange={(value) => handleCredentials('title', value)}
-                  style={pickerSelectStyles}
-                  value={credentials.title}
-                  useNativeAndroidPickerStyle={{height: 30}}
-                /> */}
-                <TouchableOpacity onPress = {()=>setShowModal(true)}>
+              <View style={{position: 'relative', width: '100%', gap: 5}}>
+                <Pressable style= {{width: '100%', height: 50, zIndex: 10}} onPress={handleTitles}>
+                </Pressable>
                   <TextInput
-                    style={[styles.input, {width: '100%'}]}
-                    placeholder="First"
+                    style={[styles.input, {width: '100%', zIndex: 0, position: 'absolute', top: 0}]}
+                    placeholder=""
                     editable= {false}
                     // onChangeText={e => handleCredentials('firstName', e)}
-                    value={credentials.title != ''?credentials.title : 'Select Title ...' }
+                    value={credentials.title ? credentials.title : 'Select Title...' }
                   />
-                </TouchableOpacity>
                 {showModal && <Modal
                   Visible={false}
                   transparent= {true}
@@ -376,15 +370,15 @@ export default function ClientSignUp({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
-              <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%'}}>
-                  <TextInput
-                    style={[styles.input, {width: '100%'}]}
+              <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
+                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}>
+                  
+                </TouchableOpacity><TextInput
+                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
                     placeholder=""
                     value={birthday.toDateString()}
                     editable={false}
                   />
-                </TouchableOpacity>
                 
                 {/* <Button title="Select Birthday" onPress={() => setShowCalendar(true)} /> */}
                 {showCalender && 
@@ -529,7 +523,7 @@ export default function ClientSignUp({ navigation }) {
                 <Text style={{
                   backgroundColor: 'yellow', 
                   marginBottom: 10, 
-                  width: 130, 
+                  // width: 140, 
                   fontSize: 16, 
                   fontWeight: 'bold', 
                   color: 'black'}}> 
@@ -642,7 +636,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(155, 155, 155, 0.61))'
   },
   scroll: {
-    marginTop: 77,
+    marginTop: 97,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -717,7 +711,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 30,
     marginLeft: '10%',
-    fontSize: 20,
+    fontSize: 18,
     borderRadius: 5,
   },
   mark: {

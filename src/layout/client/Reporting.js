@@ -100,7 +100,7 @@ export default function Reporting ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar />
-        <ScrollView style={{width: '100%', marginTop: 119}}
+        <ScrollView style={{width: '100%', marginTop: 139}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
