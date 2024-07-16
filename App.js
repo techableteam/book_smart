@@ -36,18 +36,19 @@ import MyProfile from './src/layout/client/MyProfile';
 import ShiftListing from './src/layout/client/ShiftListing';
 import Shift from './src/layout/client/Shift';
 import Reporting from './src/layout/client/Reporting';
+import EditProfile from './src/layout/client/EditProfile';
 
 // const Drawer = createDrawerNavigator();
 
 function App() {
 
   return (
-    <NavigationContainer style = {styles.sectionContainer}>
-      <Layout />
-    </NavigationContainer>
-    // <View>
-    //   <Shift />
-    // </View>
+    // <NavigationContainer style = {styles.sectionContainer}>
+    //   <Layout />
+    // </NavigationContainer>
+    <View>
+      <EditProfile />
+    </View>
   );
 }
 

@@ -18,6 +18,7 @@ import MyProfile from './client/MyProfile';
 import ShiftListing from './client/ShiftListing';
 import Shift from './client/Shift';
 import Reporting from './client/Reporting';
+import EditProfile from './client/EditProfile';
 const Stack = createNativeStackNavigator();
 
 function Layout() {
@@ -66,6 +67,11 @@ function Layout() {
       <Stack.Screen 
         name= 'Reporting'
         component = {Reporting}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'EditProfile'
+        component = {EditProfile}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

@@ -60,6 +60,7 @@ export default function MyProfile ({ navigation }) {
 
   const handleEdit = () => {
     console.log('handleEdit')
+    navigation.navigate('EditProfile')
   }
 
   return (
@@ -68,7 +69,7 @@ export default function MyProfile ({ navigation }) {
             translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <SubNavbar />
+        <SubNavbar navigation={navigation}/>
         <ScrollView style={{width: '100%', marginTop: 119}}
           showsVerticalScrollIndicator={false}
         >
