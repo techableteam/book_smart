@@ -9,7 +9,7 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/AuthProvider';
+import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom, photoImageAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 
 export default function MyProfile ({ navigation }) {
@@ -41,22 +41,22 @@ export default function MyProfile ({ navigation }) {
   const [entryDate, setEntryDate] = useAtom(entryDateAtom);
   const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
   const [address, setAddress] = useAtom(addressAtom);
+  const [photoImage, setPhotoImage] = useAtom(photoImageAtom)
   const handleNavigate = (navigateUrl) => {
       navigation.navigate(navigateUrl);
   }
 
-  // const userInfo = [
-  //   {title: 'Entry Date', content: firstName},
-  //   {title: 'Phone', content: phoneNumber},
-  //   {title: 'email', content: userRole},
-  //   {title: 'Caregiver', content: caregiver},
-  // ]
-
   const userInfo = [
-    {title: 'Entry Date', content: "17/11/2024"},
-    {title: 'Phone', content: '1231231234'},
-    {title: 'Email', content: "dalewong008@gmail.com"},
+    {title: 'Entry Date', content: entryDate},
+    {title: 'Phone', content: phoneNumber},
+    {title: 'email', content: email},
   ]
+
+  // const userInfo = [
+  //   {title: 'Entry Date', content: "17/11/2024"},
+  //   {title: 'Phone', content: '1231231234'},
+  //   {title: 'Email', content: "dalewong008@gmail.com"},
+  // ]
 
   const handleEdit = () => {
     console.log('handleEdit')
@@ -69,8 +69,8 @@ export default function MyProfile ({ navigation }) {
             translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <SubNavbar navigation={navigation}/>
-        <ScrollView style={{width: '100%', marginTop: 119}}
+        <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
+        <ScrollView style={{width: '100%', marginTop: 140}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -89,11 +89,12 @@ export default function MyProfile ({ navigation }) {
             <View style={styles.profileTitleBg}>
               <Text style={styles.profileTitle}>CAREGIVER PROFILE & DOCS</Text>
             </View>
-            <Image
-              source={images.nurse}
+            {photoImage.type === 'image' ? photoImage.content  && <Image
               resizeMode="cover"
               style={styles.nurse}
-            />
+              source={{ uri: `${photoImage.content}` }}
+            /> : 
+            <Text style={styles.name}>{photoImage.name}</Text>}
             <Text style={styles.name}>{firstName || "Dale"}</Text>
             <TouchableOpacity style={styles.edit} onPress = {() => handleEdit()}>
               <Text style={{color: 'white'}}> Edit My Profile</Text>
@@ -184,7 +185,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   imageButton: {
-    width: '100%',
+    width: '90%',
+    marginLeft: '5%',
     justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',

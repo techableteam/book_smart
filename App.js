@@ -37,18 +37,33 @@ import ShiftListing from './src/layout/client/ShiftListing';
 import Shift from './src/layout/client/Shift';
 import Reporting from './src/layout/client/Reporting';
 import EditProfile from './src/layout/client/EditProfile';
+import AccountSettings from './src/layout/client/AccountSettings';
+import AdminLogin from './src/layout/admin/AdminLogin';
+import FacilityLogin from './src/layout/facilities/FacilityLogin';
+import FacilitySignUp from './src/layout/facilities/FacilitySignUp';
+import FacilityForgotPwd from './src/layout/facilities/FacilityForgotPwd';
+import FacilityPwdPending from './src/layout/facilities/FacilityPwdPending';
+import ClientPending from './src/layout/client/ClientPending';
+import ClientForgotPwd from './src/layout/client/ClientForgotPwd';
+import FacilityPermission from './src/layout/facilities/FacilityPermission';
+import FacilityProfile from './src/layout/facilities/FacilityProfile';
+import FacilityEditProfile from './src/layout/facilities/FacilityEditProfile';
+import AddJobShift from './src/layout/facilities/AddJobShift';
+import CompanyShift from './src/layout/facilities/CompanyShift';
+import AdminHome from './src/layout/admin/AdminHome';
+import AdminDashboard from './src/layout/admin/AdminDashboard';
 
 // const Drawer = createDrawerNavigator();
 
 function App() {
 
   return (
-    // <NavigationContainer style = {styles.sectionContainer}>
-    //   <Layout />
-    // </NavigationContainer>
-    <View>
-      <EditProfile />
-    </View>
+    <NavigationContainer style = {styles.sectionContainer}>
+      <Layout />
+    </NavigationContainer>
+    // <View>
+    //   <AdminDashboard />
+    // </View>
   );
 }
 

@@ -13,7 +13,16 @@ var images = {
   reporting: require('./images/growth.png'),
   home: require('./images/home-button.png'),
   nurse: require('./images/nurse.png'),
-  close: require('./images/close-button.png')
+  close: require('./images/close-button.png'),
+  calculator: require('./images/calculate.png'),
+  filter: require('./images/filter.png'),
+  admin: require('./images/admin.png'),
+  homeIcon: require('./images/homeIcon.png'),
+  post: require('./images/time.png'),
+  view: require('./images/checklist2.png'),
+  approve: require('./images/Present.png'),
+  approveTime: require('./images/Stopwatch.png'),
+  plus: require("./images/plus.png")
 };
 var _default = images;
 exports["default"] = _default;

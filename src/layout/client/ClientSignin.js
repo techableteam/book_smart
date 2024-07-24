@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { CheckBox } from 'react-native-elements';
 import images from '../../assets/images';
 import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState } from '../../context/AuthProvider';
+import { AuthState } from '../../context/ClinicalAuthProvider';
 import { useNavigation } from '@react-navigation/native';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/AuthProvider'
+import { firstNameAtom, lastNameAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/ClinicalAuthProvider'
 import { Signin } from '../../utils/useApi';
 
 export default function ClientSignIn({ navigation }) {  
@@ -78,16 +78,17 @@ export default function ClientSignIn({ navigation }) {
 
   const handleSubmit = async () => {
     try {
-      const response = await Signin(credentials, 'client');
-      console.log('SignIn Successful: ', response);
-      setFirstName(response.data.firstName);
-      setLastName(response.data.lastName);
-      setBirthday(response.data.birthday);
-      setPhoneNumber(response.data.phoneNumber);
-      setSignature(response.data.signature);
-      setEmail(response.data.email);
-      setTitle(response.data.title);
-      setPhotoImage(response.data.photoImage);
+      const response = await Signin(credentials, 'clinical');
+      console.log('SignIn Successful: ', response.user);
+      setFirstName(response.user.firstName);
+      setLastName(response.user.lastName);
+      setBirthday(response.user.birthday);
+      setPhoneNumber(response.user.phoneNumber);
+      setSignature(response.user.signature);
+      setEmail(response.user.email);
+      setTitle(response.user.title);
+      setPhotoImage(response.user.photoImage);
+      setUserRole(response.user.userRole);
       handleSignInNavigate();
     } catch (error) {
       console.log('SignIn failed: ', error)
@@ -139,7 +140,7 @@ export default function ClientSignIn({ navigation }) {
                   onPress={() => console.log('Navigate to forget password')}>
                   <Text
                     style={[styles.subtitle, { color: '#2a53c1'}]}
-                    onPress={() => props.navigation.navigate('forgetPassword')}>
+                    onPress={() => navigation.navigate('ClientForgotPwd')}>
                     {'('}forgot?{')'}
                   </Text>
                 </TouchableOpacity>
@@ -167,8 +168,8 @@ export default function ClientSignIn({ navigation }) {
             </View>
             <View style={styles.btn}>
               <HButton style={styles.subBtn} onPress={ 
-                // handleSubmit 
-                handleSignInNavigate
+                handleSubmit 
+                // handleSignInNavigate
               }>
                 Sign In
               </HButton>
@@ -181,12 +182,12 @@ export default function ClientSignIn({ navigation }) {
         </View>
         <View style={styles.buttonWrapper}>
           <HButton
-            onPress={() => navigation.navigate('ClientSignIn')}
+            onPress={() => navigation.navigate('AdminLogin')}
             style={styles.drinksButton}>
             Admin Login
           </HButton>
           <HButton
-            onPress={() => navigation.navigate('ClientSignIn')}
+            onPress={() => navigation.navigate('FacilityLogin')}
             style={styles.drinksButton}>
             Facilities Home
           </HButton>

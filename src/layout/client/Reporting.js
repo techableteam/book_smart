@@ -9,7 +9,7 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/AuthProvider';
+import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
 
@@ -72,7 +72,7 @@ export default function Reporting ({ navigation }) {
 
   const myRenderItem = ({ item, index }) => {
     return (
-      <View key={index} style={[styles.row, index % 2 === 0 ? styles.evenRow : null]}>
+      <View key={index} style={[styles.row, index % 2 === 0 ? styles.evenRow : null, ]}>
         <Text style={{width: '20%', textAlign: 'center', fontWeight: 'bold'}}>{item.text1}</Text>
         <View style={{width: 1, height: '200%', backgroundColor: 'hsl(0, 0%, 86%)', position: 'absolute', left: '25%'}} />
         <Text style={[{width: '40%', textAlign: 'center'}, index == 0 ? {fontWeight: 'bold'}: {fontWeight: '400'}]}>{item.text2}</Text>
@@ -93,14 +93,18 @@ export default function Reporting ({ navigation }) {
     setShowModal(!showModal);
   }
 
+  const handleFilter = () => {
+
+  }
+
   return (
       <View style={styles.container}>
         <StatusBar 
             translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <SubNavbar navigation={navigation} />
-        <ScrollView style={{width: '100%', marginTop: 119}}
+        <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
+        <ScrollView style={{width: '100%', marginTop: 140}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -152,14 +156,18 @@ export default function Reporting ({ navigation }) {
                       </TouchableOpacity>
                     </View>
                     <View style={styles.filter}>
-                      <Image source={images.filter} />
-                      <Text style={[styles.searchBtn, {marginLeft: 10, marginBottom:10, textAlign:'center',alignItems: 'center'}]}>Add filters</Text>
+                      <TouchableOpacity style= {styles.filterBtn} onPress={handleFilter}>
+                        <Image source={images.filter} style={{width: 20, height: 20}} />
+                        <Text style={styles.filterText}>Add filters</Text>
+                      </TouchableOpacity>
                     </View>
-                    <FlatList
-                      data={myShiftDate}
-                      renderItem={myRenderItem}
-                      keyExtractor={(item) => item.id}
-                    />
+                    <View style={{width: '90%', marginBottom: 30}}>
+                      <FlatList
+                        data={myShiftDate}
+                        renderItem={myRenderItem}
+                        keyExtractor={(item) => item.id}
+                      />
+                    </View>
                   </View>
                 </View>
               </View>
@@ -222,7 +230,8 @@ const styles = StyleSheet.create({
     marginLeft: '5%'
   },
   imageButton: {
-    width: '100%',
+    width: '90%',
+    marginLeft: '5%',
     justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -277,6 +286,7 @@ const styles = StyleSheet.create({
     // height: 40,
     position: 'relative',
     backgroundColor: 'white',
+    width: '100%',
   },
   evenRow: {
     backgroundColor: '#7be6ff4f', // Set the background color for even rows
@@ -300,6 +310,7 @@ const styles = StyleSheet.create({
   body: {
     marginTop: 10,
     paddingHorizontal:20,
+    paddingBottom: 30
   },
   modalContainer: {
     flex: 1,
@@ -312,15 +323,18 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     elevation: 5,
     width: '80%',
-    height: '43%',
+    // height: '43%',
     marginLeft: '20',
     flexDirection: 'flex-start',
     borderWidth: 3,
-    borderColor: '#7bf4f4'
+    borderColor: '#7bf4f4',
   },
   modalBody: {
     backgroundColor: 'rgba(79, 44, 73, 0.19)',
-    borderRadius: 10
+    borderRadius: 10,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   searchBar: {
     flexDirection: 'row',
@@ -341,6 +355,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
     color: '#2a53c1',
     height: 30
+  },
+  filter: {
+    width: '90%',
+    display:'flex',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 5,
+  },
+  filterBtn: { 
+    backgroundColor: 'rgba(0, 0, 0, 0.08)', 
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems:'center',
+    padding: 5,
+    gap: 5
+  },
+  filterText: {
+    color: '#2a53c1',
   }
 });
   

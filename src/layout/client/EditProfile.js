@@ -1,49 +1,87 @@
-import { Alert, Animated, Easing, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
-import React, { useState, useRef, useEffect } from 'react';
-import { CheckBox } from 'react-native-elements';
+import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
+import React, { useState } from 'react';
 import images from '../../assets/images';
 import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/AuthProvider';
 import { useNavigation } from '@react-navigation/native';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import PhoneInput from 'react-native-phone-input';
-import DropDownPicker from 'react-native-dropdown-picker';
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
 import DocumentPicker from 'react-native-document-picker';
-import RNFS from 'react-native-fs';
-import RNSPickerSelect from 'react-native-picker-select';
 import { Signup } from '../../utils/useApi';
-import MSubNavbar from '../../components/MSubNavHar';
+import MSubNavbar from '../../components/MSubNavbar';
+import RNFS from 'react-native-fs'
+import { useAtom } from 'jotai';
+import { 
+  firstNameAtom, 
+  lastNameAtom, 
+  emailAtom, 
+  titleAtom, 
+  userRoleAtom, 
+  birthdayAtom, 
+  entryDateAtom, 
+  phoneNumberAtom, 
+  addressAtom, 
+  socialSecurityNumberAtom, 
+  photoImageAtom, 
+  driverLicenseAtom,
+  socialCardAtom,
+  physicalExamAtom,
+  ppdAtom,
+  mmrAtom,
+  healthcareLicenseAtom,
+  resumeAtom,
+  covidCardAtom,
+  blsAtom
+ } from '../../context/ClinicalAuthProvider';
+import { Update } from '../../utils/useApi';
 
 export default function EditProfile({ navigation }) {
 
   const theme = useTheme();
-
+  const [firstName, setFirstName] = useAtom(firstNameAtom);
+  const [lastName, setLastName] = useAtom(lastNameAtom);
+  const [email, setEmail] = useAtom(emailAtom);
+  const [userRole, setUserRole] = useAtom(userRoleAtom);
+  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
+  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
+  const [address, setAddress] = useAtom(addressAtom);
+  const [photoImage, setPhotoImage] = useAtom(photoImageAtom);
+  const [title, setTitle] = useAtom(titleAtom);
+  const [birthdays, setBirthdays] = useAtom(birthdayAtom);
+  const [socialSecurityNumber, setSocialSecurityNumber] = useAtom(socialSecurityNumberAtom);
+  const [driverLicense, setDriverLicense] = useAtom(driverLicenseAtom); 
+  const [socialCard, setSocialCard] = useAtom(socialCardAtom);
+  const [physicalExam, setPhysicalExam] = useAtom(physicalExamAtom); 
+  const [ppd, setPPD] = useAtom(ppdAtom);
+  const [mmr, setMMR] = useAtom(mmrAtom); 
+  const [healthcareLicense, setHealthcareLicense] = useAtom(healthcareLicenseAtom);
+  const [resume, setResume] = useAtom(resumeAtom); 
+  const [covidCard, setCovidCard] = useAtom(covidCardAtom);
+  const [bls, setBls] = useAtom(blsAtom); 
   //--------------------------------------------Credentials-----------------------------
   const [ credentials, setCredentials ] = useState({
-    firstName: 'Dale',
-    lastName: 'Wong',
-    email: 'dalewong008@gmail.com',
-    password: '',
-    phoneNumber: "1231231234",
-    title: 'RN',
-    birthday: Date("07/24/2024"),
-    socialSecurityNumber: '',
-    verifiedSocialSecurityNumber: '',
-    address: {
-      streetAddress: '',
-      streetAddress2: '',
-      city: '',
-      state: '',
-      zip: '',
-    },
-    photoImage: '',
-    password: '',
-    signature: '',
-    role: 'Clinicians'
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    phoneNumber: phoneNumber,
+    title: title,
+    birthday: birthdays,
+    socialSecurityNumber: socialSecurityNumber,
+    address: address,
+    photoImage: photoImage,
+    userRole: userRole,
+    driverLicense:driverLicense, 
+    socialCard: socialCard,
+    physicalExam: physicalExam, 
+    ppd: ppd, 
+    mmr: mmr, 
+    healthcareLicense: healthcareLicense, 
+    resume: resume, 
+    covidCard: covidCard, 
+    bls: bls
   })
 
   const handleCredentials = (target, e) => {
@@ -66,12 +104,7 @@ export default function EditProfile({ navigation }) {
     { label: 'LPN', value: 'LPN' },
     { label: 'RN', value: 'RN' },
   ];
-  const [selectedValue, setSelectedValue] = useState('Selected Value...');
 
-  const handleTitle = (target, e) => {
-    handleCredentials(target, e);
-    setSelectedValue(e)
-  }
   const [showModal, setShowModal] = useState(false);
   const handleItemPress = (text) => {
     handleCredentials('title', text);
@@ -87,20 +120,27 @@ export default function EditProfile({ navigation }) {
   }
 
   //-------------------------------------------File Upload----------------------------
-  const [photoName, setPhotoName] = useState('');
 
-  const pickFile = async () => {
+  const pickFile = async (name) => {
     try {
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
       const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.images], // Specify the type of files to pick (e.g., images)
+        type: type,
       });
-
-      setPhotoName(res[0].name);
-
-      // Read the file content and convert it to base64
+  
       const fileContent = await RNFS.readFile(res[0].uri, 'base64');
-      handleCredentials('photoImage', `data:${res.type};base64,${fileContent}`)
-      console.log(base64Image);
+          // Determine the file type based on the MIME type
+      let fileType;
+      if (res[0].type === 'application/pdf') {
+        fileType = 'pdf';
+      } else if (res[0].type.startsWith('image/')) {
+        fileType = 'image';
+      } else {
+        // Handle other file types if needed
+        fileType = 'unknown';
+      }
+      handleCredentials(name, {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
+      console.log(`File ${name} converted to base64:`, `data:${res.type};base64,${fileContent}`);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -121,7 +161,7 @@ export default function EditProfile({ navigation }) {
   }
 
   const handleBack = () => {
-    navigation.navigate('ClientSignIn');
+    navigation.navigate('MyProfile');
   }
 
     //Alert
@@ -142,15 +182,14 @@ export default function EditProfile({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    handlePassword();
+    console.log('password');
     if (credentials.email === '' || 
-      credentials.firstName === 'Dale' || 
-      credentials.lastName ==='Wong' || 
-      credentials.phoneNumber ==='1231231234' || 
+      credentials.firstName === '' || 
+      credentials.lastName ==='' || 
+      credentials.phoneNumber ==='' || 
       credentials.title ==='' || 
-      credentials.birthday ==='07/24/2024' || 
+      credentials.birthday ==='' || 
       credentials.socialSecurityNumber ==='' || 
-      credentials.verifiedSocialSecurityNumber ==='' || 
       credentials.address.streetAddress ==='' || 
       credentials.address.city ==='' || 
       credentials.address.state ==='' || 
@@ -158,15 +197,40 @@ export default function EditProfile({ navigation }) {
         showAlerts('all gaps')
     }
     else {
-      navigation.navigate('MyHome');
-      // try {
-      //   console.log('credentials: ', credentials);
-      //   const response = await Signup(credentials);
-      //   console.log('Signup successful: ', response)
-      // } catch (error) {
-      //   console.error('Signup failed: ', error)
-      // }
+      // navigation.navigate('MyHome');
+      try {
+        console.log('update------------>')
+        // console.log('credentials: ', credentials);
+        const response = await Update(credentials, 'clinical');
+        console.log('Signup successful: ', response)
+        setFirstName(response.user.firstName);
+        setLastName(response.user.lastName);
+        setBirthdays(response.user.birthday);
+        setPhoneNumber(response.user.phoneNumber);
+        setEmail(response.user.email);
+        setTitle(response.user.title);
+        setPhotoImage(response.user.photoImage);
+        setUserRole(response.user.userRole);
+        setDriverLicense(response.user.driverLicense);
+        setSocialCard(response.user.socialCard);
+        setPhysicalExam(response.user.physicalExam);
+        setPPD(response.user.ppd);
+        setMMR(response.user.mmr);
+        setHealthcareLicense(response.user.healthcareLicense);
+        setResume(response.user.resume);
+        setCovidCard(response.user.covidCard);
+        setBls(response.user.bls);
+        console.log('successfully Updated')
+        navigation.navigate("MyProfile")
+      } catch (error) {
+        console.error('Update failed: ', error)
+      }
     }
+  }
+
+  const handleRemove = (name) => {
+    handleCredentials(name, '');
+    setPhotoName('');
   }
   return (
     <View style={styles.container}>
@@ -174,7 +238,7 @@ export default function EditProfile({ navigation }) {
         translucent backgroundColor="transparent"
       />
       <MHeader navigation={navigation}/>
-      <MSubNavbar navigation={navigation} />
+      <MSubNavbar navigation={navigation} name={"Caregiver"}/>
       <ScrollView style = {styles.scroll}    
         showsVerticalScrollIndicator={false}
       >
@@ -218,9 +282,9 @@ export default function EditProfile({ navigation }) {
                   style={[styles.input, {backgroundColor: 'white', width: '100%', paddingLeft: 5}]}
                   placeholder=""
                   initialCountry="us"
-                  // autoFocus
+                  defaultValue={credentials.phoneNumber}
                   onChangePhoneNumber={e => handleCredentials('phoneNumber', e)}
-                  value={credentials.phoneNumber}
+                  // value={credentials.phoneNumber}
                   textProps={{ style: { color: 'black', fontSize: 16, padding: 0} }}
                   keyboardType="phone-pad"                            
                 />
@@ -243,14 +307,14 @@ export default function EditProfile({ navigation }) {
             <View style={styles.email}>
               <Text style={styles.subtitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%'}}>
-                  <TextInput
-                    style={[styles.input, {width: '100%'}]}
-                    placeholder=""
-                    value={birthday.toDateString()}
-                    editable={false}
-                  />
+                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 50, zIndex: 10}}>
                 </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                  placeholder=""
+                  value={birthday.toDateString()}
+                  editable={false}
+                />
                 
                 {/* <Button title="Select Birthday" onPress={() => setShowCalendar(true)} /> */}
                 {showCalender && 
@@ -323,40 +387,20 @@ export default function EditProfile({ navigation }) {
                 </View>
               </View>
             </View>
-            
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Pic. (Optional)</Text>
-              {credentials.photoImage &&
-              <Image
-                style={{ width: 200, height: 200 }}
-                source={{ uri: `data:image/jpeg;base64,${credentials.photoImage}` }}
-              />
-              }
-              <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
-                </TouchableOpacity>
-                <TextInput
-                  style={[styles.input, {width: '70%'}]}
-                  placeholder=""
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                  value={photoName || ''}
-                />
-              </View>
-            </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Title <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{position: 'relative', width: '100%', gap: 5, height: 50}}>
-                <TouchableOpacity onPress = {()=>setShowModal(true)}>
-                  <TextInput
-                    style={[styles.input, {width: '100%'}]}
-                    placeholder="First"
-                    editable= {false}
-                    // onChangeText={e => handleCredentials('firstName', e)}
-                    value={credentials.title != ''?credentials.title : 'Select Title ...' }
-                  />
+                <TouchableOpacity onPress = {()=>setShowModal(true)}
+                  style={{height: 40, zIndex: 1}}
+                >
                 </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                  placeholder="First"
+                  editable= {false}
+                  // onChangeText={e => handleCredentials('firstName', e)}
+                  value={credentials.title != ''?credentials.title : 'Select Title ...' }
+                />
                 {showModal && <Modal
                   Visible={false}
                   transparent= {true}
@@ -376,20 +420,370 @@ export default function EditProfile({ navigation }) {
                 </Modal>}
               </View>
             </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> Pic. (Optional)</Text>
+              {credentials.photoImage.type === "image" ? credentials.photoImage.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.photoImage.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('photoImage')}
+                >remove</Text>
+              </View>:
+              credentials.photoImage.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.photoImage.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('photoImage')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('photoImage')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.photoImage.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.bottomBar}/>
+          </View>
+          <View style={styles.authInfo}>
+            <View style={styles.profileTitleBg}>
+              <Text style={styles.profileTitle}>MY DOCUMENTS</Text>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> Driver's License</Text>
+              {credentials.driverLicense.type === "image" ?credentials.driverLicense.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.driverLicense.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('driverLicense')}
+                >remove</Text>
+              </View>
+              :
+              credentials.driverLicense.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.driverLicense.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('driverLicense')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('driverLicense')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.driverLicense.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> Social Security Card</Text>
+              {credentials.socialCard.type === "image" ? credentials.socialCard.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.socialCard.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {()=>handleRemove('socialCard')}
+                >remove</Text>
+              </View>
+              :
+              credentials.socialCard.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.socialCard.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('socialCard')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('socialCard')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.socialCard.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> Physical Exam</Text>
+              {credentials.physicalExam.type === "image" ? credentials.physicalExam.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.physicalExam.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {()=>handleRemove('physicalExam')}
+                >remove</Text>
+              </View>:
+              credentials.physicalExam.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.physicalExam.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('physicalExam')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('physicalExam')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.physicalExam.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> PPD (TB Test)</Text>
+              {credentials.ppd.type==="image" ? credentials.ppd.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.ppd.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('ppd')}
+                >remove</Text>
+              </View>
+              :
+              credentials.ppd.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.ppd.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('ppd')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('ppd')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.ppd.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> MMR (Immunizations)</Text>
+              {credentials.mmr.type === "image" ? credentials.mmr.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.mmr.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('mmr')}
+                >remove</Text>
+              </View>
+              :
+              credentials.mmr.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.mmr.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('mmr')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('mmr')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.mmr.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> Healthcare License</Text>
+              {credentials.healthcareLicense.type === "image" ? credentials.healthcareLicense.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.healthcareLicense.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {()=>handleRemove('healthcareLicense')}
+                >remove</Text>
+              </View>
+              :
+              credentials.healthcareLicense.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.healthcareLicense.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('healthcareLicense')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('healthcareLicense')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.healthcareLicense.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> Resume</Text>
+              {credentials.resume.type === "image" ? credentials.resume.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.resume.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('resume')}
+                >remove</Text>
+              </View>
+              :
+              credentials.resume.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.resume.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('resume')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('resume')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.resume.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> COVID Card</Text>
+              {credentials.covidCard.type === "image" ? credentials.covidCard.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.covidCard.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {()=>handleRemove('covidCard')}
+                >remove</Text>
+              </View>
+              :
+              credentials.covidCard.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.covidCard.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('covidCard')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('covidCard')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.covidCard.name || ''}
+                />
+              </View>
+            </View>
+            <View style={styles.email}>
+              <Text style={styles.subtitle}> BLS(CPR card)</Text>
+              {credentials.bls.type === "image" ? credentials.bls.content &&
+              <View style={{marginBottom: 10}}>
+                <Image
+                  style={{ width: 100, height: 100,  }}
+                  source={{ uri: `${credentials.bls.content}` }}
+                />
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('bls')}
+                >remove</Text>
+              </View>
+              :
+              credentials.bls.type === "pdf" &&<View style={{marginBottom: 10}}>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                >{credentials.bls.name} &nbsp;&nbsp;</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress = {() => handleRemove('bls')}
+                >remove</Text>
+              </View>}
+              
+              <View style={{flexDirection: 'row', width: '100%'}}>
+                <TouchableOpacity title="Select File" onPress={()=>pickFile('bls')} style={styles.chooseFile}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '70%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={credentials.bls.name || ''}
+                />
+              </View>
+              <Text style={[styles.subtitle, {lineHeight: 40}]}> W - 9 {'\n'}
+                Standard State Criminal{'\n'}
+                Drug Test{'\n'}
+                Hep B (shot or declination){'\n'}
+                Flu (shot or declination){'\n'}
+                CHRC 102 Form{'\n'}
+                CHRC 103 Form{'\n'}
+              </Text>
+            </View>
             <View style={[styles.btn, {marginTop: 20}]}>
               <HButton style={styles.subBtn} onPress={ handleSubmit }>
                 Submit
               </HButton>
             </View>
-
-            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100}}
-              onPress={handleBack}
-            >
-              Back to 🏚️ Caregiver Home
-            </Text>
           </View>
         </View>
-
+        <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, marginLeft: '10%'}}
+          onPress={handleBack}
+        >
+          Back to 🏚️ Caregiver Profile
+        </Text>
       </ScrollView>
       <MFooter />
     </View>
@@ -434,7 +828,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 131,
+    marginTop: 151,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -455,6 +849,26 @@ const styles = StyleSheet.create({
     padding: 15,
     width: '90%',
     backgroundColor: 'transparent'
+  },
+  bottomBar: {
+    marginTop: 20,
+    height: 5,
+    backgroundColor: '#C0D1DD',
+    width: '100%'
+  },
+  profileTitleBg: {
+    backgroundColor: '#BC222F',
+    padding: 10,
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '80%',
+    marginLeft: '10%',
+    marginVertical: 20
+  },
+  profileTitle: {
+    fontWeight: 'bold',
+    color: 'white',
   },
   marker: {
     width: 5,

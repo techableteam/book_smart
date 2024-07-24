@@ -10,7 +10,7 @@ var _axios = _interopRequireDefault(require("axios"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var instance = _axios["default"].create({
-  baseURL: 'http://localhost:5000',
+  baseURL: 'http://95.216.240.153:5000/',
   headers: {
     'Content-Type': 'application/json'
   }

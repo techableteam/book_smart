@@ -5,7 +5,7 @@ import images from '../assets/images';
 import { Card, IconButton, useTheme } from 'react-native-paper';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useAtom } from 'jotai';
-import { emailAtom, firstNameAtom } from '../context/AuthProvider';
+import { emailAtom, firstNameAtom } from '../context/ClinicalAuthProvider';
 // import { getRatingDataByUserID } from '../utils/api';
 
 export default function SubNavbar({props, navigation}) {

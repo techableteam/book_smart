@@ -9,7 +9,7 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, caregiverAtom } from '../../context/AuthProvider';
+import { firstNameAtom, emailAtom, userRoleAtom, caregiverAtom } from '../../context/ClinicalAuthProvider';
 
 
 export default function MyHome ({ navigation }) {
@@ -21,19 +21,19 @@ export default function MyHome ({ navigation }) {
       navigation.navigate(navigateUrl);
   }
 
-  // const userInfo = [
-  //   {title: 'Name', content: firstName},
-  //   {title: 'Email', content: email},
-  //   {title: 'User Roles', content: userRole},
-  //   {title: 'Caregiver', content: caregiver},
-  // ]
-
   const userInfo = [
-    {title: 'Name', content: "Dale"},
-    {title: 'Email', content: "dalewong008@gmail.com"},
-    {title: 'User Roles', content: 'Clinicians'},
-    {title: 'Caregiver', content: ''},
+    {title: 'Name', content: firstName},
+    {title: 'Email', content: email},
+    {title: 'User Roles', content: userRole},
+    {title: 'Caregiver', content: caregiver},
   ]
+
+  // const userInfo = [
+  //   {title: 'Name', content: "Dale"},
+  //   {title: 'Email', content: "dalewong008@gmail.com"},
+  //   {title: 'User Roles', content: 'Clinicians'},
+  //   {title: 'Caregiver', content: ''},
+  // ]
 
   return (
       <View style={styles.container}>
@@ -41,7 +41,7 @@ export default function MyHome ({ navigation }) {
             translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <SubNavbar navigation={navigation} />
+        <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
         <ScrollView style={{width: '100%', marginTop: 139}}
           showsVerticalScrollIndicator={false}
         >
@@ -119,7 +119,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   imageButton: {
-    width: '100%',
+    width: '90%',
+    marginLeft: '5%',
     justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -127,6 +128,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 30,
+    marginLeft: '5%'
   },
   homepage: {
     // paddingHorizontal: 30,

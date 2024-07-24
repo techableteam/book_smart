@@ -4,7 +4,7 @@ import { View, Image, StyleSheet, StatusBar, Text } from 'react-native';
 import images from '../assets/images';
 import { Card, IconButton, useTheme } from 'react-native-paper';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { AuthState } from '../context/AuthProvider';
+import { AuthState } from '../context/ClinicalAuthProvider';
 // import { getRatingDataByUserID } from '../utils/api';
 
 export default function MHeader({props, navigation}) {

@@ -5,10 +5,10 @@ import images from '../assets/images';
 import { Card, IconButton, useTheme } from 'react-native-paper';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useAtom } from 'jotai';
-import { emailAtom, firstNameAtom } from '../context/AuthProvider';
+import { emailAtom, firstNameAtom } from '../context/ClinicalAuthProvider';
 // import { getRatingDataByUserID } from '../utils/api';
 
-export default function MSubNavbar({props, navigation}) {
+export default function MSubNavbar({name, navigation}) {
   const theme = useTheme();
   const [firstName, serFistName] = useAtom(firstNameAtom)
   const handleNavigate = (navigateUrl) => {
@@ -23,7 +23,7 @@ export default function MSubNavbar({props, navigation}) {
           }]} 
           onPress={()=>handleNavigate('MyProfile')}
         >
-          👩‍⚕️ Caregiver Profile
+          👩‍⚕️ {name} Profile
         </Text>
         <Text style={styles.text} >
           {" > "}
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   shadow: {
     borderRadius: 0,
     backgroundColor: 'hsl(0, 0%, 80%)',
-    top: 78,
+    top: 98,
     position:'absolute',
     width: '100%',
     paddingVertical: 10

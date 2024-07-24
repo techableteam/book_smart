@@ -14,6 +14,10 @@ export default function ImageButton({
     "My Shifts": images.shift,
     "My Reporting": images.reporting,
     "My Home": images.home,
+    "POST SHIFT": images.post,
+    "VIEW / EDIT SHIFTS": images.view,
+    "APPROVE SHIFTS": images.approve,
+    "APPROVE TIMESHEETS": images.approveTime
   };
   return (
     <TouchableOpacity style={styles.button} {...props}>
@@ -27,7 +31,7 @@ export default function ImageButton({
 
 const styles = StyleSheet.create({
   button: {
-    width: 140,
+    width: 120,
     height: 120,
     borderRadius: 20,
     backgroundColor: "#0f76c1ba",

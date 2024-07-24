@@ -12,7 +12,7 @@ export default function Dashboard ({ navigation }) {
     }
     
     const handleFacility = () => {
-        navigation.navigate('Home')
+        navigation.navigate('FacilityLogin')
     }
 
   return (

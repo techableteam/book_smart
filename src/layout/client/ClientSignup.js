@@ -1,20 +1,16 @@
 import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
-import { CheckBox } from 'react-native-elements';
 import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/AuthProvider';
+import { TextInput, useTheme, } from 'react-native-paper';
+import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/ClinicalAuthProvider';
 import { useNavigation } from '@react-navigation/native';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import PhoneInput from 'react-native-phone-input';
-import DropDownPicker from 'react-native-dropdown-picker';
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
 import DocumentPicker from 'react-native-document-picker';
-import RNFS from 'react-native-fs';
-import RNSPickerSelect from 'react-native-picker-select';
 import { Signup } from '../../utils/useApi';
 
 export default function ClientSignUp({ navigation }) {
@@ -61,10 +57,13 @@ export default function ClientSignUp({ navigation }) {
       state: '',
       zip: '',
     },
-    photoImage: '',
+    photoImage: {
+      content: '',
+      type: ''
+    },
     password: '',
     signature: '',
-    role: 'Clinicians'
+    userRole: 'Clinicians'
   })
 
   const handleCredentials = (target, e) => {
@@ -74,7 +73,7 @@ export default function ClientSignUp({ navigation }) {
     else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }
-    console.log(credentials);
+    // console.log(credentials);
   }
 
   //-------------------------------------------ComboBox------------------------
@@ -113,18 +112,47 @@ export default function ClientSignUp({ navigation }) {
   //-------------------------------------------File Upload----------------------------
   const [photoName, setPhotoName] = useState('');
 
+  // const pickFile = async () => {
+  //   try {
+  //     const res = await DocumentPicker.pick({
+  //       type: [DocumentPicker.types.images], // Specify the type of files to pick (e.g., images)
+  //     });
+
+  //     setPhotoName(res[0].name);
+
+  //     // Read the file content and convert it to base64
+  //     const fileContent = await RNFS.readFile(res[0].uri, 'base64');
+  //     handleCredentials('photoImage', `data:${res.type};base64,${fileContent}`)
+  //     console.log(base64Image);
+  //   } catch (err) {
+  //     if (DocumentPicker.isCancel(err)) {
+  //       // User cancelled the picker
+  //     } else {
+  //       // Handle other errors
+  //     }
+  //   }
+  // };
   const pickFile = async () => {
     try {
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
       const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.images], // Specify the type of files to pick (e.g., images)
+        type: type,
       });
-
-      setPhotoName(res[0].name);
-
-      // Read the file content and convert it to base64
+  
       const fileContent = await RNFS.readFile(res[0].uri, 'base64');
-      handleCredentials('photoImage', `data:${res.type};base64,${fileContent}`)
-      console.log(base64Image);
+          // Determine the file type based on the MIME type
+      let fileType;
+      if (res[0].type === 'application/pdf') {
+        fileType = 'pdf';
+      } else if (res[0].type.startsWith('image/')) {
+        fileType = 'image';
+      } else {
+        // Handle other file types if needed
+        fileType = 'unknown';
+      }
+  
+      handleCredentials('photoImage', {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
+      console.log(`File ${'photoImage'} converted to base64:`, `data:${res.type};base64,${fileContent}`);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -176,22 +204,12 @@ export default function ClientSignUp({ navigation }) {
   let signatureRef = null;
   const [key, setKey] = useState(0); // Initialize the key state
 
-  const handleUndoLastStroke = () => {
-    // Increment the key to force a re-render
-    setKey((prevKey) => prevKey + 1);
-  };
-
-  const redrawStrokes = (history) => {
-    // Logic to redraw the strokes based on the updated history
-    // Use the signatureRef to interact with the signature capture component
-  };
-
   const handleClear = () => {
     signatureRef.current.resetImage();
   }
   const onSaveEvent = (result) => {
-    console.log(result)
-    handleCredentials('signature', result)
+    console.log(result.encoded)
+    handleCredentials('signature', result.encoded)
   }
   const handleSaveImage = async () => {
     // result.encoded - the base64 encoded image data
@@ -235,6 +253,23 @@ export default function ClientSignUp({ navigation }) {
     );
   };
 
+  const successAlerts = () => {
+    Alert.alert(
+      "SignUp Success",
+      "",
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('OK pressed')
+            navigation.navigate("ClientFinishSignup")
+          },
+        },
+      ],
+      { cancelable: false }
+    )
+  }
+
   const handleSubmit = async () => {
     handlePassword();
     if (credentials.email === '' || 
@@ -253,14 +288,15 @@ export default function ClientSignUp({ navigation }) {
         showAlerts('all gaps')
     }
     else {
-      navigation.navigate('MyHome');
-      // try {
-      //   console.log('credentials: ', credentials);
-      //   const response = await Signup(credentials);
-      //   console.log('Signup successful: ', response)
-      // } catch (error) {
-      //   console.error('Signup failed: ', error)
-      // }
+      // navigation.navigate('ClientFinishSignup');
+      try {
+        // console.log('credentials: ', credentials);
+        const response = await Signup(credentials, 'clinical');
+        successAlerts()
+        console.log('Signup successful: ', response)
+      } catch (error) {
+        console.error('Signup failed: ', error)
+      }
     }
   }
   return (
@@ -372,7 +408,6 @@ export default function ClientSignUp({ navigation }) {
               <Text style={styles.subtitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
                 <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}>
-                  
                 </TouchableOpacity><TextInput
                     style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
                     placeholder=""
@@ -482,7 +517,7 @@ export default function ClientSignUp({ navigation }) {
                   <View style={[styles.input, {width: '20%'}]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, {width: '100%', marginBottom: 0}]}
+                      style={[styles.input, {width: '100%', marginBottom: 0, paddingLeft: 1}]}
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
@@ -513,7 +548,7 @@ export default function ClientSignUp({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={photoName || ''}
+                  value={credentials.photoImage.name || ''}
                 />
               </View>
             </View>
