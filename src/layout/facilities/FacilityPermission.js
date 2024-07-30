@@ -72,7 +72,8 @@ export default function FacilityPermission ({ navigation }) {
       // setCredentials(...credentials, {signature: signature, facilityAcknowledgeTerm: facilityAcknowledgement});
       console.log("--------------------------", credentials)
       const response = await Update(credentials, 'facilities');
-     
+      console.log(response.user)
+      setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
       navigation.navigate("FacilityProfile")
       console.log(response)
     } catch (error) {
@@ -87,7 +88,7 @@ export default function FacilityPermission ({ navigation }) {
             translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <SubNavbar navigation={navigation} />
+        <SubNavbar navigation={navigation} name={"FacilityLogin"} />
         <ScrollView style={{width: '100%', marginTop: 140}}
           showsVerticalScrollIndicator={false}
         >
