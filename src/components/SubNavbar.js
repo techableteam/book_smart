@@ -8,14 +8,14 @@ import { useAtom } from 'jotai';
 import { emailAtom, firstNameAtom } from '../context/ClinicalAuthProvider';
 // import { getRatingDataByUserID } from '../utils/api';
 
-export default function SubNavbar({props, navigation}) {
+export default function SubNavbar({name, navigation}) {
   const theme = useTheme();
   const [firstName, serFistName] = useAtom(firstNameAtom)
   const handleNavigate = (navigateUrl) => {
-    navigation.navigate('ClientSignIn')
+    navigation.navigate(navigateUrl)
   }
   return (
-    <Card style={styles.shadow} onPress={ handleNavigate }>
+    <Card style={styles.shadow} onPress={()=> handleNavigate(name) }>
       <Text style={styles.text}>
         Logged in as&nbsp;
         <Text style={{fontWeight: 'bold'}}>{firstName}</Text>&nbsp;-&nbsp;
