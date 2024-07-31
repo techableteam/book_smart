@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     height: 68,
   },
   topView: {
-    marginTop: 90,
+    marginTop: 50,
     marginLeft: '10%',
     width: '80%',
     flexDirection: 'column',

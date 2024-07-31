@@ -29,10 +29,10 @@ export default function AddJobShift({ navigation }) {
   //-----------------------------------Degree DropDown----------------------------
   
   const [degree, setDegree] = useState([
-    {label: 'Select...', value: '1'},
-    {label: 'CNA', value: '2'},
-    {label: 'LPN', value: '3'},
-    {label: 'STNA', value: '4'},
+    {label: 'Select...', value: 'Select...'},
+    {label: 'CNA', value: 'CNA'},
+    {label: 'LPN', value: 'LPN'},
+    {label: 'STNA', value: 'STNA'},
   ])
 
   const [facility, setFacility] = useAtom(companyNameAtom);
@@ -58,40 +58,13 @@ export default function AddJobShift({ navigation }) {
 
   //-----------------------------------Unit DropDown----------------------------
   
-  const [unit, setUnit] = useState([
-    {label: 'Select...', value: '1'},
-    {label: 'Long Term Care', value: '2'},
-    {label: 'Short Term Care', value: '3'},
-  ])
-
-  const [unitValue, setUnitValue] = useState(null);
-  const [isUnitFocus, setIsUnitFocus] = useState(false);
-
-  const renderUnitLabel = () => {
-    if (unitValue || isUnitFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const [isAddUnit, setIsAddUnit] = useState(false);
-  const handleAddUnit = () => {
-    setIsAddUnit(!isAddUnit)
-  }
-
-  //-----------------------------------Unit DropDown----------------------------
-  
   const [location, setLocation] = useState([
-    {label: 'Select...', value: '1'},
-    {label: 'Lancaster, NY', value: '2'},
-    {label: 'Skilled Nursing Facility', value: '3'},
-    {label: 'Springville, NY', value: '4'},
-    {label: 'Warsaw, NY', value: '5'},
-    {label: 'Williansville', value: '6'},
+    {label: 'Select...', value: 'Select...'},
+    {label: 'Lancaster, NY', value: 'Lancaster, NY'},
+    {label: 'Skilled Nursing Facility', value: 'Skilled Nursing Facility'},
+    {label: 'Springville, NY', value: 'Springville, NY'},
+    {label: 'Warsaw, NY', value: 'Warsaw, NY'},
+    {label: 'Williansville', value: 'Williansville'},
   ])
 
   const [locationValue, setLocationValue] = useState(null);
@@ -116,7 +89,7 @@ export default function AddJobShift({ navigation }) {
   const [ credentials, setCredentials ] = useState({
     jobNum: '',
     degree: '',
-    shift: "",
+    shiftTime: "",
     shiftDate: '',
     location: '',
     payRate: '',
@@ -171,38 +144,22 @@ export default function AddJobShift({ navigation }) {
     { label: 'LPN', value: 'LPN' },
     { label: 'RN', value: 'RN' },
   ];
-
+  //-------------------------------------------Modal-------------------------
   const [showModal, setShowModal] = useState(false);
-  const handleItemPress = (text) => {
-    handleCredentials('title', text);
-    setShowModal(false);
+  const handleItemPress = () => {
+    // handleCredentials('title', text);
+    setShowModal(!showModal);
+  }
+  const toggleModal = () => {
+    setShowModal(!showModal);
   }
 
   //-------------------------------------------Date Picker---------------------------------------
   const [shiftFromDay, setShiftFromDay] = useState(new Date());
   const [showCalender, setShowCalendar] = useState(false);
-  const [isShowCalender, setIsShowCalendar] = useState(false);
-  const [showTime, setShowTime] = useState(false);
-  const [isShowTime, setIsShowTime] = useState(false);
   const handleDayChange = (target, day) => {
     handleCredentials(target, moment(day).format("MM/DD/YYYY"));
   }
-
-  const handleToDayChange = (target, day) => {
-    handleCredentials(target, moment(day).format("MM/DD/YYYY"));
-  }
-  const handleTimeChange = (target, time) => {
-    handleCredentials(target, moment(time).format("HH:mm A"));
-  }
-
-  const handleToTimeChange = (target, time) => {
-    handleCredentials(target, moment(time).format("HH:mm A"));
-  }
-
-  //-------------------------------------------File Upload----------------------------
-  const [photoName, setPhotoName] = useState({
-    photoImage: '', driverLicense: '', socialCard: '', physicalExam: '', ppd: '', mmr: '', healthcareLicense: '', resume: '', covidCard: '', 
-  });
 
     //Alert
   const showAlerts = (name) => {
@@ -222,8 +179,11 @@ export default function AddJobShift({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    if (credentials.shift === '' || credentials.shiftDate === '') {
-        showAlerts('all necessary gaps')
+    if (credentials.shift === '') {
+        showAlerts('Shift')
+    }
+    else if (credentials.shiftDate === '') {
+      showAlerts('Shift Date')
     }
     else {
       try {
@@ -236,12 +196,25 @@ export default function AddJobShift({ navigation }) {
       }
     }
   }
-
-
-  const handleRemove = (name) => {
-    handleCredentials(name, '');
-    setPhotoName('');
+  const [item, setItem] = useState('');
+  const [title, setTitle] = useState('degree')
+  const handleItemChange = (e) => {
+    setItem(e);
   }
+
+  const handleModal = (title, item) => {
+    if (title === 'degree'){
+      console.log('degree', item)
+      setDegree([...degree, {label: item, value: item}])
+    }
+    else if (title === 'location') {
+      console.log('location', item)
+      setLocation([...location, {label: item, value: item},])
+    }
+    setShowModal(!showModal)
+    setItem('')
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar 
@@ -259,7 +232,7 @@ export default function AddJobShift({ navigation }) {
             </Text>
           </View>
           <View style={styles.authInfo}>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Job Num. -# </Text>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
@@ -268,7 +241,7 @@ export default function AddJobShift({ navigation }) {
                   value={credentials.jobNum || ''}
                 />
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Degree/Discipline </Text>
               <Dropdown
                 style={[styles.dropdown, isDegreeFocus && { borderColor: 'blue' }]}
@@ -300,21 +273,21 @@ export default function AddJobShift({ navigation }) {
                   />
                 )}
               />
-              <TouchableOpacity style={styles.addItems} onPress={handleAddDegree}>
+              <TouchableOpacity style={styles.addItems} onPress={() => {handleItemPress(); setTitle('degree')}}>
                 <Image source={images.plus} style={{width: 15, height: 15}} />
                 <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Shift <Text style={{color: 'red'}}>*</Text> </Text>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
                   placeholder=""
-                  onChangeText={e => handleCredentials('shift', e)}
-                  value={credentials.shift || ''}
+                  onChangeText={e => handleCredentials('shiftTime', e)}
+                  value={credentials.shiftTime || ''}
                 />
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Shift Date <Text style={{color: 'red'}}>*</Text> </Text>
               
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
@@ -338,7 +311,7 @@ export default function AddJobShift({ navigation }) {
                 }
               </View>
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Location </Text>
               <Dropdown
                 style={[styles.dropdown, isLocationFocus && { borderColor: 'blue' }]}
@@ -370,12 +343,12 @@ export default function AddJobShift({ navigation }) {
                   />
                 )}
               />
-              <TouchableOpacity style={styles.addItems} onPress={handleAddUnit}>
+              <TouchableOpacity style={styles.addItems} onPress={() => {handleItemPress(); setTitle('location')}}>
                 <Image source={images.plus} style={{width: 15, height: 15}} />
                 <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Pay Rate </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
@@ -384,7 +357,7 @@ export default function AddJobShift({ navigation }) {
                 value={credentials.payRate || ''}
               />
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Bonus </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
@@ -401,6 +374,41 @@ export default function AddJobShift({ navigation }) {
           </View>
         </View>
       </ScrollView>
+      {showModal && <Modal
+        Visible={false}
+        transparent= {true}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowModal(!showModal);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.calendarContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Add a new option</Text>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
+                <Image source = {images.close} style={{width: 20, height: 20,}}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.modalBody}>
+                <View style={styles.searchBar}>
+                  <TextInput
+                    style={[styles.input, {width: '100%'}]}
+                    placeholder=""
+                    onChangeText={e => handleItemChange(e)}
+                    value={item || ''}
+                  />
+                  {/* <TouchableOpacity style={styles.searchBtn}>
+                    <Text>Submit</Text>
+                  </TouchableOpacity> */}
+                  <Button title="Submit" onPress={() => handleModal(title, item) } />
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>}
       <MFooter />
     </View>
   );
@@ -434,17 +442,12 @@ const pickerSelectStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  button: {
-    borderRadius: 10,
-    backgroundColor: 'red',
-    padding: 20,
-  },
   container: {
     marginBottom: 0,
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 151,
+    marginTop: 140,
   },
   headBar: {
     textAlign: 'center',
@@ -454,56 +457,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 18,
     fontWeight: 'bold'
-  },
-  backTitle: {
-    backgroundColor: 'black',
-    width: '90%',
-    height: 55,
-    marginLeft: '5%',
-    position: 'absolute',
-    marginTop: 10,
-    borderRadius: 10
-  },
-  title: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-    marginLeft: '5%',
-    padding: 15,
-    width: '90%',
-    backgroundColor: 'transparent'
-  },
-  bottomBar: {
-    marginTop: 20,
-    height: 5,
-    backgroundColor: '#C0D1DD',
-    width: '100%'
-  },
-  profileTitleBg: {
-    backgroundColor: '#BC222F',
-    padding: 10,
-    borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '80%',
-    marginLeft: '10%',
-    marginVertical: 20
-  },
-  profileTitle: {
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  marker: {
-    width: 5,
-    height: 5,
-    borderRadius: 5,
-    backgroundColor: 'white',
-    borderColor: 'black',
-    borderWidth: 1,
-    marginRight: 10,
-    marginTop: 17
   },
   text: {
     fontSize: 14,
@@ -527,9 +480,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3, // Shadow radius
     elevation: 0, // Elevation for Android devices
     backgroundColor: "#e3f6ff",
-  },
-  intro: {
-    marginTop: 30
   },
   input: {
     backgroundColor: 'white', 
@@ -634,6 +584,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black'
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    height: '20%,',
+    padding: 20,
+    borderBottomColor: '#c4c4c4',
+    borderBottomWidth: 1,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    color: 'red',
+  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -659,7 +625,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginBottom: 10
+    marginBottom: 10,
+    color: 'black'
   },
   icon: {
     marginRight: 5,
@@ -710,5 +677,50 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: '#000',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  calendarContainer: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    elevation: 5,
+    width: '80%',
+    // height: '43%',
+    marginLeft: '20',
+    flexDirection: 'flex-start',
+    borderWidth: 3,
+    borderColor: '#7bf4f4',
+  },
+  modalBody: {
+    // backgroundColor: 'rgba(79, 44, 73, 0.19)',
+    borderRadius: 10,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  searchBar: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems:'center',
+    margin: 10,
+    width: '90%'
+  },
+  searchText: {
+    width: '70%',
+    backgroundColor: 'white',
+    height: 30,
+  },
+  searchBtn: {
+    width: '30%',
+    display: 'flex',
+    justifyContent:'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    height: 30
   },
 });
