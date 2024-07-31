@@ -12,6 +12,7 @@ export default function SubNavbar({name, navigation}) {
   const theme = useTheme();
   const [firstName, serFistName] = useAtom(firstNameAtom)
   const handleNavigate = (navigateUrl) => {
+    console.log(navigateUrl, "----------------------");
     navigation.navigate(navigateUrl)
   }
   return (
@@ -34,7 +35,7 @@ export default function SubNavbar({name, navigation}) {
             color: '#2a53c1', 
             textDecorationLine: 'underline'
           }}
-          onPress={()=>handleNavigate('Home')}
+          onPress={()=>handleNavigate(name)}
         >
           Log Out
         </Text>
