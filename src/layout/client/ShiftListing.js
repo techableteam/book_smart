@@ -9,11 +9,14 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
+import { firstNameAtom, lastNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 import { transparent } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 // import MapView from 'react-native-maps';
-import { Jobs, PostJob } from '../../utils/useApi';
+import { PostBid, PostJob, Jobs } from '../../utils/useApi';
 import moment from 'moment';
+import { Dropdown } from 'react-native-element-dropdown';
+
+const itemsPerPage = 100;
 
 export default function ShiftListing ({ navigation }) {
   //---------------------------------------Animation of Background---------------------------------------
@@ -41,11 +44,7 @@ export default function ShiftListing ({ navigation }) {
 
   const theme = useTheme();
   const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [userRole, setUserRole] = useAtom(userRoleAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
-  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [address, setAddress] = useAtom(addressAtom);
+  const [lastName, setLastName] = useAtom(lastNameAtom);
   const handleNavigate = (navigateUrl) => {
     navigation.navigate(navigateUrl);
   }
@@ -73,6 +72,10 @@ export default function ShiftListing ({ navigation }) {
   const [data, setData] = useState([]);
   const [userInfos, setUserInfo] = useState([]);
   const [detailedInfos, setDetailedInfo] = useState([]);
+  const [filteredData, setFilteredData] = useState(userInfos);
+  const [filteredDetailData, setFilteredDetailData] = useState(detailedInfos);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageItems, setPageItems] = useState([]);
   useEffect(() => {
     async function getData() {
       let Data = await Jobs('jobs', 'Clinicians');
@@ -89,24 +92,68 @@ export default function ShiftListing ({ navigation }) {
           title: 'Title',
           content: item.degree
         },{
+          title: 'Date',
+          content: item.shiftDate
+        },{
+          title: 'Shift',
+          content: item.shift
+        },{
+          title: 'Location',
+          content: item.location
+        },{
+          title: 'Status',
+          content: item.status
+        }]);
+        const detailedData = Data.map(item => [{
+          title: 'Job-ID',
+          content: item.jobId
+        },{
+          title: 'Job Num. -#',
+          content: item.jobNum
+        },{
+          title: 'Caregiver',
+          content: item.degree
+        },{
           title: 'Pay Rate',
           content: item.payRate
         },{
           title: 'Job',
-          content: item.unit
+          content: item.jobInfo
         },{
-          title: 'Job Status',
-          content: item.jobStatus
+          title: 'Status',
+          content: item.status
         },{
-          title: 'Shift Date/Time Text',
-          content: moment(item.shiftDate).format("MM/DD/YYYY")
+          title: 'Shift',
+          content: item.shift
+        },{
+          title: 'Shift Dates & Times',
+          content: item.shiftDateAndTimes
         },{
           title: 'Location',
           content: item.location
+        },{
+          title: 'Bonus',
+          content: item.bonus
+        },{
+          title: 'Date',
+          content: item.shiftDate
         }]);
         console.log(transformedData, '-----++++++')
         setUserInfo(transformedData);
-        console.log('iserer', userInfos);
+        setFilteredData(transformedData);
+        const len = transformedData.length;
+        console.log(len, 'ddddd00000')
+        const page = Math.round(0.5 + (len / itemsPerPage));
+        setTotalPages(page);
+        setDetailedInfo(detailedData);
+        setFilteredDetailData(detailedData);
+        console.log(page, totalPages)
+        const generatedPageArray = Array.from({ length: page}, (_, index) => ({
+          label: `Page ${index+1}`,
+          value: index + 1
+        }));
+        setPageItems(generatedPageArray);
+        console.log(generatedPageArray, "pageItems+1+@+@+@+@+")
       }
       // // setTableData(Data[0].degree)
       // tableScan(Data);
@@ -115,71 +162,40 @@ export default function ShiftListing ({ navigation }) {
     // tableData = tableScan(Data);
   }, []);
 
-  const userInfo = [[
-    {title: 'JOB-ID', content: "344"},
-    {title: 'Job', content: 'Long Term Care'},
-    {title: 'Location', content: "Lancaster, NY"},
-    {title: 'Title', content: "LPN"},
-    {title: 'Shift', content: '6/9/24, 6p-11p'},
-    {title: 'Status', content: "Available"},
-    {title: 'Pay Rate', content: "$35.00"},
-  ]]
+  // const userInfo = [[
+  //   {title: 'JOB-ID', content: "344"},
+  //   {title: 'Job', content: 'Long Term Care'},
+  //   {title: 'Location', content: "Lancaster, NY"},
+  //   {title: 'Title', content: "LPN"},
+  //   {title: 'Shift', content: '6/9/24, 6p-11p'},
+  //   {title: 'Status', content: "Available"},
+  //   {title: 'Pay Rate', content: "$35.00"},
+  // ]]
 
-  const detailedInfo = [
-    {
-      jobId: '344', 
-      job: 'Long Term Care', 
-      jobNum: '', 
-      caregiver: 'LPN', 
-      payRate: '$35.00', 
-      jobStatus: 'Available', 
-      shiftDateTime: '07/21/2024, 3p-11p',
-      shiftDates: '',
-      location: 'Lancaster, NY',
-      bonus: ''
-    }
-  ]
+  // const detailedInfo = [
+  //   {
+  //     jobId: '344', 
+  //     job: 'Long Term Care', 
+  //     jobNum: '', 
+  //     caregiver: 'LPN', 
+  //     payRate: '$35.00', 
+  //     jobStatus: 'Available', 
+  //     shiftDateTime: '07/21/2024, 3p-11p',
+  //     shiftDates: '',
+  //     location: 'Lancaster, NY',
+  //     bonus: ''
+  //   }
+  // ]
   
   const toggleModal = () => {
     setModal(!isModal);
   }
 
+  const [modalData, setModalData] = useState([]);
   const handleEdit = (id) => {
     console.log('handleEdit--->', id);
-    console.log(data)
-    let cnt =1;
-    const infoData = data.find(item => item.jobId === id)
-    setDetailedInfo([...detailedInfos, {
-      title: 'Job-ID',
-      content: infoData.jobId
-    },{
-      title: 'Job Num. -#',
-      content: infoData.jobNum
-    },{
-      title: 'Caregiver',
-      content: infoData.degree
-    },{
-      title: 'Pay Rate',
-      content: infoData.payRate
-    },{
-      title: 'Job',
-      content: infoData.unit
-    },{
-      title: 'Job Status',
-      content: infoData.jobStatus
-    },{
-      title: 'Shift Date/Time Text',
-      content: moment(infoData.shiftDate).format("MM/DD/YYYY"),
-    },{
-      title: 'Shift Dates & Times',
-      content: infoData.shiftDates
-    },{
-      title: 'Location',
-      content: infoData.location
-    },{
-      title: 'Bonus',
-      content: infoData.bonus
-    }])
+    console.log(detailedInfos[id])
+    setModalData(filteredDetailData[id]);
     toggleModal()  
   }
   const [showModal, setShowModal] = useState(false);
@@ -195,13 +211,80 @@ export default function ShiftListing ({ navigation }) {
   } 
   const handleSubmit = async (id) => {
     console.log(content);
-    const data = {content: content, jobId: id};
-    let response = await PostJob(data, 'Jobs');
+    // const data = {content: content, jobId: id};
+    const bidData = {jobId: id[0].content, message: content, caregiver: `${firstName} ${lastName}`}
+    let response = await PostBid(bidData, 'bids');
+    setContent('');
     handleBack();
   }
   const handleBack = () => {
     setModal(!isModal)
   }
+
+  //------------------------------------------Search Function----------------
+  const [searchTerm, setSearchTem] = useState(''); // Search term
+  const handleSearch = (e) => {
+    setSearchTem(e);
+    console.log(e, '------------');
+    if (e !== '') {
+      console.log('dfesfdsdfd', userInfos[1][1].content)
+      const filtered = userInfos.filter(subArray => subArray.some(item => item.content.toString().toLowerCase().includes(e.toLowerCase())));
+      setFilteredData(filtered);
+      const detailed = detailedInfos.filter(subArray => subArray.some(item => item.content.toString().toLowerCase().includes(e.toLowerCase())));
+      setFilteredDetailData(detailed);
+      const len = filtered.length;
+      console.log(len, 'ddddd00000')
+      const page = Math.round(0.5 + (len / itemsPerPage));
+      setTotalPages(page);
+      console.log(page, totalPages)
+      const generatedPageArray = Array.from({ length: page}, (_, index) => ({
+        label: `Page ${index+1}`,
+        value: index + 1
+      }));
+      setPageItems(generatedPageArray);
+    }
+    else {
+      setFilteredData(userInfos);
+      setFilteredDetailData(detailedInfos);
+      setTotalPages(Math.ceil(filteredData.length / itemsPerPage));
+      const generatedPageArray = Array.from({ length: totalPages}, (_, index) => ({
+        label: `Page ${index+1}`,
+        value: index + 1
+      }));
+      setPageItems(generatedPageArray);
+    }
+    // setFilteredData(tableHead, ...filteredData);
+  }
+
+  //--------------------------------subPage setting-------------------------------
+  const [isDegreeFocus, setIsDegreeFocus] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageItemValue, setPageItemValue] = useState(null);
+  const [isPageItemFocus, setIsPageItemFocus] = useState(false);
+
+  const renderPageItemLabel = () => {
+    if (pageItemValue || isPageItemFocus) {
+      return (
+        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
+          Dropdown label
+        </Text>
+      );
+    }
+    return null;
+  };
+
+  const getItemsForPage = (page) => {
+    const startIndex = (page-1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
+    return filteredData.slice(startIndex, endIndex);
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  }
+
+  const itemsToShow = getItemsForPage(currentPage);
+
   return (
       <View style={styles.container}>
         <StatusBar 
@@ -229,25 +312,71 @@ export default function ShiftListing ({ navigation }) {
             <View style={styles.profileTitleBg}>
               <Text style={styles.profileTitle}>🖥️ ALL AVAILABLE SHIFTS</Text>
             </View>
-            <Text style={styles.name}>Showing 1-25 of 25</Text>
-              {userInfos.map((it, idx) =>
-                <View key={idx} style={styles.subBar}>
-                  {it.map((item, index) => 
-                    <View key={index} style={{flexDirection: 'row', width: '100%'}}>
-                      <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
-                      <Text style={[
-                        styles.content, 
-                        item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
-                      ]}>{item.content}</Text>
-                    </View>
+            <View style={styles.searchBar}>
+              <TextInput
+                style={[styles.searchText]}
+                placeholder=""
+                onChangeText={e => handleSearch(e)}
+                value={searchTerm || ''}
+              />
+              <TouchableOpacity style={styles.searchBtn}>
+                <Text>Search</Text>
+              </TouchableOpacity>
+            </View>
+            {
+              filteredData.length>itemsPerPage ?
+              <View>
+                <Text style={styles.name}>Showing 1-{itemsPerPage} of {filteredData.length}</Text>
+                <Dropdown
+                  style={[styles.dropdown, isDegreeFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  iconStyle={styles.iconStyle}
+                  data={pageItems}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={'Page 1'}
+                  value={pageItemValue}
+                  onFocus={() => setIsPageItemFocus(true)}
+                  onBlur={() => setIsPageItemFocus(false)}
+                  onChange={(item) => {
+                    setPageItemValue(item.value)
+                    handlePageChange(item.value);
+                    setIsPageItemFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isPageItemFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
                   )}
-                  <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(it[0].content)}>
-                    <Text style={{color: 'white', fontWeight: 'bold'}}> VIEW & APPLY</Text>
-                  </TouchableOpacity>
-                </View>)
-              }
+                />
+              </View>
+              :
+              <></>
+            }
+            {itemsToShow.map((it, idx) =>
+              <View key={idx} style={styles.subBar}>
+                {it.map((item, index) => 
+                  <View key={index} style={{flexDirection: 'row', width: '100%'}}>
+                    <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
+                    <Text style={[
+                      styles.content, 
+                      item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
+                    ]}>{item.content}</Text>
+                  </View>
+                )}
+                <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx)}>
+                  <Text style={{color: 'white', fontWeight: 'bold'}}> VIEW & APPLY</Text>
+                </TouchableOpacity>
+              </View>)
+            }
           </View>
-          <View style={{marginBottom: 100, marginLeft: '10%'}}>
+          {/* <View style={{marginBottom: 100, marginLeft: '10%'}}>
             <Text style={[styles.title, {color: 'black', fontSize: 20}]}>Jobs</Text>
             <View style = {{}}>
               <Text style={{marginBottom: 10}}>Search</Text>
@@ -293,7 +422,7 @@ export default function ShiftListing ({ navigation }) {
             <TouchableOpacity style={[styles.edit, {backgroundColor: 'rgba(15, 118, 193, 0.73)', width: '90%' }]} onPress = {() => handleEdit()}>
               <Text style={{color: 'white', fontSize: 20}}> Search </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </ScrollView>
         {isModal && <Modal
           Visible={false}
@@ -317,8 +446,8 @@ export default function ShiftListing ({ navigation }) {
                   <Text style={[styles.profileTitle, {textAlign: 'center'}]}>Back to Job / Shift Listings {'>'}</Text>
                 </TouchableOpacity>
                 <View style={styles.modalBody}>
-                  {detailedInfos.map((item, index) => 
-                    <View key={index} style={{flexDirection: 'row', width: '100%'}}>
+                  {modalData.map((item, index) => 
+                    <View key={index} style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>{item.title}</Text>
                       <Text style={styles.content}>{item.content}</Text>
                     </View>
@@ -340,7 +469,7 @@ export default function ShiftListing ({ navigation }) {
                   />
                 </View>
                 <View style={[styles.btn, {marginTop: 20}]}>
-                  <HButton style={styles.subBtn} onPress={()=> handleSubmit(detailedInfo[0].content) }>
+                  <HButton style={styles.subBtn} onPress={()=> handleSubmit(modalData) }>
                     Submit
                   </HButton>
                 </View>
@@ -433,11 +562,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#c2c3c42e',
     borderRadius: 30,
     borderWidth: 2,
-    borderColor: '#b0b0b0'
+    borderColor: '#b0b0b0',
     // elevation: 1,
     // // shadowColor: 'rgba(0, 0, 0, 0.4)',
     // // shadowOffset: { width: 1, height: 1 },
     // shadowRadius: 0,
+    marginBottom: 100
   },
   titles: {
     fontWeight: 'bold',
@@ -597,6 +727,66 @@ const styles = StyleSheet.create({
     backgroundColor: '#447feb',
     color: 'black',
     fontSize: 16,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: '60%',
+    borderRadius: 10,
+    height: 30,
+    marginBottom: 10,
+  },
+  searchText: {
+    width: '70%',
+    backgroundColor: 'white',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 30,
+    paddingVertical: 0
+  },
+  searchBtn: {
+    width: '30%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    height: 30,
+  },
+  dropdown: {
+    height: 30,
+    width: '100%',
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 10,
+    color: 'black'
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
   },
 });
   

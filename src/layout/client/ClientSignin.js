@@ -9,7 +9,7 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/ClinicalAuthProvider'
+import { firstNameAtom, lastNameAtom, addressAtom, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/ClinicalAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -23,6 +23,9 @@ export default function ClientSignIn({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
   const [photoImage, setPhotoImage] = useAtom(photoImageAtom);
   const [userRole, setUserRole]= useAtom(userRoleAtom);
+  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
+  const [socialSecurityNumber, setSocialSecurityNumber] = useAtom(socialSecurityNumberAtom);
+  const [address, setAddress] = useAtom(addressAtom);
   // const navigation = useNavigation(false);
   const theme = useTheme();
   // const { auth, setAuth } = AuthState();
@@ -99,6 +102,9 @@ export default function ClientSignIn({ navigation }) {
       setTitle(response.user.title);
       setPhotoImage(response.user.photoImage);
       setUserRole(response.user.userRole);
+      setEntryDate(response.user.entryDate);
+      setSocialSecurityNumber(response.user.socialSecurityNumber)
+      setAddress(response.user.address)
       if (checked) {
         await AsyncStorage.setItem('clinicalEmail', credentials.email);
         await AsyncStorage.setItem('clinicalPassword', credentials.password);

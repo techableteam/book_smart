@@ -105,6 +105,25 @@ export const Jobs = async (endpoint, role) => {
   }
 }
 
+export const PostBid = async (bidData, endpoint) => {
+  try {
+    console.log('success')
+    // Existing token (obtained from AsyncStorage or login)
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/postBid`, bidData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    // const response = await axios.get("/test");
+    return response.data;
+  } catch (error) {
+    console.log("================");
+    console.log(error)
+    throw error;
+  }
+};
+
 export const isTokenInLocalStorage = async () => {
   try {
     const token = await AsyncStorage.getItem('token');

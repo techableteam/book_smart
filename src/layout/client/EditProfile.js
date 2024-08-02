@@ -171,7 +171,7 @@ export default function EditProfile({ navigation }) {
   };
   const handlePhoneNumberChange = (text) => {
     const formattedNumber = formatPhoneNumber(text);
-    handleCredentials('contactPhone', formattedNumber);
+    handleCredentials('phoneNumber', formattedNumber);
   };
 
   const handleBack = () => {
@@ -293,11 +293,11 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> Phone <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
-                  value={credentials.contactPhone}
+                  value={credentials.phoneNumber}
                   style={[styles.input, {width: '100%'}]}
                   onChangeText={handlePhoneNumberChange}
                   keyboardType="phone-pad"
-                  placeholder={credentials.contactPhone}
+                  placeholder={credentials.phoneNumber}
                 />
               </View>
             </View>
@@ -306,7 +306,7 @@ export default function EditProfile({ navigation }) {
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
-                  placeholder=""
+                  placeholder={credentials.socialSecurityNumber}
                   autoCorrect={false}
                   autoCapitalize="none"
                   keyboardType="numeric" // Set the keyboardType to "numeric"

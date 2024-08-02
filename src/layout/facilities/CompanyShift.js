@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
+import { VirtualizedList, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
 import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
 import images from '../../assets/images';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -17,6 +17,7 @@ import { Jobs } from '../../utils/useApi';
 
 export default function CompanyShift({ navigation }) {
 
+  const [filteredData, setFilteredData] = useState(data);
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
   let colorIndex = 0;
@@ -65,6 +66,7 @@ export default function CompanyShift({ navigation }) {
       }
       else {
         setData(Data)
+        setFilteredData(Data);
       }
       // console.log('--------------------------', data);
       // // setTableData(Data[0].degree)
@@ -74,17 +76,45 @@ export default function CompanyShift({ navigation }) {
     // tableData = tableScan(Data);
   }, []);
 
-  const theme = useTheme();
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [userRole, setUserRole] = useAtom(userRoleAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
-  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [address, setAddress] = useAtom(addressAtom);
-  const handleNavigate = (navigateUrl) => {
-    navigation.navigate(navigateUrl);
+  //------------------------------------------Search Function----------------
+  const [searchTerm, setSearchTem] = useState(''); // Search term
+  const handleSearch = (e) => {
+    setSearchTem(e);
+    const filtered = data.filter(row => row.some(cell => cell.toLowerCase().includes(e.toLowerCase())));
+    setFilteredData(filtered);
+    // setFilteredData(tableHead, ...filteredData);
   }
 
+  const TableComponent = ({ data }) => {
+    return (
+      <FlatList
+        data={data}
+        keyExtractor={(item, index) => index.toString()}
+        horizontal
+        showsVerticalScrollIndicator={true}
+        style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, backgroundColor: 'white', width: '90%', marginBottom: 30, flex: 1}}
+        renderItem={({item, index}) => (
+          <View key={index} style={{height: 30, flexDirection: 'row'}}>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 150}}>{item[0]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[1]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[2]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 130}}>{item[3]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[4]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 70}}>{item[5]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 150}}>{item[6]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[7]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 150}}>{item[8]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[9]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[10]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[11]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[12]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[13]}</Text>
+            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[14]}</Text>
+          </View>
+        )}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -145,12 +175,20 @@ export default function CompanyShift({ navigation }) {
                 <Text style={styles.profileTitle}>🖥️ FACILITY / SHIFT LISTINGS</Text>
               </View>
               <View style={styles.searchBar}>
-                <TextInput style={styles.searchText} />
+                <TextInput
+                  style={[styles.searchText, {height: 30}]}
+                  placeholder=""
+                  onChangeText={e => handleSearch(e)}
+                  value={searchTerm || ''}
+                />
                 <TouchableOpacity style={styles.searchBtn}>
                   <Text>Search</Text>
                 </TouchableOpacity>
               </View>
-              <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
+              {/* <View style={{width: '95%'}}> */}
+                <TableComponent style={{width: '95%'}} data={filteredData} />
+              {/* </View> */}
+              {/* <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table borderStyle={{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                   <Row
                     data={tableHead}
@@ -164,7 +202,7 @@ export default function CompanyShift({ navigation }) {
                     textStyle={[styles.tableText, { marginTop: 0 }]}
                   />
                 </Table>
-              </ScrollView>
+              </ScrollView> */}
             </View>
           </View>
 
@@ -340,7 +378,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '60%',
     borderRadius: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   searchText: {
     width: '70%',

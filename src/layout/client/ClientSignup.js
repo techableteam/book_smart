@@ -247,8 +247,9 @@ export default function ClientSignUp({ navigation }) {
     return formattedNumber;
   };
   const handlePhoneNumberChange = (text) => {
+    console.log(text)
     const formattedNumber = formatPhoneNumber(text);
-    handleCredentials('contactPhone', formattedNumber);
+    handleCredentials('phoneNumber', formattedNumber);
   };
 
   const handleBack = () => {
@@ -294,7 +295,7 @@ export default function ClientSignUp({ navigation }) {
     if (credentials.email === '' || 
       credentials.firstName === '' || 
       credentials.lastName ==='' || 
-      credentials.phoneNumber ==='' || 
+      // credentials.phoneNumber ==='' || 
       credentials.title ==='' || 
       credentials.birthday ==='' || 
       credentials.socialSecurityNumber ==='' || 
@@ -303,7 +304,8 @@ export default function ClientSignUp({ navigation }) {
       credentials.address.city ==='' || 
       credentials.address.state ==='' || 
       credentials.address.zip ==='' || 
-      credentials.password ==='') {
+      credentials.password ===''
+    ) {
         showAlerts('all gaps')
     }
     else {
@@ -381,11 +383,11 @@ export default function ClientSignUp({ navigation }) {
               <Text style={styles.subtitle}> Phone <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
-                  value={credentials.contactPhone}
+                  value={credentials.phoneNumber}
                   style={[styles.input, {width: '100%'}]}
-                  onChangeText={handlePhoneNumberChange}
+                  onChangeText={(e) =>handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
-                  placeholder={credentials.contactPhone}
+                  placeholder="(___) ___-____"
                 />
               </View>
             </View>

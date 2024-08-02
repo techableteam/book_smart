@@ -318,7 +318,7 @@ export default function FacilitySignUp({ navigation }) {
                   style={[styles.input, {width: '100%'}]}
                   onChangeText={handlePhoneNumberChange}
                   keyboardType="phone-pad"
-                  placeholder={credentials.contactPhone}
+                  placeholder="(___) ___-____"
                 />
               </View>
             </View>
