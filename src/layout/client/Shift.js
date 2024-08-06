@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
+import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity, Button } from 'react-native';
 import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
 import images from '../../assets/images';
 import  { useNavigation, useRoute } from '@react-navigation/native';
@@ -10,13 +10,14 @@ import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { Dropdown } from 'react-native-element-dropdown';
 import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs'
 // import TimePicker from 'react-time-picker';
 // import { AntDesign } from '@expo/vector-icons';
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
-import { Jobs, PostJob } from '../../utils/useApi';
+import { Jobs, PostJob, MyShift } from '../../utils/useApi';
 import moment from 'moment';
 
 export default function Shift ({ navigation }) {
@@ -61,9 +62,91 @@ export default function Shift ({ navigation }) {
   //   {title: 'email', content: userRole},
   //   {title: 'Caregiver', content: caregiver},
   // ]
+  //-----------------------------DropDown----------------------------
+  
+  const pageItems = [
+    {label: '10 per page', value: '10'},
+    {label: '25 per page', value: '25'},
+    {label: '50 per page', value: '50'},
+    {label: '100 per page', value: '100'},
+    {label: '500 per page', value: '500'},
+    {label: '1000 per page', value: '1000'},
+  ]
+
+  const [value, setValue] = useState(100);
+  const [isFocus, setIsFocus] = useState(false);
+
+  const renderLabel = () => {
+    if (value || isFocus) {
+      return (
+        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+          Dropdown label
+        </Text>
+      );
+    }
+    return null;
+  };
   const [data, setData] = useState([]);
   const [userInfos, setUserInfo] = useState([]);
   const [detailedInfos, setDetailedInfos] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [submitData, setSubmitData] = useState({});
+
+  useEffect(() => {
+    async function getData() {
+      let Data = await MyShift('jobs', 'Clinicians');
+      if(!Data) {
+        setData(['No Data'])
+      }
+      else {
+        setData(Data);
+        console.log("date------------------------",data);
+        const transformedData = Data.reportData.map(item => [{
+          title: 'Job-ID',
+          content: item.jobId
+        },{
+          title: 'Location',
+          content: item.location
+        },{
+          title: 'Pay Rate',
+          content: item.payRate
+        },{
+          title: 'SHIFT STATUS',
+          content: item.shiftStatus
+        },{
+          title: 'Caregiver',
+          content: item.caregiver
+        },{
+          title: 'TimeSheet',
+          content: item.timeSheet.name
+        },{
+          title: 'Status',
+          content: item.status
+        }]);
+        const detailedData = Data.reportData.map(item => [
+          item.jobId,
+          item.caregiver,
+          item.timeSheet
+        ]);
+        console.log(transformedData, '-----++++++')
+        setUserInfo(transformedData);
+        const len = transformedData.length;
+        console.log(len, 'ddddd00000', value)
+        const page = Math.ceil(len / value);
+        setTotalPages(page);
+        console.log(page, totalPages)
+        // const generatedPageArray = Array.from({ length: page}, (_, index) => ({
+        //   label: `Page ${index+1}`,
+        //   value: index + 1
+        // }));
+        // setPageItems(generatedPageArray);
+      }
+      // // setTableData(Data[0].degree)
+      // tableScan(Data);
+    }
+    getData();
+
+  }, [])
 
   const userInfo = [[
     {title: 'JOB-ID', content: "344"},
@@ -73,6 +156,8 @@ export default function Shift ({ navigation }) {
     {title: 'Caregiver', content: 'Dale'},
     {title: 'Timesheet', content: 'animatedsticker.tgs'},
   ]]
+
+
   //------------------hour event------------------------
   const [content, setContent] = useState({
     startTime: '',
@@ -115,87 +200,15 @@ export default function Shift ({ navigation }) {
     setModal(!isModal);
   }
 
-  const handleHoursEdit = (id) => {
-    console.log('handleEdit--->', id);
-    let cnt =1;
-    detailedInfo.forEach(item => {
-      console.log('SUcceddd')
-      if (item.jobId === id) {
-        setInfo([
-          {title: 'Job-ID', content: item.jobId},
-          {title: 'Entry Date', content: item.entryDate},
-          {title: 'Caregiver', content: item.caregiver},
-          {title: 'Shift Date & Time', content: item.shiftDateTime},
-          {title: 'Hours Worked', content: item.hoursWorked},
-          {title: 'Hours Submitted?', content: item.hoursSubmitted},
-          {title: 'Hours Approved?', content: item.hoursApproved},
-        ])
-        cnt++;
-      }
-    });
-    if (cnt == 0) {
-      console.log('failledd')
-      setInfo([
-        {title: 'Job-ID', content: ""},
-        {title: 'Entry Date', content: ''},
-        {title: 'Caregiver', content: ''},
-        {title: 'Shift Date & Time', content: ''},
-        {title: 'Hours Worked', content: ""},
-        {title: 'Hours Submitted?', content: "yes"},
-        {title: 'Hours Approved?', content: "pending"},
-      ]);
-    }
-    toggleModal()  
-  }
-
-  useEffect(() => {
-    async function getData() {
-      let Data = await Jobs('jobs', 'Clinicians');
-      if(!Data) {
-        setData(['No Data'])
-      }
-      else {
-        setData(Data);
-        console.log("date------------------------",data);
-        const transformedData = Data.map(item => [{
-          title: 'Job-ID',
-          content: item.jobId
-        },{
-          title: 'Location',
-          content: item.location
-        },{
-          title: 'SHIFT STATUS',
-          content: item.jobStatus
-        },{
-          title: 'Caregiver',
-          content: firstName
-        },{
-          title: 'Timesheet',
-          content: item.timeSheet? "TimeSheet" : ''
-        },{
-          title: 'Shift Date/Time Text',
-          content: moment(item.shiftDate).format("MM/DD/YYYY")
-        },{
-          title: 'Location',
-          content: item.location
-        }]);
-        console.log(transformedData, '-----++++++')
-        setUserInfo(transformedData);
-        console.log('iserer', userInfos);
-      }
-      // // setTableData(Data[0].degree)
-      // tableScan(Data);
-    }
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
   //-----------------------handleUpload event--------------------------
   
   const [timeFile, setTimeFile] = useState('');
 
-  const handleUploadSubmit = async (id) => {
+  const handleUploadSubmit = async () => {
     console.log(timeFile)
-    const data = {jobId: id, timeSheet: timeFile}
+    const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet}
+    console.log('data', data);
+    
     const response = await PostJob(data, 'jobs')
     setUpload(!isUpload)
   }
@@ -207,75 +220,69 @@ export default function Shift ({ navigation }) {
     }
   ]);
 
-const [uploadInfo, setUploadInfo] = useState([
+  const [uploadInfo, setUploadInfo] = useState([
     { title: 'Job-ID', content: "" },
     { title: 'Caregiver', content: '' },
     { title: 'TimeSheet', content: '' },
-]);
+  ]);
 
-const toggleUploadModal = () => {
+  const toggleUploadModal = () => {
     setUpload(!isUpload);
-};
+  };
 
-const handleUploadEdit = (id) => {
-  console.log('handleEdit--->', id);
-  let cnt = 0;
-  let infoData = data.find(item => item.jobId === id)
-  // data.forEach(item => {
-  //   if (item.jobId === id) {
-  //     console.log('Success');
-      setDetailedInfos([
-        { title: 'Job-ID', content: infoData.jobId },
-        { title: 'Caregiver', content: firstName },
-        { title: 'TimeSheet', content: infoData.timeSheet },
-      ]);
-      // cnt++;
-    // }
-    // setDetailedInfos([...detailedInfos, {
-    //   title: 'Job-ID',
-    //   content: infoData.jobId
-    // },{
-    //   title: 'Job Num. -#',
-    //   content: infoData.jobNum
-    // },{
-    //   title: 'Caregiver',
-    //   content: infoData.degree
-    // },{
-    //   title: 'Pay Rate',
-    //   content: infoData.payRate
-    // },{
-    //   title: 'Job',
-    //   content: infoData.unit
-    // },{
-    //   title: 'Job Status',
-    //   content: infoData.jobStatus
-    // },{
-    //   title: 'Shift Date/Time Text',
-    //   content: moment(infoData.shiftDate).format("MM/DD/YYYY"),
-    // },{
-    //   title: 'Shift Dates & Times',
-    //   content: infoData.shiftDates
-    // },{
-    //   title: 'Location',
-    //   content: infoData.location
-    // },{
-    //   title: 'Bonus',
-    //   content: infoData.bonus
-    // }])
-  // }});
-
-  if (cnt === 0) {
-    console.log('failed');
-    setUploadInfo([
-      { title: 'Job-ID', content: "" },
-      { title: 'Caregiver', content: "" },
-      { title: 'TimeSheet', content: "" },
+  const handleUploadEdit = (id) => {
+    console.log('handleEdit--->', id);
+    let cnt = 0;
+    let infoData = data.find(item => item.jobId === id)
+    setSubmitData(infoData);
+    setDetailedInfos([
+      { title: 'Job-ID', content: infoData.jobId },
+      { title: 'Caregiver', content: infoData.caregiver },
+      { title: 'TimeSheet', content: infoData.timeSheet.name },
     ]);
-  }
 
-  console.log(uploadInfo);
-  toggleUploadModal();
-};
+    console.log("dfdsafafdafdafd" ,submitData);
+    toggleUploadModal();
+  };
+  //-----------------------------------------File Upload---------------------
+  const pickFile = async () => {
+    try {
+      console.log('pick Data')
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
+      const res = await DocumentPicker.pick({
+        type: type,
+      });
+      let fileContent = await RNFS.readFile(res[0].uri, 'base64');
+      console.log('FileContent', fileContent)
+      console.log('FileContent', )
+      
+          // Determine the file type based on the MIME type
+      let fileType;
+      if (res[0].type === 'application/pdf') {
+        fileType = 'pdf';
+      } else if (res[0].type.startsWith('image/')) {
+        fileType = 'image';
+      } else {
+        // Handle other file types if needed
+        fileType = 'unknown';
+      }
+      console.log('====================================');
+      console.log("type");
+      console.log('====================================');
+      
+      // fileContent = RNFS.readFile(res[0].uri, 'base64');
+  
+      // handleCredentials('photoImage', {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
+      setSubmitData({...submitData, timeSheet: {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name}})
+      console.log(`File ${'photoImage'} converted to base64:`, `data:${res.type};base64,${"io"}`);
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker
+      } else {
+        // Handle other errors
+      }
+    }
+  };
 
   const handleEdit = () => {
     console.log('handleEdit')
@@ -287,28 +294,6 @@ const handleUploadEdit = (id) => {
     setShowModal(false);
   }
 
-  const pageItems = [
-    {label: '10 per page', value: '1'},
-    {label: '25 per page', value: '2'},
-    {label: '50 per page', value: '3'},
-    {label: '100 per page', value: '4'},
-    {label: '500 per page', value: '5'},
-    {label: '1000 per page', value: '6'},
-  ]
-
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
 
   const handleDelete = () => {
     setDetailedInfo(prevUploadInfo => {
@@ -320,33 +305,26 @@ const handleUploadEdit = (id) => {
       });
     });
   }
-  const pickFile = async () => {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.images], // Specify the type of files to pick (e.g., images)
-      });
+  const [currentPage, setCurrentPage] = useState(1);
+  const getItemsForPage = (page) => {
+    const startIndex = (page-1) * value;
+    const endIndex = Math.min(startIndex + value, userInfos.length);
+    return userInfos.slice(startIndex, endIndex);
+  }
 
-      setDetailedInfo;(prevUploadInfo => {
-        return prevUploadInfo.map((item, index) => {
-          if (index === 2) { // Index 2 corresponds to the third item (0-based index)
-              return { ...item, content: res[0].name }; // Update the content of the third item
-          }
-          return item; // Keep other items unchanged
-        });
-      });
-
-      // Read the file content and convert it to base64
-      const fileContent = await RNFS.readFile(res[0].uri, 'base64');
-      setTimeFile(`data:${res.type};base64,${fileContent}`)
-      console.log('success');
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker
-      } else {
-        // Handle other errors
-      }
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1);
     }
   };
+
+  const handlePrevPage = () => {
+      if (currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+      }
+  };
+
+  const itemsToShow = getItemsForPage(currentPage);
 
   return (
       <View style={styles.container}>
@@ -376,51 +354,64 @@ const handleUploadEdit = (id) => {
               <Text style={styles.profileTitle}>🖥️ MY SHIFTS</Text>
             </View>
             {/* <Text style={styles.name}>100 per page</Text> */}
-            <Dropdown
-              style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={pageItems}
-              // search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder={'100 per page'}
-              // searchPlaceholder="Search..."
-              value={value ? value : pageItems[3].value}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={item => {
-                setValue(item.value);
-                setIsFocus(false);
-              }}
-              renderLeftIcon={() => (
-                <View
-                  style={styles.icon}
-                  color={isFocus ? 'blue' : 'black'}
-                  name="Safety"
-                  size={20}
-                />
-              )}
-            />
-              {userInfos.map((it, idx) =>
-                <View key={idx} style={styles.subBar}>
-                  {it.map((item, index) => 
-                    <View key={index} style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
-                      <Text style={[
-                        styles.content, 
-                        item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
-                      ]}>{item.content}</Text>
-                    </View>
-                  )}
-                  <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#3d94f6', marginLeft: '20%'}]} onPress = {() => handleUploadEdit(it[0].content)}>
-                    <Text style={{color: 'white'}}> Upload Timesheet</Text>
-                  </TouchableOpacity>
-                </View>)
+            <View style= {{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+              <Dropdown
+                style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                iconStyle={styles.iconStyle}
+                data={pageItems}
+                // search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={'100 per page'}
+                // searchPlaceholder="Search..."
+                value={value ? value : pageItems[3].value}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={item => {
+                  setValue(item.value);
+                  setIsFocus(false);
+                  const len = userInfos.length;
+                  console.log(len, 'ddddd00000')
+                  const page = Math.ceil(len / item.value);
+                  setTotalPages(page);
+                }}
+                renderLeftIcon={() => (
+                  <View
+                    style={styles.icon}
+                    color={isFocus ? 'blue' : 'black'}
+                    name="Safety"
+                    size={20}
+                  />
+                )}
+              />
+              { totalPages> 1 &&
+                <View style={{display: 'flex', flexDirection: 'row', height: 30, marginBottom: 10, alignItems: 'center'}}>
+                  <Text onPress={handlePrevPage} style={{width: 20}}>{currentPage>1 ? "<": " "}</Text>
+                  <Text style={{width: 20}}>{" "+currentPage+" "}</Text>
+                  <Text onPress={handleNextPage} style={{width: 20}}>{currentPage<totalPages ? ">" : " "}</Text>
+                </View>
               }
+            </View>
+            {itemsToShow.map((it, idx) =>
+              <View key={idx} style={styles.subBar}>
+                {it.map((item, index) => 
+                  <View key={index} style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                    <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
+                    <Text style={[
+                      styles.content, 
+                      item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
+                    ]}>{item.content}</Text>
+                  </View>
+                )}
+                <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#3d94f6', marginLeft: '20%'}]} onPress = {() => handleUploadEdit(it[0].content)}>
+                  <Text style={{color: 'white'}}> Upload Timesheet</Text>
+                </TouchableOpacity>
+              </View>)
+            }
           </View>
         </ScrollView>
         {isModal && <Modal
@@ -532,65 +523,33 @@ const handleUploadEdit = (id) => {
               </View>
               <View style={styles.body}>
                 <View style={styles.modalBody}>
-                    <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[0].title}</Text>
-                      <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[0].content}</Text>
-                    </View>
-                    <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[1].title}</Text>
-                      <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[1].content}</Text>
-                    </View>
-                    <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[2].title}</Text>
-                      {detailedInfos[2].content && <Text style={[styles.content, {lineHeight: 20, marginTop: 0, color: 'blue', width: '100%'}]}>{detailedInfos[2].content}<Text style={{color: 'blue'}} onPress= {handleDelete}>&nbsp;&nbsp;remove</Text></Text>}
-                    </View>
-                    <View style={{flexDirection: 'row', width: '100%'}}>
-                      <TouchableOpacity title="Select File" onPress={()=>pickFile()} style={styles.chooseFile}>
-                        <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
-                      </TouchableOpacity>
-                      <TextInput
-                        style={[styles.input, {width: '70%'}]}
-                        placeholder=""
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        value={uploadInfo[2].content || ''}
-                      />
-                    </View>
-                  {/* {uploadInfo.map((item, index) => 
-                    <View key={index} style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>{item.title}</Text>
-                      <Text style={styles.content}>{item.content}</Text>
-                    </View>
-                  )} */}
-                  {/* <View style={styles.email}>
-                    <Text style={styles.subtitle}> Healthcare License</Text>
-                    {credentials.healthcareLicense &&
-                    <View style={{marginBottom: 10}}>
-                      <Image
-                        style={{ width: 100, height: 100,  }}
-                        source={{ uri: `${credentials.healthcareLicense}` }}
-                      />
-                      <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                        onPress = {()=>handleRemove('healthcareLicense')}
-                      >remove</Text>
-                    </View>}
-                    
-                    <View style={{flexDirection: 'row', width: '100%'}}>
-                      <TouchableOpacity title="Select File" onPress={()=>pickFile('healthcareLicense')} style={styles.chooseFile}>
-                        <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
-                      </TouchableOpacity>
-                      <TextInput
-                        style={[styles.input, {width: '70%'}]}
-                        placeholder=""
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        value={photoName.healthcareLicense || ''}
-                      />
-                    </View>
-                  </View> */}
+                  <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
+                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[0].title}</Text>
+                    <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[0].content}</Text>
+                  </View>
+                  <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
+                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[1].title}</Text>
+                    <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[1].content}</Text>
+                  </View>
+                  <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
+                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[2].title}</Text>
+                    {detailedInfos[2].content && <Text style={[styles.content, {lineHeight: 20, marginTop: 0, color: 'blue', width: '100%'}]}>{detailedInfos[2].content}<Text style={{color: 'blue'}} onPress= {handleDelete}>&nbsp;&nbsp;remove</Text></Text>}
+                  </View>
+                  <View style={{flexDirection: 'row', width: '100%'}}>
+                    <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
+                      <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                    </TouchableOpacity>
+                    <TextInput
+                      style={[styles.input, {width: '70%'}]}
+                      placeholder=""
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      value={submitData.timeSheet.name|| ''}
+                    />
+                  </View>
                 </View>
                 <View style={[styles.btn, {marginTop: 20}]}>
-                  <HButton style={styles.subBtn} onPress={() => handleUploadSubmit(detailedInfos[0].id) }>
+                  <HButton style={styles.subBtn} onPress={handleUploadSubmit }>
                     Submit
                   </HButton>
                 </View>

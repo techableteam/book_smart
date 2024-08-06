@@ -69,7 +69,7 @@ export default function ClientSignIn({ navigation }) {
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e});
-    console.log(credentials);
+    // console.log(credentials);
   }
 
   const handleSignInNavigate = () => {
@@ -90,9 +90,9 @@ export default function ClientSignIn({ navigation }) {
 
   const handleSubmit = async () => {
     try {
-      console.log('credentials:', credentials)
+      // console.log('credentials:', credentials)
       const response = await Signin(credentials, 'clinical');
-      console.log('SignIn Successful: ', response.user);
+      console.log('SignIn Successful: ');
       setFirstName(response.user.firstName);
       setLastName(response.user.lastName);
       setBirthday(response.user.birthday);

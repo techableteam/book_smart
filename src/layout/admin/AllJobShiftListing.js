@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
+import { Text, PaperProvider, DataTable, useTheme, Button } from 'react-native-paper';
 import images from '../../assets/images';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import HButton from '../../components/Hbutton'
@@ -13,10 +13,11 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
-import { Jobs } from '../../utils/useApi';
+import { Jobs, Update } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
+import AHeader from '../../components/Aheader';
 
-export default function AllCaregivers({ navigation }) {
+export default function AllJobShiftListing({ navigation }) {
 
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
@@ -42,17 +43,17 @@ export default function AllCaregivers({ navigation }) {
 
   const tableHead = [
     'Entry Date',
-    'Name',
-    'Phone',
-    'Degree/Discipline',
-    'Email',
-    'View Shifts/Profile',
-    'Verification',
-    'User Status',
+    'Nurse',
+    'JobId',
+    'JobNum -#.',
+    'Location',
+    'Shift Date',
+    'Shift Time',
+    'Bid',
     'Awarded',
-    'Applied for',
-    'Ratio',
-    'P.W.',
+    'Job Status',
+    'Job Rating',
+    'Delete',
   ];
   const tableData = [
     [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
@@ -60,19 +61,19 @@ export default function AllCaregivers({ navigation }) {
   ]
 
   useEffect(() => {
-    // async function getData() {
-    //   let Data = await Jobs('jobs', 'Facilities');
-    //   if(!Data) {
-    //     setData(['No Data'])
-    //   }
-    //   else {
-    //     setData(Data)
-    //   }
-    //   // console.log('--------------------------', data);
-    //   // // setTableData(Data[0].degree)
-    //   // tableScan(Data);
-    // }
-    // getData();
+    async function getData() {
+      let Data = await Jobs('jobs', 'Admin');
+      if(!Data) {
+        setData(['No Data'])
+      }
+      else {
+        setData(Data)
+      }
+      // console.log('--------------------------', data);
+      // // setTableData(Data[0].degree)
+      // tableScan(Data);
+    }
+    getData();
     // tableData = tableScan(Data);
   }, []);
 
@@ -109,19 +110,122 @@ export default function AllCaregivers({ navigation }) {
       );
     }
     return null;
-  };
-
-  const handleRowClick = (rowData, rowID) => {
+  };  
+  const widths = [150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80, 100];
+  const [modal, setModal] = useState(false)
+  const toggleModal = () => {
+    setModal(!modal);
+  }
+  const [cellData, setCellData] = useState(null);
+  const [rowData, setRowData] = useState(null);
+  const [modalItem, setModalItem] = useState(0);
+  const handleCellClick = (cellData, rowIndex, cellIndex) => {
     // Handle row click event here
-    console.log('Row clicked:', rowData, rowID);
+    console.log('Row clicked:', cellData, rowIndex, cellIndex);
+    if (cellIndex==9) {
+      setCellData(cellData);
+      const rowD = data[rowIndex][2];
+      console.log(rowD);
+      setModalItem(cellIndex)
+      setRowData(rowD);
+      toggleModal();
+    }
   };
 
+  //-----------------Modal---------------
+  const ModalFunction = (title, body) => {
+    return (
+      <Modal
+        visible={modal}
+        transparent= {true}
+        animationType="slide"
+        onRequestClose={() => {
+          setModal(!modal);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.calendarContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>{title}</Text>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
+                <Image source = {images.close} style={{width: 20, height: 20,}}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.modalBody}>
+                {body}
+                <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
+                  <Text style={styles.buttonText}>Update</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
+
+  //---------------DropDown--------------
+  const jobStatus = [
+    {label: 'Available', value: '1'},
+    {label: 'Awarded', value: '2'},
+    {label: 'Pending Verification', value: '3'},
+    {label: 'Cancelled', value: '4'},
+    {label: 'Verified', value: '5'},
+    {label: 'Paid', value: '6'},
+  ]
+
+  const [jobValue, setJobValue] = useState(null);
+  const [label, setLabel] = useState(null);
+  const [isJobFocus, setJobIsFocus] = useState(false);
+
+  const JobStatusRender = () => {
+    return (
+      <Dropdown
+        style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={jobStatus}
+        // search
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder={cellData}
+        // searchPlaceholder="Search..."
+        value={jobValue}
+        onFocus={() => setJobIsFocus(true)}
+        onBlur={() => setJobIsFocus(false)}
+        onChange={item => {
+          setJobValue(item.value);
+          setLabel(item.label);
+          setJobIsFocus(false);
+        }}
+        renderLeftIcon={() => (
+          <View
+            style={styles.icon}
+            color={isJobFocus ? 'blue' : 'black'}
+            name="Safety"
+            size={20}
+          />
+        )}
+      />
+    )
+  }
+  const [suc, setSuc] = useState(false);
+  const handlePress = async() => {
+    const sendingData = {jobId: rowData, jobStatus: label}
+    let Data = await Update(sendingData, 'jobs');
+    if(Data) setSuc(true);
+    toggleModal();
+  };
   return (
     <View style={styles.container}>
       <StatusBar
         translucent backgroundColor="transparent"
       />
-      <MHeader navigation={navigation} />
+      <AHeader navigation={navigation}  currentPage={1} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView style={{ width: '100%', marginTop: 140 }}
         showsVerticalScrollIndicator={false}
@@ -141,12 +245,12 @@ export default function AllCaregivers({ navigation }) {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => {
+          {/* <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => {
             navigation.navigate('FacilityProfile'),
               console.log("data-------", data)
           }}>
             <Text style={styles.profileTitle}>🏚️ Facilities Home</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View style={styles.profile}>
           <Text style={{ backgroundColor: '#000080', color: 'white', width: '26%' }}>TOOL TIPS:</Text>
@@ -210,26 +314,86 @@ export default function AllCaregivers({ navigation }) {
                 )}
               />
               <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
-                <TouchableWithoutFeedback onPress={() => handleRowClick(tableData, rowID)}>
-                  <Table borderStyle={{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
-                    <Row
-                      data={tableHead}
-                      style={styles.head}
-                      widthArr={[100, 100, 130, 130, 150, 120, 100, 120, 80, 100, 80, 100]}
-                      textStyle={styles.tableText}
-                    />
-                    <Rows
-                      data={tableData}
-                      style = {{backgroundColor: '#E2E2E2'}}
-                      widthArr={[100, 100, 130, 130, 150, 120, 100, 120, 80, 100, 80, 100]}
-                      textStyle={styles.tableText}
-                    />
-                  </Table>
-                </TouchableWithoutFeedback>
+                <Table >
+                  <Row
+                    data={tableHead}
+                    style={styles.head}
+                    widthArr={[150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80, 100]}
+                    textStyle={styles.tableText}
+                  />
+                  {data.map((rowData, rowIndex) => (
+                    <View key={rowIndex} style={{ flexDirection: 'row' }}>
+                      {rowData.map((cellData, cellIndex) => (
+                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
+                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                            <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
+                          </View>
+                        </TouchableWithoutFeedback> 
+                      ))}
+                    </View>
+                  ))}
+                </Table>
               </ScrollView>
             </View>
           </View>
-
+          
+      <Modal
+        visible={modal}
+        transparent= {true}
+        animationType="slide"
+        onRequestClose={() => {
+          setModal(!modal);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.calendarContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Job Status</Text>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
+                <Image source = {images.close} style={{width: 20, height: 20,}}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.modalBody}>
+                {/* <JobStatusRender /> */}
+      <Dropdown
+        style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={jobStatus}
+        // search
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder={cellData}
+        // searchPlaceholder="Search..."
+        value={jobValue}
+        onFocus={() => setJobIsFocus(true)}
+        onBlur={() => setJobIsFocus(false)}
+        onChange={item => {
+          setJobValue(item.value);
+          setLabel(item.label);
+          setJobIsFocus(false);
+        }}
+        renderLeftIcon={() => (
+          <View
+            style={styles.icon}
+            color={isJobFocus ? 'blue' : 'black'}
+            name="Safety"
+            size={20}
+          />
+        )}
+      />
+                <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
+                  <Text style={styles.buttonText}>Update</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
         </View>
       </ScrollView>
       <MFooter />
@@ -368,7 +532,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 20,
     paddingBottom: 30,
-    marginBottom: 100
+    marginBottom: 30
   },
   modalContainer: {
     flex: 1,
@@ -388,7 +552,7 @@ const styles = StyleSheet.create({
     borderColor: '#7bf4f4',
   },
   modalBody: {
-    backgroundColor: 'rgba(79, 44, 73, 0.19)',
+    // backgroundColor: 'rgba(79, 44, 73, 0.19)',
     borderRadius: 10,
     display: 'flex',
     justifyContent: 'center',
@@ -457,7 +621,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontWeight: 'bold',
     color: 'black',
-    textAlign: 'center'
+    textAlign: 'center',
+    borderWidth: 1, 
+    borderColor: 'rgba(0, 0, 0, 0.08)',
+    height: 40,
+    textAlignVertical: 'center'
   },
   dropdown: {
     height: 30,
@@ -494,5 +662,17 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#007BFF', // Button color
+    padding: 10,    
+    marginLeft: '35%',
+    marginTop: 30,           // Padding inside the button
+    borderRadius: 5,          // Rounded corners
+    
+  },
+  buttonText: {
+    color: 'white',            // Text color
+    fontSize: 16,              // Text size
   },
 });

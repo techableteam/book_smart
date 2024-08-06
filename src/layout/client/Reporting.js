@@ -12,6 +12,9 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
+import { MyShift } from '../../utils/useApi';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+
 
 export default function Reporting ({ navigation }) {
   //---------------------------------------Animation of Background---------------------------------------
@@ -46,33 +49,132 @@ export default function Reporting ({ navigation }) {
     navigation.navigate(navigateUrl);
   }
 
-  const data = [
-    { id: 'header', text1: 'Month', text2: 'Count' },
-    { id: '1', text1: '07/24', text2: "1" },
-    // Add more data as needed
-    { id: 'footer', text1: 'Sum', text2: "1" },
-  ];
+  //--------------------Gathering Data from Backend--------------
+  
+  const [data, setData] = useState([]);
+  const [userInfos, setUserInfo] = useState([]);
+  const [detailedInfos, setDetailedInfos] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [submitData, setSubmitData] = useState({});
+  const [dailyPay, setDailyPay] = useState({date: '', pay: 0});
+  const [weeklyPay, setWeeklyPay] = useState({date: '', pay: 0});
 
-  const myShiftDate = [
-    {id: 'header', text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'},
-    {id: '1', text1: '405', text2: 'Pending - Completed Verification', text3: '', text4: ''},
-  ]
+  // useEffect(() => {
+  //   async function getData() {
+  //     let Data = await MyShift('jobs', 'Clinicians');
+  //     console.log("date------------------------",Data);
+  //     if(!Data) {
+  //       setData(['No Data'])
+  //     }
+  //     else {
+  //       setData(Data);
+  //       let transformedData = [];
+  //       const monthGroups = {};
+  //       transformedData = Data.reportData.map(({entryDate, jobId, shiftStatus, unit, shiftDateAndTimes}, index)=> (key={index}, {entryDate, jobId, jobStatus: shiftStatus, unit, shiftDateAndTimes}));
+  //       console.log("date------------------------",transformedData);
+  //       transformedData.forEach(item => {
+  //         const month = item.entryDate.split('/')[0]+"/24"; // Get the MM part
+  //         if (!monthGroups[month]) {
+  //             monthGroups[month] = []; // Initialize an array for the month
+  //         }
+  //         monthGroups[month].push(item);
+  //       });
+  //       console.log("mm", monthGroups)
+
+  //       // Get keys and sort them based on date
+  //       const sortedKeys = Object.keys(monthGroups).sort((a, b) => {
+  //         const dateA = new Date(a.split('/')[1], a.split('/')[0] - 1); // Month is 0-indexed
+  //         const dateB = new Date(b.split('/')[1], b.split('/')[0] - 1);
+  //         return dateB - dateA; // Sort in ascending order
+  //       });
+
+  //       // Create a sorted object based on sorted keys
+  //       const sortedMonthGroups = {};
+  //       sortedKeys.forEach(key => {
+  //         sortedMonthGroups[key] = monthGroups[key];
+  //       });
+  //       console.log(sortedMonthGroups, "sort")
+  //       const mothData = Object.keys(sortedMonthGroups).map(month => ({
+  //         month: month,
+  //         number: String(sortedMonthGroups[month].length) // Count of entries for that month
+  //       }));
+  //       mothData.unshift({"month":"Month", "number": "Count"})
+  //       mothData.push({"month":"Sum", "number": String(data.length)})
+  //       console.log(mothData);
+  //       const totalPayString = "$" + Data.dailyPay.toString();
+  //       const weeklyPayString = "$" + Data.weeklyPay.toString();
+  //       console.log(Data.dailyPay, Data.weeklyPay);
+        
+  //       setDailyPay(totalPayString);
+  //       setWeeklyPay(weeklyPayString);
+  //       setUserInfo(mothData);
+  //       setDetailedInfos(sortedMonthGroups)
+  //     }
+  //   }
+  //   getData();
+
+  // }, [])
+  useFocusEffect(
+    React.useCallback(() => {
+      async function getData() {
+        let Data = await MyShift('jobs', 'Clinicians');
+        console.log("date------------------------", Data);
+        if (!Data) {
+          setData(['No Data']);
+        } else {
+          setData(Data);
+          let transformedData = [];
+          const monthGroups = {};
+          transformedData = Data.reportData.map(({ entryDate, jobId, shiftStatus, unit, shiftDateAndTimes }, index) => ({ key: index, entryDate, jobId, jobStatus: shiftStatus, unit, shiftDateAndTimes }));
+          console.log("date------------------------", transformedData);
+          transformedData.forEach(item => {
+            const month = item.entryDate.split('/')[0] + "/24"; // Get the MM part
+            if (!monthGroups[month]) {
+              monthGroups[month] = []; // Initialize an array for the month
+            }
+            monthGroups[month].push(item);
+          });
+          console.log("mm", data);
+          // Get keys and sort them based on date
+          const sortedKeys = Object.keys(monthGroups).sort((a, b) => {
+            const dateA = new Date(a.split('/')[1], a.split('/')[0] - 1); // Month is 0-indexed
+            const dateB = new Date(b.split('/')[1], b.split('/')[0] - 1);
+            return dateB - dateA; // Sort in ascending order
+          });
+          // Create a sorted object based on sorted keys
+          const sortedMonthGroups = {};
+          sortedKeys.forEach(key => {
+            sortedMonthGroups[key] = monthGroups[key];
+          });
+          console.log(sortedMonthGroups, "sort");
+          const mothData = Object.keys(sortedMonthGroups).map(month => ({
+            month: month,
+            number: String(sortedMonthGroups[month].length) // Count of entries for that month
+          }));
+          mothData.unshift({ "month": "Month", "number": "Count" });
+          mothData.push({ "month": "Sum", "number": String(data.reportData.length) });
+          console.log(mothData);
+          const totalPayString = Data.dailyPay;
+          const weeklyPayString = Data.weeklyPay;
+          console.log(Data.dailyPay, Data.weeklyPay);
+          setDailyPay(totalPayString);
+          setWeeklyPay(weeklyPayString);
+          setUserInfo(mothData);
+          setDetailedInfos(sortedMonthGroups);
+        }
+      }
+
+      getData();
+    }, []) // Empty dependency array to only run on focus
+  );
+
+  const [myShiftDate, setMyShiftDate] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
-  
-  const renderItem = ({ item, index }) => {
-    return (
-      <View style={[styles.row, {paddingHorizontal: 0}, index % 2 === 0 ? styles.evenRow : null]}>
-        <Text style={{width: '50%', textAlign: 'center', fontWeight: 'bold'}}>{item.text1}</Text>
-        <View style={{width: 1, height: 40, backgroundColor: 'hsl(0, 0%, 86%)', position: 'absolute', left: '50%'}} />
-        <Text style={[{width: '50%', textAlign: 'center'}, index == 0 ? {fontWeight: 'bold'}: {fontWeight: '400'}]} onPress={() => handleClick(item.id)}>{item.text2}</Text>
-      </View>
-    );
-  };
 
   const myRenderItem = ({ item, index }) => {
     return (
-      <View key={index} style={[styles.row, index % 2 === 0 ? styles.evenRow : null, ]}>
+      <View key={index} style={[styles.row, index === 0 ? styles.evenRow : null, ]}>
         <Text style={{width: '20%', textAlign: 'center', fontWeight: 'bold'}}>{item.text1}</Text>
         <View style={{width: 1, height: '200%', backgroundColor: 'hsl(0, 0%, 86%)', position: 'absolute', left: '25%'}} />
         <Text style={[{width: '40%', textAlign: 'center'}, index == 0 ? {fontWeight: 'bold'}: {fontWeight: '400'}]}>{item.text2}</Text>
@@ -84,17 +186,48 @@ export default function Reporting ({ navigation }) {
     );
   };
 
+  //--------------------------------------------------detailed Info-------------------------------------------------------------
+  
+  //------------------------------------------Search Function----------------
+  const [searchTerm, setSearchTem] = useState(''); // Search term
+  const [fileredData, setFilteredData] = useState([]);
+  const handleSearch = (e) => {
+    setSearchTem(e);
+    console.log(e, '------------');
+    if (e !== '') {
+      // console.log('dfesfdsdfd', userInfos[1][1].content)
+      const filtered = myShiftDate.filter(item => 
+        Object.values(item).some(value => 
+            value.toString().toLowerCase().includes(e.toLowerCase())
+        )
+      );
+      filtered.unshift({text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'});
+      console.log("detailedData", filtered);
+      setFilteredData(filtered);
+    }
+    else {
+      let detailedData = myShiftDate;
+      detailedData.unshift({text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'});
+      console.log("detailedData", detailedData);
+      setFilteredData(detailedData);
+    }
+    // setFilteredData(tableHead, ...filteredData);
+  }
+
   const handleClick = (id) => {
-    if (id !== 'header' && id !== 'footer')
+    if (id !== 'Month' && id !== 'Sum'){
+      const detailedData = detailedInfos[id].map(({jobId, jobStatus, unit, shiftDateAndTimes})=> ({"text1": jobId, "text2": jobStatus, "text3": unit, "text4": shiftDateAndTimes}))      
+      setMyShiftDate(detailedData);
+      detailedData.unshift({text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'});
+      console.log("detailedData", id, detailedData);
+      setFilteredData(detailedData);
+      
       toggleModal();
+    }
   }
   
   const toggleModal = () => {
     setShowModal(!showModal);
-  }
-
-  const handleFilter = () => {
-
   }
 
   return (
@@ -124,11 +257,26 @@ export default function Reporting ({ navigation }) {
               <Text style={styles.profileTitle}>MY SHIFTS BY MONTH</Text>
             </View>
             <Text style={styles.name}>"Click On Any Value To View Details"</Text>
-            <FlatList
+            {
+              userInfos.map((item, index) => 
+                <View style={[styles.row, {paddingHorizontal: 0}, index === 0 || index === userInfos.length-1 ? styles.evenRow : null]}>
+                  <Text style={{width: '50%', textAlign: 'center', fontWeight: 'bold'}}>{item.month}</Text>
+                  <View style={{width: 1, height: 40, backgroundColor: 'hsl(0, 0%, 86%)', position: 'absolute', left: '50%'}} />
+                  <Text style={[{width: '50%', textAlign: 'center'}, index == 0 || index === userInfos.length-1 ? {fontWeight: 'bold'}: {fontWeight: '400'}]} onPress={() => handleClick(item.month)}>{item.number}</Text>
+                </View>)
+            }
+            <View style={[styles.profileTitleBg, {marginTop: 30}]}>
+              <Text style={styles.profileTitle}>Daily & Weekly Pay</Text>
+            </View>
+            <View style={{width: '90%', marginBottom: 30}}>
+              <Text style={styles.name}>{`Day:       ${dailyPay.date}                         $${dailyPay.pay}`}</Text>
+              <Text style={styles.name}>{`Week:    ${weeklyPay.date}   $${weeklyPay.pay}`}</Text>
+            </View>
+            {/* <FlatList
               data={data}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
-            />
+            /> */}
           </View>
         </ScrollView>
           {showModal && <Modal
@@ -150,20 +298,25 @@ export default function Reporting ({ navigation }) {
                 <View style={styles.body}>
                   <View style={styles.modalBody}>
                     <View style={styles.searchBar}>
-                      <TextInput style={styles.searchText} />
+                      <TextInput
+                        style={[styles.searchText]}
+                        placeholder=""
+                        onChangeText={e => handleSearch(e)}
+                        value={searchTerm || ''}
+                      />
                       <TouchableOpacity style={styles.searchBtn}>
                         <Text>Search</Text>
                       </TouchableOpacity>
                     </View>
-                    <View style={styles.filter}>
+                    {/* <View style={styles.filter}>
                       <TouchableOpacity style= {styles.filterBtn} onPress={handleFilter}>
                         <Image source={images.filter} style={{width: 20, height: 20}} />
                         <Text style={styles.filterText}>Add filters</Text>
                       </TouchableOpacity>
-                    </View>
+                    </View> */}
                     <View style={{width: '90%', marginBottom: 30}}>
                       <FlatList
-                        data={myShiftDate}
+                        data={fileredData}
                         renderItem={myRenderItem}
                         keyExtractor={(item) => item.id}
                       />
@@ -338,14 +491,30 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: '60%',
+    borderRadius: 10,
+    height: 30,
+    marginBottom: 10,
+  },
+  searchBar: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems:'center',
-    margin: 10
+    margin: 10,
+    borderRadius: 10,
+    height: 30,
+    marginBottom: 10,
   },
   searchText: {
     width: '70%',
     backgroundColor: 'white',
     height: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 0
   },
   searchBtn: {
     width: '30%',
@@ -369,7 +538,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems:'center',
     padding: 5,
-    gap: 5
+    gap: 5,
+    marginBottom: 10
   },
   filterText: {
     color: '#2a53c1',

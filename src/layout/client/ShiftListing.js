@@ -143,7 +143,7 @@ export default function ShiftListing ({ navigation }) {
         setFilteredData(transformedData);
         const len = transformedData.length;
         console.log(len, 'ddddd00000')
-        const page = Math.round(0.5 + (len / itemsPerPage));
+        const page = Math.ceil(len / itemsPerPage);
         setTotalPages(page);
         setDetailedInfo(detailedData);
         setFilteredDetailData(detailedData);
@@ -153,7 +153,7 @@ export default function ShiftListing ({ navigation }) {
           value: index + 1
         }));
         setPageItems(generatedPageArray);
-        console.log(generatedPageArray, "pageItems+1+@+@+@+@+")
+        // console.log(generatedPageArray, "pageItems+1+@+@+@+@+")
       }
       // // setTableData(Data[0].degree)
       // tableScan(Data);
@@ -234,7 +234,7 @@ export default function ShiftListing ({ navigation }) {
       setFilteredDetailData(detailed);
       const len = filtered.length;
       console.log(len, 'ddddd00000')
-      const page = Math.round(0.5 + (len / itemsPerPage));
+      const page = Math.ceil(len / itemsPerPage);
       setTotalPages(page);
       console.log(page, totalPages)
       const generatedPageArray = Array.from({ length: page}, (_, index) => ({
@@ -262,16 +262,16 @@ export default function ShiftListing ({ navigation }) {
   const [pageItemValue, setPageItemValue] = useState(null);
   const [isPageItemFocus, setIsPageItemFocus] = useState(false);
 
-  const renderPageItemLabel = () => {
-    if (pageItemValue || isPageItemFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
+  // const renderPageItemLabel = () => {
+  //   if (pageItemValue || isPageItemFocus) {
+  //     return (
+  //       <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
+  //         Dropdown label
+  //       </Text>
+  //     );
+  //   }
+  //   return null;
+  // };
 
   const getItemsForPage = (page) => {
     const startIndex = (page-1) * itemsPerPage;
@@ -370,59 +370,12 @@ export default function ShiftListing ({ navigation }) {
                     ]}>{item.content}</Text>
                   </View>
                 )}
-                <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx)}>
+                <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx + (currentPage-1)*itemsPerPage)}>
                   <Text style={{color: 'white', fontWeight: 'bold'}}> VIEW & APPLY</Text>
                 </TouchableOpacity>
               </View>)
             }
           </View>
-          {/* <View style={{marginBottom: 100, marginLeft: '10%'}}>
-            <Text style={[styles.title, {color: 'black', fontSize: 20}]}>Jobs</Text>
-            <View style = {{}}>
-              <Text style={{marginBottom: 10}}>Search</Text>
-              <View style={{flexDirection: 'row', width:'80%'}}>
-                <TextInput
-                  style={styles.textModalInput}
-                  placeholder="City, State, or Zip"
-                  onChangeText={e => handleChange(e)}
-                  value={text}
-                />
-                <Text style={[styles.text, {marginTop: 11, marginLeft: 0, width: 50}]}>within</Text>
-                
-                <TouchableOpacity onPress = {()=>setShowModal(true)} style={{height: 30, width: '100%', zIndex: 10}}>
-                </TouchableOpacity>
-                <TextInput
-                  style={[styles.textModalInput, {width: 100, position: 'absolute', left: '78%', zIndex: 0}]}
-                  placeholder=""
-                  editable= {false}
-                  // onChangeText={e => handleChange(e)}
-                  value={mile ? mile+" Miles": '' }
-                />
-                {showModal && <Modal
-                  Visible={false}
-                  transparent= {true}
-                  animationType="slide"
-                  onRequestClose={() => {
-                    setShowModal(!showModal);
-                  }}
-                >
-                  <View style={styles.modalContainer}>
-                    <View style={styles.calendarContainer}>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('5')}>5 Miles</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('10')}>10 Miles</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('25')}>25 Miles</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('50')}>50 Miles</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('100')}>100 Miles</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('any')}>Any</Text>
-                    </View>
-                  </View>
-                </Modal>}
-              </View>
-            </View>
-            <TouchableOpacity style={[styles.edit, {backgroundColor: 'rgba(15, 118, 193, 0.73)', width: '90%' }]} onPress = {() => handleEdit()}>
-              <Text style={{color: 'white', fontSize: 20}}> Search </Text>
-            </TouchableOpacity>
-          </View> */}
         </ScrollView>
         {isModal && <Modal
           Visible={false}

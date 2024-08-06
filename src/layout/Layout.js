@@ -37,6 +37,7 @@ import CompanyShift from './facilities/CompanyShift';
 import AdminHome from './admin/AdminHome';
 import AdminDashboard from './admin/AdminDashboard';
 import AllCaregivers from './admin/AllCaregivers.js';
+import AllJobShiftListing from './admin/AllJobShiftListing.js';
 const Stack = createNativeStackNavigator();
 
 function Layout() {
@@ -180,6 +181,11 @@ function Layout() {
       <Stack.Screen 
         name= 'AllCaregivers'
         component = {AllCaregivers}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AllJobShiftListing'
+        component = {AllJobShiftListing}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

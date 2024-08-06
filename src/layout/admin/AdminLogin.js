@@ -9,17 +9,13 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/ClinicalAuthProvider'
+import { firstNameAtom, lastNameAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/AdminAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AdminLogin({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [birthday, setBirthday] = useAtom(birthdayAtom);
-  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [signature, setSignature] = useAtom(signatureAtom);
-  const [title, setTitle] = useAtom(titleAtom);
   const [email, setEmail] = useAtom(emailAtom);
   const [photoImage, setPhotoImage] = useAtom(photoImageAtom);
   const [userRole, setUserRole]= useAtom(userRoleAtom);
@@ -91,14 +87,14 @@ export default function AdminLogin({ navigation }) {
     try {
       const response = await Signin(credentials, 'Admin');
       console.log('SignIn Successful: ', response);
-      // setFirstName(response.data.firstName);
-      // setLastName(response.data.lastName);
-      // setBirthday(response.data.birthday);
-      // setPhoneNumber(response.data.phoneNumber);
-      // setSignature(response.data.signature);
+      setFirstName(response.user.firstName);
+      setLastName(response.user.lastName);
+      // setBirthday(response.user.birthday);
+      // setPhoneNumber(response.user.phoneNumber);
+      setUserRole(response.user.userRole);
       setEmail(response.user.email);
       // setTitle(response.data.title);
-      // setPhotoImage(response.data.photoImage);
+      // setPhotoImage(response.user.photoImage);
       if (checked) {
         await AsyncStorage.setItem('AdminEmail', credentials.email);
         await AsyncStorage.setItem('AdminPassword', credentials.password);

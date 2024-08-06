@@ -6,9 +6,11 @@ import  { useNavigation, useRoute } from '@react-navigation/native';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
+import AHeader from '../../components/Aheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { Table, Row, Rows } from 'react-native-table-component';
+import { GetDashboardData } from '../../utils/useApi';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, userRoleAtom } from '../../context/AdminAuthProvider';
 // import MapView from 'react-native-maps';
@@ -51,30 +53,48 @@ export default function AdminDashboard ({ navigation }) {
     {title: 'TOT. - CANCELED', content: myJobInfo.totalCanceled},
   ])
 
-  const tableHead1 = [
-    'Job Status',
-    'Count',
-  ];
-  const tableHead2 = [
-    'Nurse',
-    'Count',
-  ];
-  const tableHead3 = [
-    'Month',
-    'Count',
-  ];
-
-  const tableData1 = [
-    ['Available',116],
-    ['Awarded',53],
-    ['Cancelled',2],
-    ['Paid',5],
-    ['Pending Verification',5],
-    ['Verified',1],
-    ['Pending - Completed Verification',10],
-    ['Shift Verified',4],
-    ['Sum',196],
-  ]
+  const [data, setData] = useState([]);
+  const [tableData1, setTableData1] = useState([]);
+  const [tableData2, setTableData2] = useState([]);
+  const [tableData3, setTableData3] = useState([]);
+  const [sum1,setSum1] = useState(0);
+  const [sum2, setSum2] = useState(0);
+  const [sum3,setSum3] = useState(0);
+  useEffect(() => {
+    async function getData() {
+      let Data = await GetDashboardData('jobs', 'Admin');
+      if(!Data) {
+        setData(['No Data'])
+      }
+      else {
+        setData(Data) 
+        const newTableData1 = Data.job.map(item => [item._id, item.count]);
+        setTableData1(newTableData1); // Update state
+        const newTableData2 = Data.nurse.map(item => [item._id, item.count]);
+        setTableData2(newTableData2); // Update state
+        const newTableData3 = Data.cal.map(item => [item._id, item.count]);
+        setTableData3(newTableData3); // Update state
+        console.log('--------------------------', newTableData1);
+        let s1=0;
+        let s2=0;
+        let s3=0;
+        Data.job.map((item, index) => {
+          s1 += item.count;
+        })
+        Data.nurse.map((item, index) => {
+          s2 += item.count;
+        })
+        Data.cal.map((item, index) => {
+          s3 += item.count;
+        })
+        setSum1(s1)
+        setSum2(s2)
+        setSum3(s3)
+      }
+    }
+    getData();
+    // tableData = tableScan(Data);
+  }, []);
 
   const tableDatas = [
     {
@@ -83,17 +103,8 @@ export default function AdminDashboard ({ navigation }) {
         'Job Status',
         'Count',
       ],
-      data: [
-        ['Available',116],
-        ['Awarded',53],
-        ['Cancelled',2],
-        ['Paid',5],
-        ['Pending Verification',5],
-        ['Verified',1],
-        ['Pending - Completed Verification',10],
-        ['Shift Verified',4],
-      ],
-      final: ['Sum',196],
+      data: tableData1,
+      final: ['Sum',sum1],
     },
     {
       title: 'JOBS / SHIFTS BY NURSE',
@@ -101,41 +112,8 @@ export default function AdminDashboard ({ navigation }) {
         'Nurse',
         'Count',
       ],
-      data: [
-        ['Aleigha Simmons',0],
-        ['alexis jefferds',6],
-        ['Alma Rhodes',0],
-        ['Ashley Papelian',0],
-        ['Barbara Hawkins',0],
-        ['Brian Test',1],
-        ['Dale',1],
-        ['Daniel Graves',0],
-        ['diamond dowell',0],
-        ['Elizabeth Gard',0],
-        ['Elizabeth Gard',0],
-        ['Erin Fehmer',45],
-        ['Farkhanda Bhatti',0],
-        ['Hope Hopkins',0],
-        ['Jane Maurice',1],
-        ['Jasmine Hall',0],
-        ['Jasmine White',0],
-        ['Jessica Provost',0],
-        ['Joan Dixon',0],
-        ['Joan Wilson',0],
-        ['Jon Savino',0],
-        ['Jona Diaz',0],
-        ['Jules Smith',0],
-        ['Kayleigh Weselak',0],
-        ['Kayleigh Weselak',0],
-        ['Kiyomi Hayes',0],
-        ['Kristin Zbytniewski',0],
-        ['LaDiamond Anderson',11],
-        ['Mariah Smith',0],
-        ['Mary Watson',0],
-        ['Mary Wills',2],
-        ['Melvin Gray McKnight',0],
-      ],
-      final: ['Sum',196],
+      data: tableData2,
+      final: ['Sum',sum2],
     },
     {
       title: 'JOBS / SHIFTS BY MONTH',
@@ -143,11 +121,8 @@ export default function AdminDashboard ({ navigation }) {
         'Month',
         'Count',
       ],
-      data: [
-        ['07/24',163],
-        ['06/24',33],
-      ],
-      final: ['Sum',196],
+      data: tableData3,
+      final: ['Sum',sum3],
     }
   ]
 
@@ -167,9 +142,9 @@ export default function AdminDashboard ({ navigation }) {
         <StatusBar 
             translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <AHeader navigation={navigation} currentPage={0} />
         <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-        <ScrollView style={{width: '100%', marginTop: 119}}
+        <ScrollView style={{width: '100%', marginTop: 140}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -202,13 +177,13 @@ export default function AdminDashboard ({ navigation }) {
                     data={item.header}
                     style={styles.head}
                     widthArr={[200,80]}
-                    textStyle={[styles.tableText, { marginTop: 0 }]}
+                    textStyle={styles.tableText}
                   />
                   <Rows
                     data={item.data}
                     widthArr={[200,80]}
-                    style = {{backgroundColor: '#E2E2E2'}}
-                    textStyle = {[styles.tableText, { marginTop: 0 }]}
+                    style = {{backgroundColor: '#E2E2E2', color: 'black'}}
+                    textStyle = {styles.tableText}
                   />
                   <Row
                     data={item.final}

@@ -11,6 +11,7 @@ import PhoneInput from 'react-native-phone-input';
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
 import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs'
 import { Signup } from '../../utils/useApi';
 
 export default function FacilitySignUp({ navigation }) {

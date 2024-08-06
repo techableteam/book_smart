@@ -8,6 +8,7 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import PhoneInput from 'react-native-phone-input';
+import RNFS from 'react-native-fs'
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
 import DocumentPicker from 'react-native-document-picker';
@@ -383,11 +384,11 @@ export default function ClientSignUp({ navigation }) {
               <Text style={styles.subtitle}> Phone <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
+                  placeholder="(___) ___-____"
                   value={credentials.phoneNumber}
                   style={[styles.input, {width: '100%'}]}
                   onChangeText={(e) =>handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
-                  placeholder="(___) ___-____"
                 />
               </View>
             </View>

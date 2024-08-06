@@ -9,6 +9,7 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { Table, Row, Rows } from 'react-native-table-component';
+import { Dropdown } from 'react-native-element-dropdown';
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
@@ -16,30 +17,6 @@ import * as Progress from 'react-native-progress';
 import { Jobs } from '../../utils/useApi';
 
 export default function CompanyShift({ navigation }) {
-
-  const [filteredData, setFilteredData] = useState(data);
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a random color
-      if (colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
-
   const tableHead = [
     'Degree/Discipline',
     'Entry Date',
@@ -58,6 +35,54 @@ export default function CompanyShift({ navigation }) {
     'Delete',
   ];
 
+  const [totalPages, setTotalPages] = useState(1);
+  const [tableData, setTableData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  //-----------------------------DropDown----------------------------
+  
+  const pageItems = [
+    {label: '10 per page', value: '10'},
+    {label: '25 per page', value: '25'},
+    {label: '50 per page', value: '50'},
+    {label: '100 per page', value: '100'},
+    {label: '500 per page', value: '500'},
+    {label: '1000 per page', value: '1000'},
+  ]
+
+  const [value, setValue] = useState(100);
+  const [isFocus, setIsFocus] = useState(false);
+
+  const renderLabel = () => {
+    if (value || isFocus) {
+      return (
+        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+          Dropdown label
+        </Text>
+      );
+    }
+    return null;
+  };
+  //---------------------------------------Animation of Background---------------------------------------
+  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
+  let colorIndex = 0;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Generate a random color
+      if (colorIndex >= 0.9) {
+        colorIndex = 0;
+      } else {
+        colorIndex += 0.1;
+      }
+
+      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
+      setBackgroundColor(randomColor);
+    }, 500); // Change color every 5 seconds
+
+    return () => clearInterval(interval); // Clean up the interval on component unmount
+  }, []);
+
+  const [data, setData] = useState([]);
   useEffect(() => {
     async function getData() {
       let Data = await Jobs('jobs', 'Facilities');
@@ -68,7 +93,9 @@ export default function CompanyShift({ navigation }) {
         setData(Data)
         setFilteredData(Data);
       }
-      // console.log('--------------------------', data);
+      Data.unshift(tableHead);
+      setTableData(Data);
+      console.log('--------------------------', Data);
       // // setTableData(Data[0].degree)
       // tableScan(Data);
     }
@@ -80,42 +107,79 @@ export default function CompanyShift({ navigation }) {
   const [searchTerm, setSearchTem] = useState(''); // Search term
   const handleSearch = (e) => {
     setSearchTem(e);
-    const filtered = data.filter(row => row.some(cell => cell.toLowerCase().includes(e.toLowerCase())));
+    const Data = []
+    if (data.length >1) {
+      Data = data.shift(data[0]);
+    }
+    else {
+      Data = data
+    }
+    
+    const filtered = Data.filter(row => 
+      row.some(cell => 
+        cell && cell.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
     setFilteredData(filtered);
+    filtered.unshift(tableHead);
+    setTableData(tableData)
     // setFilteredData(tableHead, ...filteredData);
   }
+  //----------------------------change Current page--------------------------
+  const [currentPage, setCurrentPage] = useState(1);
+  const getItemsForPage = (page) => {
+    const startIndex = (page-1) * value;
+    const endIndex = Math.min(startIndex + value, filteredData.length);
+    return filteredData.slice(startIndex, endIndex);
+  }
 
-  const TableComponent = ({ data }) => {
-    return (
-      <FlatList
-        data={data}
-        keyExtractor={(item, index) => index.toString()}
-        horizontal
-        showsVerticalScrollIndicator={true}
-        style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, backgroundColor: 'white', width: '90%', marginBottom: 30, flex: 1}}
-        renderItem={({item, index}) => (
-          <View key={index} style={{height: 30, flexDirection: 'row'}}>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 150}}>{item[0]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[1]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[2]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 130}}>{item[3]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[4]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 70}}>{item[5]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 150}}>{item[6]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[7]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 150}}>{item[8]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[9]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[10]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[11]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[12]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 80}}>{item[13]}</Text>
-            <Text style={{ borderColor: 'rgb(0, 0, 0, 0.08)', borderWidth: 1, textAlign: 'center', width: 100}}>{item[14]}</Text>
-          </View>
-        )}
-      />
-    );
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1);
+    }
   };
 
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const itemsToShow = getItemsForPage(currentPage);
+
+  //------------------------------table Component---------------------------
+  const widths = [150, 100, 80, 130, 100, 70, 150, 80, 150, 80, 200, 80, 100, 80, 100];
+  const RenderItem = ({ item, index }) => (
+    <View key={index} style={{ backgroundColor: index !== 0 ? 'white' : '#ccffff', flexDirection: 'row' }}>
+      {widths.map((width, idx) => (
+        <Text key={idx} style={[styles.tableItemStyle, { width }]} onPress={() => itemChange(item, idx)}>
+          {item[idx]}
+        </Text>
+      ))}
+    </View>
+  );
+  
+  const TableComponent = () => (
+    <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
+      {itemsToShow.map((item, index) => (
+        <RenderItem key={index} item={item} index={index} />
+      ))}
+    </View>
+  );
+
+  const itemChange = (item, idx) => {
+
+  }
+
+  //-------------------------------itemChangeDropBox==================
+  const degreeItem = [
+    {label: '10 per page', value: '10'},
+    {label: '25 per page', value: '25'},
+    {label: '50 per page', value: '50'},
+    {label: '100 per page', value: '100'},
+    {label: '500 per page', value: '500'},
+    {label: '1000 per page', value: '1000'},
+  ]
   return (
     <View style={styles.container}>
       <StatusBar
@@ -174,7 +238,7 @@ export default function CompanyShift({ navigation }) {
               <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
                 <Text style={styles.profileTitle}>🖥️ FACILITY / SHIFT LISTINGS</Text>
               </View>
-              <View style={styles.searchBar}>
+              <View style={[styles.searchBar, {width: '60%'}]}>
                 <TextInput
                   style={[styles.searchText, {height: 30}]}
                   placeholder=""
@@ -185,24 +249,51 @@ export default function CompanyShift({ navigation }) {
                   <Text>Search</Text>
                 </TouchableOpacity>
               </View>
-              {/* <View style={{width: '95%'}}> */}
-                <TableComponent style={{width: '95%'}} data={filteredData} />
-              {/* </View> */}
-              {/* <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
-                <Table borderStyle={{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
-                  <Row
-                    data={tableHead}
-                    style={styles.head}
-                    widthArr={[150, 100, 80, 130, 100, 70, 150, 80, 150, 80, 100, 80, 100, 80, 100]}
-                    textStyle={[styles.tableText, { marginTop: 0 }]}
-                  />
-                  <Rows
-                    data={data}
-                    widthArr={[150, 100, 80, 130, 100, 70, 150, 80, 150, 80, 100, 80, 100, 80, 100]}
-                    textStyle={[styles.tableText, { marginTop: 0 }]}
-                  />
-                </Table>
-              </ScrollView> */}
+              <View style= {{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <Dropdown
+                  style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  iconStyle={styles.iconStyle}
+                  data={pageItems}
+                  // search
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={'100 per page'}
+                  // searchPlaceholder="Search..."
+                  value={value ? value : pageItems[3].value}
+                  onFocus={() => setIsFocus(true)}
+                  onBlur={() => setIsFocus(false)}
+                  onChange={item => {
+                    setValue(item.value);
+                    setIsFocus(false);
+                    const len = tableData.length;
+                    console.log(len, 'ddddd00000')
+                    const page = Math.ceil(len / item.value);
+                    setTotalPages(page);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
+              </View>
+              { totalPages> 1 &&
+                <View style={{display: 'flex', flexDirection: 'row', height: 30, marginBottom: 10, alignItems: 'center'}}>
+                  <Text onPress={handlePrevPage} style={{width: 20}}>{currentPage>1 ? "<": " "}</Text>
+                  <Text style={{width: 20}}>{" "+currentPage+" "}</Text>
+                  <Text onPress={handleNextPage} style={{width: 20}}>{currentPage<totalPages ? ">" : " "}</Text>
+                </View>
+              }
+              <ScrollView horizontal={true} style={{marginBottom: 30, width: '95%'}}>
+                <TableComponent style={{width: '95%'}} data={itemsToShow} />
+              </ScrollView>
             </View>
           </View>
 
@@ -434,5 +525,67 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     textAlign: 'center'
-  }
+  },
+  tableItemStyle: { 
+    borderColor: '#AAAAAA', 
+    borderWidth: 1, 
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    height: 30
+  },
+  dropdown: {
+    height: 40,
+    width: '60%',
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 10
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems:'center',
+    margin: 10,
+    borderRadius: 10,
+    height: 30,
+    marginBottom: 10,
+  },
+  searchText: {
+    width: '70%',
+    backgroundColor: 'white',
+    height: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 0
+  },
+  searchBtn: {
+    width: '30%',
+    display: 'flex',
+    justifyContent:'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    height: 30
+  },
 });

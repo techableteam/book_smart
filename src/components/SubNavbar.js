@@ -52,7 +52,8 @@ const styles = StyleSheet.create({
     position:'absolute',
     width: '100%',
     flexDirection: 'row',
-    justifyContent:'flex-end'
+    justifyContent:'flex-end',
+    zIndex: 0
   },
   text: {
     paddingHorizontal: 10,

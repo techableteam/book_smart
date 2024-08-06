@@ -10,6 +10,7 @@ import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, userRoleAtom } from '../../context/AdminAuthProvider';
+import AHeader from '../../components/Aheader';
 // import MapView from 'react-native-maps';
 
 export default function AdminHome ({ navigation }) {
@@ -49,8 +50,8 @@ export default function AdminHome ({ navigation }) {
         <StatusBar 
             translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
-        <SubNavbar navigation={navigation} name={"AdminLogin"}/>
+        <AHeader currentPage={3} navigation={navigation} style={{zIndex: 10}}/>
+        <SubNavbar navigation={navigation} name={"AdminLogin"} style={{zIndex: 0}}/>
         <ScrollView style={{width: '100%', marginTop: 119}}
           showsVerticalScrollIndicator={false}
         >
