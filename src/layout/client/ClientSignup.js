@@ -303,7 +303,7 @@ export default function ClientSignUp({ navigation }) {
       credentials.verifiedSocialSecurityNumber ==='' || 
       credentials.address.streetAddress ==='' || 
       credentials.address.city ==='' || 
-      credentials.address.state ==='' || 
+      // credentials.address.state ==='' || 
       credentials.address.zip ==='' || 
       credentials.password ===''
     ) {
@@ -427,12 +427,13 @@ export default function ClientSignUp({ navigation }) {
               <Text style={styles.subtitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
                 <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}>
-                </TouchableOpacity><TextInput
+                  <TextInput
                     style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
                     placeholder=""
                     value={birthday.toDateString()}
                     editable={false}
                   />
+                </TouchableOpacity>
                 
                 {/* <Button title="Select Birthday" onPress={() => setShowCalendar(true)} /> */}
                 {showCalender && 

@@ -36,8 +36,15 @@ import AddJobShift from './facilities/AddJobShift';
 import CompanyShift from './facilities/CompanyShift';
 import AdminHome from './admin/AdminHome';
 import AdminDashboard from './admin/AdminDashboard';
-import AllCaregivers from './admin/AllCaregivers.js';
 import AllJobShiftListing from './admin/AllJobShiftListing.js';
+import AdminJobShift from './admin/AdminJobShift.js';
+import AdminCompany from './admin/AdminCompany.js';
+import AdminEditProfile from './admin/AdminEditProfile.js';
+import AllCaregivers from './admin/AllCaregivers.js';
+import AdminAllUser from './admin/AdminAllUser.js';
+import AdminFacilities from './admin/AdminFacilities.js';
+import CaregiverTimeSheet from './admin/CaregiverTimeSheet.js';
+import Invoice from './facilities/invoice.js';
 const Stack = createNativeStackNavigator();
 
 function Layout() {
@@ -179,13 +186,48 @@ function Layout() {
         options={{headerShown: false}}
       />
       <Stack.Screen 
+        name= 'AllJobShiftListing'
+        component = {AllJobShiftListing}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminJobShift'
+        component = {AdminJobShift}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminCompany'
+        component = {AdminCompany}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminEditProfile'
+        component = {AdminEditProfile}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
         name= 'AllCaregivers'
         component = {AllCaregivers}
         options={{headerShown: false}}
       />
       <Stack.Screen 
-        name= 'AllJobShiftListing'
-        component = {AllJobShiftListing}
+        name= 'AdminAllUser'
+        component = {AdminAllUser}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminFacilities'
+        component = {AdminFacilities}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'CaregiverTimeSheet'
+        component = {CaregiverTimeSheet}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'Invoice'
+        component = {Invoice}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

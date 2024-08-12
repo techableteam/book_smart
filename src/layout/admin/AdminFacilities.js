@@ -18,9 +18,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
-import { useFocusEffect } from '@react-navigation/native';
 
-export default function AllCaregivers({ navigation }) {
+export default function AdminFacilities({ navigation }) {
 
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
@@ -47,7 +46,7 @@ export default function AllCaregivers({ navigation }) {
   const tableHead = [
     'Entry Date',
     'Name',
-    'Phone',
+    'Company Name',
     'Email',
     'User Status',
   ];
@@ -72,7 +71,7 @@ export default function AllCaregivers({ navigation }) {
   }
 
   async function getData() {
-    let Data = await Clinician('clinical/clinician', 'Admin');
+    let Data = await Clinician('facilities/facility', 'Admin');
     if(!Data) {
       setData(['No Data'])
     }
@@ -103,11 +102,10 @@ export default function AllCaregivers({ navigation }) {
     // // setTableData(Data[0].degree)
     // tableScan(Data);
   }
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, []) // Empty dependency array means this runs on focus
-  );
+  useEffect(() => {
+    getData();
+    // tableData = tableScan(Data);
+  }, []);
 
   //---------------DropDown--------------
   const pageItems = [
@@ -205,33 +203,33 @@ export default function AllCaregivers({ navigation }) {
     let sendData = label;
     let sendingData = {}
     if (modalItem === 1) {
-      const emailData = {email: rowData}
+      const emailData = {contactEmail: rowData}
       sendingData = {
         ...emailData, // Ensure rowData is defined and contains the appropriate value
         ...sendData // Use sendData for jobNum
       };
     } else if (modalItem === 2) {
       sendingData = {
-        email: rowData,
+        contactEmail: rowData,
         phoneNumber: sendData // Use sendData for location
       };
     } else if (modalItem === 3)  {
       // Handle other modalItems as needed
       sendingData = {
-        email: rowData,
+        contactEmail: rowData,
         updateEmail: sendData // Use sendData for location
       };
     } else if (modalItem === 4)  {
       // Handle other modalItems as needed
       sendingData = {
-        email: rowData,
+        contactEmail: rowData,
         userStatus: sendData // Use sendData for location
       };
     }
     console.log('====================================');
     console.log(sendingData);
     console.log('====================================');
-    let Data = await Update(sendingData, 'clinical');
+    let Data = await Update(sendingData, 'facilities');
     if(Data) setSuc(suc+1);
     else setSuc(suc);
     toggleModal();
@@ -242,7 +240,7 @@ export default function AllCaregivers({ navigation }) {
       <StatusBar
         translucent backgroundColor="transparent"
       />
-      <AHeader navigation={navigation}  currentPage={4} />
+      <AHeader navigation={navigation}  currentPage={6} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView style={{ width: '100%', marginTop: 140 }}
         showsVerticalScrollIndicator={false}
@@ -259,26 +257,22 @@ export default function AllCaregivers({ navigation }) {
           <Text style={{ backgroundColor: '#000080', color: 'white', width: '26%' }}>TOOL TIPS:</Text>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>When A New <Text style={{fontWeight: 'bold'}}>"CAREGIVER"</Text> signs-up, they will have a status of <Text style={{ color: '#0000ff', fontWeight: 'bold' }}>"PENDING APPROVAL"</Text></Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Displays all Facilities within the platform.</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Once you have verified the <Text style={{fontWeight: 'bold'}}>CAREGIVER</Text> information, update the status to <Text style={{ color: '#008000', fontWeight: 'bold' }}>"ACTIVE"</Text>.</Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Click <Text style={{fontWeight: 'bold'}}>"VIEW SHIFT"</Text> - to view all shifts associated with the facility.</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>The CAREGIVER will receive an Approval email, and can then login to view Jobs / Shifts</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>To Deactivate a <Text style={{fontWeight: 'bold'}}>"CAREGIVER"</Text> change the status to <Text style={{ color: '#ff0000', fontWeight: 'bold' }}>"INACTIVE"</Text></Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Change status to <Text style={{ color: '#ff0000', fontWeight: 'bold' }}>"INACTIVE"</Text> to deactivate facility.</Text>
           </View>
         </View>
         <View>
           <View style={styles.body}>
             <View style={styles.modalBody}>
               <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                <Text style={styles.profileTitle}>ALL CAREGIVERS</Text>
+                <Text style={styles.profileTitle}>🖥️ ALL PLATFORM FACILITIES</Text>
               </View>
               <View style={styles.searchBar}>
                 {/* <TextInput style={styles.searchText} /> */}

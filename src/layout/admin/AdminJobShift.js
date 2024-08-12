@@ -1,5 +1,5 @@
 import { Alert, StyleSheet, View, Image, Button, Platform, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Pressable } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import images from '../../assets/images';
 import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
 import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/ClinicalAuthProvider';
@@ -11,7 +11,7 @@ import PhoneInput from 'react-native-phone-input';
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
 import DocumentPicker from 'react-native-document-picker';
-import { PostJob, Signup } from '../../utils/useApi';
+import { PostJob, Jobs } from '../../utils/useApi';
 import MSubNavbar from '../../components/MSubNavbar';
 import SubNavbar from '../../components/SubNavbar';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -23,9 +23,46 @@ import { useAtom } from 'jotai';
 import { companyNameAtom } from '../../context/FacilityAuthProvider'
 
 
-export default function AddJobShift({ navigation }) {
+export default function AdminJobShift({ navigation }) {
 
   const theme = useTheme();
+  const [data, setData] = useState([]);
+  const [facility, setFacility] = useState([]);
+
+  async function getData() {
+    let Data = await Jobs('jobs', 'Admin');
+    if(!Data) {
+      setData(['No Data'])
+    }
+    else {
+      setData(Data)
+      console.log('====================================');
+      console.log(Data);
+      console.log('====================================');
+    }
+    const uniqueValues = new Set();
+    const transformed = [];
+
+    // Iterate over each subarray
+    data.forEach(subarray => {
+      const value = subarray[11]; // Get the second element
+      // console.log(value)
+      if (!uniqueValues.has(value)) { // Check if it's already in the Set
+          uniqueValues.add(value); // Add to Set
+          transformed.push({ label: value, value: value }); // Add to transformed array
+      }
+    });
+
+    console.log(transformed);
+    transformed.unshift({label: 'Select...', value: 'Select...'})
+    setFacility(transformed);
+    // // setTableData(Data[0].degree)
+    // tableScan(Data);
+  }
+  useEffect(() => {
+    getData();
+    // tableData = tableScan(Data);
+  }, []);
   //-----------------------------------Degree DropDown----------------------------
   
   const [degree, setDegree] = useState([
@@ -35,7 +72,8 @@ export default function AddJobShift({ navigation }) {
     {label: 'STNA', value: 'STNA'},
   ])
 
-  const [facility, setFacility] = useAtom(companyNameAtom);
+  const [facilityValue, setFacilityValue] = useState(null);
+  const [isFacilityFocus, setIsFacilityFocus] = useState(false);
 
   const [degreeValue, setDegreeValue] = useState(null);
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
@@ -87,14 +125,14 @@ export default function AddJobShift({ navigation }) {
   }
   //--------------------------------------------Credentials-----------------------------
   const [ credentials, setCredentials ] = useState({
-    jobNum: '',
+    facility: '',
     degree: '',
     shiftTime: "",
     shiftDate: '',
+    jobNum: '',
     location: '',
     payRate: '',
     bonus: '',
-    facility: facility
   })
 
   const handleCredentials = (target, e) => {
@@ -190,7 +228,7 @@ export default function AddJobShift({ navigation }) {
         console.log('credentials: ', credentials);
         const response = await PostJob(credentials, 'jobs');
         console.log('Signup successful: ', response)
-        navigation.navigate('CompanyShift');
+        navigation.goBack();
       } catch (error) {
         console.error('Job Shift failed: ', error)
       }
@@ -233,12 +271,36 @@ export default function AddJobShift({ navigation }) {
           </View>
           <View style={styles.authInfo}>
             <View>
-              <Text style={styles.subtitle}> Job Num. -# </Text>
-              <TextInput
-                style={[styles.input, {width: '100%'}]}
-                placeholder=""
-                onChangeText={e => handleCredentials('jobNum', e)}
-                value={credentials.jobNum || ''}
+              <Text style={styles.subtitle}> Select Facility </Text>
+              <Dropdown
+                style={[styles.dropdown, isFacilityFocus && { borderColor: 'blue' }]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                iconStyle={styles.iconStyle}
+                data={facility}
+                // search
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={'Select...'}
+                // searchPlaceholder="Search..."
+                value={ facility[0].value }
+                onFocus={() => setIsFacilityFocus(true)}
+                onBlur={() => setIsFacilityFocus(false)}
+                onChange={item => {
+                  setFacilityValue(item.value);
+                  setIsFacilityFocus(false);
+                  handleCredentials('facility', item.label)
+                }}
+                renderLeftIcon={() => (
+                  <View
+                    style={styles.icon}
+                    color={isFacilityFocus ? 'blue' : 'black'}
+                    name="Safety"
+                    size={20}
+                  />
+                )}
               />
             </View>
             <View>
@@ -279,7 +341,7 @@ export default function AddJobShift({ navigation }) {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.subtitle}> Shift <Text style={{color: 'red'}}>*</Text> </Text>
+              <Text style={styles.subtitle}> Shift Time <Text style={{color: 'red'}}>*</Text> </Text>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
                   placeholder=""
@@ -310,6 +372,15 @@ export default function AddJobShift({ navigation }) {
                 </>
                 }
               </View>
+            </View>
+            <View>
+              <Text style={styles.subtitle}> Job Num. -# </Text>
+              <TextInput
+                style={[styles.input, {width: '100%'}]}
+                placeholder=""
+                onChangeText={e => handleCredentials('jobNum', e)}
+                value={credentials.jobNum || ''}
+              />
             </View>
             <View>
               <Text style={styles.subtitle}> Location </Text>

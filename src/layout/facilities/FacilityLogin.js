@@ -92,25 +92,42 @@ export default function FacilityLogin({ navigation }) {
     try {
       const response = await Signin(credentials, 'facilities');
       console.log('SignIn Successful: ', response);
-      setFirstName(response.user.firstName);
-      setLastName(response.user.lastName);
-      setContactEmail(response.user.contactEmail);
-      setContactPassword(response.user.contactPassword);
-      setContactPhone(response.user.contactPhone);
-      setEntryDate(response.user.entryDate);
-      setCompanyName(response.user.companyName);
-      setAddress(response.user.address);
-      setAvatar(response.user.avatar);
-      setUserRole(response.user.userRole);
-      setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
-      if (checked) {
-        await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
-        await AsyncStorage.setItem('facilityPassword', credentials.password);
+      if (!response.error) {
+        setFirstName(response.user.firstName);
+        setLastName(response.user.lastName);
+        setContactEmail(response.user.contactEmail);
+        setContactPassword(response.user.contactPassword);
+        setContactPhone(response.user.contactPhone);
+        setEntryDate(response.user.entryDate);
+        setCompanyName(response.user.companyName);
+        setAddress(response.user.address);
+        setAvatar(response.user.avatar);
+        setUserRole(response.user.userRole);
+        setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
+        if (checked) {
+          await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
+          await AsyncStorage.setItem('facilityPassword', credentials.password);
+        }
+        if (response.user.facilityAcknowledgeTerm) {
+          navigation.navigate("FacilityProfile");
+        } else {
+          handleSignInNavigate("FacilityPermission");
+        }
       }
-      if (response.user.facilityAcknowledgeTerm) {
-        navigation.navigate("FacilityProfile");
-      } else {
-        handleSignInNavigate("FacilityPermission");
+      else {
+        Alert.alert(
+          'Failed!',
+          `${response.error.message}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
       }
     } catch (error) {
       console.log('SignIn failed: ', error)

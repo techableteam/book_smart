@@ -13,14 +13,14 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
-import { Jobs, Update, Clinician } from '../../utils/useApi';
+import { UpdateUser, Clinician } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default function AllCaregivers({ navigation }) {
+export default function AdminAllUser({ navigation }) {
 
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
@@ -45,10 +45,9 @@ export default function AllCaregivers({ navigation }) {
   }, []);
 
   const tableHead = [
-    'Entry Date',
     'Name',
-    'Phone',
     'Email',
+    'userRole',
     'User Status',
   ];
   // const tableData = [
@@ -59,32 +58,34 @@ export default function AllCaregivers({ navigation }) {
 
   function formatData(data) {
     return data.map(item => {
-        // Parse the date and format to MM/DD/YYYY
-        const date = new Date(item[0]);
-        const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
 
         // Combine the second and third elements
         const fullName = `${item[1]} ${item[2]}`;
-
         // Return the new structure
-        return [formattedDate, fullName, item[3], item[4], item[5]];
+        return [fullName, item[4], item[6], item[5]];
     });
   }
 
   async function getData() {
     let Data = await Clinician('clinical/clinician', 'Admin');
+    let adminData = await Clinician('admin/admin', "Admin")
+    let facilityData = await Clinician('facilities/facility', 'Admin')
+    
     if(!Data) {
       setData(['No Data'])
     }
     else {
-      const modifiedData = formatData(Data);
-      console.log(modifiedData)
+      const modifiedData1 = formatData(Data);
+      const modifiedData2 = formatData(adminData);
+      const modifiedData3 = formatData(facilityData);
+      const modifiedArray = [...modifiedData1, ...modifiedData2, ...modifiedData3]
+      console.log(modifiedData1, modifiedData2, modifiedData3)
       // const modifiedArray = Data.map(subarray => {
       //   const newArray = [...subarray]; // Create a copy of the subarray
       //   newArray.pop(); // Remove the last item
       //   return newArray; // Return the modified subarray
       // });
-      setData(modifiedData)
+      setData(modifiedArray)
     }
     const uniqueValues = new Set();
     const transformed = [];
@@ -108,6 +109,9 @@ export default function AllCaregivers({ navigation }) {
       getData();
     }, []) // Empty dependency array means this runs on focus
   );
+  // useEffect(() => {
+  //   getData();
+  // }, [])
 
   //---------------DropDown--------------
   const pageItems = [
@@ -132,14 +136,15 @@ export default function AllCaregivers({ navigation }) {
     }
     return null;
   };  
-  const widths = [120, 100, 150, 150, 100];
+  const widths = [120, 150, 150, 100];
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
   }
   const [cellData, setCellData] = useState(null);
   const [rowData, setRowData] = useState(null);
-  const [modalItem, setModalItem] = useState(0);
+  const [useRole, setUserRole] = useState(null)
+  const [modalItem, setModalItem] = useState(100);
   const [showCalendar, setShowCalendar] = useState(false);
   const [label, setLabel] = useState(null);
   const [date,setDate] = useState(new Date());
@@ -148,10 +153,11 @@ export default function AllCaregivers({ navigation }) {
     console.log('Row clicked:', cellData, rowIndex, cellIndex);
     // if (cellIndex==9) {
       setCellData(cellData);
-      const rowD = data[rowIndex][3];
+      const rowD = data[rowIndex];
+      let rowD2 = data[rowIndex][2];
       console.log(rowD);
       setModalItem(cellIndex);
-      if(cellIndex==1) {
+      if(cellIndex==0) {
         const name = cellData.split(' ');
         setLabel({firstName: name[0], lastName: name[1]});
       }
@@ -159,9 +165,10 @@ export default function AllCaregivers({ navigation }) {
         setLabel(cellData.toString());
       }
       setRowData(rowD);
-      if (cellIndex !== 0 ) {
+      setUserRole(rowD2)
+      // if (cellIndex !== 0 ) {
         toggleModal();
-      }
+      // }
     // }
   };
 
@@ -176,6 +183,12 @@ export default function AllCaregivers({ navigation }) {
     {label: 'activate', value: 'activate'},
     {label: 'inactivate', value: 'inactivate'},
     {label: 'pending', value: 'pending'},
+  ])
+  const [role, setRole] = useState([
+    {label: 'Select...', value: 'Select...'},
+    {label: 'Admin', value: 'Admin'},
+    {label: 'Clinicians', value: 'Clinicians'},
+    {label: 'Facilities', value: 'Facilities'},
   ])
 
   const formatPhoneNumber = (input) => {
@@ -202,36 +215,55 @@ export default function AllCaregivers({ navigation }) {
 
   const [suc, setSuc] = useState(0);
   const handlePress = async() => {
-    let sendData = label;
+    let totalData = {}
     let sendingData = {}
-    if (modalItem === 1) {
-      const emailData = {email: rowData}
-      sendingData = {
-        ...emailData, // Ensure rowData is defined and contains the appropriate value
-        ...sendData // Use sendData for jobNum
-      };
-    } else if (modalItem === 2) {
-      sendingData = {
-        email: rowData,
-        phoneNumber: sendData // Use sendData for location
-      };
-    } else if (modalItem === 3)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        email: rowData,
-        updateEmail: sendData // Use sendData for location
-      };
-    } else if (modalItem === 4)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        email: rowData,
-        userStatus: sendData // Use sendData for location
-      };
+    console.log(rowData, label);
+    if (modalItem === 2){
+      const name = rowData[0].split(" ");
+      if (label === 'Clinicians' || label === 'Admin') {
+        
+        sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: label, userStatus: rowData[3]}
+      }
+      else {
+        sendingData = {firstName: name[0], lastName: name[1], contactEmail: rowData[1], userRole: label, userStatus: rowData[3]}
+      }
     }
-    console.log('====================================');
-    console.log(sendingData);
-    console.log('====================================');
-    let Data = await Update(sendingData, 'clinical');
+    else if (modalItem === 0) {
+      if ( useRole === 'Clinicians' || label === 'Admin') {
+        sendingData = {firstName: label.firstName, lastName: label.lastName, email: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
+      }
+      else {
+        sendingData = {firstName: label.firstName, lastName: label.lastName, contactEmail: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
+      }
+    }
+    else {
+      const name = rowData[0].split(" ");
+      console.log(label, "-----------------------------------------");
+  
+      // Initialize sendingData object
+      sendingData = {
+          firstName: name[0],
+          lastName: name[1],
+          userRole: rowData[2],
+          userStatus: rowData[3],
+      };
+      
+      // Check the role and add the relevant properties
+      if (useRole === 'Clinicians' || useRole === 'Admin') {
+          sendingData.email = rowData[1]; // Add email property
+          if (modalItem === 1) {
+              sendingData.updateEmail = label; // Conditionally add updateEmail property
+          }
+      } else {
+          sendingData.contactEmail = rowData[1]; // Add contactEmail property for other roles
+      }
+  
+      // Now sendingData is properly constructed
+      console.log(sendingData);
+    }
+    totalData = {updateData: sendingData, userRole: useRole}
+    console.log(totalData);
+    let Data = await UpdateUser(totalData, 'admin');
     if(Data) setSuc(suc+1);
     else setSuc(suc);
     toggleModal();
@@ -242,7 +274,7 @@ export default function AllCaregivers({ navigation }) {
       <StatusBar
         translucent backgroundColor="transparent"
       />
-      <AHeader navigation={navigation}  currentPage={4} />
+      <AHeader navigation={navigation}  currentPage={5} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView style={{ width: '100%', marginTop: 140 }}
         showsVerticalScrollIndicator={false}
@@ -259,26 +291,22 @@ export default function AllCaregivers({ navigation }) {
           <Text style={{ backgroundColor: '#000080', color: 'white', width: '26%' }}>TOOL TIPS:</Text>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>When A New <Text style={{fontWeight: 'bold'}}>"CAREGIVER"</Text> signs-up, they will have a status of <Text style={{ color: '#0000ff', fontWeight: 'bold' }}>"PENDING APPROVAL"</Text></Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Displays ALL Platform Users</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Once you have verified the <Text style={{fontWeight: 'bold'}}>CAREGIVER</Text> information, update the status to <Text style={{ color: '#008000', fontWeight: 'bold' }}>"ACTIVE"</Text>.</Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Deleting a user will remove them from the platform</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>The CAREGIVER will receive an Approval email, and can then login to view Jobs / Shifts</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>To Deactivate a <Text style={{fontWeight: 'bold'}}>"CAREGIVER"</Text> change the status to <Text style={{ color: '#ff0000', fontWeight: 'bold' }}>"INACTIVE"</Text></Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>To Deactivate a <Text style={{fontWeight: 'bold'}}>"USER"</Text> change the status to <Text style={{ color: '#ff0000', fontWeight: 'bold' }}>"INACTIVE"</Text></Text>
           </View>
         </View>
         <View>
           <View style={styles.body}>
             <View style={styles.modalBody}>
               <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                <Text style={styles.profileTitle}>ALL CAREGIVERS</Text>
+                <Text style={styles.profileTitle}>🖥️ ALL PLATFORM USERS</Text>
               </View>
               <View style={styles.searchBar}>
                 {/* <TextInput style={styles.searchText} /> */}
@@ -320,7 +348,7 @@ export default function AllCaregivers({ navigation }) {
                   <Row
                     data={tableHead}
                     style={styles.head}
-                    widthArr={[120, 100, 150, 150, 100]}
+                    widthArr={[120, 150, 150, 100]}
                     textStyle={styles.tableText}
                   />
                   {data.map((rowData, rowIndex) => (
@@ -358,14 +386,14 @@ export default function AllCaregivers({ navigation }) {
                 <View style={styles.body}>
                   <View style={styles.modalBody}>
                     {
-                      (modalItem === 4) ?
+                      (modalItem === 3) || (modalItem === 2) ?
                         <Dropdown
                           style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
                           placeholderStyle={styles.placeholderStyle}
                           selectedTextStyle={styles.selectedTextStyle}
                           inputSearchStyle={styles.inputSearchStyle}
                           iconStyle={styles.iconStyle}
-                          data={location}
+                          data={modalItem ===3 ? location : role}
                           // search
                           maxHeight={300}
                           labelField="label"
@@ -379,6 +407,9 @@ export default function AllCaregivers({ navigation }) {
                             setJobValue(item.value);
                             setLabel(item.label);
                             setJobIsFocus(false);
+                            // if (modalItem === 2) {
+                            //   setUserRole(item.label)
+                            // }
                           }}
                           renderLeftIcon={() => (
                             <View
@@ -390,32 +421,28 @@ export default function AllCaregivers({ navigation }) {
                           )}
                         />
                       :
-                      (modalItem === 2) || (modalItem === 3) ?
+                      (modalItem === 1) ?
                         (<TextInput
                           style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
                           placeholder=""
-                          onChangeText={e => {
-                            const formattedNumber = formatPhoneNumber(e);
-                            if (modalItem === 2) {setLabel(formattedNumber)}
-                            else {setLabel(e)}
-                          }}
+                          onChangeText={e => setLabel(e)
+                          }
                           value={label || ''}
-                          keyboardType={modalItem && "phone-pad"}
                         />)
                       :
-                      (modalItem === 1) ?
+                      (modalItem === 0) ?
                         (<View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: 20}}>
                           <TextInput
                             style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
                             placeholder=""
                             onChangeText={e => setLabel({...label, firstName: e})}
-                            value={label.firstName || ''}
+                            value={(label.firstName) ? label.firstName : ''}
                           />
                           <TextInput
                             style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
                             placeholder=""
                             onChangeText={e => setLabel({...label, lastName: e})}
-                            value={label.lastName || ''}
+                            value={(label.lastName) ? label.lastName : ''}
                           />
                         </View>
                         )

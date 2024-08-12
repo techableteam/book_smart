@@ -16,6 +16,7 @@ import { MyShift } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 
 
+
 export default function Reporting ({ navigation }) {
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
@@ -152,7 +153,7 @@ export default function Reporting ({ navigation }) {
             number: String(sortedMonthGroups[month].length) // Count of entries for that month
           }));
           mothData.unshift({ "month": "Month", "number": "Count" });
-          mothData.push({ "month": "Sum", "number": String(data.reportData.length) });
+          mothData.push({ "month": "Sum", "number": String(Data.reportData.length) });
           console.log(mothData);
           const totalPayString = Data.dailyPay;
           const weeklyPayString = Data.weeklyPay;

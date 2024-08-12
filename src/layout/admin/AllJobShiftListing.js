@@ -13,9 +13,12 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
-import { Jobs, Update } from '../../utils/useApi';
+import { Jobs, Update, Clinician } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AllJobShiftListing({ navigation }) {
 
@@ -53,40 +56,60 @@ export default function AllJobShiftListing({ navigation }) {
     'Awarded',
     'Job Status',
     'Job Rating',
-    'Delete',
   ];
-  const tableData = [
-    [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-    [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  ]
+  // const tableData = [
+  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
+  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
+  // ]
+  const [clinicians, setClinicians] = useState([]);
 
-  useEffect(() => {
-    async function getData() {
-      let Data = await Jobs('jobs', 'Admin');
-      if(!Data) {
-        setData(['No Data'])
-      }
-      else {
-        setData(Data)
-      }
-      // console.log('--------------------------', data);
-      // // setTableData(Data[0].degree)
-      // tableScan(Data);
+  async function getData() {
+    let Data = await Jobs('jobs', 'Admin');
+    if(!Data) {
+      setData(['No Data'])
     }
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
+    else {
+      const modifiedArray = Data.map(subarray => {
+        const newArray = [...subarray]; // Create a copy of the subarray
+        newArray.pop(); // Remove the last item
+        return newArray; // Return the modified subarray
+      });
+      setData(modifiedArray)
+    }
+    const uniqueValues = new Set();
+    const transformed = [];
+    
+    let clinicianData = await Clinician('clinical/clinician', 'Admin');
+    const extractData = clinicianData.map(item => {
+      const firstName = item[1];
+      const lastName = item[2];
+      return firstName ? `${firstName} ${lastName}` : null; // Combine names if they exist
+    });
 
-  const theme = useTheme();
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [userRole, setUserRole] = useAtom(userRoleAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
-  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [address, setAddress] = useAtom(addressAtom);
-  const handleNavigate = (navigateUrl) => {
-    navigation.navigate(navigateUrl);
+    // Step 2: Filter unique names
+    const uniqueNames = Array.from(new Set(extractData.filter(name => name)));
+    console.log(uniqueNames, extractData);
+    
+    
+    // Iterate over each subarray
+    uniqueNames.forEach(subarray => {
+      const value = subarray; // Get the second element
+      if (!uniqueValues.has(value)) { // Check if it's already in the Set
+          uniqueValues.add(value); // Add to Set
+          transformed.push({ label: value, value: value }); // Add to transformed array
+      }
+    });
+
+    console.log(transformed);
+    setClinicians(transformed);
+    // // setTableData(Data[0].degree)
+    // tableScan(Data);
   }
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, []) // Empty dependency array means this runs on focus
+  );
 
   //---------------DropDown--------------
   const pageItems = [
@@ -111,7 +134,7 @@ export default function AllJobShiftListing({ navigation }) {
     }
     return null;
   };  
-  const widths = [150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80, 100];
+  const widths = [150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80];
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
@@ -119,50 +142,27 @@ export default function AllJobShiftListing({ navigation }) {
   const [cellData, setCellData] = useState(null);
   const [rowData, setRowData] = useState(null);
   const [modalItem, setModalItem] = useState(0);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [label, setLabel] = useState(null);
+  const [date,setDate] = useState(new Date());
   const handleCellClick = (cellData, rowIndex, cellIndex) => {
     // Handle row click event here
     console.log('Row clicked:', cellData, rowIndex, cellIndex);
-    if (cellIndex==9) {
+    // if (cellIndex==9) {
       setCellData(cellData);
       const rowD = data[rowIndex][2];
       console.log(rowD);
-      setModalItem(cellIndex)
+      setModalItem(cellIndex);
+      setLabel(cellData.toString());
       setRowData(rowD);
-      toggleModal();
-    }
+      if (cellIndex !== 0 || cellIndex !== 2 || cellIndex !== 7 || cellIndex !== 8 )
+      {toggleModal();}
+    // }
   };
 
-  //-----------------Modal---------------
-  const ModalFunction = (title, body) => {
-    return (
-      <Modal
-        visible={modal}
-        transparent= {true}
-        animationType="slide"
-        onRequestClose={() => {
-          setModal(!modal);
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.calendarContainer}>
-            <View style={styles.header}>
-              <Text style={styles.headerText}>{title}</Text>
-              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
-                <Image source = {images.close} style={{width: 20, height: 20,}}/>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.body}>
-              <View style={styles.modalBody}>
-                {body}
-                <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
-                  <Text style={styles.buttonText}>Update</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    )
+  const handleDay = (day) => {
+    setDate(day);
+    setLabel(moment(day).format("MM/DD/YYYY"));
   }
 
   //---------------DropDown--------------
@@ -174,51 +174,81 @@ export default function AllJobShiftListing({ navigation }) {
     {label: 'Verified', value: '5'},
     {label: 'Paid', value: '6'},
   ]
+  const [degree, setDegree] = useState([
+    {label: 'Select...', value: 'Select...'},
+    {label: 'CNA', value: 'CNA'},
+    {label: 'LPN', value: 'LPN'},
+    {label: 'STNA', value: 'STNA'},
+  ])  
+  const [location, setLocation] = useState([
+    {label: 'Select...', value: 'Select...'},
+    {label: 'Lancaster, NY', value: 'Lancaster, NY'},
+    {label: 'Skilled Nursing Facility', value: 'Skilled Nursing Facility'},
+    {label: 'Springville, NY', value: 'Springville, NY'},
+    {label: 'Warsaw, NY', value: 'Warsaw, NY'},
+    {label: 'Williansville', value: 'Williansville'},
+  ])
+
 
   const [jobValue, setJobValue] = useState(null);
-  const [label, setLabel] = useState(null);
   const [isJobFocus, setJobIsFocus] = useState(false);
 
-  const JobStatusRender = () => {
-    return (
-      <Dropdown
-        style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={jobStatus}
-        // search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder={cellData}
-        // searchPlaceholder="Search..."
-        value={jobValue}
-        onFocus={() => setJobIsFocus(true)}
-        onBlur={() => setJobIsFocus(false)}
-        onChange={item => {
-          setJobValue(item.value);
-          setLabel(item.label);
-          setJobIsFocus(false);
-        }}
-        renderLeftIcon={() => (
-          <View
-            style={styles.icon}
-            color={isJobFocus ? 'blue' : 'black'}
-            name="Safety"
-            size={20}
-          />
-        )}
-      />
-    )
-  }
-  const [suc, setSuc] = useState(false);
+  const [suc, setSuc] = useState(0);
   const handlePress = async() => {
-    const sendingData = {jobId: rowData, jobStatus: label}
+    let sendData = label;
+    if (modalItem === 3 || modalItem === 10) {
+      sendData = Number(sendData)
+    }
+    let sendingData = {}
+    if (modalItem === 1) {
+      sendingData = {
+        jobId: rowData, // Ensure rowData is defined and contains the appropriate value
+        nurse: sendData // Use sendData for jobNum
+      };
+    } else if (modalItem === 3) {
+      sendingData = {
+        jobId: rowData,
+        jobNum: sendData // Use sendData for location
+      };
+    } else if (modalItem === 4)  {
+      // Handle other modalItems as needed
+      sendingData = {
+        jobId: rowData,
+        location: sendData // Use sendData for location
+      };
+    } else if (modalItem === 5)  {
+      // Handle other modalItems as needed
+      sendingData = {
+        jobId: rowData,
+        shiftDate: sendData // Use sendData for location
+      };
+    } else if (modalItem === 6)  {
+      // Handle other modalItems as needed
+      sendingData = {
+        jobId: rowData,
+        shiftTime: sendData // Use sendData for location
+      };
+    } else if (modalItem === 9)  {
+      // Handle other modalItems as needed
+      sendingData = {
+        jobId: rowData,
+        jobStatus: sendData // Use sendData for location
+      };
+    } else if (modalItem === 10)  {
+      // Handle other modalItems as needed
+      sendingData = {
+        jobId: rowData,
+        jobRating: sendData // Use sendData for location
+      };
+    }
+    console.log('====================================');
+    console.log(sendingData);
+    console.log('====================================');
     let Data = await Update(sendingData, 'jobs');
-    if(Data) setSuc(true);
+    if(Data) setSuc(suc+1);
+    else setSuc(suc);
     toggleModal();
+    getData();
   };
   return (
     <View style={styles.container}>
@@ -237,7 +267,7 @@ export default function AllJobShiftListing({ navigation }) {
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
-          <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => navigation.navigate('AddJobShift')}>
+          <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => navigation.navigate('AdminJobShift')}>
             <View style={{ backgroundColor: 'white', borderRadius: 10, width: 16, height: 16, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
               <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', marginTop: 0 }}>+</Text>
             </View>
@@ -280,9 +310,9 @@ export default function AllJobShiftListing({ navigation }) {
               </View>
               <View style={styles.searchBar}>
                 {/* <TextInput style={styles.searchText} /> */}
-                <TouchableOpacity style={styles.searchBtn}>
+                {/* <TouchableOpacity style={styles.searchBtn}>
                   <Text>Add filters</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
@@ -318,7 +348,7 @@ export default function AllJobShiftListing({ navigation }) {
                   <Row
                     data={tableHead}
                     style={styles.head}
-                    widthArr={[150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80, 100]}
+                    widthArr={[150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80]}
                     textStyle={styles.tableText}
                   />
                   {data.map((rowData, rowIndex) => (
@@ -337,63 +367,103 @@ export default function AllJobShiftListing({ navigation }) {
             </View>
           </View>
           
-      <Modal
-        visible={modal}
-        transparent= {true}
-        animationType="slide"
-        onRequestClose={() => {
-          setModal(!modal);
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.calendarContainer}>
-            <View style={styles.header}>
-              <Text style={styles.headerText}>Job Status</Text>
-              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
-                <Image source = {images.close} style={{width: 20, height: 20,}}/>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.body}>
-              <View style={styles.modalBody}>
-                {/* <JobStatusRender /> */}
-      <Dropdown
-        style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={jobStatus}
-        // search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder={cellData}
-        // searchPlaceholder="Search..."
-        value={jobValue}
-        onFocus={() => setJobIsFocus(true)}
-        onBlur={() => setJobIsFocus(false)}
-        onChange={item => {
-          setJobValue(item.value);
-          setLabel(item.label);
-          setJobIsFocus(false);
-        }}
-        renderLeftIcon={() => (
-          <View
-            style={styles.icon}
-            color={isJobFocus ? 'blue' : 'black'}
-            name="Safety"
-            size={20}
-          />
-        )}
-      />
-                <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
-                  <Text style={styles.buttonText}>Update</Text>
-                </TouchableOpacity>
+          <Modal
+            visible={modal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setModal(!modal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>{tableHead[modalItem]}</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={styles.modalBody}>
+                    {
+                      (modalItem === 1) || (modalItem === 4) || (modalItem === 9) ?
+                        <Dropdown
+                          style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          iconStyle={styles.iconStyle}
+                          data={
+                            modalItem === 1 ? clinicians :
+                            modalItem === 4 ?  location :
+                            (modalItem === 9) && jobStatus
+                          }
+                          // search
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={cellData}
+                          // searchPlaceholder="Search..."
+                          value={jobValue}
+                          onFocus={() => setJobIsFocus(true)}
+                          onBlur={() => setJobIsFocus(false)}
+                          onChange={item => {
+                            setJobValue(item.value);
+                            setLabel(item.label);
+                            setJobIsFocus(false);
+                          }}
+                          renderLeftIcon={() => (
+                            <View
+                              style={styles.icon}
+                              color={isJobFocus ? 'blue' : 'black'}
+                              name="Safety"
+                              size={20}
+                            />
+                          )}
+                        />
+                      :
+                      (modalItem === 3) || (modalItem === 6) || (modalItem === 10) ?
+                        (<TextInput
+                          style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
+                          placeholder=""
+                          onChangeText={e => setLabel(e)}
+                          value={label || ''}
+                        />)
+                      :
+                      modalItem === 5 ?
+                        <View style={{flexDirection: 'column', width: '100%', gap: 5, alignItems: 'center'}}>
+                          <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalendar)}} style={{width: '100%', height: 40, zIndex: 1}}>
+                            <TextInput
+                              style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black', fontSize: 18}]}
+                              placeholder=""
+                              value={label}
+                              editable={false}
+                            />
+                          </TouchableOpacity>
+                          {showCalendar 
+                            && 
+                            <>
+                              <DatePicker
+                                date={date}
+                                onDateChange={(day) => handleDay(day)}
+                                mode="date" // Set the mode to "date" to allow year and month selection
+                                androidVariant="native"
+                              />
+                              <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalendar);}} />
+                            </>
+                          }
+                        </View>
+                      :
+                      <></>
+                    }
+                    <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Update</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             </View>
-          </View>
-        </View>
-      </Modal>
+          </Modal>
         </View>
       </ScrollView>
       <MFooter />
@@ -674,5 +744,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',            // Text color
     fontSize: 16,              // Text size
+  },
+  input: {
+    backgroundColor: 'white', 
+    height: 30, 
+    marginBottom: 10, 
+    borderWidth: 1, 
+    borderColor: 'hsl(0, 0%, 86%)',
   },
 });

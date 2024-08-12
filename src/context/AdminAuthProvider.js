@@ -4,6 +4,7 @@ import { Provider, atom } from 'jotai';
 export const firstNameAtom = atom('');
 export const lastNameAtom = atom('');
 export const emailAtom = atom('');
+export const companyNameAtom = atom('');
 export const passInfAtom = atom('');
 export const userStatusAtom = atom('');
 export const phoneAtom = atom('');

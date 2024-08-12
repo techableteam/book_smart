@@ -12,6 +12,8 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, addressAtom, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/ClinicalAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DeviceInfo from 'react-native-device-info';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
 
 export default function ClientSignIn({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -34,7 +36,33 @@ export default function ClientSignIn({ navigation }) {
     email: '',
     password: '',
     userRole: 'Clinicians',
+    device: '',
   })
+
+  
+  const [uniqueId, setUniqueId] = useState('');
+  const [manufacturer, setManufacturer] = useState('');
+
+  useEffect(() => {
+    const fetchDeviceInfo = async () => {
+      console.log('getInfo')
+      try {
+        console.log('DeviceId');
+          // Get the unique device ID
+          const id = await getUniqueId();
+          setUniqueId(id);
+          console.log(credentials, '.....');
+          
+          // Get the manufacturer of the device
+          const manu = await getManufacturer();
+          setManufacturer(manu);
+      } catch (error) {
+          console.error('Error fetching device info:', error);
+      }
+    };
+
+    fetchDeviceInfo();
+  }, []);
   const [checked, setChecked] = useState(false);
 
   //Alert
@@ -90,27 +118,46 @@ export default function ClientSignIn({ navigation }) {
 
   const handleSubmit = async () => {
     try {
-      // console.log('credentials:', credentials)
+      setCredentials({...credentials, ["device"]: uniqueId});
+      console.log(credentials.device,uniqueId, "Deciveddd")
       const response = await Signin(credentials, 'clinical');
-      console.log('SignIn Successful: ');
-      setFirstName(response.user.firstName);
-      setLastName(response.user.lastName);
-      setBirthday(response.user.birthday);
-      setPhoneNumber(response.user.phoneNumber);
-      setSignature(response.user.signature);
-      setEmail(response.user.email);
-      setTitle(response.user.title);
-      setPhotoImage(response.user.photoImage);
-      setUserRole(response.user.userRole);
-      setEntryDate(response.user.entryDate);
-      setSocialSecurityNumber(response.user.socialSecurityNumber)
-      setAddress(response.user.address)
-      if (checked) {
-        await AsyncStorage.setItem('clinicalEmail', credentials.email);
-        await AsyncStorage.setItem('clinicalPassword', credentials.password);
+      console.log('SignIn Successful: ', response);
+      if (!response.error) {
+        setFirstName(response.user.firstName);
+        setLastName(response.user.lastName);
+        setBirthday(response.user.birthday);
+        setPhoneNumber(response.user.phoneNumber);
+        setSignature(response.user.signature);
+        setEmail(response.user.email);
+        setTitle(response.user.title);
+        setPhotoImage(response.user.photoImage);
+        setUserRole(response.user.userRole);
+        setEntryDate(response.user.entryDate);
+        setSocialSecurityNumber(response.user.socialSecurityNumber)
+        setAddress(response.user.address)
+        if (checked) {
+          await AsyncStorage.setItem('clinicalEmail', credentials.email);
+          await AsyncStorage.setItem('clinicalPassword', credentials.password);
+        }
+        // console.log('credentials:', credentials)
+        handleSignInNavigate();
+        // console.log('email:', storage)
       }
-      handleSignInNavigate();
-      // console.log('email:', storage)
+      else {
+        Alert.alert(
+          'Failed!',
+          `${response.error.message}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
     } catch (error) {
       console.log('SignIn failed: ', error)
     }

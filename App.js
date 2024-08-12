@@ -54,6 +54,11 @@ import AdminHome from './src/layout/admin/AdminHome';
 import AdminDashboard from './src/layout/admin/AdminDashboard';
 import AllCaregivers from './src/layout/admin/AllCaregivers.js';
 import AllJobShiftListing from './src/layout/admin/AllJobShiftListing.js';
+import AdminJobShift from './src/layout/admin/AdminJobShift.js';
+import AdminCompany from './src/layout/admin/AdminCompany.js';
+import AdminEditProfile from './src/layout/admin/AdminEditProfile.js';
+import AdminAllUser from './src/layout/admin/AdminAllUser.js';
+import Invoice from './src/layout/facilities/invoice.js';
 
 // const Drawer = createDrawerNavigator();
 
@@ -64,7 +69,7 @@ function App() {
       <Layout />
     </NavigationContainer>
     // <View>
-    //   <AllJobShiftListing />
+    //   <Invoice />
     // </View>
   );
 }

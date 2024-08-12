@@ -9,7 +9,7 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/AdminAuthProvider'
+import { firstNameAtom, lastNameAtom, phoneAtom, emailAtom, photoImageAtom, userRoleAtom, companyNameAtom, addressAtom } from '../../context/AdminAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -19,6 +19,9 @@ export default function AdminLogin({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
   const [photoImage, setPhotoImage] = useAtom(photoImageAtom);
   const [userRole, setUserRole]= useAtom(userRoleAtom);
+  const [phone, setPhone] = useAtom(phoneAtom);
+  const [companyName, setCompanyName] = useAtom(companyNameAtom);
+  const [address, setAddress]= useAtom(addressAtom);
   // const navigation = useNavigation(false);
   const theme = useTheme();
   // const { auth, setAuth } = AuthState();
@@ -87,19 +90,38 @@ export default function AdminLogin({ navigation }) {
     try {
       const response = await Signin(credentials, 'Admin');
       console.log('SignIn Successful: ', response);
-      setFirstName(response.user.firstName);
-      setLastName(response.user.lastName);
-      // setBirthday(response.user.birthday);
-      // setPhoneNumber(response.user.phoneNumber);
-      setUserRole(response.user.userRole);
-      setEmail(response.user.email);
-      // setTitle(response.data.title);
-      // setPhotoImage(response.user.photoImage);
-      if (checked) {
-        await AsyncStorage.setItem('AdminEmail', credentials.email);
-        await AsyncStorage.setItem('AdminPassword', credentials.password);
+      if (!response.error) {
+        setFirstName(response.user.firstName);
+        setLastName(response.user.lastName);
+        setAddress(response.user.address);
+        setCompanyName(response.user.companyName);
+        setUserRole(response.user.userRole);
+        setEmail(response.user.email);
+        setPhone(response.user.phone)
+        
+        // setTitle(response.data.title);
+        // setPhotoImage(response.user.photoImage);
+        if (checked) {
+          await AsyncStorage.setItem('AdminEmail', credentials.email);
+          await AsyncStorage.setItem('AdminPassword', credentials.password);
+        }
+        handleSignInNavigate();
       }
-      handleSignInNavigate();
+      else {
+        Alert.alert(
+          'Failed!',
+          `${response.error.message}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
     } catch (error) {
       console.log('SignIn failed: ', error)
     }
