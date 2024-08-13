@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
+import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity, Alert } from 'react-native';
 import { Text, PaperProvider, DataTable, useTheme, Button } from 'react-native-paper';
 import images from '../../assets/images';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -11,9 +11,10 @@ import ImageButton from '../../components/ImageButton';
 import { Table, Row, Rows } from 'react-native-table-component';
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
+import { invoiceFetchAtom } from '../../context/BackProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
-import { Jobs, Update, Clinician } from '../../utils/useApi';
+import { Jobs, Update, Clinician, sendInvoice } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
@@ -25,6 +26,7 @@ export default function AdminFacilities({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
   let colorIndex = 0;
   const [data, setData] = useState([]);
+  const [invoiceData, setInvoiceData] = useAtom(invoiceFetchAtom);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,6 +51,7 @@ export default function AdminFacilities({ navigation }) {
     'Company Name',
     'Email',
     'User Status',
+    "Send Invoice"
   ];
   // const tableData = [
   //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
@@ -66,7 +69,7 @@ export default function AdminFacilities({ navigation }) {
         const fullName = `${item[1]} ${item[2]}`;
 
         // Return the new structure
-        return [formattedDate, fullName, item[3], item[4], item[5]];
+        return [formattedDate, fullName, item[3], item[4], item[5], 'Send Invoice'];
     });
   }
 
@@ -130,7 +133,7 @@ export default function AdminFacilities({ navigation }) {
     }
     return null;
   };  
-  const widths = [120, 100, 150, 150, 100];
+  const widths = [120, 100, 150, 150, 100, 125];
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
@@ -139,6 +142,7 @@ export default function AdminFacilities({ navigation }) {
   const [rowData, setRowData] = useState(null);
   const [modalItem, setModalItem] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [invoiceName, setInvoiceName] = useState('');
   const [label, setLabel] = useState(null);
   const [date,setDate] = useState(new Date());
   const handleCellClick = (cellData, rowIndex, cellIndex) => {
@@ -160,6 +164,7 @@ export default function AdminFacilities({ navigation }) {
       if (cellIndex !== 0 ) {
         toggleModal();
       }
+      setInvoiceName(data[rowIndex][2]);
     // }
   };
 
@@ -202,36 +207,54 @@ export default function AdminFacilities({ navigation }) {
   const handlePress = async() => {
     let sendData = label;
     let sendingData = {}
-    if (modalItem === 1) {
-      const emailData = {contactEmail: rowData}
-      sendingData = {
-        ...emailData, // Ensure rowData is defined and contains the appropriate value
-        ...sendData // Use sendData for jobNum
-      };
-    } else if (modalItem === 2) {
-      sendingData = {
-        contactEmail: rowData,
-        phoneNumber: sendData // Use sendData for location
-      };
-    } else if (modalItem === 3)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        contactEmail: rowData,
-        updateEmail: sendData // Use sendData for location
-      };
-    } else if (modalItem === 4)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        contactEmail: rowData,
-        userStatus: sendData // Use sendData for location
-      };
+    if (modalItem !== 5) {
+      if (modalItem === 1) {
+        const emailData = {contactEmail: rowData}
+        sendingData = {
+          ...emailData, // Ensure rowData is defined and contains the appropriate value
+          ...sendData // Use sendData for jobNum
+        };
+      } else if (modalItem === 2) {
+        sendingData = {
+          contactEmail: rowData,
+          phoneNumber: sendData // Use sendData for location
+        };
+      } else if (modalItem === 3)  {
+        // Handle other modalItems as needed
+        sendingData = {
+          contactEmail: rowData,
+          updateEmail: sendData // Use sendData for location
+        };
+      } else if (modalItem === 4)  {
+        // Handle other modalItems as needed
+        sendingData = {
+          contactEmail: rowData,
+          userStatus: sendData // Use sendData for location
+        };
+      }
+      console.log('====================================');
+      console.log(sendingData);
+      console.log('====================================');
+      let Data = await Update(sendingData, 'facilities');
+      if(Data) setSuc(suc+1);
+      else setSuc(suc);
     }
-    console.log('====================================');
-    console.log(sendingData);
-    console.log('====================================');
-    let Data = await Update(sendingData, 'facilities');
-    if(Data) setSuc(suc+1);
-    else setSuc(suc);
+    else {
+      const filteredData = invoiceData.filter(item => item.facilityId === invoiceName && item.status === true);
+      if (filteredData) {
+        let result = await sendInvoice(invoiceName, rowData);
+        if (!result.error) {
+            Alert.alert('Success', 'Invoice generated successfully!');
+        }
+        else {
+            Alert.alert('Failed', response.error);
+        }
+      }
+      else {
+        Alert.alert('Failed', "There is no new invoice.");
+
+      }
+    }
     toggleModal();
     getData();
   };
@@ -314,7 +337,7 @@ export default function AdminFacilities({ navigation }) {
                   <Row
                     data={tableHead}
                     style={styles.head}
-                    widthArr={[120, 100, 150, 150, 100]}
+                    widthArr={[120, 100, 150, 150, 100, 125]}
                     textStyle={styles.tableText}
                   />
                   {data.map((rowData, rowIndex) => (
@@ -414,10 +437,17 @@ export default function AdminFacilities({ navigation }) {
                         </View>
                         )
                       :
+                      (modalItem === 5) ?
+                        (<Text>
+                          {invoiceName+'.pdf'}
+                        </Text>)
+                      :
                       <></>
                     }
                     <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
-                      <Text style={styles.buttonText}>Update</Text>
+                      <Text style={styles.buttonText}>
+                        { modalItem === 5 ? 'Send Invoice': 'Update' } 
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>

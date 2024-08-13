@@ -45,6 +45,14 @@ import AdminAllUser from './admin/AdminAllUser.js';
 import AdminFacilities from './admin/AdminFacilities.js';
 import CaregiverTimeSheet from './admin/CaregiverTimeSheet.js';
 import Invoice from './facilities/invoice.js';
+import ClientPassVerify from './client/ClientPassVerify.js';
+import ClientResetPassword from './client/ClientResetPass.js';
+import FacilityPassVerify from './facilities/FacilityPassVerify.js';
+import FacilityResetPassword from './facilities/FacilityResetPass.js';
+import AdminPassVerify from './admin/AdminPassVerify.js';
+import AdminPending from './admin/AdminPending.js';
+import AdminForgotPwd from './admin/AdminForgotPwd.js';
+import AdminResetPassword from './admin/AdminResetPass.js';
 const Stack = createNativeStackNavigator();
 
 function Layout() {
@@ -228,6 +236,46 @@ function Layout() {
       <Stack.Screen 
         name= 'Invoice'
         component = {Invoice}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'ClientPassVerify'
+        component = {ClientPassVerify}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'ClientResetPassword'
+        component = {ClientResetPassword}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'FacilityPassVerify'
+        component = {FacilityPassVerify}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'FacilityResetPassword'
+        component = {FacilityResetPassword}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminPassVerify'
+        component = {AdminPassVerify}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminResetPassword'
+        component = {AdminResetPassword}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminPending'
+        component = {AdminPending}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminForgotPwd'
+        component = {AdminForgotPwd}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

@@ -6207,6 +6207,11 @@ react-native-async-storage@^0.0.1:
   resolved "https://registry.npmjs.org/react-native-async-storage/-/react-native-async-storage-0.0.1.tgz"
   integrity sha512-EwOIpNfwMiELMnS7HDzgyX2xO4TALK95O473Z6Kai5Il5j/03yTTErwMtvoYnA0OKUHd1R54ptmbbMukUH03Xg==
 
+react-native-background-timer@^2.4.1:
+  version "2.4.1"
+  resolved "https://registry.npmjs.org/react-native-background-timer/-/react-native-background-timer-2.4.1.tgz"
+  integrity sha512-TE4Kiy7jUyv+hugxDxitzu38sW1NqjCk4uE5IgU2WevLv7sZacaBc6PZKOShNRPGirLl1NWkaG3LDEkdb9Um5g==
+
 react-native-calendars@^1.1305.0:
   version "1.1305.0"
   resolved "https://registry.npmjs.org/react-native-calendars/-/react-native-calendars-1.1305.0.tgz"
@@ -6221,6 +6226,11 @@ react-native-calendars@^1.1305.0:
     xdate "^0.8.0"
   optionalDependencies:
     moment "^2.29.4"
+
+react-native-confirmation-code-field@^7.4.0:
+  version "7.4.0"
+  resolved "https://registry.npmjs.org/react-native-confirmation-code-field/-/react-native-confirmation-code-field-7.4.0.tgz"
+  integrity sha512-Kw7rD0RXi6vZnt0Y67nkSW2wYmZFdnxJ23yxkKm3jqwvSxAvaA1NP3h3MHSPmJd25l0WK/+fjXOeCliDqWZ9rw==
 
 react-native-country-picker-modal@^2.0.0:
   version "2.0.0"
@@ -6440,7 +6450,7 @@ react-native-web@*, react-native-web@0.9.x:
     prop-types "^15.6.0"
     react-timer-mixin "^0.13.4"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@^0.73.9, "react-native@>= 0.30.0", "react-native@>= 0.60.0", "react-native@>= 0.62", "react-native@>= 0.64.3", react-native@>=0.44, react-native@>=0.47, react-native@>=0.5.0, react-native@>=0.57, react-native@>=0.65.0, react-native@>=0.69.9:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", react-native@^0.73.9, "react-native@>= 0.30.0", "react-native@>= 0.60.0", "react-native@>= 0.62", "react-native@>= 0.64.3", react-native@>=0.44, react-native@>=0.47, react-native@>=0.47.0, react-native@>=0.5.0, react-native@>=0.57, react-native@>=0.64.0, react-native@>=0.65.0, react-native@>=0.69.9:
   version "0.73.9"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.73.9.tgz"
   integrity sha512-U9Lc6GMdANG2/9uREZe/UTQEzdVWw6NLRYxBYaFWNqiu/qZAmZ0aXSNcVF6hWw/95Ex0IGQx6EVMT4iPmuSNQw==
@@ -6526,7 +6536,7 @@ react-timer-mixin@^0.13.4:
   resolved "https://registry.npmjs.org/react-timer-mixin/-/react-timer-mixin-0.13.4.tgz"
   integrity sha512-4+ow23tp/Tv7hBM5Az5/Be/eKKF7DIvJ09voz5LyHGQaqqz9WV8YMs31eFvcYQs7d451LSg7kDJV70XYN/Ug/Q==
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^16.13.1, react@^16.14.0, react@^16.3.0, react@^18.2.0, "react@>= 15.2.1", "react@>= 16.11.0", "react@>= 17.0.1", react@>=16.0, react@>=16.3.0, react@>=16.5.1, react@>=16.8, react@>=17.0.0, react@16.x.x, react@18.2.0:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", react@^16.13.1, react@^16.14.0, react@^16.3.0, react@^18.2.0, "react@>= 15.2.1", "react@>= 16.11.0", "react@>= 17.0.1", react@>=16.0, react@>=16.3.0, react@>=16.4.0, react@>=16.5.1, react@>=16.8, react@>=17.0.0, react@16.x.x, react@18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==

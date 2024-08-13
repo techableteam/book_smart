@@ -5,9 +5,9 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 
 
-export default function ClientPending ({ navigation }) {
+export default function AdminPending ({ navigation }) {
   const handleBack = () => {
-    navigation.navigate('ClientSignIn');
+    navigation.navigate('AdminLogin');
   }
   return (
       <View style={styles.container}>

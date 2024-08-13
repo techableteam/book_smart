@@ -169,7 +169,7 @@ export default function AdminLogin({ navigation }) {
                   onPress={() => console.log('Navigate to forget password')}>
                   <Text
                     style={[styles.subtitle, { color: '#2a53c1'}]}
-                    onPress={() => props.navigation.navigate('forgetPassword')}>
+                    onPress={() => navigation.navigate('AdminForgotPwd')}>
                     {'('}forgot?{')'}
                   </Text>
                 </TouchableOpacity>

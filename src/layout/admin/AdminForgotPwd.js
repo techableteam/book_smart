@@ -8,11 +8,11 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
-import { emailAtom } from '../../context/ClinicalAuthProvider';
+import { emailAtom } from '../../context/AdminAuthProvider';
 import { ForgotPassword } from '../../utils/useApi';
 
 
-export default function ClientForgotPwd ({ navigation }) {
+export default function AdminForgotPwd ({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
   const handleNavigate = (navigateUrl) => {
       navigation.navigate(navigateUrl);
@@ -31,14 +31,14 @@ export default function ClientForgotPwd ({ navigation }) {
 
   const handleSubmit = async () => {
     console.log('email: ', email)
-    const response = await ForgotPassword(credentials, 'clinical');
+    const response = await ForgotPassword(credentials, 'admin');
     console.log(response)
     if (!response.error) {
       console.log('success');
       setEmail(credentials.email);      
       console.log(credentials.email);
       
-      navigation.navigate('ClientPassVerify')
+      navigation.navigate('AdminPassVerify')
     }
     else {
       Alert.alert(
@@ -57,7 +57,7 @@ export default function ClientForgotPwd ({ navigation }) {
     }
   }
   const handleBack = () => {
-    navigation.navigate('ClientSignIn');
+    navigation.navigate('AdminLogin');
   }
   return (
       <View style={styles.container}>

@@ -18,7 +18,7 @@ export default function FacilityPwdPending ({ navigation }) {
         <View style={{width: '100%', height: '60%', marginTop: 99, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', flexWrap: 'wrap'}]}> An email will be sent with further instructions on how to reset your password if an account was found. </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', flexWrap: 'wrap'}]}> Your Password Successfully Changed. </Text>
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >

@@ -8,18 +8,19 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
-import { emailAtom } from '../../context/ClinicalAuthProvider';
+import { contactEmailAtom } from '../../context/FacilityAuthProvider';
+import { ForgotPassword } from '../../utils/useApi';
 
 
 export default function FacilityForgotPwd ({ navigation }) {
-  const [email, setEmail] = useAtom(emailAtom);
+  const [email, setEmail] = useAtom(contactEmailAtom);
   const handleNavigate = (navigateUrl) => {
       navigation.navigate(navigateUrl);
   }
 
   const [credentials, setCredentials] = useState(
     {
-      email: '',
+      contactEmail: '',
     }
   );
 
@@ -28,9 +29,32 @@ export default function FacilityForgotPwd ({ navigation }) {
     console.log(credentials)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('email: ', email)
-    navigation.navigate('FacilityPwdPending')
+    const response = await ForgotPassword(credentials, 'facilities');
+    console.log(response)
+    if (!response.error) {
+      console.log('success');
+      setEmail(credentials.contactEmail);      
+      console.log(credentials.contactEmail);
+      
+      navigation.navigate('FacilityPassVerify')
+    }
+    else {
+      Alert.alert(
+        'Failed!',
+        `${response.error}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   }
   const handleBack = () => {
     navigation.navigate('FacilityLogin');
@@ -41,7 +65,7 @@ export default function FacilityForgotPwd ({ navigation }) {
           translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <View style={{width: '100%', height: '60%', marginTop: 99, justifyContent:'center', alignItems: 'center', display: 'flex'}}
+        <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
             <Text style={styles.subject}> Forgot Password? </Text>
@@ -55,8 +79,8 @@ export default function FacilityForgotPwd ({ navigation }) {
                   autoCorrect={false}
                   autoCapitalize="none"
                   keyboardType="email-address"
-                  onChangeText={e => handleCredentials('email', e)}
-                  value={credentials.email || ''}
+                  onChangeText={e => handleCredentials('contactEmail', e)}
+                  value={credentials.contactEmail || ''}
                 />
               </View>
             </View>
@@ -68,7 +92,7 @@ export default function FacilityForgotPwd ({ navigation }) {
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
-              Back to 🏚️ Facilities Home
+              Back to 🏚️ Caregiver Home
             </Text>
           </View>
         </View>
@@ -124,11 +148,12 @@ const styles = StyleSheet.create({
   },
   authInfo: {
     display:'flex',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     width: '90%',
     borderRadius: 20,
-    backgroundColor: '#F2F2F2'
+    backgroundColor: '#F2F2F2',
+    marginTop: 140
   },
   btn: {flexDirection: 'column',
     gap: 20,

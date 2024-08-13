@@ -31,6 +31,47 @@ export const Signin = async (credentials, endpoint) => {
   }
 }
 
+export const ForgotPassword = async (credentials, endpoint) => {
+  try {
+    console.log("login");
+    const response = await axios.post(`api/${endpoint}/forgotPassword`, credentials);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error(error)    
+    return {error: error.response.data.message};
+  }
+}
+
+export const VerifyCodeSend = async (credentials, endpoint) => {
+  try {
+    console.log("login", credentials);
+    const response = await axios.post(`api/${endpoint}/verifyCode`, credentials);
+    console.log(response);
+    // if (response.data.verifyCode) {
+    //   await AsyncStorage.setItem('token', response.data.verifyCode);
+    // }
+    return response.data;
+  } catch (error) {
+    console.error(error)    
+    return {error: error.response.data.message};
+  }
+}
+export const ResetPassword = async (credentials, endpoint) => {
+  try {
+    console.log("login", credentials);
+    const response = await axios.post(`api/${endpoint}/resetPassword`, credentials);
+    console.log(response);
+    // if (response.data.verifyCode) {
+    //   await AsyncStorage.setItem('token', response.data.verifyCode);
+    // }
+    return response.data;
+  } catch (error) {
+    console.error(error)    
+    return {error: error.response.data.message};
+  }
+}
+
 export const Update = async (updateData, endpoint) => {
   try {
     console.log("update");
@@ -276,12 +317,34 @@ export const Clinician = async (endpoint, role) => {
   }
 }
 
-export const fetchInvoices = async (facilityId) => {
+export const fetchInvoices = async () => {
   try {
-    const response = await axios.get(`api/facilities/generateInvoice/${facilityId}`);
+    console.log('fetch');
+    
+    const response = await axios.get(`api/jobs/generateInvoice`);
+    console.log('success', response.data);
+    
     return response.data
-} catch (error) {
-    console.error('Error generating invoice:', error);
-}
+  } catch (error) {
+      console.error('Error generating invoice:', error);
+      return {error: error.response.data.message}
+  }
 };
 
+
+export const sendInvoice = async (facilityId, email) => {
+  try {
+    console.log('fetch');
+    
+    const response = await axios.post('api/jobs/sendInvoice', {
+      facilityId: facilityId,
+      email: email,
+    });
+    console.log('success');
+    
+    return response.data.invoiceData
+  } catch (error) {
+      console.error('Error generating invoice:', error);
+      return {error: error.response.data.message}
+  }
+};

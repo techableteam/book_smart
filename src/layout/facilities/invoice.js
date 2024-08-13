@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Alert, StyleSheet, TextInput, Button, Text } from 'react-native';
 import axios from 'axios';
-import { fetchInvoices } from '../../utils/useApi';
+import { fetchInvoices, sendInvoice } from '../../utils/useApi';
 
 const Invoice = () => {    
   const [facilityId, setFacilityId] = useState('');
@@ -11,24 +11,36 @@ const Invoice = () => {
 
   // Function to generate invoice
   const generateInvoice = async () => {
-      const response = await fetchInvoices(facilityId);
-    setInvoicePath(response.path); // Store the invoice path
-    setInvoice(response.invoice);
-    Alert.alert('Success', 'Invoice generated successfully!');
+    console.log('invoices');
+    
+    const response = await fetchInvoices(facilityId);
+    console.log(response);
+    
+    if (!response.error) {
+        Alert.alert('Success', 'Invoice generated successfully!');
+    }
+    else {
+        Alert.alert('Failed', response.error);
+
+    }
+    // setInvoicePath(response.path); // Store the invoice path
+    // setInvoice(response.invoice);
   };
 
   // Function to send invoice
-  const sendInvoice = async () => {
-      try {
-          await axios.post('http://95.216.240.153:5000/api/facilities/sendInvoice', {
-              facilityId: parseInt(facilityId),
-              email: email,
-          });
-          Alert.alert('Success', 'Invoice sent successfully!');
-      } catch (error) {
-          console.error('Error sending invoice:', error);
-          Alert.alert('Error', 'Failed to send invoice.');
-      }
+  const sendInvoices = async () => {
+    console.log('send Invoice');
+    
+    const response = await sendInvoice(facilityId, email);
+    console.log(response);
+    
+    if (!response.error) {
+        Alert.alert('Success', 'Invoice successfully Delivered!');
+    }
+    else {
+        Alert.alert('Failed', response.error);
+
+    }
   };
 
   return (
@@ -49,7 +61,7 @@ const Invoice = () => {
               keyboardType="email-address"
           />
           <Button title="Generate Invoice" onPress={generateInvoice} />
-          <Button title="Send Invoice" onPress={sendInvoice} />
+          <Button title="Send Invoice" onPress={sendInvoices} />
           {invoicePath ? <Text>Invoice Path: {invoicePath}</Text> : null}
            {/* Display Invoice Details */}
            {invoice && (

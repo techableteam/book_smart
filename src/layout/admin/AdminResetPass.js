@@ -8,19 +8,21 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
-import { emailAtom } from '../../context/ClinicalAuthProvider';
-import { ForgotPassword } from '../../utils/useApi';
+import { emailAtom } from '../../context/AdminAuthProvider';
+import { ResetPassword } from '../../utils/useApi';
 
 
-export default function ClientForgotPwd ({ navigation }) {
+export default function AdminResetPassword ({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const handleNavigate = (navigateUrl) => {
       navigation.navigate(navigateUrl);
   }
 
   const [credentials, setCredentials] = useState(
     {
-      email: '',
+      password: '',
     }
   );
 
@@ -31,19 +33,34 @@ export default function ClientForgotPwd ({ navigation }) {
 
   const handleSubmit = async () => {
     console.log('email: ', email)
-    const response = await ForgotPassword(credentials, 'clinical');
-    console.log(response)
-    if (!response.error) {
-      console.log('success');
-      setEmail(credentials.email);      
-      console.log(credentials.email);
-      
-      navigation.navigate('ClientPassVerify')
+    if (password === confirmPassword) {
+      const response = await ResetPassword({password: password, email: email}, 'admin');
+      console.log(response)
+      if (!response.error) {
+        console.log('success');
+        
+        navigation.navigate('AdminPending')
+      }
+      else {
+        Alert.alert(
+          'Failed!',
+          `${response.error}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
     }
     else {
       Alert.alert(
-        'Failed!',
-        `${response.error}`,
+        'Password Not Matched',
+        `Your password not matched. please input password again.`,
         [
           {
             text: 'OK',
@@ -57,7 +74,7 @@ export default function ClientForgotPwd ({ navigation }) {
     }
   }
   const handleBack = () => {
-    navigation.navigate('ClientSignIn');
+    navigation.navigate('AdminLogin');
   }
   return (
       <View style={styles.container}>
@@ -68,19 +85,28 @@ export default function ClientForgotPwd ({ navigation }) {
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
-            <Text style={styles.subject}> Forgot Password? </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your email address below and we will send you a link to reset your password. </Text>
+            <Text style={styles.subject}> Reset Passowrd </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your new password and confirm password here. </Text>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Email Address </Text>
-              <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+              <Text style={styles.subtitle}> Password </Text>
+              <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  keyboardType="email-address"
-                  onChangeText={e => handleCredentials('email', e)}
-                  value={credentials.email || ''}
+                  secureTextEntry={true}
+                  onChangeText={e => setPassword(e)}
+                  value={password || ''}
+                />
+                <TextInput
+                  style={[styles.input, {width: '100%'}]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"        
+                  secureTextEntry={true}
+                  onChangeText={e => setConfirmPassword(e)}
+                  value={confirmPassword || ''}
                 />
               </View>
             </View>
@@ -153,7 +179,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 20,
     backgroundColor: '#F2F2F2',
-    marginTop: 140
+    marginTop: 140,
   },
   btn: {flexDirection: 'column',
     gap: 20,

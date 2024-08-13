@@ -59,6 +59,7 @@ import AdminCompany from './src/layout/admin/AdminCompany.js';
 import AdminEditProfile from './src/layout/admin/AdminEditProfile.js';
 import AdminAllUser from './src/layout/admin/AdminAllUser.js';
 import Invoice from './src/layout/facilities/invoice.js';
+import BackgroundTask from './src/utils/backgroundTask.js'
 
 // const Drawer = createDrawerNavigator();
 
@@ -67,6 +68,7 @@ function App() {
   return (
     <NavigationContainer style = {styles.sectionContainer}>
       <Layout />
+      <BackgroundTask />
     </NavigationContainer>
     // <View>
     //   <Invoice />
