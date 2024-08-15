@@ -43,6 +43,18 @@ export const ForgotPassword = async (credentials, endpoint) => {
   }
 }
 
+export const PhoneSms = async (credentials, endpoint) => {
+  try {
+    console.log("login");
+    const response = await axios.post(`api/${endpoint}/phoneSms`, credentials);
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error(error)    
+    return {error: error.response.data.message};
+  }
+}
+
 export const VerifyCodeSend = async (credentials, endpoint) => {
   try {
     console.log("login", credentials);
@@ -57,6 +69,22 @@ export const VerifyCodeSend = async (credentials, endpoint) => {
     return {error: error.response.data.message};
   }
 }
+
+export const VerifyPhoneCodeSend = async (credentials, endpoint) => {
+  try {
+    console.log("login", credentials);
+    const response = await axios.post(`api/${endpoint}/verifyPhone`, credentials);
+    console.log(response);
+    // if (response.data.verifyCode) {
+    //   await AsyncStorage.setItem('token', response.data.verifyCode);
+    // }
+    return response.data;
+  } catch (error) {
+    console.error(error)    
+    return {error: error.response.data.message};
+  }
+}
+
 export const ResetPassword = async (credentials, endpoint) => {
   try {
     console.log("login", credentials);
@@ -82,6 +110,36 @@ export const Update = async (updateData, endpoint) => {
     const response = await axios.post(`api/${endpoint}/update`, updateData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
+      },
+    });
+    console.log('Success');
+    
+
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+export const Updates = async (updateData, endpoint) => {
+  try {
+    console.log("update");
+    // Existing token (obtained from AsyncStorage or login)
+    const existingToken = await AsyncStorage.getItem('token');
+
+    // Include token in Authorization header
+    const response = await axios.post(`api/${endpoint}/update`, updateData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`,
+        userRole: 'Admin'
       }
     });
     console.log('Success');

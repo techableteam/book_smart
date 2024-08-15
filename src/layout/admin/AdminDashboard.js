@@ -13,6 +13,7 @@ import { Table, Row, Rows } from 'react-native-table-component';
 import { GetDashboardData } from '../../utils/useApi';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, userRoleAtom } from '../../context/AdminAuthProvider';
+import { useFocusEffect } from '@react-navigation/native';
 // import MapView from 'react-native-maps';
 
 export default function AdminDashboard ({ navigation }) {
@@ -60,41 +61,44 @@ export default function AdminDashboard ({ navigation }) {
   const [sum1,setSum1] = useState(0);
   const [sum2, setSum2] = useState(0);
   const [sum3,setSum3] = useState(0);
-  useEffect(() => {
-    async function getData() {
-      let Data = await GetDashboardData('jobs', 'Admin');
-      if(!Data) {
-        setData(['No Data'])
-      }
-      else {
-        setData(Data) 
-        const newTableData1 = Data.job.map(item => [item._id, item.count]);
-        setTableData1(newTableData1); // Update state
-        const newTableData2 = Data.nurse.map(item => [item._id, item.count]);
-        setTableData2(newTableData2); // Update state
-        const newTableData3 = Data.cal.map(item => [item._id, item.count]);
-        setTableData3(newTableData3); // Update state
-        console.log('--------------------------', newTableData1);
-        let s1=0;
-        let s2=0;
-        let s3=0;
-        Data.job.map((item, index) => {
-          s1 += item.count;
-        })
-        Data.nurse.map((item, index) => {
-          s2 += item.count;
-        })
-        Data.cal.map((item, index) => {
-          s3 += item.count;
-        })
-        setSum1(s1)
-        setSum2(s2)
-        setSum3(s3)
-      }
+  
+  async function getData() {
+    let Data = await GetDashboardData('jobs', 'Admin');
+    if(!Data) {
+      setData(['No Data'])
     }
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
+    else {
+      setData(Data) 
+      const newTableData1 = Data.job.map(item => [item._id, item.count]);
+      setTableData1(newTableData1); // Update state
+      const newTableData2 = Data.nurse.map(item => [item._id, item.count]);
+      setTableData2(newTableData2); // Update state
+      const newTableData3 = Data.cal.map(item => [item._id, item.count]);
+      setTableData3(newTableData3); // Update state
+      console.log('--------------------------', newTableData1);
+      let s1=0;
+      let s2=0;
+      let s3=0;
+      Data.job.map((item, index) => {
+        s1 += item.count;
+      })
+      Data.nurse.map((item, index) => {
+        s2 += item.count;
+      })
+      Data.cal.map((item, index) => {
+        s3 += item.count;
+      })
+      setSum1(s1)
+      setSum2(s2)
+      setSum3(s3)
+    }
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, []) // Empty dependency array means this runs on focus
+  );
+
 
   const tableDatas = [
     {
@@ -166,7 +170,7 @@ export default function AdminDashboard ({ navigation }) {
             }
           </View>
           {tableDatas.map((item, index)=> 
-            <View style={{paddingVertical: 40, backgroundColor: '#c6c5c5', marginTop: 20, width: '80%', marginLeft: '10%', borderRadius: 10, display: 'flex', alignItems:'center'}}>
+            <View key={index} style={{paddingVertical: 40, backgroundColor: '#c6c5c5', marginTop: 20, width: '80%', marginLeft: '10%', borderRadius: 10, display: 'flex', alignItems:'center'}}>
               <View style={styles.profileTitleBg}>
                 <Text style={styles.profileTitle}>{item.title}</Text>
               </View>
@@ -189,7 +193,7 @@ export default function AdminDashboard ({ navigation }) {
                     data={item.final}
                     style={styles.head}
                     widthArr={[200,80]}
-                    textStyle={[styles.tableText, { marginTop: 0 }]}
+                    textStyle={styles.tableText}
                   />
                 </Table>
               </View>

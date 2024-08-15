@@ -5,15 +5,25 @@ import images from '../assets/images';
 import { Card, IconButton, useTheme } from 'react-native-paper';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useAtom } from 'jotai';
-import { emailAtom, firstNameAtom } from '../context/ClinicalAuthProvider';
+import { firstNameAtom as clinicalFirstNameAtom } from '../context/ClinicalAuthProvider';
+import { firstNameAtom as adminFirstNameAtom } from '../context/AdminAuthProvider';
+import { firstNameAtom as facilityFirstNameAtom } from '../context/FacilityAuthProvider';
+
 // import { getRatingDataByUserID } from '../utils/api';
 
 export default function SubNavbar({name, navigation}) {
   const theme = useTheme();
-  const [firstName, serFistName] = useAtom(firstNameAtom)
+  
+  let userRole = 'clinical';
+  if (name === "ClientSignIn") userRole = 'clinical';
+  else if (name === "AdminLogin") userRole = 'admin';
+  else if (name === "FacilityLogin") userRole = 'facilities';
+  // console.log( name);
+  
+  const [firstName, setFirstName] = useAtom(userRole === 'clinical' ? clinicalFirstNameAtom : userRole === 'admin' ? adminFirstNameAtom : facilityFirstNameAtom);
   const handleNavigate = (navigateUrl) => {
     console.log(navigateUrl, "----------------------");
-    navigation.navigate(navigateUrl)
+    navigation.navigate(navigateUrl, {userRole: userRole});
   }
   return (
     <Card style={styles.shadow} onPress={()=> handleNavigate(name) }>

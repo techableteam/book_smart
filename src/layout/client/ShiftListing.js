@@ -15,6 +15,7 @@ import { transparent } from 'react-native-paper/lib/typescript/styles/themes/v2/
 import { PostBid, PostJob, Jobs } from '../../utils/useApi';
 import moment from 'moment';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useFocusEffect } from '@react-navigation/native';
 
 const itemsPerPage = 100;
 
@@ -76,91 +77,93 @@ export default function ShiftListing ({ navigation }) {
   const [filteredDetailData, setFilteredDetailData] = useState(detailedInfos);
   const [totalPages, setTotalPages] = useState(1);
   const [pageItems, setPageItems] = useState([]);
-  useEffect(() => {
-    async function getData() {
-      let Data = await Jobs('jobs', 'Clinicians');
-      if(!Data) {
-        setData(['No Data'])
-      }
-      else {
-        setData(Data);
-        console.log("date------------------------",data);
-        const transformedData = Data.map(item => [{
-          title: 'Job-ID',
-          content: item.jobId
-        },{
-          title: 'Title',
-          content: item.degree
-        },{
-          title: 'Date',
-          content: item.shiftDate
-        },{
-          title: 'Shift',
-          content: item.shift
-        },{
-          title: 'Location',
-          content: item.location
-        },{
-          title: 'Status',
-          content: item.status
-        }]);
-        const detailedData = Data.map(item => [{
-          title: 'Job-ID',
-          content: item.jobId
-        },{
-          title: 'Job Num. -#',
-          content: item.jobNum
-        },{
-          title: 'Caregiver',
-          content: item.degree
-        },{
-          title: 'Pay Rate',
-          content: item.payRate
-        },{
-          title: 'Job',
-          content: item.jobInfo
-        },{
-          title: 'Status',
-          content: item.status
-        },{
-          title: 'Shift',
-          content: item.shift
-        },{
-          title: 'Shift Dates & Times',
-          content: item.shiftDateAndTimes
-        },{
-          title: 'Location',
-          content: item.location
-        },{
-          title: 'Bonus',
-          content: item.bonus
-        },{
-          title: 'Date',
-          content: item.shiftDate
-        }]);
-        console.log(transformedData, '-----++++++')
-        setUserInfo(transformedData);
-        setFilteredData(transformedData);
-        const len = transformedData.length;
-        console.log(len, 'ddddd00000')
-        const page = Math.ceil(len / itemsPerPage);
-        setTotalPages(page);
-        setDetailedInfo(detailedData);
-        setFilteredDetailData(detailedData);
-        console.log(page, totalPages)
-        const generatedPageArray = Array.from({ length: page}, (_, index) => ({
-          label: `Page ${index+1}`,
-          value: index + 1
-        }));
-        setPageItems(generatedPageArray);
-        // console.log(generatedPageArray, "pageItems+1+@+@+@+@+")
-      }
-      // // setTableData(Data[0].degree)
-      // tableScan(Data);
+  async function getData() {
+    let Data = await Jobs('jobs', 'Clinicians');
+    if(!Data) {
+      setData(['No Data'])
     }
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
+    else {
+      setData(Data);
+      console.log("date------------------------",data);
+      const transformedData = Data.map(item => [{
+        title: 'Job-ID',
+        content: item.jobId
+      },{
+        title: 'Title',
+        content: item.degree
+      },{
+        title: 'Date',
+        content: item.shiftDate
+      },{
+        title: 'Shift',
+        content: item.shift
+      },{
+        title: 'Location',
+        content: item.location
+      },{
+        title: 'Status',
+        content: item.status
+      }]);
+      const detailedData = Data.map(item => [{
+        title: 'Job-ID',
+        content: item.jobId
+      },{
+        title: 'Job Num. -#',
+        content: item.jobNum
+      },{
+        title: 'Caregiver',
+        content: item.degree
+      },{
+        title: 'Pay Rate',
+        content: item.payRate
+      },{
+        title: 'Job',
+        content: item.jobInfo
+      },{
+        title: 'Status',
+        content: item.status
+      },{
+        title: 'Shift',
+        content: item.shift
+      },{
+        title: 'Shift Dates & Times',
+        content: item.shiftDateAndTimes
+      },{
+        title: 'Location',
+        content: item.location
+      },{
+        title: 'Bonus',
+        content: item.bonus
+      },{
+        title: 'Date',
+        content: item.shiftDate
+      }]);
+      console.log(transformedData, '-----++++++')
+      setUserInfo(transformedData);
+      setFilteredData(transformedData);
+      const len = transformedData.length;
+      console.log(len, 'ddddd00000')
+      const page = Math.ceil(len / itemsPerPage);
+      setTotalPages(page);
+      setDetailedInfo(detailedData);
+      setFilteredDetailData(detailedData);
+      console.log(page, totalPages)
+      const generatedPageArray = Array.from({ length: page}, (_, index) => ({
+        label: `Page ${index+1}`,
+        value: index + 1
+      }));
+      setPageItems(generatedPageArray);
+      // console.log(generatedPageArray, "pageItems+1+@+@+@+@+")
+    }
+    // // setTableData(Data[0].degree)
+    // tableScan(Data);
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, []) // Empty dependency array means this runs on focus
+  );
+
 
   // const userInfo = [[
   //   {title: 'JOB-ID', content: "344"},

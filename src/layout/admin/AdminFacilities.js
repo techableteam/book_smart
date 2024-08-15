@@ -19,6 +19,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AdminFacilities({ navigation }) {
 
@@ -105,10 +106,11 @@ export default function AdminFacilities({ navigation }) {
     // // setTableData(Data[0].degree)
     // tableScan(Data);
   }
-  useEffect(() => {
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, []) // Empty dependency array means this runs on focus
+  );
 
   //---------------DropDown--------------
   const pageItems = [

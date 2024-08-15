@@ -104,6 +104,7 @@ export default function FacilityLogin({ navigation }) {
         setAvatar(response.user.avatar);
         setUserRole(response.user.userRole);
         setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
+        setPassword(response.user.password);
         if (checked) {
           await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
           await AsyncStorage.setItem('facilityPassword', credentials.password);

@@ -13,8 +13,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
-import * as Progress from 'react-native-progress';
 import { Jobs } from '../../utils/useApi';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function CompanyShift({ navigation }) {
   const tableHead = [
@@ -83,26 +83,26 @@ export default function CompanyShift({ navigation }) {
   }, []);
 
   const [data, setData] = useState([]);
-  useEffect(() => {
-    async function getData() {
-      let Data = await Jobs('jobs', 'Facilities');
-      if(!Data) {
-        setData(['No Data'])
-      }
-      else {
-        setData(Data)
-        setFilteredData(Data);
-      }
-      Data.unshift(tableHead);
-      setTableData(Data);
-      console.log('--------------------------', Data);
-      // // setTableData(Data[0].degree)
-      // tableScan(Data);
+  async function getData() {
+    let Data = await Jobs('jobs', 'Facilities');
+    if(!Data) {
+      setData(['No Data'])
     }
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
-
+    else {
+      setData(Data)
+      setFilteredData(Data);
+    }
+    Data.unshift(tableHead);
+    setTableData(Data);
+    console.log('--------------------------', Data);
+    // // setTableData(Data[0].degree)
+    // tableScan(Data);
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, []) // Empty dependency array means this runs on focus
+  );
   //------------------------------------------Search Function----------------
   const [searchTerm, setSearchTem] = useState(''); // Search term
   const handleSearch = (e) => {
@@ -148,7 +148,7 @@ export default function CompanyShift({ navigation }) {
   const itemsToShow = getItemsForPage(currentPage);
 
   //------------------------------table Component---------------------------
-  const widths = [150, 100, 80, 130, 100, 70, 150, 80, 150, 80, 200, 80, 100, 80, 100];
+  const widths = [150, 100, 80, 100, 150, 70, 150, 80, 150, 80, 200, 80, 100, 80, 100];
   const RenderItem = ({ item, index }) => (
     <View key={index} style={{ backgroundColor: index !== 0 ? 'white' : '#ccffff', flexDirection: 'row' }}>
       {widths.map((width, idx) => (

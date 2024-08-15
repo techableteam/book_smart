@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity, Button } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
@@ -12,13 +11,11 @@ import { Dropdown } from 'react-native-element-dropdown';
 import DocumentPicker from 'react-native-document-picker';
 import RNFS from 'react-native-fs'
 // import TimePicker from 'react-time-picker';
-// import { AntDesign } from '@expo/vector-icons';
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
-import * as Progress from 'react-native-progress';
 import { Jobs, PostJob, MyShift } from '../../utils/useApi';
-import moment from 'moment';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Shift ({ navigation }) {
   //---------------------------------------Animation of Background---------------------------------------
@@ -91,62 +88,62 @@ export default function Shift ({ navigation }) {
   const [detailedInfos, setDetailedInfos] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [submitData, setSubmitData] = useState({});
-
-  useEffect(() => {
-    async function getData() {
-      let Data = await MyShift('jobs', 'Clinicians');
-      if(!Data) {
-        setData(['No Data'])
-      }
-      else {
-        setData(Data);
-        console.log("date------------------------",data);
-        const transformedData = Data.reportData.map(item => [{
-          title: 'Job-ID',
-          content: item.jobId
-        },{
-          title: 'Location',
-          content: item.location
-        },{
-          title: 'Pay Rate',
-          content: item.payRate
-        },{
-          title: 'SHIFT STATUS',
-          content: item.shiftStatus
-        },{
-          title: 'Caregiver',
-          content: item.caregiver
-        },{
-          title: 'TimeSheet',
-          content: item.timeSheet.name
-        },{
-          title: 'Status',
-          content: item.status
-        }]);
-        const detailedData = Data.reportData.map(item => [
-          item.jobId,
-          item.caregiver,
-          item.timeSheet
-        ]);
-        console.log(transformedData, '-----++++++')
-        setUserInfo(transformedData);
-        const len = transformedData.length;
-        console.log(len, 'ddddd00000', value)
-        const page = Math.ceil(len / value);
-        setTotalPages(page);
-        console.log(page, totalPages)
-        // const generatedPageArray = Array.from({ length: page}, (_, index) => ({
-        //   label: `Page ${index+1}`,
-        //   value: index + 1
-        // }));
-        // setPageItems(generatedPageArray);
-      }
-      // // setTableData(Data[0].degree)
-      // tableScan(Data);
+  async function getData() {
+    let Data = await MyShift('jobs', 'Clinicians');
+    if(!Data) {
+      setData(['No Data'])
     }
-    getData();
-
-  }, [])
+    else {
+      setData(Data);
+      console.log("date------------------------",data);
+      const transformedData = Data.reportData.map(item => [{
+        title: 'Job-ID',
+        content: item.jobId
+      },{
+        title: 'Location',
+        content: item.location
+      },{
+        title: 'Pay Rate',
+        content: item.payRate
+      },{
+        title: 'SHIFT STATUS',
+        content: item.shiftStatus
+      },{
+        title: 'Caregiver',
+        content: item.caregiver
+      },{
+        title: 'TimeSheet',
+        content: item.timeSheet.name
+      },{
+        title: 'Status',
+        content: item.status
+      }]);
+      const detailedData = Data.reportData.map(item => [
+        item.jobId,
+        item.caregiver,
+        item.timeSheet
+      ]);
+      console.log(transformedData, '-----++++++')
+      setUserInfo(transformedData);
+      const len = transformedData.length;
+      console.log(len, 'ddddd00000', value)
+      const page = Math.ceil(len / value);
+      setTotalPages(page);
+      console.log(page, totalPages)
+      // const generatedPageArray = Array.from({ length: page}, (_, index) => ({
+      //   label: `Page ${index+1}`,
+      //   value: index + 1
+      // }));
+      // setPageItems(generatedPageArray);
+    }
+    // // setTableData(Data[0].degree)
+    // tableScan(Data);
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, []) // Empty dependency array means this runs on focus
+  );
 
   const userInfo = [[
     {title: 'JOB-ID', content: "344"},
@@ -233,7 +230,9 @@ export default function Shift ({ navigation }) {
   const handleUploadEdit = (id) => {
     console.log('handleEdit--->', id);
     let cnt = 0;
-    let infoData = data.find(item => item.jobId === id)
+    console.log(data, 'ddddd');
+    
+    let infoData = data.reportData.find(item => item.jobId === id)
     setSubmitData(infoData);
     setDetailedInfos([
       { title: 'Job-ID', content: infoData.jobId },

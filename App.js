@@ -60,6 +60,7 @@ import AdminEditProfile from './src/layout/admin/AdminEditProfile.js';
 import AdminAllUser from './src/layout/admin/AdminAllUser.js';
 import Invoice from './src/layout/facilities/invoice.js';
 import BackgroundTask from './src/utils/backgroundTask.js'
+import ClientPhone from './src/layout/client/ClientPhone.js';
 
 // const Drawer = createDrawerNavigator();
 
@@ -71,7 +72,7 @@ function App() {
       <BackgroundTask />
     </NavigationContainer>
     // <View>
-    //   <Invoice />
+    //   <ClientPhone />
     // </View>
   );
 }

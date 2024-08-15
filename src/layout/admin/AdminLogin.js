@@ -9,7 +9,7 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, phoneAtom, emailAtom, photoImageAtom, userRoleAtom, companyNameAtom, addressAtom } from '../../context/AdminAuthProvider'
+import { firstNameAtom, lastNameAtom, phoneAtom, emailAtom, photoImageAtom, userRoleAtom, companyNameAtom, addressAtom, passInfAtom } from '../../context/AdminAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -22,6 +22,7 @@ export default function AdminLogin({ navigation }) {
   const [phone, setPhone] = useAtom(phoneAtom);
   const [companyName, setCompanyName] = useAtom(companyNameAtom);
   const [address, setAddress]= useAtom(addressAtom);
+  const [password, setPassword] = useAtom(passInfAtom)
   // const navigation = useNavigation(false);
   const theme = useTheme();
   // const { auth, setAuth } = AuthState();
@@ -97,7 +98,8 @@ export default function AdminLogin({ navigation }) {
         setCompanyName(response.user.companyName);
         setUserRole(response.user.userRole);
         setEmail(response.user.email);
-        setPhone(response.user.phone)
+        setPhone(response.user.phone);
+        setPassword(response.user.password);
         
         // setTitle(response.data.title);
         // setPhotoImage(response.user.photoImage);
@@ -232,7 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#777777'
   },
   scroll: {
-    marginTop: 97,
+    marginTop: 99,
   },
   modal: {
     width: '90%',

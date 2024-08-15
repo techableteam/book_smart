@@ -10,9 +10,15 @@ import { emailAtom, firstNameAtom } from '../context/ClinicalAuthProvider';
 
 export default function MSubNavbar({name, navigation}) {
   const theme = useTheme();
+
+  let userRole = 'clinical';
+  if (name === "Caregiver") userRole = 'clinical';
+  else if (name === "Admin") userRole = 'admin';
+  else if (name === "Facilities") userRole = 'facilities';
+
   const [firstName, serFistName] = useAtom(firstNameAtom)
   const handleNavigate = (navigateUrl) => {
-    navigation.navigate('ClientSignIn')
+    navigation.navigate(navigateUrl)
   }
   return (
     <Card style={styles.shadow}>
@@ -21,7 +27,15 @@ export default function MSubNavbar({name, navigation}) {
             color: '#2a53c1', 
             textDecorationLine: 'underline'
           }]} 
-          onPress={()=>handleNavigate('MyProfile')}
+          onPress={()=>{
+            if (name === "Admin") {
+              handleNavigate("AdminHome")
+            } else if (name === "Caregiver") {
+              handleNavigate('MyProfile')
+            } else if (name === "Facilities") {
+              handleNavigate('FacilityProfile')
+            }
+          }}
         >
           👩‍⚕️ {name} Profile
         </Text>
@@ -32,7 +46,16 @@ export default function MSubNavbar({name, navigation}) {
             color: '#2a53c1', 
             textDecorationLine: 'underline'
           }]} 
-          onPress={()=>handleNavigate('EditProfile')}>
+          onPress={()=>{
+            if (name === "Admin") {
+              handleNavigate("AdminEditProfile")
+            } else if (name === "Caregiver") {
+              handleNavigate('EditProfile')
+            } else if (name === "Facilities") {
+              handleNavigate('FacilityEditProfile')
+            }
+          }}
+        >
           Edit My Profile
         </Text>
       </View>
@@ -45,7 +68,7 @@ export default function MSubNavbar({name, navigation}) {
               color: '#2a53c1', 
               textDecorationLine: 'underline'
             }}
-            onPress={()=>handleNavigate('AccountSettings')}
+            onPress={()=>handleNavigate('AccountSettings', {userRole: userRole})}
           >
             Account Settings
           </Text>

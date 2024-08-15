@@ -249,11 +249,11 @@ export default function AdminEditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Logo </Text>
-              {credentials.avatar.content &&
+              {credentials.photoImage.content &&
               <View style={{marginBottom: 10}}>
                 <Image
                   style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.avatar.content}` }}
+                  source={{ uri: `${credentials.photoImage.content}` }}
                 />
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('avatar')}
@@ -269,7 +269,7 @@ export default function AdminEditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.avatar.name || ''}
+                  value={credentials.photoImage.name || ''}
                 />
               </View>
             </View>

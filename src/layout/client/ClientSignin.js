@@ -9,11 +9,13 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, addressAtom, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom } from '../../context/ClinicalAuthProvider'
+import { firstNameAtom, lastNameAtom, addressAtom, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom, passwordAtom } from '../../context/ClinicalAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
 import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import { useFocusEffect } from '@react-navigation/native';
+import { deviceNumberAtom } from '../../context/BackProvider';
 
 export default function ClientSignIn({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -28,6 +30,8 @@ export default function ClientSignIn({ navigation }) {
   const [entryDate, setEntryDate] = useAtom(entryDateAtom);
   const [socialSecurityNumber, setSocialSecurityNumber] = useAtom(socialSecurityNumberAtom);
   const [address, setAddress] = useAtom(addressAtom);
+  const [password, setPassword] = useAtom(passwordAtom);
+  const [deviceNum, setDeviceNum] = useAtom(deviceNumberAtom);
   // const navigation = useNavigation(false);
   const theme = useTheme();
   // const { auth, setAuth } = AuthState();
@@ -43,26 +47,28 @@ export default function ClientSignIn({ navigation }) {
   const [uniqueId, setUniqueId] = useState('');
   const [manufacturer, setManufacturer] = useState('');
 
-  useEffect(() => {
-    const fetchDeviceInfo = async () => {
-      console.log('getInfo')
-      try {
-        console.log('DeviceId');
-          // Get the unique device ID
-          const id = await getUniqueId();
-          setUniqueId(id);
-          console.log(credentials, '.....');
-          
-          // Get the manufacturer of the device
-          const manu = await getManufacturer();
-          setManufacturer(manu);
-      } catch (error) {
-          console.error('Error fetching device info:', error);
-      }
-    };
-
-    fetchDeviceInfo();
-  }, []);
+  const fetchDeviceInfo = async () => {
+    console.log('getInfo')
+    try {
+      console.log('DeviceId');
+        // Get the unique device ID
+        const id = await getUniqueId();
+        setUniqueId(id);
+        console.log(credentials, '.....');
+        
+        // Get the manufacturer of the device
+        const manu = await getManufacturer();
+        setManufacturer(manu);
+    } catch (error) {
+        console.error('Error fetching device info:', error);
+    }
+  };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDeviceInfo();
+    }, []) // Empty dependency array means this runs on focus
+  );
   const [checked, setChecked] = useState(false);
 
   //Alert
@@ -100,7 +106,7 @@ export default function ClientSignIn({ navigation }) {
     // console.log(credentials);
   }
 
-  const handleSignInNavigate = () => {
+  const handleSignInNavigate = (url) => {
     if (credentials.email === '') {
       showAlert('email')
     }
@@ -108,7 +114,8 @@ export default function ClientSignIn({ navigation }) {
       showAlert('password')
     }
     else {
-      navigation.navigate('MyHome');
+      // navigation.navigate('MyHome');
+      navigation.navigate(url);
     }
   }
 
@@ -121,7 +128,7 @@ export default function ClientSignIn({ navigation }) {
       setCredentials({...credentials, ["device"]: uniqueId});
       console.log(credentials.device,uniqueId, "Deciveddd")
       const response = await Signin(credentials, 'clinical');
-      console.log('SignIn Successful: ', response);
+      console.log('SignIn Successful: ', response.phoneAuth);
       if (!response.error) {
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
@@ -135,12 +142,23 @@ export default function ClientSignIn({ navigation }) {
         setEntryDate(response.user.entryDate);
         setSocialSecurityNumber(response.user.socialSecurityNumber)
         setAddress(response.user.address)
+        setPassword(response.user.password);
+        setDeviceNum(uniqueId);
         if (checked) {
           await AsyncStorage.setItem('clinicalEmail', credentials.email);
           await AsyncStorage.setItem('clinicalPassword', credentials.password);
         }
         // console.log('credentials:', credentials)
-        handleSignInNavigate();
+        console.log(response.phoneAuth, "-----------------------------");
+        
+        if (response.phoneAuth) {
+          console.log(response.phoneAuth);
+          
+          handleSignInNavigate('ClientPhone');
+        }
+        else {
+          handleSignInNavigate('MyHome');
+        }
         // console.log('email:', storage)
       }
       else {

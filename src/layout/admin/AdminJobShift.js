@@ -21,6 +21,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAtom } from 'jotai';
 import { companyNameAtom } from '../../context/FacilityAuthProvider'
+import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function AdminJobShift({ navigation }) {
@@ -59,10 +60,11 @@ export default function AdminJobShift({ navigation }) {
     // // setTableData(Data[0].degree)
     // tableScan(Data);
   }
-  useEffect(() => {
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, []) // Empty dependency array means this runs on focus
+  );
   //-----------------------------------Degree DropDown----------------------------
   
   const [degree, setDegree] = useState([

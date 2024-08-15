@@ -53,6 +53,8 @@ import AdminPassVerify from './admin/AdminPassVerify.js';
 import AdminPending from './admin/AdminPending.js';
 import AdminForgotPwd from './admin/AdminForgotPwd.js';
 import AdminResetPassword from './admin/AdminResetPass.js';
+import ClientPhone from './client/ClientPhone.js';
+import ClientPhoneVerify from './client/ClientPhoneVerify.js';
 const Stack = createNativeStackNavigator();
 
 function Layout() {
@@ -110,7 +112,8 @@ function Layout() {
       />
       <Stack.Screen 
         name= 'AccountSettings'
-        component = {AccountSettings}
+        component = {AccountSettings}        
+        initialParams={{ userRole: 'clinical' }}
         options={{headerShown: false}}
       />
       <Stack.Screen 
@@ -276,6 +279,16 @@ function Layout() {
       <Stack.Screen 
         name= 'AdminForgotPwd'
         component = {AdminForgotPwd}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'ClientPhone'
+        component = {ClientPhone}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'ClientPhoneVerify'
+        component = {ClientPhoneVerify}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

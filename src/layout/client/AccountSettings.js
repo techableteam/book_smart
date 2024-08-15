@@ -8,20 +8,30 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
+import { Updates } from '../../utils/useApi';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, emailAtom, passwordAtom } from '../../context/ClinicalAuthProvider';
+import { firstNameAtom as clinicalFirstNameAtom, lastNameAtom as clinicalLastNameAtom, emailAtom as clinicalEmailAtom, passwordAtom as clinicalPasswordAtom } from '../../context/ClinicalAuthProvider';
+import { firstNameAtom as adminFirstNameAtom, lastNameAtom as adminLastNameAtom, emailAtom as adminEmailAtom, passInfAtom as adminPasswordAtom } from '../../context/AdminAuthProvider';
+import { firstNameAtom as facilityFirstNameAtom, lastNameAtom as facilityLastNameAtom, contactEmailAtom as facilityContactEmailAtom, passwordAtom as facilityPasswordAtom } from '../../context/FacilityAuthProvider';
 
 
-export default function AccountSettings ({ navigation }) {
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [password, setPassword] = useAtom(passwordAtom);
+export default function AccountSettings ({ route, navigation }) {
+  const { userRole } = route.params;
+  // console.log(userRole);
+  
+
+  const [firstName, setFirstName] = useAtom(userRole === 'clinical' ? clinicalFirstNameAtom : userRole === 'admin' ? adminFirstNameAtom : facilityFirstNameAtom);
+  const [lastName, setLastName] = useAtom(userRole === 'clinical' ? clinicalLastNameAtom : userRole === 'admin' ? adminLastNameAtom : facilityLastNameAtom);
+  const [email, setEmail] = useAtom(userRole === 'clinical' ? clinicalEmailAtom : userRole === 'admin' ? adminEmailAtom : facilityContactEmailAtom);
+  const [password, setPassword] = useAtom(userRole === 'clinical' ? clinicalPasswordAtom : userRole === 'admin' ? adminPasswordAtom : facilityPasswordAtom);
+  console.log(email, firstName, lastName);
+  
   const handleNavigate = (navigateUrl) => {
       navigation.navigate(navigateUrl);
   }
   const [confirmPassword, setConfirmPassword] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
+  const [emails, setEmails] = useState(email);
   
   // const userInfo = [
   //   {title: 'Name', content: firstName},
@@ -31,10 +41,17 @@ export default function AccountSettings ({ navigation }) {
   // ]
 
   const [credentials, setCredentials] = useState(
+    userRole !== 'facilities' ?
     {
-      firstName: 'Dale',
-      lastName: '',
-      email: '',
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: ''
+    } :
+    {
+      firstName: firstName,
+      lastName: lastName,
+      contactEmail: email,
       password: ''
     }
   );
@@ -44,14 +61,44 @@ export default function AccountSettings ({ navigation }) {
     console.log(credentials)
   }
 
-  const handleSubmit = () => {
-    console.log('email: ', email)
+  const handleSubmit = async () => {
+    console.log('credential: ', credentials, emails);
+    delete credentials.password;
+    if (userRole === 'facilities') {
+      if(emails !== credentials.contactEmail) {
+        credentials.updateEmail = emails;
+      }
+    }
+    else {
+      if(emails !== credentials.email) {
+        credentials.updateEmail = emails;
+      }
+    }
+    let Data = await Updates(credentials, userRole);
+    if (!Data.error) {
+      navigation.goBack();
+    }
+    else {
+      Alert.alert(
+        'Failed!',
+        `${response.error.message}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   }
 
-  const showAlert = () => {
+  const showAlert = (content) => {
     Alert.alert(
       'Warning!',
-      "The Password doesn't matched. Please try again.",
+      content,
       [
         {
           text: 'OK',
@@ -66,18 +113,48 @@ export default function AccountSettings ({ navigation }) {
     );
   };
   
-  const handlePassword = () => {
-    if (password !== confirmPassword ) {
-      showAlert();
+  const handlePasswordSubmit = async () => {
+    if (password !== currentPassword ) {
+      showAlert('Please enter correct Password');
     }
     else {
-      setPassword('password', password);
+      if (credentials.password !== confirmPassword) {
+        showAlert('Please enter correct Password');
+      } else {
+        // setPassword('password', password);
+        let updateData = {};
+        if (userRole === 'facilities') {
+          updateData = {contactEmail: credentials.contactEmail, password: confirmPassword}
+        }
+        else {
+          updateData = {email: credentials.email, password: password}
+        }
+        let Data = await Updates(updateData, userRole);
+        if (!Data.error) {
+          navigation.goBack();
+        }
+        else {
+          Alert.alert(
+            'Failed!',
+            `${response.error.message}`,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      }
     }
   }
 
-  const handlePasswordSubmit = () => {
+  // const handlePasswordSubmit = () => {
 
-  }
+  // }
   return (
       <View style={styles.container}>
         <StatusBar 
@@ -116,8 +193,8 @@ export default function AccountSettings ({ navigation }) {
                   autoCorrect={false}
                   autoCapitalize="none"
                   keyboardType="email-address"
-                  onChangeText={e => handleCredentials('email', e)}
-                  value={credentials.email || ''}
+                  onChangeText={e => { userRole !== 'facilities' ? handleCredentials('email', e) : handleCredentials('contactEmail', e); setEmails(e)}}
+                  value={userRole !== 'facilities' ? credentials.email :  credentials.contactEmail || ''}
                 />
               </View>
             </View>
@@ -179,7 +256,7 @@ export default function AccountSettings ({ navigation }) {
                 style={[styles.input, {width: '100%'}]}
                 placeholder="Confirm Password"
                 onChangeText={e => setConfirmPassword(e)}
-                onSubmitEditing={handlePassword} // This handles the "Enter" key press event
+                // onSubmitEditing={handlePassword} // This handles the "Enter" key press event
                 value={confirmPassword || ''}
               />
             </View>

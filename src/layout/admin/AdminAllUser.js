@@ -97,6 +97,7 @@ export default function AdminAllUser({ navigation }) {
           uniqueValues.add(value); // Add to Set
           transformed.push({ label: value, value: value }); // Add to transformed array
       }
+      
     });
 
     console.log(transformed);

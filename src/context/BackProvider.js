@@ -2,6 +2,8 @@ import React from 'react';
 import { Provider, atom } from 'jotai';
 
 export const invoiceFetchAtom = atom([]);
+export const verifyPhoneAtom = atom('');
+export const deviceNumberAtom = atom('');
 
 export const AuthContext = React.createContext();
 
