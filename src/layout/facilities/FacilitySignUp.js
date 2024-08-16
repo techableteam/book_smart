@@ -181,13 +181,16 @@ export default function FacilitySignUp({ navigation }) {
 
   //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
+    let formattedNumber = '';
     // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
-
+    console.log('clenard', cleaned);
+    
     // Apply the desired phone number format
-    let formattedNumber = '';
     if (cleaned.length >= 3) {
       formattedNumber = `(${cleaned.slice(0, 3)})`;
+      console.log(formattedNumber);
+      
     }
     if (cleaned.length > 3) {
       formattedNumber += ` ${cleaned.slice(3, 6)}`;
@@ -199,7 +202,11 @@ export default function FacilitySignUp({ navigation }) {
     return formattedNumber;
   };
   const handlePhoneNumberChange = (text) => {
+    console.log(text);
+    
     const formattedNumber = formatPhoneNumber(text);
+    console.log(formattedNumber);
+    
     handleCredentials('contactPhone', formattedNumber);
   };
   const handleSignUpNavigate = () => {
@@ -317,9 +324,9 @@ export default function FacilitySignUp({ navigation }) {
                 <TextInput
                   value={credentials.contactPhone}
                   style={[styles.input, {width: '100%'}]}
-                  onChangeText={handlePhoneNumberChange}
+                  onChangeText={e => handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
-                  placeholder="(___) ___-____"
+                  placeholder=""
                 />
               </View>
             </View>

@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     lineHeight: 40,
-    width: '40%'
+    width: '100%'
   },
   content: {
     fontSize: 16,
-    width: '60%',
+    width: '100%',
     lineHeight: 40,
   },
   profileTitleBg: {

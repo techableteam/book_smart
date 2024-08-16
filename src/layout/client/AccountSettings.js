@@ -76,6 +76,13 @@ export default function AccountSettings ({ route, navigation }) {
     }
     let Data = await Updates(credentials, userRole);
     if (!Data.error) {
+      setFirstName(credentials.firstName);
+      setLastName(credentials.lastName);
+      if (userRole === 'facilities') {
+        setEmail(credentials.contactEmail);        
+      } else {
+        setEmail(credentials.email)
+      }
       navigation.goBack();
     }
     else {
@@ -131,6 +138,7 @@ export default function AccountSettings ({ route, navigation }) {
         }
         let Data = await Updates(updateData, userRole);
         if (!Data.error) {
+          setPassword(confirmPassword)
           navigation.goBack();
         }
         else {

@@ -12,8 +12,9 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
-import { MyShift } from '../../utils/useApi';
+import { MyShift, UpdateTime, Update } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import moment from 'moment';
 
 
 
@@ -52,14 +53,13 @@ export default function Reporting ({ navigation }) {
 
   //--------------------Gathering Data from Backend--------------
   
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({reportData: [],dailyPay: 0, weeklyPay: 0});
   const [userInfos, setUserInfo] = useState([]);
   const [detailedInfos, setDetailedInfos] = useState([]);
   const [clocks, setClocks] = useState([]);
-  // const [totalPages, setTotalPages] = useState(1);
-  // const [submitData, setSubmitData] = useState({});
   const [dailyPay, setDailyPay] = useState({date: '', pay: 0});
   const [weeklyPay, setWeeklyPay] = useState({date: '', pay: 0});
+  const [times, setTimes] = useState([]);
   
   async function getData() {
     let Data = await MyShift('jobs', 'Clinicians');
@@ -70,8 +70,12 @@ export default function Reporting ({ navigation }) {
       setData(Data);
       let transformedData = [];
       const monthGroups = {};
+      const extractVerifiedJobs = Data.reportData.filter(job => job.shiftStatus === "Verified");
+      console.log(extractVerifiedJobs);
+      setClocks(extractVerifiedJobs)
+      
       transformedData = Data.reportData.map(({ entryDate, jobId, shiftStatus, unit, shiftDateAndTimes }, index) => ({ key: index, entryDate, jobId, jobStatus: shiftStatus, unit, shiftDateAndTimes }));
-      console.log("date------------------------", transformedData);
+      // console.log("date------------------------", transformedData);
       transformedData.forEach(item => {
         const month = item.entryDate.split('/')[0] + "/24"; // Get the MM part
         if (!monthGroups[month]) {
@@ -79,7 +83,7 @@ export default function Reporting ({ navigation }) {
         }
         monthGroups[month].push(item);
       });
-      console.log("mm", data);
+      // console.log("mm", data);
       // Get keys and sort them based on date
       const sortedKeys = Object.keys(monthGroups).sort((a, b) => {
         const dateA = new Date(a.split('/')[1], a.split('/')[0] - 1); // Month is 0-indexed
@@ -91,17 +95,17 @@ export default function Reporting ({ navigation }) {
       sortedKeys.forEach(key => {
         sortedMonthGroups[key] = monthGroups[key];
       });
-      console.log(sortedMonthGroups, "sort");
+      // console.log(sortedMonthGroups, "sort");
       const mothData = Object.keys(sortedMonthGroups).map(month => ({
         month: month,
         number: String(sortedMonthGroups[month].length) // Count of entries for that month
       }));
       mothData.unshift({ "month": "Month", "number": "Count" });
       mothData.push({ "month": "Sum", "number": String(Data.reportData.length) });
-      console.log(mothData);
+      // console.log(mothData);
       const totalPayString = Data.dailyPay;
       const weeklyPayString = Data.weeklyPay;
-      console.log(Data.dailyPay, Data.weeklyPay);
+      // console.log(Data.dailyPay, Data.weeklyPay);
       setDailyPay(totalPayString);
       setWeeklyPay(weeklyPayString);
       setUserInfo(mothData);
@@ -140,7 +144,7 @@ export default function Reporting ({ navigation }) {
   const [filteredData, setFilteredData] = useState([]);
   const handleSearch = (e) => {
     setSearchTem(e);
-    console.log(e, '------------');
+    // console.log(e, '------------');
     if (e !== '') {
       const filtered = myShiftDate.filter(item => 
         Object.values(item).some(value => 
@@ -164,7 +168,7 @@ export default function Reporting ({ navigation }) {
       const detailedData = detailedInfos[id].map(({jobId, jobStatus, unit, shiftDateAndTimes})=> ({"text1": jobId, "text2": jobStatus, "text3": unit, "text4": shiftDateAndTimes}))      
       setMyShiftDate(detailedData);
       detailedData.unshift({text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'});
-      console.log("detailedData", id, detailedData);
+      // console.log("detailedData", id, detailedData);
       setFilteredData(detailedData);
       toggleModal();
     }
@@ -173,6 +177,33 @@ export default function Reporting ({ navigation }) {
   const toggleModal = () => {
     setShowModal(!showModal);
   }
+
+  const handleButtonClick = async(jobId, laborSate) => {
+    const timeNow = moment(new Date()).format("MM/DD/YYYY HH.MM") // Get current time as a string
+    const existingJobIndex = times.findIndex(time => time.jobId === jobId)
+    let deliverArray = {};
+    let index = 0;
+    if (laborSate == 0) {
+        // If the jobId does not exist, add a new object
+        index = times.length-1;
+        console.log(index, times);
+        deliverArray = { jobId, laborState: 1, shiftStartTime: timeNow, shiftEndTime: '' };
+        setTimes([...times, { jobId, laborState: 1, shiftStartTime: timeNow, shiftEndTime: '' }]);
+    } else {
+        // If the jobId exists, update the existing object's shiftEndTime and laborState
+        const updatedTimes = [...times];
+        updatedTimes[existingJobIndex].shiftEndTime = timeNow; // Update shiftEndTime
+        updatedTimes[existingJobIndex].laborState = 2; // Update laborState to false
+        setTimes(updatedTimes); // Set the updated array back to state
+        index = existingJobIndex;
+        deliverArray = updatedTimes[index]
+    }
+    console.log(times[index]);
+    const update = await UpdateTime(deliverArray, 'jobs')
+    if(update) {
+      getData();
+    }
+};
 
   return (
       <View style={styles.container}>
@@ -203,10 +234,34 @@ export default function Reporting ({ navigation }) {
             <Text style={styles.name}>"Click On Any Value To View Details"</Text>
             {
               userInfos.map((item, index) => 
-                <View style={[styles.row, {paddingHorizontal: 0}, index === 0 || index === userInfos.length-1 ? styles.evenRow : null]}>
+                <View key={index} style={[styles.row, {paddingHorizontal: 0}, index === 0 || index === userInfos.length-1 ? styles.evenRow : null]}>
                   <Text style={{width: '50%', textAlign: 'center', fontWeight: 'bold'}}>{item.month}</Text>
                   <View style={{width: 1, height: 40, backgroundColor: 'hsl(0, 0%, 86%)', position: 'absolute', left: '50%'}} />
                   <Text style={[{width: '50%', textAlign: 'center'}, index == 0 || index === userInfos.length-1 ? {fontWeight: 'bold'}: {fontWeight: '400'}]} onPress={() => handleClick(item.month)}>{item.number}</Text>
+                </View>
+              )
+            }
+            {
+              clocks.map((item, index) => 
+                <View key={index} style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10,height: 40}}>
+                  {
+                    item.laborState === 2 ? 
+                    <Text style={{backgroundColor: '#394232', padding: 10, textAlign: 'center', fontWeight: 'bold', color: 'black', borderRadius: 5}}
+                    >
+                      Ended
+                    </Text>
+                    :
+                    <TouchableOpacity onPress={() => handleButtonClick(item.jobId, item.laborState)}>
+                      <Text style={{backgroundColor: '#BC222F', padding: 10, textAlign: 'center', fontWeight: 'bold', borderRadius: 5, color: 'white'}}>
+                        {item.laborState === 0?'Clock In': 'Clock Out'}
+                      </Text>
+                    </TouchableOpacity>
+                  }
+                  <Text style={[styles.name, {padding: 10, height: '100%',}]}>JobId: {item.jobId}</Text>
+                  <View style={{height: '100%'}}>
+                    <Text style={styles.name}>{item.shiftStartTime}</Text>
+                    <Text style={styles.name}>{item.shiftEndTime}</Text>
+                  </View>
                 </View>
               )
             }
@@ -214,8 +269,8 @@ export default function Reporting ({ navigation }) {
               <Text style={styles.profileTitle}>Daily & Weekly Pay</Text>
             </View>
             <View style={{width: '90%', marginBottom: 30}}>
-              <Text style={styles.name}>{`Day:       ${dailyPay.date}                         $${dailyPay.pay}`}</Text>
-              <Text style={styles.name}>{`Week:    ${weeklyPay.date}   $${weeklyPay.pay}`}</Text>
+              <Text style={styles.name}>{`Day:     ${dailyPay.date}                        $${dailyPay.pay}`}</Text>
+              <Text style={styles.name}>{`Week:  ${weeklyPay.date}  $${weeklyPay.pay}`}</Text>
             </View>
             {/* <FlatList
               data={data}

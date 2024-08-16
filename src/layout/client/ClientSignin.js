@@ -157,6 +157,7 @@ export default function ClientSignIn({ navigation }) {
           handleSignInNavigate('ClientPhone');
         }
         else {
+          console.log('welcome')
           handleSignInNavigate('MyHome');
         }
         // console.log('email:', storage)

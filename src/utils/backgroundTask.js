@@ -16,8 +16,8 @@ const BackgroundTask = () => {
         currentDate.getFullYear(),
         currentDate.getMonth(),
         currentDate.getDate() + ((5 - currentDate.getDay() + 7) % 7), // Friday
-        18, // 6 AM
-        30, // 51 minutes
+        10, // 6 AM
+        21, // 51 minutes
         0 // 0 seconds
       );
       const timeUntilTarget = targetDate.getTime() - currentDate.getTime();

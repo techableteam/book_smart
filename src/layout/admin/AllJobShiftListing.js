@@ -70,10 +70,10 @@ export default function AllJobShiftListing({ navigation }) {
     }
     else {
       const modifiedArray = Data.map(subarray => {
-        const newArray = [...subarray]; // Create a copy of the subarray
-        newArray.pop(); // Remove the last item
-        return newArray; // Return the modified subarray
+        return subarray.slice(0, -2); // Remove the last three items
       });
+      console.log(modifiedArray, '\n modified Array');
+      
       setData(modifiedArray)
     }
     const uniqueValues = new Set();

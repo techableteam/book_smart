@@ -64,9 +64,10 @@ export default function CaregiverTimeSheet({ navigation }) {
 
         // Combine the second and third elements
         const fullName = `${item[5]} ${item[6]}`;
+        
 
         // Return the new structure
-        return [item[2], item[1], fullName, item[9], ''];
+        return [item[2], item[1], fullName, item[9], item[12]];
     });
   }
 

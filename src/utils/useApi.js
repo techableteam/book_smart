@@ -20,14 +20,14 @@ export const Signin = async (credentials, endpoint) => {
   try {
     console.log("login");
     const response = await axios.post(`api/${endpoint}/login`, credentials);
-    console.log(response);
+    console.log('ewrw', response.data);
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
     return response.data;
   } catch (error) {
     console.error(error)    
-    return {error: error.response.data};
+    // return {error: error.response.data};
   }
 }
 
@@ -266,6 +266,24 @@ export const MyShift = async (endpoint, role) => {
   }
 }
 
+export const UpdateTime = async (data, endpoint) => {
+  try {
+    console.log('success')
+    // Existing token (obtained from AsyncStorage or login)
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/updateTime`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    // const response = await axios.get("/test");
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 
 export const GetDashboardData = async (endpoint, role) => {
   try {
@@ -392,7 +410,7 @@ export const fetchInvoices = async () => {
 
 export const sendInvoice = async (facilityId, email) => {
   try {
-    console.log('fetch');
+    console.log('fetch', facilityId, email);
     
     const response = await axios.post('api/jobs/sendInvoice', {
       facilityId: facilityId,

@@ -244,6 +244,8 @@ export default function AdminFacilities({ navigation }) {
     else {
       const filteredData = invoiceData.filter(item => item.facilityId === invoiceName && item.status === true);
       if (filteredData) {
+        console.log(rowData);
+        
         let result = await sendInvoice(invoiceName, rowData);
         if (!result.error) {
             Alert.alert('Success', 'Invoice generated successfully!');
