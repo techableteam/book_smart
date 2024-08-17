@@ -179,7 +179,7 @@ export default function Reporting ({ navigation }) {
   }
 
   const handleButtonClick = async(jobId, laborSate) => {
-    const timeNow = moment(new Date()).format("MM/DD/YYYY HH.MM") // Get current time as a string
+    const timeNow = moment(new Date()).format("MM/DD/YYYY hh:mm") // Get current time as a string
     const existingJobIndex = times.findIndex(time => time.jobId === jobId)
     let deliverArray = {};
     let index = 0;

@@ -137,7 +137,7 @@ export default function AdminAllUser({ navigation }) {
     }
     return null;
   };  
-  const widths = [120, 150, 150, 100];
+  const widths = [120, 200, 150, 100];
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
@@ -183,7 +183,7 @@ export default function AdminAllUser({ navigation }) {
     {label: 'Select...', value: 'Select...'},
     {label: 'activate', value: 'activate'},
     {label: 'inactivate', value: 'inactivate'},
-    {label: 'pending', value: 'pending'},
+    {label: 'pending approval', value: 'pending approval'},
   ])
   const [role, setRole] = useState([
     {label: 'Select...', value: 'Select...'},
@@ -196,20 +196,30 @@ export default function AdminAllUser({ navigation }) {
     // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
 
+    // If the cleaned input has 1 or 2 characters, return it as is
+    if (cleaned.length === 1 || cleaned.length === 2) {
+        return cleaned;
+    }
+
     // Apply the desired phone number format
     let formattedNumber = '';
     if (cleaned.length >= 3) {
-      formattedNumber = `(${cleaned.slice(0, 3)})`;
+        formattedNumber = `(${cleaned.slice(0, 3)})`;
     }
     if (cleaned.length > 3) {
-      formattedNumber += ` ${cleaned.slice(3, 6)}`;
+        formattedNumber += ` ${cleaned.slice(3, 6)}`;
     }
     if (cleaned.length > 6) {
-      formattedNumber += `-${cleaned.slice(6, 10)}`;
+        formattedNumber += `-${cleaned.slice(6, 10)}`;
     }
-
     return formattedNumber;
   };
+  
+  const handlePhoneNumberChange = (text) => {
+    const formattedNumber = formatPhoneNumber(text);
+    handleCredentials('contactPhone', formattedNumber);
+  };
+
 
   const [jobValue, setJobValue] = useState(null);
   const [isJobFocus, setJobIsFocus] = useState(false);
@@ -221,7 +231,10 @@ export default function AdminAllUser({ navigation }) {
     console.log(rowData, label);
     if (modalItem === 2){
       const name = rowData[0].split(" ");
+      console.log(label, "---------------------===================");
+      
       if (label === 'Clinicians' || label === 'Admin') {
+        console.log('-----------------------------------------------------');
         
         sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: label, userStatus: rowData[3]}
       }
@@ -230,14 +243,15 @@ export default function AdminAllUser({ navigation }) {
       }
     }
     else if (modalItem === 0) {
-      if ( useRole === 'Clinicians' || label === 'Admin') {
+      if ( useRole === 'Clinicians' || useRole === 'Admin') {
         sendingData = {firstName: label.firstName, lastName: label.lastName, email: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
       }
       else {
+        
         sendingData = {firstName: label.firstName, lastName: label.lastName, contactEmail: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
       }
     }
-    else {
+    else if (modalItem ===1) {
       const name = rowData[0].split(" ");
       console.log(label, "-----------------------------------------");
   
@@ -260,7 +274,17 @@ export default function AdminAllUser({ navigation }) {
       }
   
       // Now sendingData is properly constructed
-      console.log(sendingData);
+      console.log(sendingData, "++++++++++++++++++++++++++++++++++++");
+    } else {
+      const name = rowData[0].split(" ");
+      if ( useRole === 'Clinicians' || useRole === 'Admin') {
+        sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: rowData[2], userStatus: label}
+      }
+      else {
+        
+        sendingData = {firstName: name[0], lastName: name[1], contactEmail: rowData[1], userRole: rowData[2], userStatus: label}
+      }
+
     }
     totalData = {updateData: sendingData, userRole: useRole}
     console.log(totalData);
@@ -349,7 +373,7 @@ export default function AdminAllUser({ navigation }) {
                   <Row
                     data={tableHead}
                     style={styles.head}
-                    widthArr={[120, 150, 150, 100]}
+                    widthArr={[120, 200, 150, 100]}
                     textStyle={styles.tableText}
                   />
                   {data.map((rowData, rowIndex) => (
@@ -635,7 +659,7 @@ const styles = StyleSheet.create({
   searchText: {
     width: '70%',
     backgroundColor: 'white',
-    height: 30,
+    paddingBottom: 0,
   },
   searchBtn: {
     width: '50%',

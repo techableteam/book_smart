@@ -155,18 +155,22 @@ export default function EditProfile({ navigation }) {
     // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
 
+    // If the cleaned input has 1 or 2 characters, return it as is
+    if (cleaned.length === 1 || cleaned.length === 2) {
+        return cleaned;
+    }
+
     // Apply the desired phone number format
     let formattedNumber = '';
     if (cleaned.length >= 3) {
-      formattedNumber = `(${cleaned.slice(0, 3)})`;
+        formattedNumber = `(${cleaned.slice(0, 3)})`;
     }
     if (cleaned.length > 3) {
-      formattedNumber += ` ${cleaned.slice(3, 6)}`;
+        formattedNumber += ` ${cleaned.slice(3, 6)}`;
     }
     if (cleaned.length > 6) {
-      formattedNumber += `-${cleaned.slice(6, 10)}`;
+        formattedNumber += `-${cleaned.slice(6, 10)}`;
     }
-
     return formattedNumber;
   };
   const handlePhoneNumberChange = (text) => {
@@ -244,7 +248,7 @@ export default function EditProfile({ navigation }) {
 
   const handleRemove = (name) => {
     handleCredentials(name, '');
-    setPhotoName('');
+    // setPhotoName('');
   }
   return (
     <View style={styles.container}>

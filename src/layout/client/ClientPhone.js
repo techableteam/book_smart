@@ -8,6 +8,7 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
+import { emailAtom } from '../../context/ClinicalAuthProvider';
 import { verifyPhoneAtom, deviceNumberAtom } from '../../context/BackProvider';
 import { PhoneSms } from '../../utils/useApi';
 
@@ -15,6 +16,7 @@ import { PhoneSms } from '../../utils/useApi';
 export default function ClientPhone ({ navigation }) {
   const [verifyPhone, setVerifyPhone] = useAtom(verifyPhoneAtom);
   const [device, setDevice] = useAtom(deviceNumberAtom);
+  const [email, setEmail] = useAtom(emailAtom);
   const handleNavigate = (navigateUrl) => {
       navigation.navigate(navigateUrl);
   }
@@ -37,22 +39,23 @@ export default function ClientPhone ({ navigation }) {
   const formatPhoneNumber = (input) => {
     // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
-    console.log(input,'------+');
-    
+
+    // If the cleaned input has 1 or 2 characters, return it as is
+    if (cleaned.length === 1 || cleaned.length === 2) {
+        return cleaned;
+    }
 
     // Apply the desired phone number format
     let formattedNumber = '';
     if (cleaned.length >= 3) {
-      formattedNumber = `(${cleaned.slice(0, 3)})`;
+        formattedNumber = `(${cleaned.slice(0, 3)})`;
     }
     if (cleaned.length > 3) {
-      formattedNumber += ` ${cleaned.slice(3, 6)}`;
+        formattedNumber += ` ${cleaned.slice(3, 6)}`;
     }
     if (cleaned.length > 6) {
-      formattedNumber += `-${cleaned.slice(6, 10)}`;
+        formattedNumber += `-${cleaned.slice(6, 10)}`;
     }
-    console.log(formattedNumber);
-    
     return formattedNumber;
   };
   const handlePhoneNumberChange = (text) => {
@@ -65,7 +68,7 @@ export default function ClientPhone ({ navigation }) {
   const handleSubmit = async () => {
     // console.log('email: ', email)
     if (credentials.phoneNumber) {
-      const response = await PhoneSms(credentials, 'clinical');
+      const response = await PhoneSms({phoneNumber: credentials.phoneNumber, email: email}, 'clinical');
       console.log(response)
       if (!response.error) {
         console.log('success');

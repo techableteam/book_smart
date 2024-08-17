@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
   searchText: {
     width: '70%',
     backgroundColor: 'white',
-    height: 30,
+    paddingBottom: 0,
   },
   searchBtn: {
     width: '50%',

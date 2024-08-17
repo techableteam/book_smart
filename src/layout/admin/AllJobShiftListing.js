@@ -424,7 +424,7 @@ export default function AllJobShiftListing({ navigation }) {
                       :
                       (modalItem === 3) || (modalItem === 6) || (modalItem === 10) ?
                         (<TextInput
-                          style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
+                          style={[styles.searchText, {width: '100%', paddingTop: 0, paddingBottom: 0, textAlignVertical: 'center'}]}
                           placeholder=""
                           onChangeText={e => setLabel(e)}
                           value={label || ''}
@@ -432,9 +432,9 @@ export default function AllJobShiftListing({ navigation }) {
                       :
                       modalItem === 5 ?
                         <View style={{flexDirection: 'column', width: '100%', gap: 5, alignItems: 'center'}}>
-                          <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalendar)}} style={{width: '100%', height: 40, zIndex: 1}}>
+                          <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalendar)}} style={{width: '100%', height: 35, paddingBottom: 0, zIndex: 1}}>
                             <TextInput
-                              style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black', fontSize: 18}]}
+                              style={[styles.searchText, {width: '100%', paddingTop: 0, textAlignVertical: 'center', color: 'black', paddingBottom: 0, fontSize: 18}]}
                               placeholder=""
                               value={label}
                               editable={false}
@@ -641,7 +641,6 @@ const styles = StyleSheet.create({
   searchText: {
     width: '70%',
     backgroundColor: 'white',
-    height: 30,
   },
   searchBtn: {
     width: '50%',
