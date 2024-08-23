@@ -134,7 +134,7 @@ export default function AllJobShiftListing({ navigation }) {
     }
     return null;
   };  
-  const widths = [150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80];
+  const widths = [150, 130, 100, 100, 200, 120, 100, 80, 80, 200, 80];
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
@@ -194,7 +194,14 @@ export default function AllJobShiftListing({ navigation }) {
   const [isJobFocus, setJobIsFocus] = useState(false);
 
   const [suc, setSuc] = useState(0);
+  const getLocalTimeOffset = () => {
+    const date = new Date();
+    const offsetInMinutes = date.getTimezoneOffset(); // Offset in minutes
+    const offsetInHours = offsetInMinutes / 60; // Convert to hours
+    return offsetInHours;
+  };
   const handlePress = async() => {
+    const offestTime = getLocalTimeOffset();
     let sendData = label;
     if (modalItem === 3 || modalItem === 10) {
       sendData = Number(sendData)
@@ -203,7 +210,8 @@ export default function AllJobShiftListing({ navigation }) {
     if (modalItem === 1) {
       sendingData = {
         jobId: rowData, // Ensure rowData is defined and contains the appropriate value
-        nurse: sendData // Use sendData for jobNum
+        nurse: sendData, // Use sendData for jobNum
+        offestTime: offestTime
       };
     } else if (modalItem === 3) {
       sendingData = {
@@ -226,19 +234,21 @@ export default function AllJobShiftListing({ navigation }) {
       // Handle other modalItems as needed
       sendingData = {
         jobId: rowData,
-        shiftTime: sendData // Use sendData for location
+        shiftTime: sendData, // Use sendData for location
+        offestTime: offestTime
       };
     } else if (modalItem === 9)  {
       // Handle other modalItems as needed
       sendingData = {
         jobId: rowData,
-        jobStatus: sendData // Use sendData for location
+        jobStatus: sendData, // Use sendData for location
+        offestTime: offestTime
       };
     } else if (modalItem === 10)  {
       // Handle other modalItems as needed
       sendingData = {
         jobId: rowData,
-        jobRating: sendData // Use sendData for location
+        jobRating: sendData, // Use sendData for location
       };
     }
     console.log('====================================');
@@ -283,7 +293,7 @@ export default function AllJobShiftListing({ navigation }) {
           </TouchableOpacity> */}
         </View>
         <View style={styles.profile}>
-          <Text style={{ backgroundColor: '#000080', color: 'white', width: '26%' }}>TOOL TIPS:</Text>
+          <Text style={{ backgroundColor: '#000080', color: 'white', width: '27%' }}>TOOL TIPS:</Text>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
             <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>When A New "Job / Shift" is added the status will appear as <Text style={{ backgroundColor: '#ffff99' }}>"AVAILABLE"</Text> & will appear on Caregivers Dashboard</Text>
@@ -348,14 +358,14 @@ export default function AllJobShiftListing({ navigation }) {
                   <Row
                     data={tableHead}
                     style={styles.head}
-                    widthArr={[150, 100, 80, 80, 150, 120, 100, 80, 80, 150, 80]}
+                    widthArr={[150, 130, 100, 100, 200, 120, 100, 80, 80, 200, 80]}
                     textStyle={styles.tableText}
                   />
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
                       {rowData.map((cellData, cellIndex) => (
                         <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
-                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', paddingVertical: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
                             <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
                           </View>
                         </TouchableWithoutFeedback> 
@@ -402,9 +412,9 @@ export default function AllJobShiftListing({ navigation }) {
                           maxHeight={300}
                           labelField="label"
                           valueField="value"
-                          placeholder={cellData}
+                          placeholder={label}
                           // searchPlaceholder="Search..."
-                          value={jobValue}
+                          value={label}
                           onFocus={() => setJobIsFocus(true)}
                           onBlur={() => setJobIsFocus(false)}
                           onChange={item => {
@@ -431,14 +441,16 @@ export default function AllJobShiftListing({ navigation }) {
                         />)
                       :
                       modalItem === 5 ?
-                        <View style={{flexDirection: 'column', width: '100%', gap: 5, alignItems: 'center'}}>
-                          <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalendar)}} style={{width: '100%', height: 35, paddingBottom: 0, zIndex: 1}}>
-                            <TextInput
-                              style={[styles.searchText, {width: '100%', paddingTop: 0, textAlignVertical: 'center', color: 'black', paddingBottom: 0, fontSize: 18}]}
-                              placeholder=""
-                              value={label}
-                              editable={false}
-                            />
+                        <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
+                          <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalendar)}} style={{width: '100%', height: 40}}>
+                            <View pointerEvents="none">
+                              <TextInput
+                                style={[styles.searchText, {width: '100%', paddingTop: 0, textAlignVertical: 'center', color: 'black', paddingBottom: 0, fontSize: 18}]}
+                                placeholder=""
+                                value={label}
+                                editable={false}
+                              />
+                            </View>
                           </TouchableOpacity>
                           {showCalendar 
                             && 
@@ -687,14 +699,17 @@ const styles = StyleSheet.create({
     height: 40,
   },
   tableText: {
-    paddingHorizontal: 10,
+    // paddingHorizontal: 10,
     fontWeight: 'bold',
     color: 'black',
     textAlign: 'center',
+    textAlignVertical: 'center',
     borderWidth: 1, 
     borderColor: 'rgba(0, 0, 0, 0.08)',
     height: 40,
-    textAlignVertical: 'center'
+    paddingTop: 10,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   dropdown: {
     height: 30,

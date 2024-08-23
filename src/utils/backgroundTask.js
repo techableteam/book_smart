@@ -11,13 +11,14 @@ const BackgroundTask = () => {
     console.log('time', new Date());
 
     const scheduleTask = () => {
-      const currentDate = new Date();
+      let currentDate = new Date().toUTCString();
+      currentDate = new Date(currentDate);
       const targetDate = new Date(
         currentDate.getFullYear(),
         currentDate.getMonth(),
         currentDate.getDate() + ((5 - currentDate.getDay() + 7) % 7), // Friday
-        10, // 6 AM
-        21, // 51 minutes
+        18, // 6 AM
+        30, // 51 minutes
         0 // 0 seconds
       );
       const timeUntilTarget = targetDate.getTime() - currentDate.getTime();
