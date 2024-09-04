@@ -126,10 +126,12 @@ export default function ClientSignIn({ navigation }) {
   const handleSubmit = async () => {
     try {
       setCredentials({...credentials, ["device"]: uniqueId});
-      console.log(credentials.device,uniqueId, "Deciveddd")
       const response = await Signin(credentials, 'clinical');
-      console.log('SignIn Successful: ', response.phoneAuth);
-      if (!response.error) {
+
+      if (response?.user) {
+        
+        console.log(response, "-----------------------------");
+
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
         setBirthday(response.user.birthday);
@@ -148,34 +150,45 @@ export default function ClientSignIn({ navigation }) {
           await AsyncStorage.setItem('clinicalEmail', credentials.email);
           await AsyncStorage.setItem('clinicalPassword', credentials.password);
         }
-        // console.log('credentials:', credentials)
-        console.log(response.phoneAuth, "-----------------------------");
         
         if (response.phoneAuth) {
           console.log(response.phoneAuth);
-          
           handleSignInNavigate('ClientPhone');
-        }
-        else {
+        } else {
           console.log('welcome')
           handleSignInNavigate('MyHome');
         }
-        // console.log('email:', storage)
-      }
-      else {
-        Alert.alert(
-          'Failed!',
-          `${response.error.message}`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed')
+      } else {
+        console.log(response.error.status);
+        if (response.error.status == 401) {
+          Alert.alert(
+            'Failed!',
+            "Sign in informaation is incorrect.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
               },
-            },
-          ],
-          { cancelable: false }
-        );
+            ],
+            { cancelable: false }
+          );
+        } else {
+          Alert.alert(
+            'Failed!',
+            "User Not Found! Please Register First.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
       }
     } catch (error) {
       console.log('SignIn failed: ', error)
