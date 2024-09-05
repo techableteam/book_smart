@@ -90,10 +90,10 @@ android {
             keyPassword 'android'
         }
         release {
-        storeFile file('your_key_name.keystore')
-        storePassword 'P@ssword123123'
-        keyAlias 'your_key_alias'
-        keyPassword 'P@ssword123123'
+            storeFile file('booksmart_keystore.keystore')
+            storePassword 'booksmart'
+            keyAlias 'booksmart_keystore'
+            keyPassword 'booksmart'
         }
     }
     buildTypes {
