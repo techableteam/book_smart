@@ -129,9 +129,6 @@ export default function ClientSignIn({ navigation }) {
       const response = await Signin(credentials, 'clinical');
 
       if (response?.user) {
-        
-        console.log(response, "-----------------------------");
-
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
         setBirthday(response.user.birthday);
@@ -164,6 +161,20 @@ export default function ClientSignIn({ navigation }) {
           Alert.alert(
             'Failed!',
             "Sign in informaation is incorrect.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 402) {
+          Alert.alert(
+            'Failed!',
+            "You are not approved! Please wait.",
             [
               {
                 text: 'OK',
