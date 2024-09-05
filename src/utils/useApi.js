@@ -19,13 +19,13 @@ export const Signup = async (userData, endpoint) => {
 export const Signin = async (credentials, endpoint) => {
   try {
     const response = await axios.post(`api/${endpoint}/login`, credentials);
-
+    console.log(response.data);
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
     return response.data;
   } catch (error) {
-    console.error(JSON.stringify(error))
+    console.log(error);
     return {error: error};
   }
 }

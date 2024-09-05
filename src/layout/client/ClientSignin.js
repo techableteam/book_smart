@@ -1,21 +1,17 @@
-import { StyleSheet, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { CheckBox } from 'react-native-elements';
+import { StyleSheet, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
 import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState } from '../../context/ClinicalAuthProvider';
-import { useNavigation } from '@react-navigation/native';
+import { TextInput, useTheme } from 'react-native-paper';
+import { useAtom } from 'jotai';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import { useFocusEffect } from '@react-navigation/native';
+import { firstNameAtom, lastNameAtom, addressAtom, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom, passwordAtom } from '../../context/ClinicalAuthProvider'
+import { Signin } from '../../utils/useApi';
+import { deviceNumberAtom } from '../../context/BackProvider';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, addressAtom, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom, passwordAtom } from '../../context/ClinicalAuthProvider'
-import { Signin } from '../../utils/useApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import DeviceInfo from 'react-native-device-info';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
-import { useFocusEffect } from '@react-navigation/native';
-import { deviceNumberAtom } from '../../context/BackProvider';
 
 export default function ClientSignIn({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -32,35 +28,25 @@ export default function ClientSignIn({ navigation }) {
   const [address, setAddress] = useAtom(addressAtom);
   const [password, setPassword] = useAtom(passwordAtom);
   const [deviceNum, setDeviceNum] = useAtom(deviceNumberAtom);
-  // const navigation = useNavigation(false);
   const theme = useTheme();
-  // const { auth, setAuth } = AuthState();
-  // const { isAuthenticated } = auth || {};
   const [ credentials, setCredentials ] = useState({
     email: '',
     password: '',
     userRole: 'Clinicians',
     device: '',
-  })
-
-  
+  });
   const [uniqueId, setUniqueId] = useState('');
   const [manufacturer, setManufacturer] = useState('');
-
   const fetchDeviceInfo = async () => {
-    console.log('getInfo')
     try {
-      console.log('DeviceId');
-        // Get the unique device ID
-        const id = await getUniqueId();
-        setUniqueId(id);
-        console.log(credentials, '.....');
-        
-        // Get the manufacturer of the device
-        const manu = await getManufacturer();
-        setManufacturer(manu);
+      const id = await getUniqueId();
+      setUniqueId(id);
+      console.log(credentials, '.....');
+      
+      const manu = await getManufacturer();
+      setManufacturer(manu);
     } catch (error) {
-        console.error('Error fetching device info:', error);
+      console.error('Error fetching device info:', error);
     }
   };
   
@@ -103,18 +89,14 @@ export default function ClientSignIn({ navigation }) {
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e});
-    // console.log(credentials);
   }
 
   const handleSignInNavigate = (url) => {
     if (credentials.email === '') {
       showAlert('email')
-    }
-    else if (credentials.password === '') {
+    } else if (credentials.password === '') {
       showAlert('password')
-    }
-    else {
-      // navigation.navigate('MyHome');
+    } else {
       navigation.navigate(url);
     }
   }
@@ -143,6 +125,7 @@ export default function ClientSignIn({ navigation }) {
         setAddress(response.user.address)
         setPassword(response.user.password);
         setDeviceNum(uniqueId);
+
         if (checked) {
           await AsyncStorage.setItem('clinicalEmail', credentials.email);
           await AsyncStorage.setItem('clinicalPassword', credentials.password);
@@ -156,7 +139,6 @@ export default function ClientSignIn({ navigation }) {
           handleSignInNavigate('MyHome');
         }
       } else {
-        console.log(response.error.status);
         if (response.error.status == 401) {
           Alert.alert(
             'Failed!',
@@ -208,9 +190,7 @@ export default function ClientSignIn({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-          translucent backgroundColor="transparent"
-      />
+      <StatusBar  translucent backgroundColor="transparent" />
       <MHeader navigation={navigation}/>
       <ScrollView style = {styles.scroll}
         showsVerticalScrollIndicator={false}
