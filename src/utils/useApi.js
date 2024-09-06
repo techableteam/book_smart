@@ -7,12 +7,9 @@ export const Signup = async (userData, endpoint) => {
   try {
     console.log('success')
     const response = await axios.post(`api/${endpoint}/signup`, userData);
-    // const response = await axios.get("/test");
     return response.data;
   } catch (error) {
-    console.log("================");
-    console.log(error)
-    throw error;
+    return {error: error};
   }
 };
 
@@ -25,7 +22,6 @@ export const Signin = async (credentials, endpoint) => {
     }
     return response.data;
   } catch (error) {
-    console.log(error);
     return {error: error};
   }
 }

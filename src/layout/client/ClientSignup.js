@@ -1,17 +1,13 @@
-import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
-import images from '../../assets/images';
+import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import { TextInput, useTheme, } from 'react-native-paper';
-import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/ClinicalAuthProvider';
-import { useNavigation } from '@react-navigation/native';
-import HButton from '../../components/Hbutton';
-import MHeader from '../../components/Mheader';
-import MFooter from '../../components/Mfooter';
-import PhoneInput from 'react-native-phone-input';
 import RNFS from 'react-native-fs'
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
 import DocumentPicker from 'react-native-document-picker';
+import HButton from '../../components/Hbutton';
+import MHeader from '../../components/Mheader';
+import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
 
 export default function ClientSignUp({ navigation }) {
@@ -65,28 +61,16 @@ export default function ClientSignUp({ navigation }) {
     password: '',
     signature: '',
     userRole: 'Clinicians'
-  })
+  });
 
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
       setCredentials({...credentials, [target]: e});
-    }
-    else {
+    } else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }
-    // console.log(credentials);
   }
 
-  //-------------------------------------------ComboBox------------------------
-  const placeholder = {
-    label: 'Select an item...',
-    value: null,
-  };
-  const items = [
-    { label: 'CNA', value: 'CNA' },
-    { label: 'LPN', value: 'LPN' },
-    { label: 'RN', value: 'RN' },
-  ];
   const [selectedValue, setSelectedValue] = useState('Selected Value...');
 
   const handleTitle = (target, e) => {
@@ -110,29 +94,6 @@ export default function ClientSignUp({ navigation }) {
     handleCredentials(target, day);
   }
 
-  //-------------------------------------------File Upload----------------------------
-  const [photoName, setPhotoName] = useState('');
-
-  // const pickFile = async () => {
-  //   try {
-  //     const res = await DocumentPicker.pick({
-  //       type: [DocumentPicker.types.images], // Specify the type of files to pick (e.g., images)
-  //     });
-
-  //     setPhotoName(res[0].name);
-
-  //     // Read the file content and convert it to base64
-  //     const fileContent = await RNFS.readFile(res[0].uri, 'base64');
-  //     handleCredentials('photoImage', `data:${res.type};base64,${fileContent}`)
-  //     console.log(base64Image);
-  //   } catch (err) {
-  //     if (DocumentPicker.isCancel(err)) {
-  //       // User cancelled the picker
-  //     } else {
-  //       // Handle other errors
-  //     }
-  //   }
-  // };
   const pickFile = async () => {
     try {
       let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
@@ -141,14 +102,13 @@ export default function ClientSignUp({ navigation }) {
       });
   
       const fileContent = await RNFS.readFile(res[0].uri, 'base64');
-          // Determine the file type based on the MIME type
+
       let fileType;
       if (res[0].type === 'application/pdf') {
         fileType = 'pdf';
       } else if (res[0].type.startsWith('image/')) {
         fileType = 'image';
       } else {
-        // Handle other file types if needed
         fileType = 'unknown';
       }
   
@@ -164,7 +124,6 @@ export default function ClientSignUp({ navigation }) {
   };
 
   //--------------------------------------------password--------------------------
-  const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   //Alert
@@ -196,37 +155,15 @@ export default function ClientSignUp({ navigation }) {
   }
 
   const [checked, setChecked] = useState(false);
-  
-  const handleToggle = () => {
-    setChecked(!checked);
-  };
 
   //--------------------------------------signature--------------------
   let signatureRef = null;
   const [key, setKey] = useState(0); // Initialize the key state
 
-  const handleClear = () => {
-    signatureRef.current.resetImage();
-  }
   const onSaveEvent = (result) => {
     console.log(result.encoded)
     handleCredentials('signature', result.encoded)
   }
-  const handleSaveImage = async () => {
-    // result.encoded - the base64 encoded image data
-    // console.log(result);
-    console.log(signatureRef)
-    const savedImage = await signatureRef.current.saveImage(); // Save the image and capture the result
-
-    // Convert the saved image to Base64
-    const base64Image = `data:image/png;base64,${savedImage.encoded}`; // Convert to Base64 format
-    handleCredentials('signature', base64Image)
-    console.log(base64Image); // Log or use t
-  };
-
-  // const handleUndoLastStroke = () => {
-  //   signatureRef.current.undoLastDraw(); // Undo the last stroke drawn
-  // };
   
   //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
@@ -314,17 +251,89 @@ export default function ClientSignUp({ navigation }) {
         showAlerts('all gaps')
     }
     else {
-      // navigation.navigate('ClientFinishSignup');
       try {
-        // console.log('credentials: ', credentials);
         const response = await Signup(credentials, 'clinical');
-        successAlerts()
-        console.log('Signup successful: ', response)
+
+        if (!response?.error) {
+          successAlerts();
+        } else {
+          if (response.error.status == 500) {
+            Alert.alert(
+              'Warning!',
+              "Can't register now",
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          } else if (response.error.status == 409) {
+            Alert.alert(
+              'Alert',
+              "The Email is already registered",
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          } else if (response.error.status == 405) {
+            Alert.alert(
+              'Alert',
+              "User not approved",
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          } else {
+            Alert.alert(
+              'Failure!',
+              'Network Error',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          }
+        }
       } catch (error) {
-        console.error('Signup failed: ', error)
+        console.error('Signup failed: ', error);
+        Alert.alert(
+          'Failure!',
+          'Network Error',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
       }
     }
   }
+
   return (
     <View style={styles.container}>
       <StatusBar 
@@ -432,7 +441,7 @@ export default function ClientSignUp({ navigation }) {
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
                 <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}>
                   <TextInput
-                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0, color: 'black'}]}
                     placeholder=""
                     value={birthday.toDateString()}
                     editable={false}
@@ -444,6 +453,7 @@ export default function ClientSignUp({ navigation }) {
                 <>
                   <DatePicker
                     date={birthday}
+                    theme='light'
                     onDateChange={(day) => handleDayChange('birthday', day)}
                     mode="date" // Set the mode to "date" to allow year and month selection
                     androidVariant="native"
@@ -515,7 +525,7 @@ export default function ClientSignUp({ navigation }) {
                     onChangeText={e => handleCredentials('streetAddress', e)}
                     value={credentials.address.streetAddress || ''}
                   />
-                  <Text>Street Address</Text>
+                  <Text style={{ color: 'black' }}>Street Address</Text>
                 </View>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
@@ -526,7 +536,7 @@ export default function ClientSignUp({ navigation }) {
                     onChangeText={e => handleCredentials('streetAddress2', e)}
                     value={credentials.address.streetAddress2 || ''}
                   />
-                  <Text>Street Address2</Text>
+                  <Text style={{ color: 'black' }}>Street Address2</Text>
                 </View>
                 <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
                   <View style={[styles.input, {width: '45%'}]}>
@@ -536,7 +546,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text>City</Text>
+                    <Text style={{ color: 'black' }}>City</Text>
                   </View>
                   <View style={[styles.input, {width: '20%'}]}>
                     <TextInput
@@ -545,7 +555,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text>State</Text>
+                    <Text style={{ color: 'black' }}>State</Text>
                   </View>
                   <View style={[styles.input, {width: '30%'}]}>
                     <TextInput
@@ -555,7 +565,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text>Zip</Text>
+                    <Text style={{ color: 'black' }}>Zip</Text>
                   </View>
                 </View>
               </View>
@@ -565,7 +575,7 @@ export default function ClientSignUp({ navigation }) {
               <Text style={styles.subtitle}> Upload Pic. (Optional)</Text>
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%'}]}
@@ -631,7 +641,7 @@ export default function ClientSignUp({ navigation }) {
             
             <View style={[styles.email, {marginTop: 20}]}>
               {/* <Text style={[styles.subtitle, {color: '#2a53c1'}]}>Reset</Text> */}
-              <Text style={{fontWeight: '400'}}>
+              <Text style={{fontWeight: '400', color: 'black'}}>
                 As a web marketplace dedicated to booking shifts for independent contractors and customers like you, we require your signature on this disclosure statement to ensure clarity and transparency in our working relationships. By signing, you acknowledge your understanding of our role as a web-based intermediary between independent contractors and customers needing shifts booked. We are committed to upholding ethical standards, ensuring compliance with industry regulations, and prioritizing your best interests throughout the placement process. Your signature signifies mutual agreement and cooperation as we work together to match skills with open shifts. Thank you for trusting BookSmart™ for your next gig!
               </Text>
 

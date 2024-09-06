@@ -185,6 +185,19 @@ export default function ClientSignIn({ navigation }) {
       }
     } catch (error) {
       console.log('SignIn failed: ', error)
+      Alert.alert(
+        'Failed!',
+        "Network Error",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
   }
 

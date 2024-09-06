@@ -1,17 +1,11 @@
-import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
-import images from '../../assets/images';
+import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import { TextInput, useTheme, } from 'react-native-paper';
-import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/ClinicalAuthProvider';
-import { useNavigation } from '@react-navigation/native';
+import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs'
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import PhoneInput from 'react-native-phone-input';
-import SignatureCapture from 'react-native-signature-capture';
-import DatePicker from 'react-native-date-picker';
-import DocumentPicker from 'react-native-document-picker';
-import RNFS from 'react-native-fs'
 import { Signup } from '../../utils/useApi';
 
 export default function FacilitySignUp({ navigation }) {
@@ -77,15 +71,6 @@ export default function FacilitySignUp({ navigation }) {
   }
 
   //-------------------------------------------ComboBox------------------------
-  const placeholder = {
-    label: 'Select an item...',
-    value: null,
-  };
-  const items = [
-    { label: 'CNA', value: 'CNA' },
-    { label: 'LPN', value: 'LPN' },
-    { label: 'RN', value: 'RN' },
-  ];
   const [selectedValue, setSelectedValue] = useState('Selected Value...');
 
   const handleTitle = (target, e) => {
@@ -247,12 +232,83 @@ export default function FacilitySignUp({ navigation }) {
     }
     else {
       try {
-        console.log('credentials: ', credentials);
         const response = await Signup(credentials, "facilities");
-        console.log('Signup successful: ', response)
-        navigation.navigate('FacilityFinishSignup');
+        if (!response?.error) {
+          navigation.navigate('FacilityFinishSignup');
+        } else {
+          if (response.error.status == 500) {
+            Alert.alert(
+              'Warning!',
+              "Can't register now",
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          } else if (response.error.status == 409) {
+            Alert.alert(
+              'Alert',
+              "The Email is already registered",
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          } else if (response.error.status == 405) {
+            Alert.alert(
+              'Alert',
+              "User not approved",
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          } else {
+            Alert.alert(
+              'Failure!',
+              'Network Error',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          }
+        }
       } catch (error) {
-        console.error('Signup failed: ', error)
+        console.error('Signup failed: ', error);
+        Alert.alert(
+          'Failure!',
+          'Network Error',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
       }
     }
   }
@@ -400,7 +456,7 @@ export default function FacilitySignUp({ navigation }) {
                     onChangeText={e => handleCredentials('street', e)}
                     value={credentials.address.street || ''}
                   />
-                  <Text>Street Address</Text>
+                  <Text style={{ color: 'black' }}>Street Address</Text>
                 </View>
                 <View style={{ width: '100%', marginBottom: 10 }}>
                   <TextInput
@@ -411,7 +467,7 @@ export default function FacilitySignUp({ navigation }) {
                     onChangeText={e => handleCredentials('street2', e)}
                     value={credentials.address.street2 || ''}
                   />
-                  <Text>Street Address2</Text>
+                  <Text style={{ color: 'black' }}>Street Address2</Text>
                 </View>
                 <View style={{ flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30 }}>
                   <View style={[styles.input, { width: '45%' }]}>
@@ -421,7 +477,7 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text>City</Text>
+                    <Text style={{ color: 'black' }}>City</Text>
                   </View>
                   <View style={[styles.input, { width: '20%' }]}>
                     <TextInput
@@ -430,7 +486,7 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text>State</Text>
+                    <Text style={{ color: 'black' }}>State</Text>
                   </View>
                   <View style={[styles.input, { width: '30%' }]}>
                     <TextInput
@@ -440,7 +496,7 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text>Zip</Text>
+                    <Text style={{ color: 'black' }}>Zip</Text>
                   </View>
                 </View>
               </View>
@@ -450,7 +506,7 @@ export default function FacilitySignUp({ navigation }) {
               <Text style={styles.subtitle}> Logo / Pic</Text>
               <View style={{ flexDirection: 'row', width: '100%' }}>
                 <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
-                  <Text style={{ fontWeight: '400', padding: 0, fontSize: 14 }}>Choose File</Text>
+                  <Text style={{ fontWeight: '400', padding: 0, fontSize: 14, color: 'black' }}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, { width: '70%' }]}
@@ -460,7 +516,7 @@ export default function FacilitySignUp({ navigation }) {
                   value={credentials.avatar.name || ''}
                 />
               </View>
-              <Text> "optional"</Text>
+              <Text style={{ color: 'black' }}> "optional"</Text>
             </View>
 
             <View style={[styles.btn, { marginTop: 20 }]}>
