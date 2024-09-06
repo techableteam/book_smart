@@ -65,7 +65,11 @@ export default function ClientSignUp({ navigation }) {
 
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
-      setCredentials({...credentials, [target]: e});
+      let value = e;
+      if (target === 'email') {
+        value = e.toLowerCase();
+      }
+      setCredentials({...credentials, [target]: value});
     } else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }

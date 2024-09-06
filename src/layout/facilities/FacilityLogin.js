@@ -91,7 +91,7 @@ export default function FacilityLogin({ navigation }) {
   const handleSubmit = async () => {
     try {
       const response = await Signin(credentials, 'facilities');
-      console.log('SignIn Successful: ', response);
+
       if (!response.error) {
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
@@ -114,24 +114,94 @@ export default function FacilityLogin({ navigation }) {
         } else {
           handleSignInNavigate("FacilityPermission");
         }
-      }
-      else {
-        Alert.alert(
-          'Failed!',
-          `${response.error.message}`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed')
+      } else {
+        if (response.error.status == 401) {
+          Alert.alert(
+            'Failed!',
+            "Login information is incorrect.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
               },
-            },
-          ],
-          { cancelable: false }
-        );
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 400) {
+          Alert.alert(
+            'Failed!',
+            "Cannot logined User!",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 404) {
+          Alert.alert(
+            'Failed!',
+            "User Not Found! Please Register First.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 402) {
+          Alert.alert(
+            'Failed!',
+            "You are not approved! Please wait until the admin accept you.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          Alert.alert(
+            'Failed!',
+            "Network Error",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
       }
     } catch (error) {
-      console.log('SignIn failed: ', error)
+      console.log('SignIn failed: ', error);
+      Alert.alert(
+        'Failed!',
+        "Network Error",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
   }
 

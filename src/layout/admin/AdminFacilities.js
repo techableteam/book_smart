@@ -385,6 +385,7 @@ export default function AdminFacilities({ navigation }) {
                           placeholderStyle={styles.placeholderStyle}
                           selectedTextStyle={styles.selectedTextStyle}
                           inputSearchStyle={styles.inputSearchStyle}
+                          itemTextStyle={styles.itemTextStyle}
                           iconStyle={styles.iconStyle}
                           data={location}
                           // search
@@ -413,7 +414,7 @@ export default function AdminFacilities({ navigation }) {
                       :
                       (modalItem === 2) || (modalItem === 3) ?
                         (<TextInput
-                          style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
+                          style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black'}]}
                           placeholder=""
                           onChangeText={e => {
                             const formattedNumber = formatPhoneNumber(e);
@@ -427,13 +428,13 @@ export default function AdminFacilities({ navigation }) {
                       (modalItem === 1) ?
                         (<View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: 20}}>
                           <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
+                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black'}]}
                             placeholder=""
                             onChangeText={e => setLabel({...label, firstName: e})}
                             value={label.firstName || ''}
                           />
                           <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
+                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black'}]}
                             placeholder=""
                             onChangeText={e => setLabel({...label, lastName: e})}
                             value={label.lastName || ''}
@@ -442,7 +443,7 @@ export default function AdminFacilities({ navigation }) {
                         )
                       :
                       (modalItem === 5) ?
-                        (<Text>
+                        (<Text style={{ color: "black" }}>
                           {invoiceName+'.pdf'}
                         </Text>)
                       :
@@ -694,6 +695,7 @@ const styles = StyleSheet.create({
   dropdown: {
     height: 30,
     width: '50%',
+    color: 'black',
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 0.5,
@@ -714,16 +716,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   placeholderStyle: {
+    color: 'black',
     fontSize: 16,
   },
   selectedTextStyle: {
+    color: 'black',
     fontSize: 16,
+  },
+  itemTextStyle: {
+    color: 'black'
   },
   iconStyle: {
     width: 20,
     height: 20,
   },
   inputSearchStyle: {
+    color: 'black',
     height: 40,
     fontSize: 16,
   },

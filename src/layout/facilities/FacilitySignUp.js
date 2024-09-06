@@ -62,7 +62,11 @@ export default function FacilitySignUp({ navigation }) {
 
   const handleCredentials = (target, e) => {
     if (target !== "street" && target !== "street2" && target !== "city" && target !== "state" && target !== "zip") {
-      setCredentials({ ...credentials, [target]: e });
+      let value = e;
+      if (target === 'contactEmail') {
+        value = e.toLowerCase();
+      }
+      setCredentials({...credentials, [target]: value});
     }
     else {
       setCredentials({ ...credentials, address: { ...credentials.address, [target]: e } })
