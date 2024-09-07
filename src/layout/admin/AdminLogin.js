@@ -1,17 +1,14 @@
-import { StyleSheet, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { CheckBox } from 'react-native-elements';
+import { StyleSheet, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState } from '../../context/ClinicalAuthProvider';
-import { useNavigation } from '@react-navigation/native';
+import { TextInput, useTheme } from 'react-native-paper';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, phoneAtom, emailAtom, photoImageAtom, userRoleAtom, companyNameAtom, addressAtom, passInfAtom } from '../../context/AdminAuthProvider'
 import { Signin } from '../../utils/useApi';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AdminLogin({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -23,15 +20,11 @@ export default function AdminLogin({ navigation }) {
   const [companyName, setCompanyName] = useAtom(companyNameAtom);
   const [address, setAddress]= useAtom(addressAtom);
   const [password, setPassword] = useAtom(passInfAtom)
-  // const navigation = useNavigation(false);
-  const theme = useTheme();
-  // const { auth, setAuth } = AuthState();
-  // const { isAuthenticated } = auth || {};
   const [ credentials, setCredentials ] = useState({
     email: '',
     password: '',
     userRole: 'Admin',
-  })
+  });
 
   useEffect(() => {
     const getCredentials = async() => {
@@ -73,18 +66,11 @@ export default function AdminLogin({ navigation }) {
   const handleSignInNavigate = async () => {
     if (credentials.email === '') {
       showAlert('email')
-    }
-    else if (credentials.password === '') {
+    } else if (credentials.password === '') {
       showAlert('password')
-    }
-    else {
-      // const response = 
+    } else {
       navigation.navigate('AdminHome');
     }
-  }
-
-  const handleSignUpNavigate = () => {
-    navigation.navigate('ClientSignUp');
   }
 
   const handleSubmit = async () => {
@@ -99,33 +85,100 @@ export default function AdminLogin({ navigation }) {
         setUserRole(response.user.userRole);
         setEmail(response.user.email);
         setPhone(response.user.phone);
-        setPassword(response.user.password);
-        
-        // setTitle(response.data.title);
-        // setPhotoImage(response.user.photoImage);
+        setPassword(response.user.password); 
         if (checked) {
           await AsyncStorage.setItem('AdminEmail', credentials.email);
           await AsyncStorage.setItem('AdminPassword', credentials.password);
         }
         handleSignInNavigate();
-      }
-      else {
-        Alert.alert(
-          'Failed!',
-          `${response.error.message}`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed')
+      } else {
+        if (response.error.status == 401) {
+          Alert.alert(
+            'Failed!',
+            "Login information is incorrect.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
               },
-            },
-          ],
-          { cancelable: false }
-        );
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 400) {
+          Alert.alert(
+            'Failed!',
+            "Cannot logined User!",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 404) {
+          Alert.alert(
+            'Failed!',
+            "User Not Found! Please Register First.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 402) {
+          Alert.alert(
+            'Failed!',
+            "You are not approved! Please wait until the admin accept you.",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          Alert.alert(
+            'Failed!',
+            "Network Error",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed')
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
       }
     } catch (error) {
-      console.log('SignIn failed: ', error)
+      console.log('SignIn failed: ', error);
+      Alert.alert(
+        'Failed!',
+        "Network Error",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
   }
 
