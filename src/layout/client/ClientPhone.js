@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, View, TextInput, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
-import { Text, PaperProvider, DataTable } from 'react-native-paper';
-import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
+import { useAtom } from 'jotai';
+import { Alert, View, TextInput, StyleSheet, StatusBar } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Text } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
-import SubNavbar from '../../components/SubNavbar';
-import { useAtom } from 'jotai';
 import { emailAtom } from '../../context/ClinicalAuthProvider';
 import { verifyPhoneAtom, deviceNumberAtom } from '../../context/BackProvider';
 import { PhoneSms } from '../../utils/useApi';
@@ -20,22 +18,24 @@ export default function ClientPhone ({ navigation }) {
   const handleNavigate = (navigateUrl) => {
       navigation.navigate(navigateUrl);
   }
+  const [credentials, setCredentials] = useState({
+    phoneNumber: '',
+  });
 
-  const [credentials, setCredentials] = useState(
-    {
-      phoneNumber: '',
+  useEffect(() => {
+    const getCredentials = async() => {
+      const phoneNumber = (await AsyncStorage.getItem('clinicalPhoneNumber')) || '';
+      const formattedNumber = formatPhoneNumber(phoneNumber);
+      console.log(phoneNumber);
+      setCredentials({...credentials, phoneNumber: formattedNumber});
     }
-  );
+    getCredentials();
+  }, []);
   
   const handleCredentials = (target, e) => {
-    console.log(target, e, '-----------');
-    
-    setCredentials({...credentials, [target]: e})
-    console.log(credentials)
+    setCredentials({...credentials, [target]: e});
   }
 
-
-  //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
     // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
@@ -58,6 +58,7 @@ export default function ClientPhone ({ navigation }) {
     }
     return formattedNumber;
   };
+
   const handlePhoneNumberChange = (text) => {
     console.log(text)
     const formattedNumber = formatPhoneNumber(text);
@@ -66,7 +67,6 @@ export default function ClientPhone ({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    // console.log('email: ', email)
     if (credentials.phoneNumber) {
       const response = await PhoneSms({phoneNumber: credentials.phoneNumber, email: email}, 'clinical');
       console.log(response)
@@ -93,10 +93,12 @@ export default function ClientPhone ({ navigation }) {
         );
       }
     }
-  }
+  };
+
   const handleBack = () => {
     navigation.navigate('ClientSignIn');
-  }
+  };
+
   return (
       <View style={styles.container}>
         <StatusBar 
@@ -114,7 +116,7 @@ export default function ClientPhone ({ navigation }) {
                 <TextInput
                   placeholder=""
                   value={credentials.phoneNumber}
-                  style={[styles.input, {width: '100%'}]}
+                  style={[styles.input, {width: '100%', color: 'black'}]}
                   onChangeText={(e) =>handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
                 />

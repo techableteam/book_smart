@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -16,58 +16,73 @@ import { Update } from '../../utils/useApi';
 export default function FacilityPermission ({ navigation }) {
   const [facilityAcknowledgement, setFacilityAcknowledgement] = useAtom(facilityAcknowledgementAtom);
   const [signature, setSignature] = useAtom(signatureAtom);
-  const handleNavigate = (navigateUrl) => {
-      navigation.navigate(navigateUrl);
-  }
   const items = [
     {label: 'Yes', value: '1'},
     {label: 'No', value: '2'},
-  ]
-
+  ];
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [credentials, setCredentials] = useState({
     signature: signature,
     facilityAcknowledgeTerm: facilityAcknowledgement
-  })
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-
+  });
+  const [key, setKey] = useState(0);
   let signatureRef = null;
-  const [key, setKey] = useState(0); // Initialize the key state
 
-  const handleClear = () => {
-    signatureRef.current.resetImage();
-  }
   const onSaveEvent = (result) => {
     console.log(result)
-    // handleCredentials('signature', result)
     setCredentials({...credentials, ["signature"] :result.encoded})
   }
 
   const handleUploadSubmit = async () => {
-    console.log('submit')
     try {
-      // setCredentials(...credentials, {signature: signature, facilityAcknowledgeTerm: facilityAcknowledgement});
-      console.log("--------------------------", credentials)
       const response = await Update(credentials, 'facilities');
-      console.log(response.user)
-      setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
-      navigation.navigate("FacilityProfile")
-      console.log(response)
+      if (!response?.error) {
+        Alert.alert(
+          'Success!',
+          response?.message,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+        setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
+        navigation.navigate("FacilityProfile")
+      } else {
+        Alert.alert(
+          'Failed!',
+          "Network Error",
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
     } catch (error) {
-
+      Alert.alert(
+        'Failed!',
+        "Network Error",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
-    // navigation.navigate("FacilityProfile")
   }
 
   return (
@@ -134,14 +149,13 @@ export default function FacilityPermission ({ navigation }) {
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
                   inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
                   iconStyle={styles.iconStyle}
                   data={items}
-                  // search
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
                   placeholder={'100 per page'}
-                  // searchPlaceholder="Search..."
                   value={value ? value : items[1].value}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
@@ -213,12 +227,14 @@ const styles = StyleSheet.create({
   dropdown: {
     height: 30,
     width: '25%',
+    color: 'black',
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginBottom: 10
+    marginBottom: 10,
+    color: 'black'
   },
   icon: {
     marginRight: 5,
@@ -233,10 +249,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   placeholderStyle: {
+    color: 'black',
     fontSize: 16,
   },
   selectedTextStyle: {
+    color: 'black',
     fontSize: 16,
+  },
+  itemTextStyle: {
+    color: 'black'
   },
   iconStyle: {
     width: 20,

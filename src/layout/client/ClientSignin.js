@@ -126,6 +126,8 @@ export default function ClientSignIn({ navigation }) {
         setPassword(response.user.password);
         setDeviceNum(uniqueId);
 
+        await AsyncStorage.setItem('clinicalPhoneNumber', response.user.phoneNumber);
+
         if (checked) {
           await AsyncStorage.setItem('clinicalEmail', credentials.email);
           await AsyncStorage.setItem('clinicalPassword', credentials.password);

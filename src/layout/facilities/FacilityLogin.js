@@ -69,7 +69,6 @@ export default function FacilityLogin({ navigation }) {
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e});
-    console.log(credentials);
   }
 
   const handleSignInNavigate = () => {

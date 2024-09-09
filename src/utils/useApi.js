@@ -97,32 +97,23 @@ export const ResetPassword = async (credentials, endpoint) => {
 
 export const Update = async (updateData, endpoint) => {
   try {
-    console.log("update");
-    // Existing token (obtained from AsyncStorage or login)
     const existingToken = await AsyncStorage.getItem('token');
-
-    // Include token in Authorization header
     const response = await axios.post(`api/${endpoint}/update`, updateData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
-      },
+      }
     });
-    console.log('Success');
-    
 
-    // If the update is successful, you can potentially update the token in AsyncStorage
     if (response.status === 200) {
-      // Optionally, if the backend sends a new token for some reason
       if (response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
       }
     } 
     return response.data;
   } catch (error) {
-    throw error;
+    return {error: error}
   }
 }
-
 
 export const Updates = async (updateData, endpoint) => {
   try {
@@ -313,19 +304,15 @@ export const GetDashboardData = async (endpoint, role) => {
 export const PostBid = async (bidData, endpoint) => {
   try {
     console.log('success')
-    // Existing token (obtained from AsyncStorage or login)
     const existingToken = await AsyncStorage.getItem('token');
     const response = await axios.post(`api/${endpoint}/postBid`, bidData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
       }
     });
-    // const response = await axios.get("/test");
     return response.data;
   } catch (error) {
-    console.log("================");
-    console.log(error)
-    throw error;
+    return {error: error};
   }
 };
 

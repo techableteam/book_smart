@@ -279,6 +279,7 @@ export default function AdminJobShift({ navigation }) {
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={facility}
                 // search
@@ -312,6 +313,7 @@ export default function AdminJobShift({ navigation }) {
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={degree}
                 // search
@@ -391,6 +393,7 @@ export default function AdminJobShift({ navigation }) {
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={location}
                 // search
@@ -714,10 +717,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   placeholderStyle: {
+    color: 'black',
     fontSize: 16,
   },
   selectedTextStyle: {
+    color: 'black',
     fontSize: 16,
+  },
+  itemTextStyle: {
+    color: 'black'
   },
   iconStyle: {
     width: 20,

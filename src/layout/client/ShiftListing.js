@@ -1,19 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme, } from 'react-native-paper';
+import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Text, useTheme, } from 'react-native-paper';
 import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-import { transparent } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
-// import MapView from 'react-native-maps';
-import { PostBid, PostJob, Jobs } from '../../utils/useApi';
-import moment from 'moment';
+import { firstNameAtom, lastNameAtom } from '../../context/ClinicalAuthProvider';
+import { PostBid, Jobs } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -37,39 +33,16 @@ export default function ShiftListing ({ navigation }) {
 
       const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
       setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
+    }, 500);
 
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
-  const theme = useTheme();
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
   const handleNavigate = (navigateUrl) => {
     navigation.navigate(navigateUrl);
-  }
-
-  // const userInfo = [
-  //   {title: 'Entry Date', content: firstName},
-  //   {title: 'Phone', content: phoneNumber},
-  //   {title: 'email', content: userRole},
-  //   {title: 'Caregiver', content: caregiver},
-  // ]
-
-
-  let info = [
-    {title: 'Job-ID', content: ""},
-    {title: 'Job Num. -#', content: ''},
-    {title: 'Caregiver', content: ''},
-    {title: 'Pay Rate', content: ""},
-    {title: 'Job', content: ""},
-    {title: 'Job Status', content: ""},
-    {title: 'Shift Date/Time Text', content: ''},
-    {title: 'Shift Dates & Times', content: ''},
-    {title: 'Location', content: ""},
-    {title: 'Bonus', content: ""},
-  ];
+  };
   const [data, setData] = useState([]);
   const [userInfos, setUserInfo] = useState([]);
   const [detailedInfos, setDetailedInfo] = useState([]);
@@ -77,14 +50,13 @@ export default function ShiftListing ({ navigation }) {
   const [filteredDetailData, setFilteredDetailData] = useState(detailedInfos);
   const [totalPages, setTotalPages] = useState(1);
   const [pageItems, setPageItems] = useState([]);
+
   async function getData() {
     let Data = await Jobs('jobs', 'Clinicians');
     if(!Data) {
       setData(['No Data'])
-    }
-    else {
+    } else {
       setData(Data);
-      console.log("date------------------------",data);
       const transformedData = Data.map(item => [{
         title: 'Job-ID',
         content: item.jobId
@@ -138,57 +110,27 @@ export default function ShiftListing ({ navigation }) {
         title: 'Date',
         content: item.shiftDate
       }]);
-      console.log(transformedData, '-----++++++')
+      
       setUserInfo(transformedData);
       setFilteredData(transformedData);
-      const len = transformedData.length;
-      console.log(len, 'ddddd00000')
-      const page = Math.ceil(len / itemsPerPage);
       setTotalPages(page);
       setDetailedInfo(detailedData);
       setFilteredDetailData(detailedData);
-      console.log(page, totalPages)
+      const len = transformedData.length;
+      const page = Math.ceil(len / itemsPerPage);
       const generatedPageArray = Array.from({ length: page}, (_, index) => ({
         label: `Page ${index+1}`,
         value: index + 1
       }));
       setPageItems(generatedPageArray);
-      // console.log(generatedPageArray, "pageItems+1+@+@+@+@+")
     }
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
-  }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
-
-
-  // const userInfo = [[
-  //   {title: 'JOB-ID', content: "344"},
-  //   {title: 'Job', content: 'Long Term Care'},
-  //   {title: 'Location', content: "Lancaster, NY"},
-  //   {title: 'Title', content: "LPN"},
-  //   {title: 'Shift', content: '6/9/24, 6p-11p'},
-  //   {title: 'Status', content: "Available"},
-  //   {title: 'Pay Rate', content: "$35.00"},
-  // ]]
-
-  // const detailedInfo = [
-  //   {
-  //     jobId: '344', 
-  //     job: 'Long Term Care', 
-  //     jobNum: '', 
-  //     caregiver: 'LPN', 
-  //     payRate: '$35.00', 
-  //     jobStatus: 'Available', 
-  //     shiftDateTime: '07/21/2024, 3p-11p',
-  //     shiftDates: '',
-  //     location: 'Lancaster, NY',
-  //     bonus: ''
-  //   }
-  // ]
   
   const toggleModal = () => {
     setModal(!isModal);
@@ -200,53 +142,69 @@ export default function ShiftListing ({ navigation }) {
     console.log(detailedInfos[id])
     setModalData(filteredDetailData[id]);
     toggleModal()  
-  }
-  const [showModal, setShowModal] = useState(false);
-  const [text, setText] = useState('');
-  const [mile, setMile] = useState('10');
-  const handleItemPress = (e) => {
-    setMile(e);
-    setShowModal(false);
-  }
+  };
 
-  const handleChange = (e) => {
-    setText(e.value);
-  } 
+  const [showModal, setShowModal] = useState(false);
+
   const handleSubmit = async (id) => {
-    console.log(content);
-    // const data = {content: content, jobId: id};
     const bidData = {jobId: id[0].content, message: content, caregiver: `${firstName} ${lastName}`}
     let response = await PostBid(bidData, 'bids');
-    setContent('');
-    handleBack();
-  }
+
+    if (!response?.error) {
+      Alert.alert(
+        'Success!',
+        response?.message,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      setContent('');
+      handleBack();
+    } else {
+      Alert.alert(
+        'Failed!',
+        "",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
   const handleBack = () => {
     setModal(!isModal)
-  }
+  };
 
   //------------------------------------------Search Function----------------
   const [searchTerm, setSearchTem] = useState(''); // Search term
   const handleSearch = (e) => {
     setSearchTem(e);
-    console.log(e, '------------');
     if (e !== '') {
-      console.log('dfesfdsdfd', userInfos[1][1].content)
       const filtered = userInfos.filter(subArray => subArray.some(item => item.content.toString().toLowerCase().includes(e.toLowerCase())));
       setFilteredData(filtered);
       const detailed = detailedInfos.filter(subArray => subArray.some(item => item.content.toString().toLowerCase().includes(e.toLowerCase())));
       setFilteredDetailData(detailed);
       const len = filtered.length;
-      console.log(len, 'ddddd00000')
       const page = Math.ceil(len / itemsPerPage);
       setTotalPages(page);
-      console.log(page, totalPages)
       const generatedPageArray = Array.from({ length: page}, (_, index) => ({
         label: `Page ${index+1}`,
         value: index + 1
       }));
       setPageItems(generatedPageArray);
-    }
-    else {
+    } else {
       setFilteredData(userInfos);
       setFilteredDetailData(detailedInfos);
       setTotalPages(Math.ceil(filteredData.length / itemsPerPage));
@@ -256,8 +214,7 @@ export default function ShiftListing ({ navigation }) {
       }));
       setPageItems(generatedPageArray);
     }
-    // setFilteredData(tableHead, ...filteredData);
-  }
+  };
 
   //--------------------------------subPage setting-------------------------------
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
@@ -265,26 +222,15 @@ export default function ShiftListing ({ navigation }) {
   const [pageItemValue, setPageItemValue] = useState(null);
   const [isPageItemFocus, setIsPageItemFocus] = useState(false);
 
-  // const renderPageItemLabel = () => {
-  //   if (pageItemValue || isPageItemFocus) {
-  //     return (
-  //       <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-  //         Dropdown label
-  //       </Text>
-  //     );
-  //   }
-  //   return null;
-  // };
-
   const getItemsForPage = (page) => {
     const startIndex = (page-1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
     return filteredData.slice(startIndex, endIndex);
-  }
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-  }
+  };
 
   const itemsToShow = getItemsForPage(currentPage);
 
@@ -335,6 +281,7 @@ export default function ShiftListing ({ navigation }) {
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
                   inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
                   iconStyle={styles.iconStyle}
                   data={pageItems}
                   maxHeight={300}
@@ -373,7 +320,7 @@ export default function ShiftListing ({ navigation }) {
                     ]}>{item.content}</Text>
                   </View>
                 )}
-                <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx + (currentPage-1)*itemsPerPage)}>
+                <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx + (currentPage-1) * itemsPerPage)}>
                   <Text style={{color: 'white', fontWeight: 'bold'}}> VIEW & APPLY</Text>
                 </TouchableOpacity>
               </View>)
@@ -416,7 +363,7 @@ export default function ShiftListing ({ navigation }) {
                 <View style={styles.msgBar}>
                   <Text style={[styles.subtitle, {textAlign: 'left', marginTop: 10, fontWeight: 'bold'}]}>ADD A BRIEF MESSAGE (optional)</Text>
                   <TextInput
-                    style={styles.inputs}
+                    style={[styles.inputs, { color: 'black' }]}
                     onChangeText={setContent}
                     value={content}
                     multiline={true}
@@ -735,10 +682,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   placeholderStyle: {
+    color: 'black',
     fontSize: 16,
   },
   selectedTextStyle: {
+    color: 'black',
     fontSize: 16,
+  },
+  itemTextStyle: {
+    color: 'black'
   },
   iconStyle: {
     width: 20,

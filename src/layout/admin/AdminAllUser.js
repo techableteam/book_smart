@@ -344,6 +344,7 @@ export default function AdminAllUser({ navigation }) {
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
                 inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={pageItems}
                 // search
@@ -417,6 +418,7 @@ export default function AdminAllUser({ navigation }) {
                           placeholderStyle={styles.placeholderStyle}
                           selectedTextStyle={styles.selectedTextStyle}
                           inputSearchStyle={styles.inputSearchStyle}
+                          itemTextStyle={styles.itemTextStyle}
                           iconStyle={styles.iconStyle}
                           data={modalItem ===3 ? location : role}
                           // search
@@ -738,10 +740,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   placeholderStyle: {
+    color: 'black',
     fontSize: 16,
   },
   selectedTextStyle: {
+    color: 'black',
     fontSize: 16,
+  },
+  itemTextStyle: {
+    color: 'black'
   },
   iconStyle: {
     width: 20,
