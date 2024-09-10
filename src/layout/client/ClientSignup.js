@@ -443,49 +443,24 @@ export default function ClientSignUp({ navigation }) {
             <View style={styles.email}>
               <Text style={styles.subtitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}>
-                  <TextInput
-                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0, color: 'black'}]}
-                    placeholder=""
-                    value={birthday.toDateString()}
-                    editable={false}
-                  />
-                </TouchableOpacity>
-                
-                {/* <Button title="Select Birthday" onPress={() => setShowCalendar(true)} /> */}
+                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0, color: 'black'}]}
+                  placeholder=""
+                  value={birthday.toDateString()}
+                  editable={false}
+                />
                 {showCalender && 
-                <>
-                  <DatePicker
-                    date={birthday}
-                    theme='light'
-                    onDateChange={(day) => handleDayChange('birthday', day)}
-                    mode="date" // Set the mode to "date" to allow year and month selection
-                    androidVariant="native"
-                  />
-                  <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />
-                </>
-                
-                  // <Modal
-                  //   Visible={false}
-                  //   transparent= {true}
-                  //   animationType="slide"
-                  //   onRequestClose={() => {
-                  //     setShowCalendar(!showCalender);
-                  //   }}
-                  // >
-                  //   <View style={styles.modalContainer}>
-                  //     <View style={styles.calendarContainer}>
-                  //       <Calendar 
-                  //         onDayPress = {(day) => handleDayPress ('birthday', day)}
-                  //         hideExtraDays={true}
-                  //         minDate={'1900-01-01'} // Set the minimum selectable date
-                  //         maxDate={'2024-12-31'} // Set the maximum selectable date
-                  //         marketDates = {{ [birthday]: {selected: true, selectedColor: 'blue'}}}
-                  //       />
-                  //       <Button title="Close" onPress={() => setShowCalendar(!showCalender)} />
-                  //     </View>
-                  //   </View>
-                  // </Modal>
+                  <>
+                    <DatePicker
+                      date={birthday}
+                      theme='light'
+                      onDateChange={(day) => handleDayChange('birthday', day)}
+                      mode="date"
+                      androidVariant="native"
+                    />
+                    <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />
+                  </>
                 }
               </View>
             </View>

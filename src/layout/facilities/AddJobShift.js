@@ -292,19 +292,20 @@ export default function AddJobShift({ navigation }) {
               <Text style={styles.subtitle}> Shift Date <Text style={{color: 'red'}}>*</Text> </Text>
               
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}>
-                </TouchableOpacity><TextInput
-                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
-                    placeholder=""
-                    value={credentials.shiftDate}
-                    editable={false}
-                  />
+                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                  placeholder=""
+                  value={credentials.shiftDate}
+                  editable={false}
+                />
                 {showCalender && 
                 <>
                   <DatePicker
                     date={shiftFromDay}
                     onDateChange={(day) => handleDayChange('shiftDate', day)}
                     mode="date" // Set the mode to "date" to allow year and month selection
+                    theme='light'
                     androidVariant="native"
                   />
                   <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />

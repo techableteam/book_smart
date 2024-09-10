@@ -26,7 +26,7 @@ export default function SubNavbar({name, navigation}) {
     navigation.navigate(navigateUrl, {userRole: userRole});
   }
   return (
-    <Card style={styles.shadow} onPress={()=> handleNavigate(name) }>
+    <Card style={styles.shadow}>
       <Text style={styles.text}>
         Logged in as&nbsp;
         <Text style={{fontWeight: 'bold'}}>{firstName}</Text>&nbsp;-&nbsp;
