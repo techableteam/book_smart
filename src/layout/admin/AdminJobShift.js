@@ -1,131 +1,31 @@
-import { Alert, StyleSheet, View, Image, Button, Platform, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Pressable } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
+import { TextInput, useTheme } from 'react-native-paper';
+import { Dropdown } from 'react-native-element-dropdown';
+import DatePicker from 'react-native-date-picker';
+import { useFocusEffect } from '@react-navigation/native';
+import moment from 'moment';
 import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/ClinicalAuthProvider';
-import { useNavigation } from '@react-navigation/native';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import PhoneInput from 'react-native-phone-input';
-import SignatureCapture from 'react-native-signature-capture';
-import DatePicker from 'react-native-date-picker';
-import DocumentPicker from 'react-native-document-picker';
 import { PostJob, Jobs } from '../../utils/useApi';
-import MSubNavbar from '../../components/MSubNavbar';
 import SubNavbar from '../../components/SubNavbar';
-import { Dropdown } from 'react-native-element-dropdown';
-import RNFS from 'react-native-fs'
-import moment from 'moment';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useAtom } from 'jotai';
-import { companyNameAtom } from '../../context/FacilityAuthProvider'
-import { useFocusEffect } from '@react-navigation/native';
-
 
 export default function AdminJobShift({ navigation }) {
-
-  const theme = useTheme();
   const [data, setData] = useState([]);
   const [facility, setFacility] = useState([]);
-
-  async function getData() {
-    let Data = await Jobs('jobs', 'Admin');
-    if(!Data) {
-      setData(['No Data'])
-    }
-    else {
-      setData(Data)
-      console.log('====================================');
-      console.log(Data);
-      console.log('====================================');
-    }
-    const uniqueValues = new Set();
-    const transformed = [];
-
-    // Iterate over each subarray
-    data.forEach(subarray => {
-      const value = subarray[11]; // Get the second element
-      // console.log(value)
-      if (!uniqueValues.has(value)) { // Check if it's already in the Set
-          uniqueValues.add(value); // Add to Set
-          transformed.push({ label: value, value: value }); // Add to transformed array
-      }
-    });
-
-    console.log(transformed);
-    transformed.unshift({label: 'Select...', value: 'Select...'})
-    setFacility(transformed);
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
-  }
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, []) // Empty dependency array means this runs on focus
-  );
-  //-----------------------------------Degree DropDown----------------------------
-  
-  const [degree, setDegree] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'CNA', value: 'CNA'},
-    {label: 'LPN', value: 'LPN'},
-    {label: 'STNA', value: 'STNA'},
-  ])
-
   const [facilityValue, setFacilityValue] = useState(null);
   const [isFacilityFocus, setIsFacilityFocus] = useState(false);
-
   const [degreeValue, setDegreeValue] = useState(null);
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (degreeValue || isDegreeFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const [isAddDegree, setIsAddDegree] = useState(false);
-  const handleAddDegree = () => {
-    setIsAddDegree(!isAddDegree)
-  }
-
-  //-----------------------------------Unit DropDown----------------------------
-  
-  const [location, setLocation] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'Lancaster, NY', value: 'Lancaster, NY'},
-    {label: 'Skilled Nursing Facility', value: 'Skilled Nursing Facility'},
-    {label: 'Springville, NY', value: 'Springville, NY'},
-    {label: 'Warsaw, NY', value: 'Warsaw, NY'},
-    {label: 'Williansville', value: 'Williansville'},
-  ])
-
   const [locationValue, setLocationValue] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [isLocationFocus, setIsLocationFocus] = useState(false);
-
-  const renderLocationLabel = () => {
-    if (locationValue || isLocationFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const [isAddLocation, setIsAddLocation] = useState(false);
-  const handleAddLocation = () => {
-    setIsAddLocation(!isAddLocation)
-  }
-  //--------------------------------------------Credentials-----------------------------
+  const [shiftFromDay, setShiftFromDay] = useState(new Date());
+  const [showCalender, setShowCalendar] = useState(false);
+  const [item, setItem] = useState('');
+  const [title, setTitle] = useState('degree')
   const [ credentials, setCredentials ] = useState({
     facility: '',
     degree: '',
@@ -135,73 +35,75 @@ export default function AdminJobShift({ navigation }) {
     location: '',
     payRate: '',
     bonus: '',
-  })
+  });
+
+  const [degree, setDegree] = useState([
+    {label: 'Select...', value: 'Select...'},
+    {label: 'CNA', value: 'CNA'},
+    {label: 'LPN', value: 'LPN'},
+    {label: 'STNA', value: 'STNA'},
+  ]);
+
+  const [location, setLocation] = useState([
+    {label: 'Select...', value: 'Select...'},
+    {label: 'Lancaster, NY', value: 'Lancaster, NY'},
+    {label: 'Skilled Nursing Facility', value: 'Skilled Nursing Facility'},
+    {label: 'Springville, NY', value: 'Springville, NY'},
+    {label: 'Warsaw, NY', value: 'Warsaw, NY'},
+    {label: 'Williansville', value: 'Williansville'},
+  ]);
+
+  async function getData() {
+    let data = await Jobs('jobs', 'Admin');
+    if(!data) {
+      setData(['No Data'])
+    } else {
+      setData(data)
+    }
+    const uniqueValues = new Set();
+    const transformed = [];
+
+    data.forEach(subarray => {
+      const value = subarray[11];
+      if (!uniqueValues.has(value)) {
+        uniqueValues.add(value);
+        transformed.push({ label: value, value: value });
+      }
+    });
+
+    transformed.unshift({ label: 'Select...', value: 'Select...' })
+    setFacility(transformed);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, [])
+  );
 
   const handleCredentials = (target, e) => {
     if (target === "streetAddress" || target === "streetAddress2" || target === "city" || target === "state" || target === "zip") {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
-    }
-    else if (target === "timeFrom" || target === "dateFrom" || target === "dateTo" || target === "timeTo") {
+    } else if (target === "timeFrom" || target === "dateFrom" || target === "dateTo" || target === "timeTo") {
       console.log('success')
       setCredentials({...credentials, shiftsDateAndTimes: {...credentials.shiftsDateAndTimes, [target]: e}})
-    }
-    else {
+    } else {
       setCredentials({...credentials, [target]: e});
     }
-    console.log(credentials);
-  }
-
-  //-------------------------------------CheckBox-----------------------------
-  const [checked, setChecked] = useState(false);
-  
-  const handleToggle = () => {
-    setChecked(!checked);
-  };
-  const [check, setCheck] = useState(false);
-  
-  const handleCheckToggle = () => {
-    setCheck(!check);
   };
 
-  //-------------------------------------CheckBox2-----------------------------
-  const [isChecked, setIsChecked] = useState(false);
-
-  const handleIsToggle = () => {
-    setIsChecked(!isChecked);
-  };
-  const [isCheck, setIsCheck] = useState(false);
-  
-  const handleIsCheckToggle = () => {
-    setIsCheck(!isCheck);
-  };
-  //-------------------------------------------ComboBox------------------------
-  const placeholder = {
-    label: 'Select an item...',
-    value: null,
-  };
-  const items = [
-    { label: 'CNA', value: 'CNA' },
-    { label: 'LPN', value: 'LPN' },
-    { label: 'RN', value: 'RN' },
-  ];
-  //-------------------------------------------Modal-------------------------
-  const [showModal, setShowModal] = useState(false);
   const handleItemPress = () => {
-    // handleCredentials('title', text);
     setShowModal(!showModal);
-  }
+  };
+
   const toggleModal = () => {
     setShowModal(!showModal);
-  }
+  };
 
-  //-------------------------------------------Date Picker---------------------------------------
-  const [shiftFromDay, setShiftFromDay] = useState(new Date());
-  const [showCalender, setShowCalendar] = useState(false);
   const handleDayChange = (target, day) => {
     handleCredentials(target, moment(day).format("MM/DD/YYYY"));
-  }
+  };
 
-    //Alert
   const showAlerts = (name) => {
     Alert.alert(
       'Warning!',
@@ -221,55 +123,43 @@ export default function AdminJobShift({ navigation }) {
   const handleSubmit = async () => {
     if (credentials.shift === '') {
         showAlerts('Shift')
-    }
-    else if (credentials.shiftDate === '') {
+    } else if (credentials.shiftDate === '') {
       showAlerts('Shift Date')
-    }
-    else {
+    } else {
       try {
-        console.log('credentials: ', credentials);
         const response = await PostJob(credentials, 'jobs');
-        console.log('Signup successful: ', response)
         navigation.goBack();
       } catch (error) {
         console.error('Job Shift failed: ', error)
       }
     }
-  }
-  const [item, setItem] = useState('');
-  const [title, setTitle] = useState('degree')
+  };
+
   const handleItemChange = (e) => {
     setItem(e);
-  }
+  };
 
   const handleModal = (title, item) => {
     if (title === 'degree'){
       console.log('degree', item)
       setDegree([...degree, {label: item, value: item}])
-    }
-    else if (title === 'location') {
+    } else if (title === 'location') {
       console.log('location', item)
       setLocation([...location, {label: item, value: item},])
     }
     setShowModal(!showModal)
     setItem('')
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-        translucent backgroundColor="transparent"
-      />
-      <MHeader navigation={navigation}/>
+      <StatusBar translucent backgroundColor="transparent" />
+      <MHeader navigation={navigation} />
       <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-      <ScrollView style = {styles.scroll}    
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style= {{width: '60%', marginLeft: '20%', marginTop: 20}}>
-            <Text style={styles.headBar}>
-              Add A New Job / Shift
-            </Text>
+            <Text style={styles.headBar}>Add A New Job / Shift</Text>
           </View>
           <View style={styles.authInfo}>
             <View>
@@ -288,13 +178,13 @@ export default function AdminJobShift({ navigation }) {
                 valueField="value"
                 placeholder={'Select...'}
                 // searchPlaceholder="Search..."
-                value={ facility[0].value }
+                value={ facilityValue ? facilityValue : facility[0]?.value }
                 onFocus={() => setIsFacilityFocus(true)}
                 onBlur={() => setIsFacilityFocus(false)}
                 onChange={item => {
-                  setFacilityValue(item.value);
+                  setFacilityValue(item?.value);
                   setIsFacilityFocus(false);
-                  handleCredentials('facility', item.label)
+                  handleCredentials('facility', item?.label)
                 }}
                 renderLeftIcon={() => (
                   <View
@@ -322,13 +212,13 @@ export default function AdminJobShift({ navigation }) {
                 valueField="value"
                 placeholder={'100 per page'}
                 // searchPlaceholder="Search..."
-                value={degreeValue ? degreeValue : degree[0].value}
+                value={degreeValue ? degreeValue : degree[0]?.value}
                 onFocus={() => setIsDegreeFocus(true)}
                 onBlur={() => setIsDegreeFocus(false)}
                 onChange={item => {
-                  setDegreeValue(item.value);
+                  setDegreeValue(item?.value);
                   setIsDegreeFocus(false);
-                  handleCredentials('degree', item.label)
+                  handleCredentials('degree', item?.label)
                 }}
                 renderLeftIcon={() => (
                   <View
@@ -354,26 +244,26 @@ export default function AdminJobShift({ navigation }) {
                 />
             </View>
             <View>
-              <Text style={styles.subtitle}> Shift Date <Text style={{color: 'red'}}>*</Text> </Text>
-              
+              <Text style={styles.subtitle}>Shift Date<Text style={{color: 'red'}}>*</Text></Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}>
-                </TouchableOpacity><TextInput
-                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
-                    placeholder=""
-                    value={credentials.shiftDate}
-                    editable={false}
-                  />
+                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
+                <TextInput
+                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                  placeholder=""
+                  value={credentials.shiftDate}
+                  editable={false}
+                />
                 {showCalender && 
-                <>
-                  <DatePicker
-                    date={shiftFromDay}
-                    onDateChange={(day) => handleDayChange('shiftDate', day)}
-                    mode="date" // Set the mode to "date" to allow year and month selection
-                    androidVariant="native"
-                  />
-                  <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />
-                </>
+                  <>
+                    <DatePicker
+                      date={shiftFromDay}
+                      onDateChange={(day) => handleDayChange('shiftDate', day)}
+                      mode="date"
+                      theme='light'
+                      androidVariant="native"
+                    />
+                    <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />
+                  </>
                 }
               </View>
             </View>
