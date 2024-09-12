@@ -1,29 +1,95 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { VirtualizedList, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Modal, TextInput, View, Animated, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Text } from 'react-native-paper';
+import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget';
+import RadioGroup from 'react-native-radio-buttons-group';
+import DocumentPicker from 'react-native-document-picker';
+import RNFS from 'react-native-fs'
 import images from '../../assets/images';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
-import ImageButton from '../../components/ImageButton';
-import { Table, Row, Rows } from 'react-native-table-component';
 import { Dropdown } from 'react-native-element-dropdown';
-import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-// import MapView from 'react-native-maps';
-import { Jobs } from '../../utils/useApi';
+import { Job, Jobs, RemoveJos, setAwraded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function CompanyShift({ navigation }) {
+  const [totalPages, setTotalPages] = useState(1);
+  const [tableData, setTableData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [value, setValue] = useState(100);
+  const [isFocus, setIsFocus] = useState(false);
+  const [isJobDetailModal, setIsJobDetailModal] = useState(false);
+  const [isRatingModal, setIsRatingModal] = useState(false);
+  const [isAwardJobModal, setIsAwardJobModal] = useState(false);
+  const [isJobEditModal, setIsJobEditModal] = useState(false);
+  const [isJobTSVerifyModal, setIsJobTSVerifyModal] = useState(false);
+  const [curRatings, setCurRatings] = useState(0);
+  const [curJobId, setCurJobId] = useState(0);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedBidder, setSelectedBidder] = useState([]);
+  const [selectedBidders, setSelectedBidders] = useState([]);
+  const [awardedStatus, setAwardedStatus] = useState(2);
+  const [tsVerifyStatus, setTSVerifyStatus] = useState(2);
+  const [timeSheetFile, setTimesheetFile] = useState({
+    content: '',
+    name: '',
+    type: ''
+  });
+
+  const [ credentials, setCredentials ] = useState({
+    facility: '',
+    degree: '',
+    shiftTime: "",
+    shiftDate: '',
+    jobNum: '',
+    location: '',
+    payRate: '',
+    bonus: '',
+    rating: 0,
+  });
+
+  const radioButtons = useMemo(() => ([
+    {
+      id: 1,
+      label: 'Awarded',
+      value: 1
+    },
+    {
+      id: 2,
+      label: 'Not Awarded',
+      value: 2
+    }
+  ]), []);
+
+  const TSradioButtons = useMemo(() => ([
+    {
+      id: 1,
+      label: 'Yes',
+      value: 1
+    },
+    {
+      id: 2,
+      label: 'No',
+      value: 2
+    }
+  ]), []);
+
+  const pageItems = [
+    {label: '10 per page', value: '10'},
+    {label: '25 per page', value: '25'},
+    {label: '50 per page', value: '50'},
+    {label: '100 per page', value: '100'},
+    {label: '500 per page', value: '500'},
+    {label: '1000 per page', value: '1000'},
+  ]
+
   const tableHead = [
     'Degree/Discipline',
     'Entry Date',
     'Job ID',
     'Job Num. -#',
     'Location',
-    'Unit',
     'Shift Dates & Times',
     'Shift',
     'View Shift/Bids',
@@ -35,40 +101,24 @@ export default function CompanyShift({ navigation }) {
     'Delete',
   ];
 
-  const [totalPages, setTotalPages] = useState(1);
-  const [tableData, setTableData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  //-----------------------------DropDown----------------------------
-  
-  const pageItems = [
-    {label: '10 per page', value: '10'},
-    {label: '25 per page', value: '25'},
-    {label: '50 per page', value: '50'},
-    {label: '100 per page', value: '100'},
-    {label: '500 per page', value: '500'},
-    {label: '1000 per page', value: '1000'},
-  ]
+  const bidderTableHeader = [
+    "Entry Date",
+    "Caregiver",
+    "Details",
+    "Message From Applicant",
+    "Bid Status",
+    "Award Job",
+    "",
+    "",
+    ""
+  ];
 
-  const [value, setValue] = useState(100);
-  const [isFocus, setIsFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
   let colorIndex = 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Generate a random color
       if (colorIndex >= 0.9) {
         colorIndex = 0;
       } else {
@@ -77,32 +127,196 @@ export default function CompanyShift({ navigation }) {
 
       const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
       setBackgroundColor(randomColor);
-    }, 500); // Change color every 5 seconds
-
+    }, 500);
     return () => clearInterval(interval); // Clean up the interval on component unmount
   }, []);
 
   const [data, setData] = useState([]);
   async function getData() {
-    let Data = await Jobs('jobs', 'Facilities');
-    if(!Data) {
+    let result = await Jobs('jobs', 'Facilities');
+    if(!result) {
       setData(['No Data'])
+    } else {
+      setData(result)
+      setFilteredData(result);
     }
-    else {
-      setData(Data)
-      setFilteredData(Data);
-    }
-    Data.unshift(tableHead);
-    setTableData(Data);
-    console.log('--------------------------', Data);
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
+    result.unshift(tableHead);
+    setTableData(result);
   }
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
+
+  const handleRemove = async (id) => {
+    let results = await RemoveJos({ jobId: id }, 'jobs');
+    if (!results?.error) {
+      console.log('success');
+      getData();
+    } else {
+      console.log('failure', results.error);
+    }
+  };
+
+  const toggleRatingsModal = () => {
+    setIsRatingModal(!isRatingModal);
+  };
+
+  const toggleJobDetailModal = () => {
+    setIsJobDetailModal(!isJobDetailModal);
+  };
+
+  const toggleJobAwardModal = () => {
+    setIsAwardJobModal(!isAwardJobModal);
+  };
+
+  const toggleJobEditModal = () => {
+    setIsJobEditModal(!isJobEditModal);
+  };
+
+  const toggleJobTSVerifyModal = () => {
+    setIsJobTSVerifyModal(!isJobTSVerifyModal);
+  };
+
+  const handleChangeRatings = async () => {
+    let results = await updateJobRatings({ jobId: curJobId, rating: curRatings }, 'jobs');
+    if (!results?.error) {
+      console.log('success');
+      setIsRatingModal(false);
+      getData();
+    } else {
+      console.log('failure', results.error);
+    }
+  };
+
+  const handleShowRatingModal = async (id, rating) => {
+    setIsRatingModal(true);
+    setCurRatings(rating);
+    setCurJobId(id);
+  };
+
+  const handleShowJobDetailModal = async (id) => {
+    let data = await Job({ jobId: id }, 'jobs');
+    if(!data) {
+      setSelectedJob(null);
+      setSelectedBidders([]);
+    } else {
+      let biddersList = data.bidders;
+      biddersList.unshift(bidderTableHeader);
+      setSelectedJob(data.jobData);
+      setSelectedBidders(biddersList);
+      setIsJobDetailModal(true);
+    }
+  };
+
+  const handleShowJobTSVerifyModal = async (id) => {
+    console.log(id);
+    let data = await Job({ jobId: id }, 'jobs');
+    console.log(data);
+    if(!data) {
+      setCurJobId(id);
+    } else {
+      setCurJobId(id);
+      setTSVerifyStatus(data.jobData.timeSheetVerified ? 1 : 2);
+      setIsJobTSVerifyModal(true);
+    }
+  };
+
+  const handleShowJobAwardModal = async (id) => {
+    let bidder = [];
+    selectedBidders.map((item, idx) => {
+      if (item[6] === id) {
+        bidder = item;
+      }
+    });
+
+    if (bidder) {
+      setIsJobDetailModal(false);
+      setSelectedBidder(bidder);
+      setAwardedStatus(bidder[4] === 'Awarded' ? 1 : 2);
+      setIsAwardJobModal(true);
+    } else {
+      setSelectedBidder([]);
+    }
+  };
+
+  const handleChangeAwardStatus = async (bidderId, jobId) => {
+    const response = await setAwraded({ jobId: jobId, bidderId: bidderId, status: awardedStatus }, 'jobs');
+    if (!response?.error) {
+      console.log('success');
+      setIsAwardJobModal(false);
+    } else {
+      console.log('failure', response.error);
+      Alert.alert('Failure!', 'Please retry again later', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  };
+
+  const handleChangeJobTSVerify = async () => {
+    const response = await updateJobTSVerify({ jobId: curJobId, status: tsVerifyStatus, file: timeSheetFile }, 'jobs');
+    
+    if (!response?.error) {
+      console.log('success');
+      setIsJobTSVerifyModal(false);
+    } else {
+      console.log('failure', response.error);
+      Alert.alert('Failure!', 'Please retry again later', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  };
+
+  const handleShowJobEditModal = async () => {
+    console.log(selectedJob);
+  };
+
+  const pickFile = async () => {
+    try {
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf];
+      const res = await DocumentPicker.pick({
+        type: type,
+      });
+      const fileContent = await RNFS.readFile(res[0].uri, 'base64');
+      let fileType;
+
+      if (res[0].type === 'application/pdf') {
+        fileType = 'pdf';
+      } else if (res[0].type.startsWith('image/')) {
+        fileType = 'image';
+      } else {
+        fileType = 'unknown';
+      }
+      console.log(res);
+      setTimesheetFile({
+        content: `data:${res[0].type};base64,${fileContent}`,
+        type: res[0].type,
+        name: res[0].name,
+      });
+    } catch (err) {
+      console.log(err);
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker
+      } else {
+        // Handle other errors
+      }
+    }
+  };
+
   //------------------------------------------Search Function----------------
   const [searchTerm, setSearchTem] = useState(''); // Search term
   const handleSearch = (e) => {
@@ -110,8 +324,7 @@ export default function CompanyShift({ navigation }) {
     const Data = []
     if (data.length >1) {
       Data = data.shift(data[0]);
-    }
-    else {
+    } else {
       Data = data
     }
     
@@ -122,9 +335,9 @@ export default function CompanyShift({ navigation }) {
     );
     setFilteredData(filtered);
     filtered.unshift(tableHead);
-    setTableData(tableData)
-    // setFilteredData(tableHead, ...filteredData);
-  }
+    setTableData(tableData);
+  };
+
   //----------------------------change Current page--------------------------
   const [currentPage, setCurrentPage] = useState(1);
   const getItemsForPage = (page) => {
@@ -135,27 +348,229 @@ export default function CompanyShift({ navigation }) {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-        setCurrentPage(currentPage + 1);
+      setCurrentPage(currentPage + 1);
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
-        setCurrentPage(currentPage - 1);
+      setCurrentPage(currentPage - 1);
     }
   };
 
   const itemsToShow = getItemsForPage(currentPage);
 
   //------------------------------table Component---------------------------
-  const widths = [150, 100, 80, 100, 150, 70, 150, 80, 150, 80, 200, 80, 100, 80, 100];
+  const widths = [150, 100, 80, 100, 150, 150, 150, 150, 80, 150, 150, 100, 150, 100];
   const RenderItem = ({ item, index }) => (
-    <View key={index} style={{ backgroundColor: index !== 0 ? 'white' : '#ccffff', flexDirection: 'row' }}>
-      {widths.map((width, idx) => (
-        <Text key={idx} style={[styles.tableItemStyle, { width }]} onPress={() => itemChange(item, idx)}>
-          {item[idx]}
-        </Text>
-      ))}
+    <View
+      key={index}
+      style={{
+        backgroundColor: index !== 0 ? 'white' : '#ccffff',
+        flexDirection: 'row',
+      }}
+    >
+      {widths.map((width, idx) => {
+        if (idx === 7 && index > 0) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  handleShowJobDetailModal(item[2]);
+                }}
+              >
+                <Text style={styles.profileTitle}>View</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else if (idx === 11 && index > 0) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  handleShowJobTSVerifyModal(item[2]);
+                }}
+              >
+                <Text style={styles.profileTitle}>View</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else if (
+          idx === 12 &&
+          index > 0 &&
+          item[9] !== 'Available' &&
+          item[9] !== 'Awarded'
+        ) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  handleShowRatingModal(item[2], item[12]);
+                }}
+              >
+                <Text style={styles.profileTitle}>Add / View</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else if (idx === 13 && index > 0) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  Alert.alert('Alert!', 'Are you sure you want to delete this?', [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        handleRemove(item[2]);
+                      },
+                    },
+                    { text: 'Cancel', style: 'cancel' },
+                  ]);
+                }}
+              >
+                <Text style={styles.profileTitle}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else {
+          return (
+            <Text
+              key={idx}
+              style={[styles.tableItemStyle, { width }]}
+              onPress={() => itemChange(item, idx)}
+            >
+              {item[idx]}
+            </Text>
+          );
+        }
+      })}
+    </View>
+  );  
+
+  const bidderTableWidth = [150, 150, 140, 200, 150, 100];
+  const RenderItem1 = ({ item, index }) => (
+    <View
+      key={index}
+      style={{
+        backgroundColor: index !== 0 ? 'white' : '#ccffff',
+        flexDirection: 'row',
+      }}
+    >
+      {bidderTableWidth.map((width, idx) => {
+        if (idx === 2 && index > 0) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  console.log(item[6]);
+                  navigation.navigate("ClientProfile", {id: item[6]});
+                }}
+              >
+                <Text style={styles.profileTitle}>View</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else if (idx === 5 && index > 0) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  handleShowJobAwardModal(item[6]);
+                }}
+              >
+                <Text style={styles.profileTitle}>Click</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else {
+          return (
+            <Text
+              key={idx}
+              style={[styles.tableItemStyle, { width }]}
+            >
+              {item[idx]}
+            </Text>
+          );
+        }
+      })}
     </View>
   );
   
@@ -167,19 +582,18 @@ export default function CompanyShift({ navigation }) {
     </View>
   );
 
+  const BidderTableComponent = () => (
+    <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
+      {selectedBidders.map((item, index) => (
+        <RenderItem1 key={index} item={item} index={index} />
+      ))}
+    </View>
+  );
+
   const itemChange = (item, idx) => {
 
   }
 
-  //-------------------------------itemChangeDropBox==================
-  const degreeItem = [
-    {label: '10 per page', value: '10'},
-    {label: '25 per page', value: '25'},
-    {label: '50 per page', value: '50'},
-    {label: '100 per page', value: '100'},
-    {label: '500 per page', value: '500'},
-    {label: '1000 per page', value: '1000'},
-  ]
   return (
     <View style={styles.container}>
       <StatusBar
@@ -206,8 +620,7 @@ export default function CompanyShift({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => {
-            navigation.navigate('FacilityProfile'),
-              console.log("data-------", data)
+            navigation.navigate('FacilityProfile')
           }}>
             <Text style={styles.profileTitle}>🏚️ Facilities Home</Text>
           </TouchableOpacity>
@@ -271,7 +684,6 @@ export default function CompanyShift({ navigation }) {
                     setValue(item.value);
                     setIsFocus(false);
                     const len = tableData.length;
-                    console.log(len, 'ddddd00000')
                     const page = Math.ceil(len / item.value);
                     setTotalPages(page);
                   }}
@@ -297,8 +709,333 @@ export default function CompanyShift({ navigation }) {
               </ScrollView>
             </View>
           </View>
-
         </View>
+        <Modal
+          visible={isRatingModal}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setIsRatingModal(!isRatingModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.calendarContainer}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Add / View Rating</Text>
+                <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleRatingsModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <View style={[styles.modalBody, { alignItems: 'center', padding: 0, paddingVertical: 10 }]}>
+                  <StarRating
+                    rating={curRatings}
+                    onChange={setCurRatings}
+                    maxStars={5}
+                    enableHalfStar={false}
+                  />
+                  <TouchableOpacity style={styles.button} onPress={handleChangeRatings} underlayColor="#0056b3">
+                    <Text style={styles.buttonText}>Update</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          visible={isJobDetailModal}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setIsJobDetailModal(!isJobDetailModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.calendarContainer, { height: '80%' }]}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Facility View Job Details</Text>
+                <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobDetailModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <ScrollView>
+                  <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Entry Date</Text>
+                      <Text style={styles.content}>{selectedJob?.entryDate}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job-ID</Text>
+                      <Text style={styles.content}>{selectedJob?.jobId}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Num</Text>
+                      <Text style={styles.content}>{selectedJob?.jobNum}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Nurse</Text>
+                      <Text style={styles.content}>{selectedJob?.nurse}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Bids / Offers</Text>
+                      <Text style={styles.content}>{selectedJob?.bid_offer}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Nurse Req.</Text>
+                      <Text style={styles.content}>{selectedJob?.degree}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Shift Time</Text>
+                      <Text style={styles.content}>{selectedJob?.shiftTime}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Shift Date</Text>
+                      <Text style={styles.content}>{selectedJob?.shiftDate}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Pay Rate</Text>
+                      <Text style={styles.content}>{selectedJob?.payRate}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Status</Text>
+                      <Text style={styles.content}>{selectedJob?.jobStatus}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Timesheet Upload</Text>
+                      <Text style={styles.content}>{selectedJob?.timeSheet?.name}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Rating</Text>
+                      <Text style={styles.content}>
+                        <StarRatingDisplay
+                          rating={selectedJob?.jobRating}
+                          maxStars={5}
+                          starSize={25}
+                        />
+                      </Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Location</Text>
+                      <Text style={styles.content}>{selectedJob?.location}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <TouchableOpacity style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]} onPress={handleShowJobEditModal} underlayColor="#0056b3">
+                        <Text style={[styles.buttonText, { fontSize: 12 }]}>Edit Job / Shift</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                        <Text style={[styles.profileTitle, { fontSize: 12 }]}>ALL BIDS / OFFERS FOR SHIFT</Text>
+                      </View>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
+                      <ScrollView horizontal={true} style={{width: '100%'}}>
+                        <BidderTableComponent />
+                      </ScrollView>
+                    </View>
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          visible={isAwardJobModal}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setIsAwardJobModal(!isAwardJobModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.calendarContainer, { height: '80%' }]}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Award Job To Applicant</Text>
+                <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobAwardModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <ScrollView>
+                  <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Num. - #</Text>
+                      <Text style={styles.content}>{selectedJob?.jobNum || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Message From Applicant</Text>
+                      <Text style={styles.content}>{selectedBidder[3] || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job</Text>
+                      <Text style={styles.content}>{selectedJob?.jobId || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Applicant</Text>
+                      <Text style={styles.content}>{selectedBidder[1] || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Phone</Text>
+                      <Text style={styles.content}>{selectedBidder[8] || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Email</Text>
+                      <Text style={styles.content}>{selectedBidder[7] || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Shift Date</Text>
+                      <Text style={styles.content}>{selectedJob?.shiftTime || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Shift Time</Text>
+                      <Text style={styles.content}>{selectedJob?.shiftDate || ''}</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30, backgroundColor: 'green' }]}>
+                        <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️"CLICK "AWARDED"</Text>
+                      </View>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
+                      <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>This will awrd the job to the applicant, and change the status of the JOB to "AWARDED" on your "Job Listings Tab"</Text>
+                    </View>
+                    <View style={{flexDirection: 'column', width: '100%', alignItems: 'flex-start', justifyContent: 'center'}}>
+                      <View>
+                        <Text style={{ fontWeight: 'bold', marginTop: 20, fontSize: 14 }}>Bid Status</Text>
+                      </View>
+                      <View style={{ color: 'black' }}>
+                        <RadioGroup 
+                          radioButtons={radioButtons} 
+                          onPress={setAwardedStatus}
+                          selectedId={awardedStatus}
+                          containerStyle={{
+                            flexDirection: 'column',
+                            alignItems: 'flex-start'
+                          }}
+                          labelStyle={{
+                            color: 'black'
+                          }}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                  <View style={{flexDirection: 'row', width: '100%'}}>
+                    <TouchableOpacity
+                      style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                      onPress={() => handleChangeAwardStatus(selectedBidder[6], selectedJob?.jobId)} underlayColor="#0056b3"
+                    >
+                      <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          visible={isJobTSVerifyModal}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setIsJobTSVerifyModal(!isJobTSVerifyModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.calendarContainer, { height: '80%' }]}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Verify Timesheet</Text>
+                <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobTSVerifyModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <ScrollView>
+                  <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                    <View style={{flexDirection: 'column', width: '100%', alignItems: 'flex-start', justifyContent: 'center'}}>
+                      <View>
+                        <Text style={{ fontWeight: 'bold', marginTop: 20, fontSize: 14 }}>Timesheet Verified?</Text>
+                      </View>
+                      <View style={{ color: 'black' }}>
+                        <RadioGroup 
+                          radioButtons={TSradioButtons} 
+                          onPress={setTSVerifyStatus}
+                          selectedId={tsVerifyStatus}
+                          containerStyle={{
+                            flexDirection: 'column',
+                            alignItems: 'flex-start'
+                          }}
+                          labelStyle={{
+                            color: 'black'
+                          }}
+                        />
+                      </View>
+                    </View>
+            
+                    <View>
+                      <Text style={{ fontWeight: 'bold', marginTop: 20, fontSize: 14, marginBottom: 5 }}>Timesheet Upload</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
+                        <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        style={[styles.input, { width: '60%' }]}
+                        placeholder={timeSheetFile?.name}
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        value={timeSheetFile?.name}
+                      />
+                    </View>
+                  </View>
+                  <View style={{flexDirection: 'row', width: '100%'}}>
+                    <TouchableOpacity
+                      style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                      onPress={() => handleChangeJobTSVerify()}
+                      underlayColor="#0056b3"
+                    >
+                      <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          visible={isJobEditModal}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setIsJobEditModal(!isJobEditModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.calendarContainer, { height: '80%' }]}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Facility Edit Job</Text>
+                <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobEditModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <ScrollView>
+                  <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                    
+                  </View>
+                  <View style={{flexDirection: 'row', width: '100%'}}>
+                    <TouchableOpacity
+                      style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                      onPress={() => handleChangeAwardStatus(selectedBidder[6], selectedJob?.jobId)} underlayColor="#0056b3"
+                    >
+                      <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
       <MFooter />
     </View>
@@ -320,6 +1057,23 @@ const styles = StyleSheet.create({
     width: '80%',
     position: 'relative'
   },
+  input: {
+    backgroundColor: 'white', 
+    height: 30, 
+    marginBottom: 10, 
+    borderWidth: 1, 
+    borderColor: 'hsl(0, 0%, 86%)',
+  },
+  chooseFile: {
+    width: '30%', 
+    height: 30, 
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: 'black'
+  },
   backTitle: {
     backgroundColor: 'black',
     width: '100%',
@@ -340,6 +1094,17 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     backgroundColor: 'transparent',
     paddingVertical: 10
+  },
+  titles: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    lineHeight: 30,
+    width: '35%'
+  },
+  content: {
+    fontSize: 16,
+    lineHeight: 30,
+    width: '60%'
   },
   bottomBar: {
     marginTop: 30,
@@ -445,13 +1210,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   calendarContainer: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#e3f2f1',
     borderRadius: 30,
     elevation: 5,
-    width: '80%',
-    // height: '43%',
-    marginLeft: '20',
-    flexDirection: 'flex-start',
+    width: '90%',
+    flexDirection: 'column',
     borderWidth: 3,
     borderColor: '#7bf4f4',
   },
@@ -593,5 +1356,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
     color: '#2a53c1',
     height: 30
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    marginTop: 30,  
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });

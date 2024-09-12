@@ -1,6 +1,5 @@
 import axios from './axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import  { useNavigation, useRoute } from '@react-navigation/native';
 import { Alert } from 'react-native';
 
 export const Signup = async (userData, endpoint) => {
@@ -174,30 +173,21 @@ export const UpdateUser = async (updateData, endpoint) => {
 
 export const PostJob = async (jobData, endpoint) => {
   try {
-    console.log('success')
-    // Existing token (obtained from AsyncStorage or login)
     const existingToken = await AsyncStorage.getItem('token');
     const response = await axios.post(`api/${endpoint}/postJob`, jobData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
       }
     });
-    // const response = await axios.get("/test");
     return response.data;
   } catch (error) {
-    console.log("================");
-    console.log(error)
-    throw error;
+    return { error: error };
   }
 };
 
 export const Jobs = async (endpoint, role) => {
   try {
-    // console.log("jobs");
-    // Existing token (obtained from AsyncStorage or login)
     const existingToken = await AsyncStorage.getItem('token');
-    console.log(existingToken)
-    // Include token in Authorization header
     const response = await axios.get(`api/${endpoint}/shifts`, {
       headers: {
         Authorization: `Bearer ${existingToken}`,
@@ -220,7 +210,99 @@ export const Jobs = async (endpoint, role) => {
     console.log(error);
     throw error;
   }
-}
+};
+
+export const Job = async (jobData, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/getJob`, jobData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+    }
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const removeJob = async (jobData, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/removeJob`, jobData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const setAwraded = async (jobData, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/setAwraded`, jobData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const updateJobRatings = async (jobData, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/updateJobRatings`, jobData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const updateJobTSVerify = async (jobData, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/updateJobTSVerify`, jobData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const getClientInfoWithJobId = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/getClientInfo`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    return response.data.userData;
+  } catch (error) {
+    return { error: error };
+  }
+};
 
 export const MyShift = async (endpoint, role) => {
   try {

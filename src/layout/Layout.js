@@ -55,6 +55,7 @@ import AdminForgotPwd from './admin/AdminForgotPwd.js';
 import AdminResetPassword from './admin/AdminResetPass.js';
 import ClientPhone from './client/ClientPhone.js';
 import ClientPhoneVerify from './client/ClientPhoneVerify.js';
+import ClientProfile from './facilities/ClientProfile.js';
 const Stack = createNativeStackNavigator();
 
 function Layout() {
@@ -184,6 +185,11 @@ function Layout() {
       <Stack.Screen 
         name= 'CompanyShift'
         component = {CompanyShift}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'ClientProfile'
+        component = {ClientProfile}
         options={{headerShown: false}}
       />
       <Stack.Screen 
