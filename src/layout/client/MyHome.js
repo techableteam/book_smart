@@ -9,11 +9,12 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, caregiverAtom } from '../../context/ClinicalAuthProvider';
+import { firstNameAtom, lastNameAtom, emailAtom, userRoleAtom, caregiverAtom } from '../../context/ClinicalAuthProvider';
 
 
 export default function MyHome ({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
+  const [lastName, setLastName] = useAtom(lastNameAtom);
   const [email, setEmail] = useAtom(emailAtom);
   const [userRole, setUserRole] = useAtom(userRoleAtom);
   const [caregiver, setCaregiver] = useAtom(caregiverAtom);
@@ -22,7 +23,7 @@ export default function MyHome ({ navigation }) {
   }
 
   const userInfo = [
-    {title: 'Name', content: firstName},
+    {title: 'Name', content: firstName + ' ' + lastName},
     {title: 'Email', content: email},
     {title: 'User Roles', content: userRole},
     {title: 'Caregiver', content: caregiver},
@@ -54,7 +55,7 @@ export default function MyHome ({ navigation }) {
             <View style={styles.bottomBar}/>
           </View>
           <View style={styles.imageButton}>
-            <ImageButton title={"My Profile"} onPress={() => handleNavigate('MyProfile')} />
+            <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
             <ImageButton title={"All Shift Listings"} onPress={() => handleNavigate('ShiftListing')} />
             <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
             <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
@@ -63,7 +64,7 @@ export default function MyHome ({ navigation }) {
             {
               userInfo.map((item, index) => 
                 <View key={index} style={{flexDirection: 'row'}}>
-                  <Text style={styles.titles}>{item.title}</Text>
+                  {/* <Text style={styles.titles}>{item.title}</Text> */}
                   <Text style={[
                     styles.content, 
                     item.title == "Name" ? {fontWeight: 'bold'} : 
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
   },
   content: {
     fontSize: 16,
-    width: '60%',
+    // width: '60%',
     lineHeight: 40,
   }
 });

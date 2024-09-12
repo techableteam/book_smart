@@ -60,7 +60,7 @@ export default function ClientSignUp({ navigation }) {
     },
     password: '',
     signature: '',
-    userRole: 'Clinicians'
+    userRole: 'Clinician'
   });
 
   const handleCredentials = (target, e) => {
@@ -360,7 +360,7 @@ export default function ClientSignUp({ navigation }) {
               <Text style={[styles.text, {flexDirection:'row'}]}>
                 NOTE: Your Registration will be in <Text style={[styles.text, {color:'#0000ff'}]}>"PENDING"</Text> {"\n"}
                 &nbsp;Status until your information is verified. Once
-                <Text style={[styles.text, {color:'#008000'}]}>"APPROVED" </Text> &nbsp;you will be notified by email.
+                <Text style={[styles.text, {color:'#008000'}]}> "APPROVED" </Text>you will be notified by email.
               </Text>
             </View>
           </View>
@@ -504,7 +504,7 @@ export default function ClientSignUp({ navigation }) {
                     onChangeText={e => handleCredentials('streetAddress', e)}
                     value={credentials.address.streetAddress || ''}
                   />
-                  <Text style={{ color: 'black' }}>Street Address</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address</Text>
                 </View>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
@@ -515,7 +515,7 @@ export default function ClientSignUp({ navigation }) {
                     onChangeText={e => handleCredentials('streetAddress2', e)}
                     value={credentials.address.streetAddress2 || ''}
                   />
-                  <Text style={{ color: 'black' }}>Street Address2</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address2</Text>
                 </View>
                 <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
                   <View style={[styles.input, {width: '45%'}]}>
@@ -525,7 +525,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text style={{ color: 'black' }}>City</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>City</Text>
                   </View>
                   <View style={[styles.input, {width: '20%'}]}>
                     <TextInput
@@ -534,7 +534,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text style={{ color: 'black' }}>State</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>State</Text>
                   </View>
                   <View style={[styles.input, {width: '30%'}]}>
                     <TextInput
@@ -544,7 +544,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text style={{ color: 'black' }}>Zip</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip</Text>
                   </View>
                 </View>
               </View>
@@ -598,7 +598,7 @@ export default function ClientSignUp({ navigation }) {
                 onSubmitEditing={handlePassword} // This handles the "Enter" key press event
                 value={confirmPassword || ''}
               />
-              <Text style={[styles.subtitle, {fontStyle:'italic', fontSize: 14}]}> "Create your password to access the platform" </Text>
+              <Text style={[styles.subtitle, { fontStyle:'italic', fontSize: 14, color: 'red' }]}> Create your password to access the platform </Text>
             </View>
             
             <View style={styles.password}>
@@ -619,9 +619,8 @@ export default function ClientSignUp({ navigation }) {
             </View>
             
             <View style={[styles.email, {marginTop: 20}]}>
-              {/* <Text style={[styles.subtitle, {color: '#2a53c1'}]}>Reset</Text> */}
               <Text style={{fontWeight: '400', color: 'black'}}>
-                As a web marketplace dedicated to booking shifts for independent contractors and customers like you, we require your signature on this disclosure statement to ensure clarity and transparency in our working relationships. By signing, you acknowledge your understanding of our role as a web-based intermediary between independent contractors and customers needing shifts booked. We are committed to upholding ethical standards, ensuring compliance with industry regulations, and prioritizing your best interests throughout the placement process. Your signature signifies mutual agreement and cooperation as we work together to match skills with open shifts. Thank you for trusting BookSmart™ for your next gig!
+                As a web marketplace dedicated to booking shifts for independent contractors and customers like you, we require your signature on this disclosure statement to ensure clarity and transparency in our working relationship. By signing, you acknowledge your understanding of our role as a web-based intermediary between independent contractors and customers needing shifts booked. We are committed to upholding ethical standards, ensuring compliance with industry regulations, and prioritizing your best interests throughout the placement process. Your signature signifies mutual agreement and cooperation as we work together to match skills with open shifts. Thank you for trusting BookSmart™ for your next gig!
               </Text>
 
             </View>
@@ -645,33 +644,6 @@ export default function ClientSignUp({ navigation }) {
     </View>
   );
 }
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    // paddingVertical: 4,
-    // paddingHorizontal: 10,
-    borderRadius: 4,
-    color: 'black',
-    // paddingRight: 30,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: 'hsl(0, 0%, 86%)',
-    margin: 0,
-  },
-  inputAndroid: {
-    fontSize: 8,
-    // paddingHorizontal: 10,
-    // paddingVertical: 0,
-    margin: 0,
-    borderRadius: 10,
-    color: 'black',
-    // paddingRight: 30,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: 'hsl(0, 0%, 86%)',
-  },
-});
 
 const styles = StyleSheet.create({
   button: {

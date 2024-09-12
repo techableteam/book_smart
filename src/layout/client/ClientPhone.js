@@ -37,10 +37,8 @@ export default function ClientPhone ({ navigation }) {
   }
 
   const formatPhoneNumber = (input) => {
-    // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
 
-    // If the cleaned input has 1 or 2 characters, return it as is
     if (cleaned.length === 1 || cleaned.length === 2) {
         return cleaned;
     }
@@ -56,11 +54,12 @@ export default function ClientPhone ({ navigation }) {
     if (cleaned.length > 6) {
         formattedNumber += `-${cleaned.slice(6, 10)}`;
     }
+    // replace
+    formattedNumber = '(***) ***-' + cleaned.slice(6, 10);
     return formattedNumber;
   };
 
   const handlePhoneNumberChange = (text) => {
-    console.log(text)
     const formattedNumber = formatPhoneNumber(text);
     console.log(formattedNumber);
     handleCredentials('phoneNumber', formattedNumber);
@@ -109,7 +108,7 @@ export default function ClientPhone ({ navigation }) {
         >
           <View style={styles.authInfo}>
             <Text style={styles.subject}> 2FA Authentication </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your phone number below and we will send you a verify code to login the site. </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}>Click the submit button below, and we'll send a verification code to your registered phone number for login. </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Phone Number </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
@@ -119,6 +118,7 @@ export default function ClientPhone ({ navigation }) {
                   style={[styles.input, {width: '100%', color: 'black'}]}
                   onChangeText={(e) =>handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
+                  editable={false}
                 />
               </View>
             </View>

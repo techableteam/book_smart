@@ -225,8 +225,8 @@ export default function ClientSignIn({ navigation }) {
               style={styles.homepage}
             />
             <Text style={styles.text}>Let your licensure and certifications pay off. {'\n'}
-              Get the money you deserver by signing up {'\n'}
-              and becoming a freelance clinclan today!
+              Get the money you deserve by signing up {'\n'}
+              and becoming a freelance clinician today!
             </Text>
           </View>
           <View style={styles.authInfo}>
