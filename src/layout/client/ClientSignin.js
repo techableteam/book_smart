@@ -32,7 +32,7 @@ export default function ClientSignIn({ navigation }) {
   const [ credentials, setCredentials ] = useState({
     email: '',
     password: '',
-    userRole: 'Clinicians',
+    userRole: 'Clinician',
     device: '',
   });
   const [uniqueId, setUniqueId] = useState('');

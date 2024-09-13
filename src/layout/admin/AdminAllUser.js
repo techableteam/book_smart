@@ -188,7 +188,7 @@ export default function AdminAllUser({ navigation }) {
   const [role, setRole] = useState([
     {label: 'Select...', value: 'Select...'},
     {label: 'Admin', value: 'Admin'},
-    {label: 'Clinicians', value: 'Clinicians'},
+    {label: 'Clinician', value: 'Clinician'},
     {label: 'Facilities', value: 'Facilities'},
   ])
 
@@ -233,7 +233,7 @@ export default function AdminAllUser({ navigation }) {
       const name = rowData[0].split(" ");
       console.log(label, "---------------------===================");
       
-      if (label === 'Clinicians' || label === 'Admin') {
+      if (label === 'Clinician' || label === 'Admin') {
         console.log('-----------------------------------------------------');
         
         sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: label, userStatus: rowData[3]}
@@ -243,7 +243,7 @@ export default function AdminAllUser({ navigation }) {
       }
     }
     else if (modalItem === 0) {
-      if ( useRole === 'Clinicians' || useRole === 'Admin') {
+      if ( useRole === 'Clinician' || useRole === 'Admin') {
         sendingData = {firstName: label.firstName, lastName: label.lastName, email: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
       }
       else {
@@ -264,7 +264,7 @@ export default function AdminAllUser({ navigation }) {
       };
       
       // Check the role and add the relevant properties
-      if (useRole === 'Clinicians' || useRole === 'Admin') {
+      if (useRole === 'Clinician' || useRole === 'Admin') {
           sendingData.email = rowData[1]; // Add email property
           if (modalItem === 1) {
               sendingData.updateEmail = label; // Conditionally add updateEmail property
@@ -277,7 +277,7 @@ export default function AdminAllUser({ navigation }) {
       console.log(sendingData, "++++++++++++++++++++++++++++++++++++");
     } else {
       const name = rowData[0].split(" ");
-      if ( useRole === 'Clinicians' || useRole === 'Admin') {
+      if ( useRole === 'Clinician' || useRole === 'Admin') {
         sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: rowData[2], userStatus: label}
       }
       else {

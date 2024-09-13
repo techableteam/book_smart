@@ -62,7 +62,7 @@ export default function Reporting ({ navigation }) {
   const [times, setTimes] = useState([]);
   
   async function getData() {
-    let Data = await MyShift('jobs', 'Clinicians');
+    let Data = await MyShift('jobs', 'Clinician');
     console.log("date------------------------", Data);
     if (!Data) {
       setData(['No Data']);

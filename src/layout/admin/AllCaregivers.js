@@ -256,7 +256,9 @@ export default function AllCaregivers({ navigation }) {
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
         </View>
         <View style={styles.profile}>
-          <Text style={{ backgroundColor: '#000080', color: 'white', width: '26%' }}>TOOL TIPS:</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ backgroundColor: '#000080', color: 'white', paddingHorizontal: 5 }}>TOOL TIPS</Text>
+          </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
             <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>When A New <Text style={{fontWeight: 'bold'}}>"CAREGIVER"</Text> signs-up, they will have a status of <Text style={{ color: '#0000ff', fontWeight: 'bold' }}>"PENDING APPROVAL"</Text></Text>
@@ -457,7 +459,7 @@ const styles = StyleSheet.create({
   backTitle: {
     backgroundColor: 'black',
     width: '100%',
-    height: '55',
+    height: 55,
     marginTop: 10,
     borderRadius: 10,
     display: 'flex',
@@ -509,10 +511,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 2,
     borderColor: '#b0b0b0',
-    // elevation: 1,
-    // // shadowColor: 'rgba(0, 0, 0, 0.4)',
-    // // shadowOffset: { width: 1, height: 1 },
-    // shadowRadius: 0,
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
@@ -542,19 +540,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: 'hsl(0, 0%, 86%)',
-    // height: 40,
     position: 'relative',
     backgroundColor: 'white',
     width: '100%',
   },
   evenRow: {
-    backgroundColor: '#7be6ff4f', // Set the background color for even rows
+    backgroundColor: '#7be6ff4f',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
-    height: '20%,',
+    height: '20%',
     padding: 20,
     borderBottomColor: '#c4c4c4',
     borderBottomWidth: 1,
@@ -583,14 +580,12 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     elevation: 5,
     width: '80%',
-    // height: '43%',
     marginLeft: '20',
     flexDirection: 'flex-start',
     borderWidth: 3,
     borderColor: '#7bf4f4',
   },
   modalBody: {
-    // backgroundColor: 'rgba(79, 44, 73, 0.19)',
     borderRadius: 10,
     display: 'flex',
     justifyContent: 'center',

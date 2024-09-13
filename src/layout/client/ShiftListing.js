@@ -52,7 +52,7 @@ export default function ShiftListing ({ navigation }) {
   const [pageItems, setPageItems] = useState([]);
 
   async function getData() {
-    let Data = await Jobs('jobs', 'Clinicians');
+    let Data = await Jobs('jobs', 'Clinician');
     if(!Data) {
       setData(['No Data'])
     } else {
@@ -189,32 +189,42 @@ export default function ShiftListing ({ navigation }) {
 
   //------------------------------------------Search Function----------------
   const [searchTerm, setSearchTem] = useState(''); // Search term
-  const handleSearch = (e) => {
-    setSearchTem(e);
-    if (e !== '') {
-      const filtered = userInfos.filter(subArray => subArray.some(item => item.content.toString().toLowerCase().includes(e.toLowerCase())));
+  const handleSearch = () => {
+    if (searchTerm !== '') {
+      const filtered = userInfos.filter(subArray => 
+        subArray.some(item => item.content && item.content.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+      );
       setFilteredData(filtered);
-      const detailed = detailedInfos.filter(subArray => subArray.some(item => item.content.toString().toLowerCase().includes(e.toLowerCase())));
+  
+      const detailed = detailedInfos.filter(subArray => 
+        subArray.some(item => item.content && item.content.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+      );
       setFilteredDetailData(detailed);
+  
       const len = filtered.length;
       const page = Math.ceil(len / itemsPerPage);
       setTotalPages(page);
-      const generatedPageArray = Array.from({ length: page}, (_, index) => ({
-        label: `Page ${index+1}`,
-        value: index + 1
+  
+      const generatedPageArray = Array.from({ length: page }, (_, index) => ({
+        label: `Page ${index + 1}`,
+        value: index + 1,
       }));
       setPageItems(generatedPageArray);
     } else {
       setFilteredData(userInfos);
       setFilteredDetailData(detailedInfos);
-      setTotalPages(Math.ceil(filteredData.length / itemsPerPage));
-      const generatedPageArray = Array.from({ length: totalPages}, (_, index) => ({
-        label: `Page ${index+1}`,
-        value: index + 1
+  
+      const len = userInfos.length; // use the length of the original data
+      const page = Math.ceil(len / itemsPerPage);
+      setTotalPages(page);
+  
+      const generatedPageArray = Array.from({ length: page }, (_, index) => ({
+        label: `Page ${index + 1}`,
+        value: index + 1,
       }));
       setPageItems(generatedPageArray);
     }
-  };
+  };  
 
   //--------------------------------subPage setting-------------------------------
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
@@ -265,10 +275,10 @@ export default function ShiftListing ({ navigation }) {
               <TextInput
                 style={[styles.searchText]}
                 placeholder=""
-                onChangeText={e => handleSearch(e)}
+                onChangeText={e => setSearchTem(e)}
                 value={searchTerm || ''}
               />
-              <TouchableOpacity style={styles.searchBtn}>
+              <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
                 <Text>Search</Text>
               </TouchableOpacity>
             </View>
@@ -647,7 +657,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     height: 30,
-    paddingVertical: 0
+    paddingVertical: 0,
+    color: 'black'
   },
   searchBtn: {
     width: '30%',

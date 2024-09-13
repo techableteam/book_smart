@@ -29,7 +29,7 @@ export default function MFooter(props) {
     <View style={styles.shadow}>
       {/* <StatusBar hidden={true} /> */}
       <View style={styles.bottomStyle}></View>
-      <Text style={styles.text}>Support by Email: support@whybookdub.com{'\n'}
+      <Text style={styles.text}>Support by Email: support@whybookdumb.com{'\n'}
         Support by Text: 716.997.9990
       </Text>
     </View>

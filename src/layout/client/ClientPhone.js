@@ -15,9 +15,7 @@ export default function ClientPhone ({ navigation }) {
   const [verifyPhone, setVerifyPhone] = useAtom(verifyPhoneAtom);
   const [device, setDevice] = useAtom(deviceNumberAtom);
   const [email, setEmail] = useAtom(emailAtom);
-  const handleNavigate = (navigateUrl) => {
-      navigation.navigate(navigateUrl);
-  }
+  const [isAlreadyHas, setIsAlreadyHas] = useState(false);
   const [credentials, setCredentials] = useState({
     phoneNumber: '',
   });
@@ -25,8 +23,12 @@ export default function ClientPhone ({ navigation }) {
   useEffect(() => {
     const getCredentials = async() => {
       const phoneNumber = (await AsyncStorage.getItem('clinicalPhoneNumber')) || '';
+      if (phoneNumber !== '') {
+        setIsAlreadyHas(true);
+      } else {
+        setIsAlreadyHas(false);
+      }
       const formattedNumber = formatPhoneNumber(phoneNumber);
-      console.log(phoneNumber);
       setCredentials({...credentials, phoneNumber: formattedNumber});
     }
     getCredentials();
@@ -55,13 +57,12 @@ export default function ClientPhone ({ navigation }) {
         formattedNumber += `-${cleaned.slice(6, 10)}`;
     }
     // replace
-    formattedNumber = '(***) ***-' + cleaned.slice(6, 10);
+    // formattedNumber = '(***) ***-' + cleaned.slice(6, 10);
     return formattedNumber;
   };
 
   const handlePhoneNumberChange = (text) => {
     const formattedNumber = formatPhoneNumber(text);
-    console.log(formattedNumber);
     handleCredentials('phoneNumber', formattedNumber);
   };
 
@@ -112,14 +113,19 @@ export default function ClientPhone ({ navigation }) {
             <View style={styles.email}>
               <Text style={styles.subtitle}> Phone Number </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
-                <TextInput
-                  placeholder=""
-                  value={credentials.phoneNumber}
-                  style={[styles.input, {width: '100%', color: 'black'}]}
-                  onChangeText={(e) =>handlePhoneNumberChange(e)}
-                  keyboardType="phone-pad"
-                  editable={false}
-                />
+                {isAlreadyHas ? 
+                (
+                  <Text style={[styles.input, {width: '100%', color: 'black', padding: 10}]}>{"(***) ***-" + credentials.phoneNumber.slice(10, 14)}</Text>
+                ) : (
+                  <TextInput
+                    placeholder=""
+                    value={credentials.phoneNumber}
+                    style={[styles.input, {width: '100%', color: 'black'}]}
+                    onChangeText={(e) =>handlePhoneNumberChange(e)}
+                    keyboardType="phone-pad"
+                    editable={false}
+                  />
+                )}
               </View>
             </View>
             <View style={[styles.btn, {marginTop: 20}]}>

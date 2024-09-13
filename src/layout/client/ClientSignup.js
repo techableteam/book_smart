@@ -150,15 +150,13 @@ export default function ClientSignUp({ navigation }) {
   };
   
   const handlePassword = () => {
-    if (password !== confirmPassword ) {
-      showAlert();
-    }
-    else {
-      handleCredentials('password', password);
+    console.log(credentials.password, confirmPassword);
+    if (credentials.password !== confirmPassword ) {
+      return true;
+    } else {
+      return false;
     }
   }
-
-  const [checked, setChecked] = useState(false);
 
   //--------------------------------------signature--------------------
   let signatureRef = null;
@@ -237,24 +235,26 @@ export default function ClientSignUp({ navigation }) {
   }
 
   const handleSubmit = async () => {
-    handlePassword();
     if (credentials.email === '' || 
       credentials.firstName === '' || 
       credentials.lastName ==='' || 
-      // credentials.phoneNumber ==='' || 
+      credentials.phoneNumber ==='' || 
       credentials.title ==='' || 
       credentials.birthday ==='' || 
       credentials.socialSecurityNumber ==='' || 
       credentials.verifiedSocialSecurityNumber ==='' || 
       credentials.address.streetAddress ==='' || 
       credentials.address.city ==='' || 
-      // credentials.address.state ==='' || 
+      credentials.address.state ==='' || 
       credentials.address.zip ==='' || 
-      credentials.password ===''
+      credentials.password ==='' ||
+      credentials.signature === ''
     ) {
-        showAlerts('all gaps')
-    }
-    else {
+      console.log(credentials);
+      showAlerts('all gaps');
+    } else if (handlePassword()) {
+      showAlert();
+    } else {
       try {
         const response = await Signup(credentials, 'clinical');
 
@@ -585,8 +585,8 @@ export default function ClientSignUp({ navigation }) {
                 secureTextEntry={true}
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""
-                onChangeText={e => setPassword(e)}
-                value={password || ''}
+                onChangeText={e => handleCredentials('password', e)}
+                value={credentials.password || ''}
               />
               <TextInput
                 autoCorrect={false}

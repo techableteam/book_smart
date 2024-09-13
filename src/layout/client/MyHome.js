@@ -32,7 +32,7 @@ export default function MyHome ({ navigation }) {
   // const userInfo = [
   //   {title: 'Name', content: "Dale"},
   //   {title: 'Email', content: "dalewong008@gmail.com"},
-  //   {title: 'User Roles', content: 'Clinicians'},
+  //   {title: 'User Roles', content: 'Clinician'},
   //   {title: 'Caregiver', content: ''},
   // ]
 

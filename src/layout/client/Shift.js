@@ -89,7 +89,7 @@ export default function Shift ({ navigation }) {
   const [totalPages, setTotalPages] = useState(1);
   const [submitData, setSubmitData] = useState({});
   async function getData() {
-    let Data = await MyShift('jobs', 'Clinicians');
+    let Data = await MyShift('jobs', 'Clinician');
     if(!Data) {
       setData(['No Data'])
     }
