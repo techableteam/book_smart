@@ -215,13 +215,13 @@ export default function ClientSignIn({ navigation }) {
           <View style={styles.intro}>
             <Image
               source={images.mark}
-              resizeMode="cover"
+              resizeMode="contain"
               style={styles.mark}
             />
             <Text style={styles.title}>WHY BOOK DUMB?</Text>
             <Image
               source={images.homepage}
-              resizeMode="cover"
+              resizeMode="contain"
               style={styles.homepage}
             />
             <Text style={styles.text}>Let your licensure and certifications pay off. {'\n'}

@@ -9,7 +9,6 @@ import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
 
 export default function FacilitySignUp({ navigation }) {
-  //---------------------------------------Animation of Background---------------------------------------
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export default function FacilitySignUp({ navigation }) {
       content: '',
       name: ''
     },
-    password: '',
     contactPassword: '',
     signature: '',
     userRole: 'Facilities'
@@ -67,38 +65,11 @@ export default function FacilitySignUp({ navigation }) {
         value = e.toLowerCase();
       }
       setCredentials({...credentials, [target]: value});
-    }
-    else {
+    } else {
       setCredentials({ ...credentials, address: { ...credentials.address, [target]: e } })
     }
-    console.log(credentials);
   }
 
-  //-------------------------------------------ComboBox------------------------
-  const [selectedValue, setSelectedValue] = useState('Selected Value...');
-
-  const handleTitle = (target, e) => {
-    handleCredentials(target, e);
-    setSelectedValue(e)
-  }
-  const [showModal, setShowModal] = useState(false);
-  const handleItemPress = (text) => {
-    handleCredentials('title', text);
-    setShowModal(!showModal);
-  }
-  const handleTitles = () => {
-    setShowModal(!showModal);
-  }
-
-  //-------------------------------------------Date Picker---------------------------------------
-  const [birthday, setBirthday] = useState(new Date());
-  const [showCalender, setShowCalendar] = useState(false);
-  const handleDayChange = (target, day) => {
-    setBirthday(day);
-    handleCredentials(target, day);
-  }
-
-  //-------------------------------------------File Upload----------------------------
   const pickFile = async () => {
     try {
       console.log("picker")
@@ -130,10 +101,8 @@ export default function FacilitySignUp({ navigation }) {
     }
   };
 
-  //--------------------------------------------password--------------------------
-  const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
   //Alert
   const showAlert = () => {
     Alert.alert(
@@ -143,7 +112,6 @@ export default function FacilitySignUp({ navigation }) {
         {
           text: 'OK',
           onPress: () => {
-            setPassword('');
             setConfirmPassword('');
             console.log('OK pressed')
           },
@@ -154,20 +122,13 @@ export default function FacilitySignUp({ navigation }) {
   };
 
   const handlePassword = () => {
-    if (password !== confirmPassword) {
-      showAlert();
-    }
-    else {
-      handleCredentials('password', password);
+    if (credentials.password !== confirmPassword ) {
+      return true;
+    } else {
+      return false;
     }
   }
-
-  const [checked, setChecked] = useState(false);
-
-  const handleToggle = () => {
-    setChecked(!checked);
-  };
-
+ 
   //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
     // Remove all non-numeric characters from the input
@@ -191,17 +152,11 @@ export default function FacilitySignUp({ navigation }) {
     }
     return formattedNumber;
   };
+
   const handlePhoneNumberChange = (text) => {
-    console.log(text);
-    
-    const formattedNumber = formatPhoneNumber(text);
-    console.log(formattedNumber);
-    
+    const formattedNumber = formatPhoneNumber(text); 
     handleCredentials('contactPhone', formattedNumber);
   };
-  const handleSignUpNavigate = () => {
-    navigation.navigate('FacilityPending');
-  }
 
   const handleBack = () => {
     navigation.navigate('FacilityLogin');
@@ -225,16 +180,20 @@ export default function FacilitySignUp({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    handlePassword();
     if (credentials.contactEmail === '' ||
       credentials.firstName === '' ||
       credentials.lastName === '' ||
       credentials.contactPhone === '' ||
-      credentials.password === ''
+      credentials.password === '' ||
+      credentials.address.street ==='' || 
+      credentials.address.city ==='' || 
+      credentials.address.state ==='' || 
+      credentials.address.zip ===''
     ) {
       showAlerts('all gaps')
-    }
-    else {
+    } else if (handlePassword()) {
+      showAlert();
+    } else {
       try {
         const response = await Signup(credentials, "facilities");
         if (!response?.error) {
@@ -318,18 +277,14 @@ export default function FacilitySignUp({ navigation }) {
   }
   return (
     <View style={styles.container}>
-      <StatusBar
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation} />
-      <ScrollView style={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.intro}>
             <View style={styles.backTitle} />
             <Animated.View
-              style={[styles.backTitle, { opacity: fadeAnim, backgroundColor: '#0f00c4' },]
+              style={[styles.backTitle, { opacity: fadeAnim, backgroundColor: '#0f00c4' }]
               }>
             </Animated.View>
             <Text style={styles.title}>FACILITIES REGISTER HERE!</Text>
@@ -411,8 +366,8 @@ export default function FacilitySignUp({ navigation }) {
                 secureTextEntry={true}
                 style={[styles.input, { width: '100%' }]}
                 placeholder="Password"
-                onChangeText={e => setPassword(e)}
-                value={password || ''}
+                onChangeText={e => handleCredentials('password', e)}
+                value={credentials.password || ''}
               />
               <TextInput
                 autoCorrect={false}
@@ -421,10 +376,10 @@ export default function FacilitySignUp({ navigation }) {
                 style={[styles.input, { width: '100%' }]}
                 placeholder="Confirm Password"
                 onChangeText={e => setConfirmPassword(e)}
-                onSubmitEditing={handlePassword} // This handles the "Enter" key press event
+                onSubmitEditing={handlePassword}
                 value={confirmPassword || ''}
               />
-              <Text style={[styles.subtitle, { fontStyle: 'italic', fontSize: 14 }]}> "Create your password to access the platform" </Text>
+              <Text style={[styles.subtitle, { fontStyle: 'italic', fontSize: 14, color: 'red' }]}>Create your password to access the platform</Text>
             </View>
             <View style={styles.password}>
               <View style={{ flexDirection: 'row' }}>
@@ -460,7 +415,7 @@ export default function FacilitySignUp({ navigation }) {
                     onChangeText={e => handleCredentials('street', e)}
                     value={credentials.address.street || ''}
                   />
-                  <Text style={{ color: 'black' }}>Street Address</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address</Text>
                 </View>
                 <View style={{ width: '100%', marginBottom: 10 }}>
                   <TextInput
@@ -471,7 +426,7 @@ export default function FacilitySignUp({ navigation }) {
                     onChangeText={e => handleCredentials('street2', e)}
                     value={credentials.address.street2 || ''}
                   />
-                  <Text style={{ color: 'black' }}>Street Address2</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address2</Text>
                 </View>
                 <View style={{ flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30 }}>
                   <View style={[styles.input, { width: '45%' }]}>
@@ -481,7 +436,7 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text style={{ color: 'black' }}>City</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>City</Text>
                   </View>
                   <View style={[styles.input, { width: '20%' }]}>
                     <TextInput
@@ -490,17 +445,16 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text style={{ color: 'black' }}>State</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>State</Text>
                   </View>
                   <View style={[styles.input, { width: '30%' }]}>
                     <TextInput
                       placeholder=""
                       style={[styles.input, { width: '100%', marginBottom: 0 }]}
-                      // keyboardType="numeric" // Set the keyboardType to "numeric" for zip input
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text style={{ color: 'black' }}>Zip</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip</Text>
                   </View>
                 </View>
               </View>
