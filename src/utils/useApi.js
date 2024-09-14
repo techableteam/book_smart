@@ -29,7 +29,6 @@ export const ForgotPassword = async (credentials, endpoint) => {
   try {
     console.log("login");
     const response = await axios.post(`api/${endpoint}/forgotPassword`, credentials);
-    console.log(response);
     return response.data;
   } catch (error) {
     console.error(error)    
@@ -179,6 +178,16 @@ export const PostJob = async (jobData, endpoint) => {
         Authorization: `Bearer ${existingToken}`
       }
     });
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+      // navigation.navigate('Home')
+    }
     return response.data;
   } catch (error) {
     return { error: error };
@@ -220,16 +229,9 @@ export const Job = async (jobData, endpoint) => {
         Authorization: `Bearer ${existingToken}`
       }
     });
-
-    if (response.status === 200) {
-      if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
-    } else if (response.status === 401) {
-      console.log('Token is expired')
-    }
     return response.data;
   } catch (error) {
+    console.log(JSON.stringify(error));
     return { error: error };
   }
 };
@@ -242,20 +244,61 @@ export const removeJob = async (jobData, endpoint) => {
         Authorization: `Bearer ${existingToken}`
       }
     });
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+      // navigation.navigate('Home')
+    }
     return response.data;
   } catch (error) {
     return { error: error };
   }
 };
 
-export const setAwraded = async (jobData, endpoint) => {
+export const updateHoursStatus = async (jobData, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/setAwraded`, jobData, {
+    const response = await axios.post(`api/${endpoint}/updateHoursStatus`, jobData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
       }
     });
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+      // navigation.navigate('Home')
+    }
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const setAwarded = async (jobData, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/setAwarded`, jobData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+    }
     return response.data;
   } catch (error) {
     return { error: error };
@@ -270,6 +313,16 @@ export const updateJobRatings = async (jobData, endpoint) => {
         Authorization: `Bearer ${existingToken}`
       }
     });
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+      // navigation.navigate('Home')
+    }
     return response.data;
   } catch (error) {
     return { error: error };
@@ -284,6 +337,40 @@ export const updateJobTSVerify = async (jobData, endpoint) => {
         Authorization: `Bearer ${existingToken}`
       }
     });
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+      // navigation.navigate('Home')
+    }
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const updateTimeSheet = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/updateTimeSheet`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+      // navigation.navigate('Home')
+    }
     return response.data;
   } catch (error) {
     return { error: error };
@@ -298,6 +385,16 @@ export const getClientInfoWithJobId = async (data, endpoint) => {
         Authorization: `Bearer ${existingToken}`
       }
     });
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired')
+      // navigation.navigate('Home')
+    }
     return response.data.userData;
   } catch (error) {
     return { error: error };

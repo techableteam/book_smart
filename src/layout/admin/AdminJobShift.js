@@ -235,7 +235,7 @@ export default function AdminJobShift({ navigation }) {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.subtitle}> Shift Time <Text style={{color: 'red'}}>*</Text> </Text>
+              <Text style={styles.subtitle}>Time <Text style={{color: 'red'}}>*</Text> </Text>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
                   placeholder=""
@@ -244,7 +244,7 @@ export default function AdminJobShift({ navigation }) {
                 />
             </View>
             <View>
-              <Text style={styles.subtitle}>Shift Date<Text style={{color: 'red'}}>*</Text></Text>
+              <Text style={styles.subtitle}>Date<Text style={{color: 'red'}}>*</Text></Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
                 <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
                 <TextInput
@@ -268,7 +268,7 @@ export default function AdminJobShift({ navigation }) {
               </View>
             </View>
             <View>
-              <Text style={styles.subtitle}> Job Num. -# </Text>
+              <Text style={styles.subtitle}> Job # </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""

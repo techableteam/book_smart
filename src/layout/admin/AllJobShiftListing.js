@@ -1,19 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme, Button } from 'react-native-paper';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Alert, TouchableOpacity } from 'react-native';
+import { Text, Button } from 'react-native-paper';
+import { StarRatingDisplay } from 'react-native-star-rating-widget';
+import RadioGroup from 'react-native-radio-buttons-group';
 import images from '../../assets/images';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
-import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
-import ImageButton from '../../components/ImageButton';
-import { Table, Row, Rows } from 'react-native-table-component';
-import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-// import MapView from 'react-native-maps';
-import * as Progress from 'react-native-progress';
-import { Jobs, Update, Clinician } from '../../utils/useApi';
+import { Table, Row } from 'react-native-table-component';
+import { Jobs, Update, Clinician, removeJob, Job, setAwarded, updateHoursStatus } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
@@ -26,6 +20,22 @@ export default function AllJobShiftListing({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
   let colorIndex = 0;
   const [data, setData] = useState([]);
+  const [isJobDetailModal, setIsJobDetailModal] = useState(false);
+  const [isAwardJobModal, setIsAwardJobModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedBidders, setSelectedBidders] = useState([]);
+  const [selectedBidder, setSelectedBidder] = useState([]);
+  const [awardedStatus, setAwardedStatus] = useState(2);
+  const [isHoursDetailModal, setIsHoursDetailModal] = useState(false);
+  const [showFromDate, setShowFromDate] = useState(false);
+  const [showToDate, setShowToDate] = useState(false);
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
+  const [preTime, setPreTime] = useState('');
+  const [lunch, setLunch] = useState('');
+  const [content, setContent] = useState('');
+  const [approved, setApproved] = useState(false);
+  const [clinicians, setClinicians] = useState([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,7 +48,6 @@ export default function AllJobShiftListing({ navigation }) {
 
       const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
       setBackgroundColor(randomColor);
-      // console.log(randomColor)
     }, 500); // Change color every 5 seconds
 
     return () => clearInterval(interval); // Clean up the interval on component unmount
@@ -46,35 +55,32 @@ export default function AllJobShiftListing({ navigation }) {
 
   const tableHead = [
     'Entry Date',
-    'Nurse',
+    'Customer',
     'JobId',
     'JobNum -#.',
     'Location',
-    'Shift Date',
-    'Shift Time',
-    'Bid',
-    'Awarded',
+    'Date',
+    'Shift',
+    'View Shift & Bids',
+    'Nurse Type',
     'Job Status',
-    'Job Rating',
+    'Hired',
+    'Bids',
+    'View Hours',
+    'Hours Submitted?',
+    'Hours Approved?',
+    'Timesheet',
+    'Verfication',
+    'No Status Explanation',
+    'Delete'
   ];
-  // const tableData = [
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  // ]
-  const [clinicians, setClinicians] = useState([]);
 
-  async function getData() {
-    let Data = await Jobs('jobs', 'Admin');
-    if(!Data) {
+  const getData = async () => {
+    let data = await Jobs('jobs', 'Admin');
+    if(!data) {
       setData(['No Data'])
-    }
-    else {
-      const modifiedArray = Data.map(subarray => {
-        return subarray.slice(0, -2); // Remove the last three items
-      });
-      console.log(modifiedArray, '\n modified Array');
-      
-      setData(modifiedArray)
+    } else {
+      setData(data)
     }
     const uniqueValues = new Set();
     const transformed = [];
@@ -83,15 +89,11 @@ export default function AllJobShiftListing({ navigation }) {
     const extractData = clinicianData.map(item => {
       const firstName = item[1];
       const lastName = item[2];
-      return firstName ? `${firstName} ${lastName}` : null; // Combine names if they exist
+      return firstName ? `${firstName} ${lastName}` : null;
     });
 
-    // Step 2: Filter unique names
     const uniqueNames = Array.from(new Set(extractData.filter(name => name)));
-    console.log(uniqueNames, extractData);
-    
-    
-    // Iterate over each subarray
+
     uniqueNames.forEach(subarray => {
       const value = subarray; // Get the second element
       if (!uniqueValues.has(value)) { // Check if it's already in the Set
@@ -100,15 +102,13 @@ export default function AllJobShiftListing({ navigation }) {
       }
     });
 
-    console.log(transformed);
     setClinicians(transformed);
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
   }
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
 
   //---------------DropDown--------------
@@ -119,51 +119,75 @@ export default function AllJobShiftListing({ navigation }) {
     {label: '100 per page', value: '4'},
     {label: '500 per page', value: '5'},
     {label: '1000 per page', value: '6'},
-  ]
+  ];
+
+  const approve_status = [
+    {label: 'Yes', value: true},
+    {label: 'No', value: false}
+  ];
 
   const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };  
-  const widths = [150, 130, 100, 100, 200, 120, 100, 80, 80, 200, 80];
+  const [isFocus, setIsFocus] = useState(false); 
+  const [isFocus1, setIsFocus1] = useState(false); 
+  const widths = [150, 130, 100, 100, 200, 120, 100, 200, 150, 120, 150, 80, 150, 200, 200, 150, 250, 250, 100];
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
   }
-  const [cellData, setCellData] = useState(null);
   const [rowData, setRowData] = useState(null);
   const [modalItem, setModalItem] = useState(0);
   const [showCalendar, setShowCalendar] = useState(false);
   const [label, setLabel] = useState(null);
   const [date,setDate] = useState(new Date());
-  const handleCellClick = (cellData, rowIndex, cellIndex) => {
-    // Handle row click event here
-    console.log('Row clicked:', cellData, rowIndex, cellIndex);
-    // if (cellIndex==9) {
-      setCellData(cellData);
-      const rowD = data[rowIndex][2];
-      console.log(rowD);
-      setModalItem(cellIndex);
-      setLabel(cellData.toString());
-      setRowData(rowD);
-      if (cellIndex !== 0 || cellIndex !== 2 || cellIndex !== 7 || cellIndex !== 8 )
-      {toggleModal();}
-    // }
-  };
 
   const handleDay = (day) => {
     setDate(day);
     setLabel(moment(day).format("MM/DD/YYYY"));
   }
+
+  const toggleHoursDetailModal = () => {
+    setIsHoursDetailModal(!isHoursDetailModal);
+  };
+
+  const toggleJobDetailModal = () => {
+    setIsJobDetailModal(!isJobDetailModal);
+  };
+
+  const toggleJobAwardModal = () => {
+    setIsAwardJobModal(!isAwardJobModal);
+  };
+
+  const handleChangeAwardStatus = async (bidderId, jobId) => {
+    const response = await setAwarded({ jobId: jobId, bidderId: bidderId, status: awardedStatus }, 'jobs');
+    if (!response?.error) {
+      console.log('success');
+      setIsAwardJobModal(false);
+    } else {
+      console.log('failure', response.error);
+      Alert.alert('Failure!', 'Please retry again later', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  };
+
+  const radioButtons = useMemo(() => ([
+    {
+      id: 1,
+      label: 'Awarded',
+      value: 1
+    },
+    {
+      id: 2,
+      label: 'Not Awarded',
+      value: 2
+    }
+  ]), []);
 
   //---------------DropDown--------------
   const jobStatus = [
@@ -173,13 +197,8 @@ export default function AllJobShiftListing({ navigation }) {
     {label: 'Cancelled', value: '4'},
     {label: 'Verified', value: '5'},
     {label: 'Paid', value: '6'},
-  ]
-  const [degree, setDegree] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'CNA', value: 'CNA'},
-    {label: 'LPN', value: 'LPN'},
-    {label: 'STNA', value: 'STNA'},
-  ])  
+  ];
+
   const [location, setLocation] = useState([
     {label: 'Select...', value: 'Select...'},
     {label: 'Lancaster, NY', value: 'Lancaster, NY'},
@@ -187,10 +206,8 @@ export default function AllJobShiftListing({ navigation }) {
     {label: 'Springville, NY', value: 'Springville, NY'},
     {label: 'Warsaw, NY', value: 'Warsaw, NY'},
     {label: 'Williansville', value: 'Williansville'},
-  ])
+  ]);
 
-
-  const [jobValue, setJobValue] = useState(null);
   const [isJobFocus, setJobIsFocus] = useState(false);
 
   const [suc, setSuc] = useState(0);
@@ -200,6 +217,189 @@ export default function AllJobShiftListing({ navigation }) {
     const offsetInHours = offsetInMinutes / 60; // Convert to hours
     return offsetInHours;
   };
+
+  const handleRemove = async (id) => {
+    let results = await removeJob({ jobId: id }, 'jobs');
+    if (!results?.error) {
+      console.log('success');
+      Alert.alert('Success!', 'Successfully Removed', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('removed');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+      getData();
+    } else {
+      console.log('failure', results.error);
+    }
+  };
+
+  const bidderTableHeader = [
+    "Entry Date",
+    "Caregiver",
+    "Details",
+    "Message From Applicant",
+    "Bid Status",
+    "Award Job",
+    "",
+    "",
+    ""
+  ];
+
+  const handleShowHoursModal = async (id) => {
+    console.log(id);
+    let data = await Job({ jobId: id }, 'jobs');
+    if(!data) {
+      setSelectedJob(null);
+    } else {
+      setSelectedJob(data.jobData);
+      setApproved(data.jobData.isHoursApproved);
+      setContent('');
+      setLunch(data.jobData.lunch);
+      setPreTime();
+      setToDate(new Date());
+      setFromDate(new Date());
+      setIsHoursDetailModal(true);
+    }
+  };
+
+  const handleShowJobDetailModal = async (id) => {
+    console.log(id);
+    let data = await Job({ jobId: id }, 'jobs');
+    console.log('--------------------------------', data);
+    if(data?.error) {
+      setSelectedJob(null);
+      setSelectedBidders([]);
+    } else {
+      let biddersList = data.bidders;
+      biddersList.unshift(bidderTableHeader);
+      setSelectedJob(data.jobData);
+      setSelectedBidders(biddersList);
+      setIsJobDetailModal(true);
+    }
+  };
+
+  const handleShowJobEditModal = async () => {
+    console.log(selectedJob);
+  };
+
+  const handleShowJobAwardModal = async (id) => {
+    let bidder = [];
+    selectedBidders.map((item, idx) => {
+      if (item[6] === id) {
+        bidder = item;
+      }
+    });
+
+    if (bidder) {
+      setIsJobDetailModal(false);
+      setSelectedBidder(bidder);
+      setAwardedStatus(bidder[4] === 'Awarded' ? 1 : 2);
+      setIsAwardJobModal(true);
+    } else {
+      setSelectedBidder([]);
+    }
+  };
+
+  const handlechangeHoursStatus = async () => {
+    let results = await updateHoursStatus({ jobId: selectedJob.jobId, fromDate: fromDate, endDate: toDate, preTime: preTime, approved: approved, lunch: lunch, explanation: content }, 'jobs');
+    if (!results?.error) {
+      console.log('success');
+      getData();
+      setIsHoursDetailModal(false);
+    } else {
+      console.log('failure', results.error);
+    }
+  };
+
+  const bidderTableWidth = [150, 150, 140, 200, 150, 100];
+  const RenderItem1 = ({ item, index }) => (
+    <View
+      key={index}
+      style={{
+        backgroundColor: index == 0 ? '#ccffff' : '#fff',
+        flexDirection: 'row',
+      }}
+    >
+      {bidderTableWidth.map((width, idx) => {
+        if (idx === 2 && index > 0) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  paddingVertical: 5,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  console.log(item[6]);
+                  navigation.navigate("ClientProfile", {id: item[6]});
+                }}
+              >
+                <Text style={styles.profileTitle}>View</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else if (idx === 5 && index > 0) {
+          return (
+            <View
+              key={idx}
+              style={[
+                styles.tableItemStyle,
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+              ]}
+            >
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 20,
+                  paddingVertical: 5,
+                  backgroundColor: 'green',
+                  borderRadius: 20,
+                }}
+                onPress={() => {
+                  handleShowJobAwardModal(item[6]);
+                }}
+              >
+                <Text style={styles.profileTitle}>Click</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        } else {
+          return (
+            <Text
+              key={idx}
+              style={[styles.tableItemStyle, { width }]}
+            >
+              {item[idx]}
+            </Text>
+          );
+        }
+      })}
+    </View>
+  );
+
+  const BidderTableComponent = () => (
+    <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
+      {selectedBidders.map((item, index) => (
+        <RenderItem1 key={index} item={item} index={index} />
+      ))}
+    </View>
+  );
+
   const handlePress = async() => {
     const offestTime = getLocalTimeOffset();
     let sendData = label;
@@ -251,15 +451,14 @@ export default function AllJobShiftListing({ navigation }) {
         jobRating: sendData, // Use sendData for location
       };
     }
-    console.log('====================================');
-    console.log(sendingData);
-    console.log('====================================');
-    let Data = await Update(sendingData, 'jobs');
-    if(Data) setSuc(suc+1);
+
+    let data = await Update(sendingData, 'jobs');
+    if(data) setSuc(suc+1);
     else setSuc(suc);
     toggleModal();
     getData();
   };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -284,13 +483,6 @@ export default function AllJobShiftListing({ navigation }) {
             <Text style={styles.profileTitle}>Add A New Job / Shift
             </Text>
           </TouchableOpacity>
-
-          {/* <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => {
-            navigation.navigate('FacilityProfile'),
-              console.log("data-------", data)
-          }}>
-            <Text style={styles.profileTitle}>🏚️ Facilities Home</Text>
-          </TouchableOpacity> */}
         </View>
         <View style={styles.profile}>
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -321,10 +513,6 @@ export default function AllJobShiftListing({ navigation }) {
                 <Text style={styles.profileTitle}>🖥️ FACILITY / SHIFT LISTINGS</Text>
               </View>
               <View style={styles.searchBar}>
-                {/* <TextInput style={styles.searchText} /> */}
-                {/* <TouchableOpacity style={styles.searchBtn}>
-                  <Text>Add filters</Text>
-                </TouchableOpacity> */}
               </View>
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
@@ -334,12 +522,10 @@ export default function AllJobShiftListing({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={pageItems}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
                 value={value ? value : pageItems[3].value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
@@ -361,18 +547,119 @@ export default function AllJobShiftListing({ navigation }) {
                   <Row
                     data={tableHead}
                     style={styles.head}
-                    widthArr={[150, 130, 100, 100, 200, 120, 100, 80, 80, 200, 80]}
-                    textStyle={styles.tableText}
+                    widthArr={[150, 130, 100, 100, 200, 120, 100, 200, 150, 120, 150, 80, 150, 200, 200, 150, 250, 250, 100]}
+                    textStyle={StyleSheet.flatten([styles.tableText])}
                   />
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
-                      {rowData.map((cellData, cellIndex) => (
+                      {/* {rowData.map((cellData, cellIndex) => (
                         <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
                           <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', paddingVertical: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
                             <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
                           </View>
-                        </TouchableWithoutFeedback> 
-                      ))}
+                        </TouchableWithoutFeedback>
+                      ))} */}
+                      {rowData.map((cellData, cellIndex) => {
+                        if (cellData === 'view_shift') {
+                          return (
+                            <View
+                              key={cellIndex}
+                              style={[
+                                styles.tableItemStyle,
+                                { flex: 1, justifyContent: 'center', alignItems: 'center', width: 200 },
+                              ]}
+                            >
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  console.log('job id => ', rowData[2]);
+                                  handleShowJobDetailModal(rowData[2]);
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>View</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else if (cellData === 'view_hours') {
+                          return (
+                            <View
+                              key={cellIndex}
+                              style={[
+                                styles.tableItemStyle,
+                                { flex: 1, justifyContent: 'center', alignItems: 'center', width: 150 },
+                              ]}
+                            >
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  console.log('job id =>', rowData[2]);
+                                  handleShowHoursModal(rowData[2]);
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>View</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else if (cellData === 'delete') {
+                          return (
+                            <View
+                              key={cellIndex}
+                              style={[
+                                styles.tableItemStyle,
+                                { flex: 1, justifyContent: 'center', alignItems: 'center', width: widths[cellIndex] },
+                              ]}
+                            >
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  Alert.alert('Alert!', 'Are you sure you want to delete this?', [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        console.log('job id > ', rowData[2]);
+                                        handleRemove(rowData[2]);
+                                      },
+                                    },
+                                    { text: 'Cancel', style: 'cancel' },
+                                  ]);
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>Delete</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else {
+                          return (
+                            <Text
+                              key={cellIndex}
+                              style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
+                            >
+                              {cellData}
+                            </Text>
+                          );
+                        }
+                      })}
                     </View>
                   ))}
                 </Table>
@@ -422,7 +709,6 @@ export default function AllJobShiftListing({ navigation }) {
                           onFocus={() => setJobIsFocus(true)}
                           onBlur={() => setJobIsFocus(false)}
                           onChange={item => {
-                            setJobValue(item.value);
                             setLabel(item.label);
                             setJobIsFocus(false);
                           }}
@@ -462,7 +748,8 @@ export default function AllJobShiftListing({ navigation }) {
                               <DatePicker
                                 date={date}
                                 onDateChange={(day) => handleDay(day)}
-                                mode="date" // Set the mode to "date" to allow year and month selection
+                                mode="date"
+                                theme='light'
                                 androidVariant="native"
                               />
                               <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalendar);}} />
@@ -480,6 +767,430 @@ export default function AllJobShiftListing({ navigation }) {
               </View>
             </View>
           </Modal>
+          <Modal
+            visible={isJobDetailModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setIsJobDetailModal(!isJobDetailModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.calendarContainer, { height: '80%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Facility View Job Details</Text>
+                  <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobDetailModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <ScrollView>
+                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Entry Date</Text>
+                        <Text style={styles.content}>{selectedJob?.entryDate}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job-ID</Text>
+                        <Text style={styles.content}>{selectedJob?.jobId}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job #</Text>
+                        <Text style={styles.content}>{selectedJob?.jobNum}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Nurse</Text>
+                        <Text style={styles.content}>{selectedJob?.nurse}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Bids / Offers</Text>
+                        <Text style={styles.content}>{selectedJob?.bid_offer}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Nurse Req.</Text>
+                        <Text style={styles.content}>{selectedJob?.degree}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Time</Text>
+                        <Text style={styles.content}>{selectedJob?.shiftTime}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Date</Text>
+                        <Text style={styles.content}>{selectedJob?.shiftDate}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Pay Rate</Text>
+                        <Text style={styles.content}>{selectedJob?.payRate}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Status</Text>
+                        <Text style={styles.content}>{selectedJob?.jobStatus}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Timesheet Upload</Text>
+                        <Text style={styles.content}>{selectedJob?.timeSheet?.name}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Rating</Text>
+                        <Text style={styles.content}>
+                          <StarRatingDisplay
+                            rating={selectedJob?.jobRating}
+                            maxStars={5}
+                            starSize={25}
+                          />
+                        </Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Location</Text>
+                        <Text style={styles.content}>{selectedJob?.location}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <TouchableOpacity style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]} onPress={handleShowJobEditModal} underlayColor="#0056b3">
+                          <Text style={[styles.buttonText, { fontSize: 12 }]}>Edit Job / Shift</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>ALL BIDS / OFFERS FOR SHIFT</Text>
+                        </View>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
+                        <ScrollView horizontal={true} style={{width: '100%'}}>
+                          <BidderTableComponent />
+                        </ScrollView>
+                      </View>
+                    </View>
+                  </ScrollView>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={isAwardJobModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setIsAwardJobModal(!isAwardJobModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.calendarContainer, { height: '80%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Award Job To Applicant</Text>
+                  <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobAwardModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <ScrollView>
+                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job #</Text>
+                        <Text style={styles.content}>{selectedJob?.jobNum || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Message From Applicant</Text>
+                        <Text style={styles.content}>{selectedBidder[3] || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job</Text>
+                        <Text style={styles.content}>{selectedJob?.jobId || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Applicant</Text>
+                        <Text style={styles.content}>{selectedBidder[1] || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Phone</Text>
+                        <Text style={styles.content}>{selectedBidder[8] || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Email</Text>
+                        <Text style={styles.content}>{selectedBidder[7] || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Date</Text>
+                        <Text style={styles.content}>{selectedJob?.shiftTime || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Time</Text>
+                        <Text style={styles.content}>{selectedJob?.shiftDate || ''}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30, backgroundColor: 'green' }]}>
+                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️"CLICK "AWARDED"</Text>
+                        </View>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
+                        <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>This will awrd the job to the applicant, and change the status of the JOB to "AWARDED" on your "Job Listings Tab"</Text>
+                      </View>
+                      <View style={{flexDirection: 'column', width: '100%', alignItems: 'flex-start', justifyContent: 'center'}}>
+                        <View>
+                          <Text style={{ fontWeight: 'bold', marginTop: 20, fontSize: 14 }}>Bid Status</Text>
+                        </View>
+                        <View style={{ color: 'black' }}>
+                          <RadioGroup 
+                            radioButtons={radioButtons} 
+                            onPress={setAwardedStatus}
+                            selectedId={awardedStatus}
+                            containerStyle={{
+                              flexDirection: 'column',
+                              alignItems: 'flex-start'
+                            }}
+                            labelStyle={{
+                              color: 'black'
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <TouchableOpacity
+                        style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                        onPress={() => handleChangeAwardStatus(selectedBidder[6], selectedJob?.jobId)} underlayColor="#0056b3"
+                      >
+                        <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </ScrollView>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={isHoursDetailModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setIsHoursDetailModal(!isHoursDetailModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.calendarContainer, { height: '80%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>View Hours</Text>
+                  <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleHoursDetailModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <ScrollView>
+                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Caregiver</Text>
+                        <Text style={styles.content}>{selectedJob?.nurse}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job-ID</Text>
+                        <Text style={styles.content}>{selectedJob?.jobId}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Facility</Text>
+                        <Text style={styles.content}>{selectedJob?.facility}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Status</Text>
+                        <Text style={styles.content}>{selectedJob?.jobStatus}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job #</Text>
+                        <Text style={styles.content}>{selectedJob?.jobNum}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Sift Date & Time</Text>
+                        <Text style={styles.content}>{selectedJob?.shiftDate}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Hours Submitted</Text>
+                        <Text style={styles.content}>{selectedJob?.isHoursSubmit ? "yes" : "no"}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ffff99', marginBottom: 5, paddingLeft: 2}]}>Hours Worked</Text>
+                        <Text style={styles.content}>{selectedJob?.shiftStartTime ? selectedJob?.shiftStartTime.split(' ')[1] + 'pm to ' + selectedJob?.shiftEndTime.split(' ')[1] + 'pm = ' + selectedJob?.workedHours : selectedJob?.workedHours}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Hours Approved?</Text>
+                        <Text style={styles.content}>{selectedJob?.isHoursApproved ? "yes" : "no"}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Hours Comments</Text>
+                        <Text style={styles.content}>{selectedJob?.hoursComments}</Text>
+                      </View>
+                      
+                      <View style={styles.line}></View>
+
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ffff99', marginBottom: 5, paddingLeft: 2, fontSize: 20}]}>Hours Worked</Text>
+                        <Text style={[styles.content, { fontSize: 20 }]}>{selectedJob?.shiftStartTime != '' ? selectedJob?.shiftStartTime.split(' ')[1] + 'pm to ' + selectedJob?.shiftEndTime.split(' ')[1] + 'pm = ' + selectedJob?.workedHours : selectedJob?.workedHours}</Text>
+                      </View>
+
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>ADD HOURS</Text>
+                        </View>
+                      </View>
+
+                      <View>
+  <Text style={styles.subtitle}>Time Submitted By Caregiver</Text>
+
+  {/* From Date Picker */}
+  <View style={{ flexDirection: 'column', width: '100%', gap: 5, position: 'relative' }}>
+    <TouchableOpacity
+      onPress={() => setShowFromDate((prev) => !prev)}
+      style={{ width: '100%', height: 40, zIndex: 2 }}
+    />
+    <TextInput
+      style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
+      placeholder=""
+      value={fromDate.toDateString()}
+      editable={false}
+    />
+    {showFromDate && (
+      <View style={{ position: 'absolute', top: 50, zIndex: 3 }}> {/* Ensure DatePicker is displayed */}
+        <DatePicker
+          date={fromDate}
+          theme="light"
+          onDateChange={(day) => setFromDate(day)}
+          mode="date"
+          androidVariant="native"
+        />
+        <Button title="confirm" onPress={() => setShowFromDate((prev) => !prev)} />
+      </View>
+    )}
+  </View>
+
+  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '90%', paddingVertical: 5 }}>
+    <Text style={{ width: '90%', textAlign: 'center' }}>to</Text>
+  </View>
+
+  {/* To Date Picker */}
+  <View style={{ flexDirection: 'column', width: '100%', gap: 5, position: 'relative' }}>
+    <TouchableOpacity
+      onPress={() => setShowToDate((prev) => !prev)}
+      style={{ width: '100%', height: 40, zIndex: 2 }}
+    />
+    <TextInput
+      style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
+      placeholder=""
+      value={toDate.toDateString()}
+      editable={false}
+    />
+    {showToDate && (
+      <View style={{ position: 'absolute', top: 50, zIndex: 3 }}> {/* Ensure DatePicker is displayed */}
+        <DatePicker
+          date={toDate}
+          theme="light"
+          onDateChange={(day) => setToDate(day)}
+          mode="date"
+          androidVariant="native"
+        />
+        <Button title="confirm" onPress={() => setShowToDate((prev) => !prev)} />
+      </View>
+    )}
+  </View>
+</View>
+
+
+
+                      <View>
+                        <Text style={styles.subtitle}>Pre Time " Add In Total Hours Worked - from above</Text>
+                        <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                          <TextInput
+                            style={[styles.input, {width: '90%', color: 'black'}]}
+                            placeholder=""
+                            autoCorrect={false}
+                            autoCapitalize="none"
+                            keyboardType="numeric"
+                            onChangeText={e => setPreTime(e)}
+                            value={preTime}
+                          />
+                        </View>
+                      </View>
+
+                      <View>
+                        <Text style={styles.subtitle}>Hours Approved</Text>
+                        <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                          <Dropdown
+                            style={[styles.dropdown, isFocus1 && { borderColor: 'blue' }]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            itemTextStyle={styles.itemTextStyle}
+                            iconStyle={styles.iconStyle}
+                            data={approve_status}
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={''}
+                            value={approved ? approved : approve_status[1].value}
+                            onFocus={() => setIsFocus1(true)}
+                            onBlur={() => setIsFocus1(false)}
+                            onChange={item => {
+                              setApproved(item.value);
+                              setIsFocus1(false);
+                            }}
+                            renderLeftIcon={() => (
+                              <View
+                                style={styles.icon}
+                                color={isFocus ? 'blue' : 'black'}
+                                name="Safety"
+                                size={20}
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+
+                      <View>
+                        <Text style={styles.subtitle}>No Status Explanation</Text>
+                        <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                          <TextInput
+                            style={[styles.inputs, { width: '90%', color: 'black'}]}
+                            onChangeText={setContent}
+                            value={content}
+                            multiline={true}
+                            textAlignVertical="top"
+                            placeholder=""
+                          />
+                        </View>
+                      </View>
+
+                      <View>
+                        <Text style={styles.subtitle}>Lunch</Text>
+                        <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                          <TextInput
+                            style={[styles.input, {width: '90%', color: 'black'}]}
+                            placeholder=""
+                            autoCorrect={false}
+                            autoCapitalize="none"
+                            onChangeText={e => setLunch(e)}
+                            value={lunch}
+                          />
+                        </View>
+                      </View>
+
+                      <View>
+                        <Text style={styles.subtitle}>Final Hours Equation</Text>
+                        <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                          <Text style={{width: '90%'}}>{preTime}</Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <TouchableOpacity
+                        style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                        onPress={handlechangeHoursStatus} underlayColor="#0056b3"
+                      >
+                        <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </ScrollView>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       </ScrollView>
       <MFooter />
@@ -493,14 +1204,26 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    position: 'relative',
     width: '100%'
   },
   topView: {
     marginTop: 30,
     marginLeft: '10%',
     width: '80%',
-    position: 'relative'
+  },
+  tableItemStyle: { 
+    borderColor: '#AAAAAA', 
+    backgroundColor: '#ffffff',
+    borderWidth: 1, 
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    minHeight: 50
+  },
+  line: {
+    width: '100%',
+    height: 5,
+    backgroundColor: '#fff',
+    marginVertical: 15
   },
   backTitle: {
     backgroundColor: 'black',
@@ -513,7 +1236,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 500,
     color: 'black',
-    top: 10
   },
   title: {
     fontSize: 18,
@@ -521,13 +1243,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'left',
     backgroundColor: 'transparent',
-    paddingVertical: 10
+    paddingVertical: 10,
   },
   bottomBar: {
     marginTop: 30,
     height: 5,
     backgroundColor: '#4f70ee1c',
-    width: '100%'
+    width: '100%',
   },
   text: {
     fontSize: 14,
@@ -536,7 +1258,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 30,
     width: '90%',
-    marginLeft: '5%'
+    marginLeft: '5%',
   },
   imageButton: {
     width: '100%',
@@ -557,10 +1279,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 2,
     borderColor: '#b0b0b0',
-    // elevation: 1,
-    // // shadowColor: 'rgba(0, 0, 0, 0.4)',
-    // // shadowOffset: { width: 1, height: 1 },
-    // shadowRadius: 0,
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
@@ -570,7 +1288,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '80%',
     marginLeft: '10%',
-    marginBottom: 20
+    marginBottom: 20,
   },
   profileTitle: {
     fontWeight: 'bold',
@@ -583,26 +1301,31 @@ const styles = StyleSheet.create({
     color: '#22138e',
     fontWeight: 'bold',
   },
+  titles: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    lineHeight: 30,
+    width: '35%'
+  },
   row: {
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     flexDirection: 'row',
     borderWidth: 1,
-    borderColor: 'hsl(0, 0%, 86%)',
-    // height: 40,
+    borderColor: '#DBDBDB',
     position: 'relative',
     backgroundColor: 'white',
     width: '100%',
   },
   evenRow: {
-    backgroundColor: '#7be6ff4f', // Set the background color for even rows
+    backgroundColor: '#7be6ff4f',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
-    height: '20%',
+    height: '20%,',
     padding: 20,
     borderBottomColor: '#c4c4c4',
     borderBottomWidth: 1,
@@ -611,6 +1334,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  content: {
+    fontSize: 16,
+    lineHeight: 30,
+    width: '60%'
+  },
   closeButton: {
     color: 'red',
   },
@@ -618,7 +1346,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 20,
     paddingBottom: 30,
-    marginBottom: 30
+    marginBottom: 100
   },
   modalContainer: {
     flex: 1,
@@ -627,17 +1355,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   calendarContainer: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#e3f2f1',
     borderRadius: 30,
     elevation: 5,
-    width: '80%',
-    marginLeft: 20,
+    width: '90%',
     flexDirection: 'column',
     borderWidth: 3,
     borderColor: '#7bf4f4',
   },
   modalBody: {
-    // backgroundColor: 'rgba(79, 44, 73, 0.19)',
+    backgroundColor: 'rgba(79, 44, 73, 0.19)',
     borderRadius: 10,
     display: 'flex',
     justifyContent: 'center',
@@ -651,7 +1378,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '60%',
     borderRadius: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   searchText: {
     width: '70%',
@@ -659,7 +1386,6 @@ const styles = StyleSheet.create({
   },
   searchBtn: {
     width: '50%',
-    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
@@ -668,9 +1394,8 @@ const styles = StyleSheet.create({
   },
   filter: {
     width: '90%',
-    display: 'flex',
-    alignItems: 'center',
     flexDirection: 'row',
+    alignItems: 'center',
     padding: 5,
   },
   filterBtn: {
@@ -690,19 +1415,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 20,
     padding: 8,
+    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    display: 'flex',
     gap: 10,
-    flexDirection: 'row'
+    alignItems: 'center',
   },
   head: {
     backgroundColor: '#7be6ff4f',
-    // width: 2000,
     height: 40,
   },
   tableText: {
-    // paddingHorizontal: 10,
     fontWeight: 'bold',
     color: 'black',
     textAlign: 'center',
@@ -711,8 +1433,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0, 0, 0, 0.08)',
     height: 40,
     paddingTop: 10,
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   dropdown: {
     height: 30,
@@ -722,19 +1442,10 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginBottom: 10
+    marginBottom: 10,
   },
   icon: {
     marginRight: 5,
-  },
-  label: {
-    position: 'absolute',
-    backgroundColor: 'white',
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
   },
   placeholderStyle: {
     color: 'black',
@@ -745,33 +1456,48 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
   },
   iconStyle: {
     width: 20,
     height: 20,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: 'black',
+    textAlign: 'left',
+    paddingTop: 10,
+    paddingBottom: 10
   },
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007BFF', // Button color
-    padding: 10,    
-    marginLeft: '35%',
-    marginTop: 30,           // Padding inside the button
-    borderRadius: 5,          // Rounded corners
-    
+    backgroundColor: '#007BFF',
+    padding: 10,
+    marginTop: 30,  
+    borderRadius: 5,
   },
   buttonText: {
-    color: 'white',            // Text color
-    fontSize: 16,              // Text size
+    color: 'white',
+    fontSize: 16,
+  },
+  inputs: {
+    marginTop: 5,
+    marginBottom: 20,
+    height: 100,
+    width: '100%',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#DBDBDB',
+    backgroundColor: 'white'
   },
   input: {
-    backgroundColor: 'white', 
-    height: 30, 
-    marginBottom: 10, 
-    borderWidth: 1, 
-    borderColor: 'hsl(0, 0%, 86%)',
+    backgroundColor: 'white',
+    height: 40,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#DBDBDB',
   },
 });

@@ -91,7 +91,7 @@ export default function AdminResetPassword ({ navigation }) {
               <Text style={styles.subtitle}> Password </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
                 <TextInput
-                  style={[styles.input, {width: '100%'}]}
+                  style={[styles.input, {width: '100%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -100,7 +100,7 @@ export default function AdminResetPassword ({ navigation }) {
                   value={password || ''}
                 />
                 <TextInput
-                  style={[styles.input, {width: '100%'}]}
+                  style={[styles.input, {width: '100%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"        

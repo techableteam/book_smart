@@ -109,7 +109,7 @@ export default function ClientPhone ({ navigation }) {
         >
           <View style={styles.authInfo}>
             <Text style={styles.subject}> 2FA Authentication </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}>Click the submit button below, and we'll send a verification code to your registered phone number for login. </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}>Click the submit button below and we'll send a verification code to your registered phone number for login. </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Phone Number </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>

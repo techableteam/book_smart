@@ -10,7 +10,7 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Job, Jobs, RemoveJos, setAwraded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
+import { Job, Jobs, RemoveJos, setAwarded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function CompanyShift({ navigation }) {
@@ -88,9 +88,9 @@ export default function CompanyShift({ navigation }) {
     'Degree/Discipline',
     'Entry Date',
     'Job ID',
-    'Job Num. -#',
+    'Job #',
     'Location',
-    'Shift Dates & Times',
+    'Date',
     'Shift',
     'View Shift/Bids',
     'Bids',
@@ -243,7 +243,8 @@ export default function CompanyShift({ navigation }) {
   };
 
   const handleChangeAwardStatus = async (bidderId, jobId) => {
-    const response = await setAwraded({ jobId: jobId, bidderId: bidderId, status: awardedStatus }, 'jobs');
+    const response = await setAwarded({ jobId: jobId, bidderId: bidderId, status: awardedStatus }, 'jobs');
+    console.log(JSON.stringify(response));
     if (!response?.error) {
       console.log('success');
       setIsAwardJobModal(false);
@@ -772,7 +773,7 @@ export default function CompanyShift({ navigation }) {
                       <Text style={styles.content}>{selectedJob?.jobId}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Num</Text>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job #</Text>
                       <Text style={styles.content}>{selectedJob?.jobNum}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
@@ -792,7 +793,7 @@ export default function CompanyShift({ navigation }) {
                       <Text style={styles.content}>{selectedJob?.shiftTime}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Shift Date</Text>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Date</Text>
                       <Text style={styles.content}>{selectedJob?.shiftDate}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
@@ -862,7 +863,7 @@ export default function CompanyShift({ navigation }) {
                 <ScrollView>
                   <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Num. - #</Text>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job #</Text>
                       <Text style={styles.content}>{selectedJob?.jobNum || ''}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
@@ -886,11 +887,11 @@ export default function CompanyShift({ navigation }) {
                       <Text style={styles.content}>{selectedBidder[7] || ''}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Shift Date</Text>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Date</Text>
                       <Text style={styles.content}>{selectedJob?.shiftTime || ''}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Shift Time</Text>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Time</Text>
                       <Text style={styles.content}>{selectedJob?.shiftDate || ''}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%'}}>

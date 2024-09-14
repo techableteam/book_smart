@@ -1,23 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, View, TextInput, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
-import { Text, PaperProvider, DataTable } from 'react-native-paper';
-import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { Alert, View, TextInput, StyleSheet, StatusBar } from 'react-native';
+import { Text, } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
-import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
 import { emailAtom } from '../../context/AdminAuthProvider';
 import { ForgotPassword } from '../../utils/useApi';
 
-
 export default function AdminForgotPwd ({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
-  const handleNavigate = (navigateUrl) => {
-      navigation.navigate(navigateUrl);
-  }
-
   const [credentials, setCredentials] = useState(
     {
       email: '',
@@ -26,21 +18,16 @@ export default function AdminForgotPwd ({ navigation }) {
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e})
-    console.log(credentials)
   }
 
   const handleSubmit = async () => {
-    console.log('email: ', email)
     const response = await ForgotPassword(credentials, 'admin');
-    console.log(response)
+
     if (!response.error) {
       console.log('success');
-      setEmail(credentials.email);      
-      console.log(credentials.email);
-      
+      setEmail(credentials.email);
       navigation.navigate('AdminPassVerify')
-    }
-    else {
+    } else {
       Alert.alert(
         'Failed!',
         `${response.error}`,
@@ -55,10 +42,12 @@ export default function AdminForgotPwd ({ navigation }) {
         { cancelable: false }
       );
     }
-  }
+  };
+
   const handleBack = () => {
     navigation.navigate('AdminLogin');
-  }
+  };
+
   return (
       <View style={styles.container}>
         <StatusBar 
@@ -74,7 +63,7 @@ export default function AdminForgotPwd ({ navigation }) {
               <Text style={styles.subtitle}> Email Address </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
-                  style={[styles.input, {width: '100%'}]}
+                  style={[styles.input, {width: '100%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"

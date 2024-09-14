@@ -1,22 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme, Button } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { TouchableWithoutFeedback, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import images from '../../assets/images';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
-import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
-import ImageButton from '../../components/ImageButton';
-import { Table, Row, Rows } from 'react-native-table-component';
-import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-// import MapView from 'react-native-maps';
-import * as Progress from 'react-native-progress';
+import { Table, Row } from 'react-native-table-component';
 import { UpdateUser, Clinician } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
-import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -50,10 +41,7 @@ export default function AdminAllUser({ navigation }) {
     'userRole',
     'User Status',
   ];
-  // const tableData = [
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  // ]
+
   const [clinicians, setClinicians] = useState([]);
 
   function formatData(data) {
@@ -126,17 +114,6 @@ export default function AdminAllUser({ navigation }) {
 
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };  
   const widths = [120, 200, 150, 100];
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
@@ -144,39 +121,29 @@ export default function AdminAllUser({ navigation }) {
   }
   const [cellData, setCellData] = useState(null);
   const [rowData, setRowData] = useState(null);
-  const [useRole, setUserRole] = useState(null)
+  const [useRole, setUserRole] = useState(0)
   const [modalItem, setModalItem] = useState(100);
-  const [showCalendar, setShowCalendar] = useState(false);
   const [label, setLabel] = useState(null);
-  const [date,setDate] = useState(new Date());
-  const handleCellClick = (cellData, rowIndex, cellIndex) => {
-    // Handle row click event here
-    console.log('Row clicked:', cellData, rowIndex, cellIndex);
-    // if (cellIndex==9) {
-      setCellData(cellData);
-      const rowD = data[rowIndex];
-      let rowD2 = data[rowIndex][2];
-      console.log(rowD);
-      setModalItem(cellIndex);
-      if(cellIndex==0) {
-        const name = cellData.split(' ');
-        setLabel({firstName: name[0], lastName: name[1]});
-      }
-      else {
-        setLabel(cellData.toString());
-      }
-      setRowData(rowD);
-      setUserRole(rowD2)
-      // if (cellIndex !== 0 ) {
-        toggleModal();
-      // }
-    // }
-  };
 
-  const handleDay = (day) => {
-    setDate(day);
-    setLabel(moment(day).format("MM/DD/YYYY"));
-  }
+  const handleCellClick = (cellData, rowIndex, cellIndex) => {
+    console.log('Row clicked:', cellData, rowIndex, cellIndex);
+    setCellData(cellData);
+    setUserRole(cellData.userRole);
+    // const rowD = data[rowIndex];
+    // let rowD2 = data[rowIndex][2];
+    // console.log(rowD);
+    // setModalItem(cellIndex);
+    // if(cellIndex==0) {
+    //   const name = cellData.split(' ');
+    //   setLabel({firstName: name[0], lastName: name[1]});
+    // }
+    // else {
+    //   setLabel(cellData.toString());
+    // }
+    // setRowData(rowD);
+    // setUserRole(rowD2)
+    toggleModal();
+  };
 
   //---------------DropDown--------------
   const [location, setLocation] = useState([
@@ -184,47 +151,24 @@ export default function AdminAllUser({ navigation }) {
     {label: 'activate', value: 'activate'},
     {label: 'inactivate', value: 'inactivate'},
     {label: 'pending approval', value: 'pending approval'},
-  ])
+  ]);
+
   const [role, setRole] = useState([
     {label: 'Select...', value: 'Select...'},
     {label: 'Admin', value: 'Admin'},
     {label: 'Clinician', value: 'Clinician'},
     {label: 'Facilities', value: 'Facilities'},
-  ])
-
-  const formatPhoneNumber = (input) => {
-    // Remove all non-numeric characters from the input
-    const cleaned = input.replace(/\D/g, '');
-
-    // If the cleaned input has 1 or 2 characters, return it as is
-    if (cleaned.length === 1 || cleaned.length === 2) {
-        return cleaned;
-    }
-
-    // Apply the desired phone number format
-    let formattedNumber = '';
-    if (cleaned.length >= 3) {
-        formattedNumber = `(${cleaned.slice(0, 3)})`;
-    }
-    if (cleaned.length > 3) {
-        formattedNumber += ` ${cleaned.slice(3, 6)}`;
-    }
-    if (cleaned.length > 6) {
-        formattedNumber += `-${cleaned.slice(6, 10)}`;
-    }
-    return formattedNumber;
-  };
+  ]);
   
-  const handlePhoneNumberChange = (text) => {
-    const formattedNumber = formatPhoneNumber(text);
-    handleCredentials('contactPhone', formattedNumber);
-  };
-
-
   const [jobValue, setJobValue] = useState(null);
   const [isJobFocus, setJobIsFocus] = useState(false);
 
   const [suc, setSuc] = useState(0);
+
+  const handleUpdate = async () => {
+
+  };
+
   const handlePress = async() => {
     let totalData = {}
     let sendingData = {}
@@ -294,6 +238,7 @@ export default function AdminAllUser({ navigation }) {
     toggleModal();
     getData();
   };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -411,72 +356,59 @@ export default function AdminAllUser({ navigation }) {
                 </View>
                 <View style={styles.body}>
                   <View style={styles.modalBody}>
-                    {
-                      (modalItem === 3) || (modalItem === 2) ?
-                        <Dropdown
-                          style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          inputSearchStyle={styles.inputSearchStyle}
-                          itemTextStyle={styles.itemTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={modalItem ===3 ? location : role}
-                          // search
-                          maxHeight={300}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={cellData}
-                          // searchPlaceholder="Search..."
-                          value={jobValue}
-                          onFocus={() => setJobIsFocus(true)}
-                          onBlur={() => setJobIsFocus(false)}
-                          onChange={item => {
-                            setJobValue(item.value);
-                            setLabel(item.label);
-                            setJobIsFocus(false);
-                            // if (modalItem === 2) {
-                            //   setUserRole(item.label)
-                            // }
-                          }}
-                          renderLeftIcon={() => (
-                            <View
-                              style={styles.icon}
-                              color={isJobFocus ? 'blue' : 'black'}
-                              name="Safety"
-                              size={20}
-                            />
-                          )}
+                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>User Role</Text>
+                    <Dropdown
+                      style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      itemTextStyle={styles.itemTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={role}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={cellData}
+                      value={useRole}
+                      onFocus={() => setJobIsFocus(true)}
+                      onBlur={() => setJobIsFocus(false)}
+                      onChange={item => {
+                        setUserRole(item.value);
+                        setJobIsFocus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <View
+                          style={styles.icon}
+                          color={isJobFocus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
                         />
-                      :
-                      (modalItem === 1) ?
-                        (<TextInput
-                          style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
-                          placeholder=""
-                          onChangeText={e => setLabel(e)
-                          }
-                          value={label || ''}
-                        />)
-                      :
-                      (modalItem === 0) ?
-                        (<View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: 20}}>
-                          <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
-                            placeholder=""
-                            onChangeText={e => setLabel({...label, firstName: e})}
-                            value={(label.firstName) ? label.firstName : ''}
-                          />
-                          <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
-                            placeholder=""
-                            onChangeText={e => setLabel({...label, lastName: e})}
-                            value={(label.lastName) ? label.lastName : ''}
-                          />
-                        </View>
-                        )
-                      :
-                      <></>
-                    }
-                    <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
+                      )}
+                    />
+
+                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>User Role</Text>
+
+                    {/* <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      secureTextEntry={true}
+                      style={[styles.input, {width: '100%'}]}
+                      placeholder=""
+                      onChangeText={e => handleCredentials('password', e)}
+                      value={credentials.password || ''}
+                    />
+                    <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      secureTextEntry={true}
+                      style={[styles.input, {width: '100%'}]}
+                      placeholder=""
+                      onChangeText={e => setConfirmPassword(e)}
+                      onSubmitEditing={handlePassword} // This handles the "Enter" key press event
+                      value={confirmPassword || ''}
+                    /> */}
+                    
+                    <TouchableOpacity style={styles.button} onPress={handleUpdate} underlayColor="#0056b3">
                       <Text style={styles.buttonText}>Update</Text>
                     </TouchableOpacity>
                   </View>

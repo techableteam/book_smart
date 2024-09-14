@@ -80,7 +80,7 @@ export default function ShiftListing ({ navigation }) {
         title: 'Job-ID',
         content: item.jobId
       },{
-        title: 'Job Num. -#',
+        title: 'Job #',
         content: item.jobNum
       },{
         title: 'Caregiver',
@@ -98,7 +98,7 @@ export default function ShiftListing ({ navigation }) {
         title: 'Shift',
         content: item.shift
       },{
-        title: 'Shift Dates & Times',
+        title: 'Date',
         content: item.shiftDateAndTimes
       },{
         title: 'Location',
@@ -366,10 +366,10 @@ export default function ShiftListing ({ navigation }) {
                     </View>
                   )}
                 </View>
-                <View style={[styles.profileTitleBg, {marginTop: 20}]}>
+                {/* <View style={[styles.profileTitleBg, {marginTop: 20}]}>
                   <Text style={styles.profileTitle}>🖥️ SUBMIT INTEREST IN THIS SHIFT</Text>
-                </View>
-                <Text style={[styles.text, {color: 'blue', fontWeight: 'bold', marginTop: 0, textAlign: 'left'}]}>You will be notified via email, if this shift is awarded to you!</Text>
+                </View> */}
+                <Text style={[styles.text, {color: 'blue', fontWeight: 'bold', marginTop: 20, textAlign: 'left'}]}>You will be notified via email if this shift is awarded to you!</Text>
                 <View style={styles.msgBar}>
                   <Text style={[styles.subtitle, {textAlign: 'left', marginTop: 10, fontWeight: 'bold'}]}>ADD A BRIEF MESSAGE (optional)</Text>
                   <TextInput

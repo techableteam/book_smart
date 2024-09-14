@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity, Button } from 'react-native';
+import { Modal, TextInput, View, Image, Animated, Alert, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity, Button } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton'
@@ -14,7 +14,7 @@ import RNFS from 'react-native-fs'
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
-import { Jobs, PostJob, MyShift } from '../../utils/useApi';
+import { Jobs, PostJob, MyShift, updateTimeSheet } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function Shift ({ navigation }) {
@@ -89,14 +89,14 @@ export default function Shift ({ navigation }) {
   const [totalPages, setTotalPages] = useState(1);
   const [submitData, setSubmitData] = useState({});
   async function getData() {
-    let Data = await MyShift('jobs', 'Clinician');
-    if(!Data) {
+    let data = await MyShift('jobs', 'Clinician');
+    if(!data) {
       setData(['No Data'])
     }
     else {
-      setData(Data);
-      console.log("date------------------------",data);
-      const transformedData = Data.reportData.map(item => [{
+      setData(data);
+      console.log("----------------",data);
+      const transformedData = data.reportData.map(item => [{
         title: 'Job-ID',
         content: item.jobId
       },{
@@ -118,42 +118,22 @@ export default function Shift ({ navigation }) {
         title: 'Status',
         content: item.status
       }]);
-      const detailedData = Data.reportData.map(item => [
+      const detailedData = data.reportData.map(item => [
         item.jobId,
         item.caregiver,
         item.timeSheet
       ]);
-      console.log(transformedData, '-----++++++')
       setUserInfo(transformedData);
       const len = transformedData.length;
-      console.log(len, 'ddddd00000', value)
       const page = Math.ceil(len / value);
       setTotalPages(page);
-      console.log(page, totalPages)
-      // const generatedPageArray = Array.from({ length: page}, (_, index) => ({
-      //   label: `Page ${index+1}`,
-      //   value: index + 1
-      // }));
-      // setPageItems(generatedPageArray);
     }
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
   }
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
-
-  const userInfo = [[
-    {title: 'JOB-ID', content: "344"},
-    {title: 'Location', content: "Lancaster, NY"},
-    {title: 'Pay Rate', content: "$30.00"},
-    {title: 'SHIFT  STATUS', content: 'Pending - Completed Verification'},
-    {title: 'Caregiver', content: 'Dale'},
-    {title: 'Timesheet', content: 'animatedsticker.tgs'},
-  ]]
-
 
   //------------------hour event------------------------
   const [content, setContent] = useState({
@@ -167,7 +147,6 @@ export default function Shift ({ navigation }) {
     setContent({...content, [target]: e});
   }
   const handleSubmit = () => {
-    console.log(content);
     toggleModal();
   }
   
@@ -187,7 +166,7 @@ export default function Shift ({ navigation }) {
     {title: 'Job-ID', content: ""},
     {title: 'Entry Date', content: ''},
     {title: 'Caregiver', content: ''},
-    {title: 'Shift Date & Time', content: ''},
+    {title: 'Date', content: ''},
     {title: 'Hours Worked', content: ""},
     {title: 'Hours Submitted?', content: "yes"},
     {title: 'Hours Approved?', content: "pending"},
@@ -197,31 +176,32 @@ export default function Shift ({ navigation }) {
     setModal(!isModal);
   }
 
-  //-----------------------handleUpload event--------------------------
-  
-  const [timeFile, setTimeFile] = useState('');
-
   const handleUploadSubmit = async () => {
-    console.log(timeFile)
     const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet}
-    console.log('data', data);
-    
-    const response = await PostJob(data, 'jobs')
-    setUpload(!isUpload)
-  }
-  const [detailedUploadInfo, setDetailedUploadInfo] = useState([
-    {
-      jobId: '344',
-      caregiver: 'Dale',
-      timeSheet: 'animatedsticker.tgs',
+    if (submitData.timeSheet?.name != '') {
+      const response = await updateTimeSheet(data, 'jobs');
+      setUpload(!isUpload)
+      Alert.alert('Success!', 'Trading Signals saved Successfully', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    } else {
+      Alert.alert('Failure!', 'Please upload documentation', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
     }
-  ]);
-
-  const [uploadInfo, setUploadInfo] = useState([
-    { title: 'Job-ID', content: "" },
-    { title: 'Caregiver', content: '' },
-    { title: 'TimeSheet', content: '' },
-  ]);
+  };
 
   const toggleUploadModal = () => {
     setUpload(!isUpload);
@@ -283,17 +263,6 @@ export default function Shift ({ navigation }) {
     }
   };
 
-  const handleEdit = () => {
-    console.log('handleEdit')
-  }
-  const [showModal, setShowModal] = useState(false);
-  const [text, setText] = useState('');
-  const handleItemPress = (e) => {
-    setText(e);
-    setShowModal(false);
-  }
-
-
   const handleDelete = () => {
     setDetailedInfo(prevUploadInfo => {
       return prevUploadInfo.map((item, index) => {
@@ -303,7 +272,8 @@ export default function Shift ({ navigation }) {
         return item; // Keep other items unchanged
       });
     });
-  }
+  };
+  
   const [currentPage, setCurrentPage] = useState(1);
   const getItemsForPage = (page) => {
     const startIndex = (page-1) * value;
