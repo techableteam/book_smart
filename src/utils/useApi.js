@@ -170,6 +170,34 @@ export const UpdateUser = async (updateData, endpoint) => {
   }
 }
 
+export const updateUserInfo = async (updateData, endpoint) => {
+  try {
+    console.log("update");
+    // Existing token (obtained from AsyncStorage or login)
+    const existingToken = await AsyncStorage.getItem('token');
+
+    // Include token in Authorization header
+    const response = await axios.post(`api/${endpoint}/updateUserInfo`, updateData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    // If the update is successful, you can potentially update the token in AsyncStorage
+    if (response.status === 200) {
+      // Optionally, if the backend sends a new token for some reason
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    console.log(response.data);
+    
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const PostJob = async (jobData, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');

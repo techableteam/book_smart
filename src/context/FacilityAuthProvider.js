@@ -1,6 +1,5 @@
 import React from 'react';
 import { Provider, atom } from 'jotai';
-import { ScreenStackHeaderRightView } from 'react-native-screens';
 
 export const companyNameAtom = atom('');
 export const firstNameAtom = atom('');

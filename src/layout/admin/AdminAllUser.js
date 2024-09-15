@@ -1,39 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableWithoutFeedback, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { TouchableWithoutFeedback, Alert, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import { Table, Row } from 'react-native-table-component';
-import { UpdateUser, Clinician } from '../../utils/useApi';
+import { UpdateUser, Clinician, updateUserInfo } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
-import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function AdminAllUser({ navigation }) {
-
+  let colorIndex = 0;
+  const widths = [120, 200, 150, 100];
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
   const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a random color
-      if (colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
+  const [cellData, setCellData] = useState(null);
+  const [rowData, setRowData] = useState(null);
+  const [useRole, setUserRole] = useState(0)
+  const [modalItem, setModalItem] = useState(100);
+  const [label, setLabel] = useState(null);
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+  const [modal, setModal] = useState(false)  
+  const [isJobFocus, setJobIsFocus] = useState(false);
+  const [suc, setSuc] = useState(0);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [status, setStatus] = useState('');
 
   const tableHead = [
     'Name',
@@ -42,38 +37,62 @@ export default function AdminAllUser({ navigation }) {
     'User Status',
   ];
 
-  const [clinicians, setClinicians] = useState([]);
+  const pageItems = [
+    {label: '10 per page', value: '1'},
+    {label: '25 per page', value: '2'},
+    {label: '50 per page', value: '3'},
+    {label: '100 per page', value: '4'},
+    {label: '500 per page', value: '5'},
+    {label: '1000 per page', value: '6'},
+  ];
+
+  const [role, setRole] = useState([
+    {label: 'Select...', value: 'Select...'},
+    {label: 'Admin', value: 'Admin'},
+    {label: 'Clinician', value: 'Clinician'},
+    {label: 'Facilities', value: 'Facilities'},
+  ]);
+
+  const [userStatus, setUserStatus] = useState([
+    {label: 'activate', value: 'activate'},
+    {label: 'inactivate', value: 'inactivate'},
+    {label: 'pending approval', value: 'pending approval'}
+  ]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (colorIndex >= 0.9) {
+        colorIndex = 0;
+      } else {
+        colorIndex += 0.1;
+      }
+
+      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
+      setBackgroundColor(randomColor);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   function formatData(data) {
     return data.map(item => {
-
-        // Combine the second and third elements
-        const fullName = `${item[1]} ${item[2]}`;
-        // Return the new structure
-        return [fullName, item[4], item[6], item[5]];
+      const fullName = `${item[1]} ${item[2]}`;
+      return [fullName, item[4], item[6], item[5]];
     });
-  }
+  };
 
   async function getData() {
-    let Data = await Clinician('clinical/clinician', 'Admin');
+    let data = await Clinician('clinical/clinician', 'Admin');
     let adminData = await Clinician('admin/admin', "Admin")
     let facilityData = await Clinician('facilities/facility', 'Admin')
     
-    if(!Data) {
+    if(!data) {
       setData(['No Data'])
-    }
-    else {
-      const modifiedData1 = formatData(Data);
+    } else {
+      const modifiedData1 = formatData(data);
       const modifiedData2 = formatData(adminData);
       const modifiedData3 = formatData(facilityData);
-      const modifiedArray = [...modifiedData1, ...modifiedData2, ...modifiedData3]
-      console.log(modifiedData1, modifiedData2, modifiedData3)
-      // const modifiedArray = Data.map(subarray => {
-      //   const newArray = [...subarray]; // Create a copy of the subarray
-      //   newArray.pop(); // Remove the last item
-      //   return newArray; // Return the modified subarray
-      // });
-      setData(modifiedArray)
+      const modifiedArray = [...modifiedData1, ...modifiedData2, ...modifiedData3];
+      setData(modifiedArray);
     }
     const uniqueValues = new Set();
     const transformed = [];
@@ -82,158 +101,152 @@ export default function AdminAllUser({ navigation }) {
     data.forEach(subarray => {
       const value = subarray[1]; // Get the second element
       if (!uniqueValues.has(value)) { // Check if it's already in the Set
-          uniqueValues.add(value); // Add to Set
-          transformed.push({ label: value, value: value }); // Add to transformed array
+        uniqueValues.add(value); // Add to Set
+        transformed.push({ label: value, value: value }); // Add to transformed array
       }
-      
     });
+  };
 
-    console.log(transformed);
-    setClinicians(transformed);
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
-  }
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
-  // useEffect(() => {
-  //   getData();
-  // }, [])
 
-  //---------------DropDown--------------
-  const pageItems = [
-    {label: '10 per page', value: '1'},
-    {label: '25 per page', value: '2'},
-    {label: '50 per page', value: '3'},
-    {label: '100 per page', value: '4'},
-    {label: '500 per page', value: '5'},
-    {label: '1000 per page', value: '6'},
-  ]
-
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
-  const widths = [120, 200, 150, 100];
-  const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
-  }
-  const [cellData, setCellData] = useState(null);
-  const [rowData, setRowData] = useState(null);
-  const [useRole, setUserRole] = useState(0)
-  const [modalItem, setModalItem] = useState(100);
-  const [label, setLabel] = useState(null);
+  };
 
-  const handleCellClick = (cellData, rowIndex, cellIndex) => {
-    console.log('Row clicked:', cellData, rowIndex, cellIndex);
-    setCellData(cellData);
-    setUserRole(cellData.userRole);
+  const handleCellClick = (data, rowIndex, cellIndex) => {
+    setCellData(data);
+    setStatus(data[3]);
     // const rowD = data[rowIndex];
     // let rowD2 = data[rowIndex][2];
     // console.log(rowD);
     // setModalItem(cellIndex);
     // if(cellIndex==0) {
-    //   const name = cellData.split(' ');
+    //   const name = data.split(' ');
     //   setLabel({firstName: name[0], lastName: name[1]});
     // }
     // else {
-    //   setLabel(cellData.toString());
+    //   setLabel(data.toString());
     // }
     // setRowData(rowD);
     // setUserRole(rowD2)
     toggleModal();
   };
 
-  //---------------DropDown--------------
-  const [location, setLocation] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'activate', value: 'activate'},
-    {label: 'inactivate', value: 'inactivate'},
-    {label: 'pending approval', value: 'pending approval'},
-  ]);
 
-  const [role, setRole] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'Admin', value: 'Admin'},
-    {label: 'Clinician', value: 'Clinician'},
-    {label: 'Facilities', value: 'Facilities'},
-  ]);
-  
-  const [jobValue, setJobValue] = useState(null);
-  const [isJobFocus, setJobIsFocus] = useState(false);
-
-  const [suc, setSuc] = useState(0);
 
   const handleUpdate = async () => {
+    console.log(cellData);
+    console.log(status, password, confirmPassword);
 
+    if (password != '') {
+      if (password != confirmPassword) {
+        Alert.alert(
+          'Warning!',
+          "The Password doesn't matched. Please try again.",
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                setPassword('');
+                setConfirmPassword('');
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+        return;
+      }
+    }
+
+    try {
+      const response = await updateUserInfo({userEmail: cellData[1], userRole: cellData[2], status: status, password: password}, 'admin');
+
+      if (!response?.error) {
+        getData();
+        toggleModal();
+      } else {
+        Alert.alert(
+          'Failure!',
+          'Network Error',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        'Failure!',
+        'Network Error',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   const handlePress = async() => {
-    let totalData = {}
-    let sendingData = {}
-    console.log(rowData, label);
-    if (modalItem === 2){
+    let totalData = {};
+    let sendingData = {};
+
+    if (modalItem === 2) {
       const name = rowData[0].split(" ");
-      console.log(label, "---------------------===================");
-      
+
       if (label === 'Clinician' || label === 'Admin') {
-        console.log('-----------------------------------------------------');
-        
         sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: label, userStatus: rowData[3]}
-      }
-      else {
+      } else {
         sendingData = {firstName: name[0], lastName: name[1], contactEmail: rowData[1], userRole: label, userStatus: rowData[3]}
       }
-    }
-    else if (modalItem === 0) {
+    } else if (modalItem === 0) {
       if ( useRole === 'Clinician' || useRole === 'Admin') {
         sendingData = {firstName: label.firstName, lastName: label.lastName, email: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
-      }
-      else {
-        
+      } else {
         sendingData = {firstName: label.firstName, lastName: label.lastName, contactEmail: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
       }
-    }
-    else if (modalItem ===1) {
+    } else if (modalItem === 1) {
       const name = rowData[0].split(" ");
-      console.log(label, "-----------------------------------------");
-  
-      // Initialize sendingData object
       sendingData = {
-          firstName: name[0],
-          lastName: name[1],
-          userRole: rowData[2],
-          userStatus: rowData[3],
+        firstName: name[0],
+        lastName: name[1],
+        userRole: rowData[2],
+        userStatus: rowData[3],
       };
       
-      // Check the role and add the relevant properties
       if (useRole === 'Clinician' || useRole === 'Admin') {
-          sendingData.email = rowData[1]; // Add email property
-          if (modalItem === 1) {
-              sendingData.updateEmail = label; // Conditionally add updateEmail property
-          }
+        sendingData.email = rowData[1];
+        if (modalItem === 1) {
+          sendingData.updateEmail = label;
+        }
       } else {
-          sendingData.contactEmail = rowData[1]; // Add contactEmail property for other roles
+        sendingData.contactEmail = rowData[1];
       }
-  
-      // Now sendingData is properly constructed
-      console.log(sendingData, "++++++++++++++++++++++++++++++++++++");
     } else {
       const name = rowData[0].split(" ");
       if ( useRole === 'Clinician' || useRole === 'Admin') {
         sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: rowData[2], userStatus: label}
-      }
-      else {
-        
+      } else {
         sendingData = {firstName: name[0], lastName: name[1], contactEmail: rowData[1], userRole: rowData[2], userStatus: label}
       }
-
     }
     totalData = {updateData: sendingData, userRole: useRole}
-    console.log(totalData);
-    let Data = await UpdateUser(totalData, 'admin');
-    if(Data) setSuc(suc+1);
+    let data = await UpdateUser(totalData, 'admin');
+    if(data) setSuc(suc+1);
     else setSuc(suc);
     toggleModal();
     getData();
@@ -241,12 +254,11 @@ export default function AdminAllUser({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent" />
       <AHeader navigation={navigation}  currentPage={5} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 140 }}
+      <ScrollView
+        style={{ width: '100%', marginTop: 140 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
@@ -255,10 +267,11 @@ export default function AdminAllUser({ navigation }) {
           </Animated.View>
           <View style={styles.bottomBar} />
         </View>
-        <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
-        </View>
+        <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}></View>
         <View style={styles.profile}>
-          <Text style={{ backgroundColor: '#000080', color: 'white', width: '26%' }}>TOOL TIPS:</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ backgroundColor: '#000080', color: 'white', paddingHorizontal: 5 }}>TOOL TIPS</Text>
+          </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
             <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Displays ALL Platform Users</Text>
@@ -292,12 +305,10 @@ export default function AdminAllUser({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={pageItems}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
                 value={value ? value : pageItems[3].value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
@@ -325,7 +336,7 @@ export default function AdminAllUser({ navigation }) {
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
                       {rowData.map((cellData, cellIndex) => (
-                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
+                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(rowData, rowIndex, cellIndex)}>
                           <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
                             <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
                           </View>
@@ -356,7 +367,7 @@ export default function AdminAllUser({ navigation }) {
                 </View>
                 <View style={styles.body}>
                   <View style={styles.modalBody}>
-                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>User Role</Text>
+                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>User Status</Text>
                     <Dropdown
                       style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
                       placeholderStyle={styles.placeholderStyle}
@@ -364,16 +375,16 @@ export default function AdminAllUser({ navigation }) {
                       inputSearchStyle={styles.inputSearchStyle}
                       itemTextStyle={styles.itemTextStyle}
                       iconStyle={styles.iconStyle}
-                      data={role}
+                      data={userStatus}
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      placeholder={cellData}
-                      value={useRole}
+                      placeholder={''}
+                      value={status}
                       onFocus={() => setJobIsFocus(true)}
                       onBlur={() => setJobIsFocus(false)}
                       onChange={item => {
-                        setUserRole(item.value);
+                        setStatus(item.value);
                         setJobIsFocus(false);
                       }}
                       renderLeftIcon={() => (
@@ -386,27 +397,26 @@ export default function AdminAllUser({ navigation }) {
                       )}
                     />
 
-                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>User Role</Text>
+                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Change Password</Text>
 
-                    {/* <TextInput
+                    <TextInput
                       autoCorrect={false}
                       autoCapitalize="none"
                       secureTextEntry={true}
-                      style={[styles.input, {width: '100%'}]}
-                      placeholder=""
-                      onChangeText={e => handleCredentials('password', e)}
-                      value={credentials.password || ''}
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder="Please enter new password"
+                      onChangeText={e => setPassword(e)}
+                      value={password}
                     />
                     <TextInput
                       autoCorrect={false}
                       autoCapitalize="none"
                       secureTextEntry={true}
-                      style={[styles.input, {width: '100%'}]}
-                      placeholder=""
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder="Please enter confirm password"
                       onChangeText={e => setConfirmPassword(e)}
-                      onSubmitEditing={handlePassword} // This handles the "Enter" key press event
-                      value={confirmPassword || ''}
-                    /> */}
+                      value={confirmPassword}
+                    />
                     
                     <TouchableOpacity style={styles.button} onPress={handleUpdate} underlayColor="#0056b3">
                       <Text style={styles.buttonText}>Update</Text>
@@ -704,7 +714,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
+    height: 40, 
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',

@@ -120,8 +120,22 @@ export default function FacilityPermission ({ navigation }) {
               </View>
               <View style={styles.titleBar}>
                 <Text style={styles.subTitle}>3. Payment and Insurance Terms</Text>
-                <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>(a) Payment Terms. </Text>For each Completed Requested Service that an I/C performs, BOOKSMART™ will receive from the Customer the I/Cs hourly Fees plus applicable Fees of $5/hour designated for access to and use of BOOKSMART™ and processing of payments and insurances (“Service Fee”). Terms for billing are to be Due Upon Receipt. BOOKSMART™ shall remit to I/C within a reasonable time of a Service Request for which I/C provided to the Customer being marked as a Completed Service on the Service. BOOKSMART™ hereby disclaims all liability related to errors in fund deposits due to inaccurate or incomplete bank account information. If BOOKSMART™ is unable to collect any fees that are owed, BOOKSMART™ will inform I/C in writing.</Text>
-                <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>(b) Taxes. </Text>Users are solely responsible for all tax returns and payments required to be filed with or made to any federal, state, or local tax authority in connection with the performance of Services. Users of BOOKSMART™ are exclusively liable for complying with all applicable federal, state, and local laws, including laws governing self-employed individuals, if applicable. Furthermore, users are exclusively liable for complying with all laws related to payment of taxes, social security, disability, and other contributions based on fees paid to I/C by BOOKSMART™ in connection with a Completed Service or otherwise received by I/C through the Service. BOOKSMART™ will not withhold or make payments for taxes, social security, unemployment insurance or disability insurance contributions. BOOKSMART™ will not obtain workers’ compensation insurance (except as described below) on I/Cs behalf. Users hereby agree to indemnify and defend BOOKSMART™ against any and all such taxes or contributions, including penalties, interest, attorneys’ fees and expenses. BOOKSMART™ does not offer tax advice to Users.</Text>
+                <Text style={[styles.text, { marginBottom: 0 }]}><Text style={{fontWeight: 'bold'}}>(a) Payment Terms. </Text>For each Completed Requested Service that an I/C performs, BOOKSMART™ will receive from the Customer the I/Cs hourly Fees plus applicable Rates and/or Fees as such:</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                  <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
+                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>If Customer is a Staffing Agency or Managed Services Provider, that Fee is $5/hour for any I/C for designated access to and use of BOOKSMART™ and processing of payments and insurances (“Service Fee”).</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                  <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
+                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>If Customer is a Facility or Community paying Net 7, that Fee is $7/hour for CNA, $10/hour for LPN or $15/hour for RN for designated access to and use of BOOKSMART™ and processing of payments and insurances (“Service Fee”).</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                  <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
+                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Or - Net 30 Bill rates as such: $35/hour-CNA, $55/hour-LPN, and $75/hour-RN.</Text>
+                </View>
+                <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>A 50% Fee increase shall be applied for all hours worked by I/Cs in excess of 40 hours in any given week. Further, a 50% Fee increase shall be applied for any I/C hours worked on: New Years Day, Easter Sunday, Memorial Day, Independence Day, Labor Day, and Christmas Day. The Fee increases are non-compoundable so in the case a holiday falls on a weekend you will only be billed the 50% increase for hours over 40.</Text>
+                <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>BOOKSMART™ shall remit to I/C within a reasonable time of a Service Request for which I/C provided to the Customer being marked as a Completed Service on the Service. BOOKSMART™ hereby disclaims all liability related to errors in fund deposits due to inaccurate or incomplete bank account information. If BOOKSMART™ is unable to collect any fees that are owed, BOOKSMART™ will inform I/C in writing.</Text>
+                <Text style={[styles.text]}><Text style={{fontWeight: 'bold'}}>(b) Taxes. </Text>Users are solely responsible for all tax returns and payments required to be filed with or made to any federal, state, or local tax authority in connection with the performance of Services. Users of BOOKSMART™ are exclusively liable for complying with all applicable federal, state, and local laws, including laws governing self-employed individuals, if applicable. Furthermore, users are exclusively liable for complying with all laws related to payment of taxes, social security, disability, and other contributions based on fees paid to I/C by BOOKSMART™ in connection with a Completed Service or otherwise received by I/C through the Service. BOOKSMART™ will not withhold or make payments for taxes, social security, unemployment insurance or disability insurance contributions. BOOKSMART™ will not obtain workers’ compensation insurance (except as described below) on I/Cs behalf. Users hereby agree to indemnify and defend BOOKSMART™ against any and all such taxes or contributions, including penalties, interest, attorneys’ fees and expenses. BOOKSMART™ does not offer tax advice to Users.</Text>
                 <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>(c) Insurance. </Text>I/Cs using BOOKSMART™ are required to carry Workplace Safety Insurance and Liability Insurance coverage in order to perform Services for any Customer. BOOKSMART™ has Workplace Safety Insurance in place through accredited insurance carriers as well as Independent Contractor Liability Insurance (Collectively “Insurance”) for you to enroll in and take advantage of. Applicants will need to list themselves with this Insurance coverage from BOOKSMART™’s insurance carrier(s). Further information about these insurances and carriers may be available on the www.WhyBookDumb.com or on this app from time to time. By accessing/using BOOKSMART™ you consent and agree to these Terms.</Text>
                 <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>4.HIPAA. </Text>Users expressly understand and acknowledge that, as a result of the provision of I/C Services using BOOKSMART™, you may be considered a covered entity under the Health Insurance Portability and Accountability Act (“HIPAA”). You expressly agree to observe the Privacy, Security, and Breach Notification Rules set forth under HIPAA. You understand that failure to adhere to these three HIPAA Rules may result in the imposition of civil, or some cases, criminal sanctions.</Text>
                 <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>5.Third-Party Beneficiaries. </Text>Users agree that the Terms of this Agreement shall apply only to you and are not for the benefit of any third-party beneficiaries.</Text>
@@ -210,16 +224,17 @@ export default function FacilityPermission ({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     height: '100%',
+    width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    position: 'relative',
-    width: '100%'
+    position: 'relative'
   },
   permission: {
     display: 'flex',
     alignItems: 'center',
-    paddingTop: 30
+    paddingTop: 30,
+    paddingHorizontal: 10
   },
   titleBar: {
     width: '90%'

@@ -6,7 +6,7 @@ import RadioGroup from 'react-native-radio-buttons-group';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
-import { Table, Row } from 'react-native-table-component';
+import { Table } from 'react-native-table-component';
 import { Jobs, Update, Clinician, removeJob, Job, setAwarded, updateHoursStatus } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
@@ -544,21 +544,18 @@ export default function AllJobShiftListing({ navigation }) {
               />
               <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
-                  <Row
-                    data={tableHead}
-                    style={styles.head}
-                    widthArr={[150, 130, 100, 100, 200, 120, 100, 200, 150, 120, 150, 80, 150, 200, 200, 150, 250, 250, 100]}
-                    textStyle={StyleSheet.flatten([styles.tableText])}
-                  />
+                  <View style={[styles.tableText, { flexDirection: 'row', backgroundColor: '#ccffff' }]}>
+                    {tableHead.map((item, index) => (
+                      <Text
+                        key={index}
+                        style={{ width: widths[index], justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}
+                      >
+                        {item}
+                      </Text>
+                    ))}
+                  </View>
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
-                      {/* {rowData.map((cellData, cellIndex) => (
-                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
-                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', paddingVertical: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
-                            <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
-                          </View>
-                        </TouchableWithoutFeedback>
-                      ))} */}
                       {rowData.map((cellData, cellIndex) => {
                         if (cellData === 'view_shift') {
                           return (
@@ -1032,67 +1029,59 @@ export default function AllJobShiftListing({ navigation }) {
                       </View>
 
                       <View>
-  <Text style={styles.subtitle}>Time Submitted By Caregiver</Text>
-
-  {/* From Date Picker */}
-  <View style={{ flexDirection: 'column', width: '100%', gap: 5, position: 'relative' }}>
-    <TouchableOpacity
-      onPress={() => setShowFromDate((prev) => !prev)}
-      style={{ width: '100%', height: 40, zIndex: 2 }}
-    />
-    <TextInput
-      style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
-      placeholder=""
-      value={fromDate.toDateString()}
-      editable={false}
-    />
-    {showFromDate && (
-      <View style={{ position: 'absolute', top: 50, zIndex: 3 }}> {/* Ensure DatePicker is displayed */}
-        <DatePicker
-          date={fromDate}
-          theme="light"
-          onDateChange={(day) => setFromDate(day)}
-          mode="date"
-          androidVariant="native"
-        />
-        <Button title="confirm" onPress={() => setShowFromDate((prev) => !prev)} />
-      </View>
-    )}
-  </View>
-
-  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '90%', paddingVertical: 5 }}>
-    <Text style={{ width: '90%', textAlign: 'center' }}>to</Text>
-  </View>
-
-  {/* To Date Picker */}
-  <View style={{ flexDirection: 'column', width: '100%', gap: 5, position: 'relative' }}>
-    <TouchableOpacity
-      onPress={() => setShowToDate((prev) => !prev)}
-      style={{ width: '100%', height: 40, zIndex: 2 }}
-    />
-    <TextInput
-      style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
-      placeholder=""
-      value={toDate.toDateString()}
-      editable={false}
-    />
-    {showToDate && (
-      <View style={{ position: 'absolute', top: 50, zIndex: 3 }}> {/* Ensure DatePicker is displayed */}
-        <DatePicker
-          date={toDate}
-          theme="light"
-          onDateChange={(day) => setToDate(day)}
-          mode="date"
-          androidVariant="native"
-        />
-        <Button title="confirm" onPress={() => setShowToDate((prev) => !prev)} />
-      </View>
-    )}
-  </View>
-</View>
-
-
-
+                        <Text style={styles.subtitle}>Time Submitted By Caregiver</Text>
+                        <View style={{ flexDirection: 'column', width: '100%', gap: 5, position: 'relative' }}>
+                          <TouchableOpacity onPress={() => setShowFromDate((prev) => !prev)} style={{ width: 300, height: 40, zIndex: 2 }}>
+                            <View>
+                              <TextInput
+                                style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
+                                placeholder=""
+                                value={fromDate.toDateString()}
+                                editable={false}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {showFromDate && (
+                            <>
+                              <DatePicker
+                                date={fromDate}
+                                onDateChange={(day) => setFromDate(day)}
+                                mode="date"
+                                theme='light'
+                                androidVariant="native"
+                              />
+                              <Button style={{ width: 300 }} buttonColor='rgb(26,115,232)' textColor='#fff' onPress={() =>setShowFromDate((prev) => !prev)}>Confirm</Button>
+                            </>
+                          )}
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '90%', paddingVertical: 10 }}>
+                          <Text style={{ width: '90%', textAlign: 'center' }}>to</Text>
+                        </View>
+                        <View style={{ flexDirection: 'column', width: '100%', gap: 5, position: 'relative' }}>
+                          <TouchableOpacity onPress={() => setShowToDate((prev) => !prev)} style={{ width: 300, height: 40, zIndex: 2 }}>
+                            <View pointerEvents="none">
+                              <TextInput
+                                style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
+                                placeholder=""
+                                value={toDate.toDateString()}
+                                editable={false}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {showToDate && (
+                            <>
+                              <DatePicker
+                                date={toDate}
+                                theme="light"
+                                onDateChange={(day) => setToDate(day)}
+                                mode="date"
+                                androidVariant="native"
+                              />
+                              <Button style={{ width: 300 }} buttonColor='rgb(26,115,232)' textColor='#fff' onPress={() =>setShowToDate((prev) => !prev)}>Confirm</Button>
+                            </>
+                          )}
+                        </View>
+                      </View>
                       <View>
                         <Text style={styles.subtitle}>Pre Time " Add In Total Hours Worked - from above</Text>
                         <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
@@ -1314,7 +1303,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderWidth: 1,
     borderColor: '#DBDBDB',
-    position: 'relative',
     backgroundColor: 'white',
     width: '100%',
   },
@@ -1432,10 +1420,10 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: 'rgba(0, 0, 0, 0.08)',
     height: 40,
-    paddingTop: 10,
+    paddingTop: 10
   },
   dropdown: {
-    height: 30,
+    height: 40,
     width: '50%',
     backgroundColor: 'white',
     borderColor: 'gray',

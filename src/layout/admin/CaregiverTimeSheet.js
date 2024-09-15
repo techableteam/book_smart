@@ -255,7 +255,9 @@ export default function CaregiverTimeSheet({ navigation }) {
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
         </View>
         <View style={styles.profile}>
-          <Text style={{ backgroundColor: '#000080', color: 'white', width: '26%' }}>TOOL TIPS:</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ backgroundColor: '#000080', color: 'white', paddingHorizontal: 5 }}>TOOL TIPS</Text>
+          </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
             <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Displays all Facilities within the platform.</Text>

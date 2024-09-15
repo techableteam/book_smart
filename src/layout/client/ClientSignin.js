@@ -6,7 +6,7 @@ import { useAtom } from 'jotai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUniqueId, getManufacturer } from 'react-native-device-info';
 import { useFocusEffect } from '@react-navigation/native';
-import { firstNameAtom, lastNameAtom, addressAtom, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom, passwordAtom } from '../../context/ClinicalAuthProvider'
+import { firstNameAtom, lastNameAtom, addressAtom, clinicalAcknowledgeTerm, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom, passwordAtom } from '../../context/ClinicalAuthProvider'
 import { Signin } from '../../utils/useApi';
 import { deviceNumberAtom } from '../../context/BackProvider';
 import HButton from '../../components/Hbutton';
@@ -27,6 +27,7 @@ export default function ClientSignIn({ navigation }) {
   const [socialSecurityNumber, setSocialSecurityNumber] = useAtom(socialSecurityNumberAtom);
   const [address, setAddress] = useAtom(addressAtom);
   const [password, setPassword] = useAtom(passwordAtom);
+  const [clinicalAcknowledgement, setClinicalAcknowledgement] = useAtom(clinicalAcknowledgeTerm);
   const [deviceNum, setDeviceNum] = useAtom(deviceNumberAtom);
   const theme = useTheme();
   const [ credentials, setCredentials ] = useState({
@@ -121,8 +122,9 @@ export default function ClientSignIn({ navigation }) {
         setPhotoImage(response.user.photoImage);
         setUserRole(response.user.userRole);
         setEntryDate(response.user.entryDate);
-        setSocialSecurityNumber(response.user.socialSecurityNumber)
-        setAddress(response.user.address)
+        setSocialSecurityNumber(response.user.socialSecurityNumber);
+        setClinicalAcknowledgement(response.user.clinicalAcknowledgeTerm);
+        setAddress(response.user.address);
         setPassword(response.user.password);
         setDeviceNum(uniqueId);
 
@@ -132,13 +134,11 @@ export default function ClientSignIn({ navigation }) {
           await AsyncStorage.setItem('clinicalEmail', credentials.email);
           await AsyncStorage.setItem('clinicalPassword', credentials.password);
         }
-        
-        if (response.phoneAuth) {
-          console.log(response.phoneAuth);
+
+        if (response.user.clinicalAcknowledgeTerm) {
           handleSignInNavigate('ClientPhone');
         } else {
-          console.log('welcome')
-          handleSignInNavigate('MyHome');
+          handleSignInNavigate("ClientPermission");
         }
       } else {
         if (response.error.status == 401) {

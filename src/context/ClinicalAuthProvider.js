@@ -23,6 +23,7 @@ export const photoImageAtom = atom({
   type: '',
   name: ''
 });
+export const clinicalAcknowledgeTerm = atom(false);
 export const passwordAtom = atom('');
 export const signatureAtom = atom('');
 export const caregiverAtom = atom('');
