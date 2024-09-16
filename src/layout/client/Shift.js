@@ -114,9 +114,6 @@ export default function Shift ({ navigation }) {
       },{
         title: 'TimeSheet',
         content: item.timeSheet.name
-      },{
-        title: 'Status',
-        content: item.status
       }]);
       const detailedData = data.reportData.map(item => [
         item.jobId,
@@ -180,8 +177,9 @@ export default function Shift ({ navigation }) {
     const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet}
     if (submitData.timeSheet?.name != '') {
       const response = await updateTimeSheet(data, 'jobs');
-      setUpload(!isUpload)
-      Alert.alert('Success!', 'Trading Signals saved Successfully', [
+      setUpload(!isUpload);
+      getData();
+      Alert.alert('Success!', 'Your timesheet has been submitted', [
         {
           text: 'OK',
           onPress: () => {

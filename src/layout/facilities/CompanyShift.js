@@ -266,7 +266,16 @@ export default function CompanyShift({ navigation }) {
     const response = await updateJobTSVerify({ jobId: curJobId, status: tsVerifyStatus, file: timeSheetFile }, 'jobs');
     
     if (!response?.error) {
-      console.log('success');
+      getData();
+      Alert.alert('Success!', 'Verified!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
       setIsJobTSVerifyModal(false);
     } else {
       console.log('failure', response.error);
@@ -386,6 +395,7 @@ export default function CompanyShift({ navigation }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   paddingHorizontal: 20,
+                  paddingVertical: 5,
                   backgroundColor: 'green',
                   borderRadius: 20,
                 }}
@@ -411,6 +421,7 @@ export default function CompanyShift({ navigation }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   paddingHorizontal: 20,
+                  paddingVertical: 5,
                   backgroundColor: 'green',
                   borderRadius: 20,
                 }}
@@ -441,6 +452,7 @@ export default function CompanyShift({ navigation }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   paddingHorizontal: 20,
+                  paddingVertical: 5,
                   backgroundColor: 'green',
                   borderRadius: 20,
                 }}
@@ -466,6 +478,7 @@ export default function CompanyShift({ navigation }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   paddingHorizontal: 20,
+                  paddingVertical: 5,
                   backgroundColor: 'green',
                   borderRadius: 20,
                 }}
@@ -524,6 +537,7 @@ export default function CompanyShift({ navigation }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   paddingHorizontal: 20,
+                  paddingVertical: 5,
                   backgroundColor: 'green',
                   borderRadius: 20,
                 }}
@@ -550,6 +564,7 @@ export default function CompanyShift({ navigation }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   paddingHorizontal: 20,
+                  paddingVertical: 5,
                   backgroundColor: 'green',
                   borderRadius: 20,
                 }}
@@ -1298,7 +1313,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     textAlign: 'center',
     textAlignVertical: 'center',
-    height: 30
+    height: 40
   },
   dropdown: {
     height: 40,
