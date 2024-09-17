@@ -1,20 +1,10 @@
-import React, { useEffect, useState } from 'react';
-
-import { View, Image, StyleSheet, StatusBar, Text } from 'react-native';
-import images from '../assets/images';
-import { Card, IconButton, useTheme } from 'react-native-paper';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { AuthState } from '../context/ClinicalAuthProvider';
-// import { getRatingDataByUserID } from '../utils/api';
+import React from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import { Card } from 'react-native-paper';
 
 export default function MHeader({props, navigation}) {
-  const theme = useTheme();
-  const handleNavigate = () => {
-    navigation.navigate('ClientSignIn')
-  }
   return (
-    <Card style={styles.shadow} onPress={ handleNavigate }>
-      {/* <StatusBar hidden={true} /> */}
+    <Card style={styles.shadow}>
       <Text style={styles.text}>BookSmart™</Text>
       <View style={styles.bottomStyle}></View>
     </Card>
