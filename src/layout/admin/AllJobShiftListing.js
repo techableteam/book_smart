@@ -938,7 +938,7 @@ export default function AllJobShiftListing({ navigation }) {
                       </View>
                       <View style={{flexDirection: 'row', width: '100%'}}>
                         <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-                        <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>This will awrd the job to the applicant, and change the status of the JOB to "AWARDED" on your "Job Listings Tab"</Text>
+                        <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>This will award the job to the applicant, and change the status of the JOB to "AWARDED" on your "Job Listings Tab"</Text>
                       </View>
                       <View style={{flexDirection: 'column', width: '100%', alignItems: 'flex-start', justifyContent: 'center'}}>
                         <View>
