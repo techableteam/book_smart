@@ -20,7 +20,7 @@ export default function HButton({
 const styles = StyleSheet.create({
   text: {
     fontSize: 20,
-    fontWeight: 800,
+    fontWeight: '800',
     color: 'white',
     textAlign: 'center',
     borderRadius: 10,

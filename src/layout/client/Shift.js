@@ -115,11 +115,7 @@ export default function Shift ({ navigation }) {
         title: 'TimeSheet',
         content: item.timeSheet.name
       }]);
-      const detailedData = data.reportData.map(item => [
-        item.jobId,
-        item.caregiver,
-        item.timeSheet
-      ]);
+
       setUserInfo(transformedData);
       const len = transformedData.length;
       const page = Math.ceil(len / value);
@@ -171,7 +167,13 @@ export default function Shift ({ navigation }) {
   
   const toggleModal = () => {
     setModal(!isModal);
-  }
+  };
+
+  const handleShowFile = (data) => {
+    const jobIdObject = data.find(item => item.title === 'Job-ID');
+    const jobId = jobIdObject ? jobIdObject.content : null;
+    navigation.navigate("FileViewer", { jobId: jobId });
+  };
 
   const handleUploadSubmit = async () => {
     const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet}
@@ -229,29 +231,37 @@ export default function Shift ({ navigation }) {
       const res = await DocumentPicker.pick({
         type: type,
       });
-      let fileContent = await RNFS.readFile(res[0].uri, 'base64');
+      // Read file content using RNFS
+      let fileUri = res[0].uri;
+      let fileContent;
+
+      // Ensure we have a valid URI
+      if (fileUri) {
+        // Read the file as base64
+        fileContent = await RNFS.readFile(fileUri, 'base64');
+        
+        // Check if fileContent is correctly base64 encoded
+        if (!/^[A-Za-z0-9+/]+={0,2}$/.test(fileContent)) {
+          console.log('Invalid base64 encoding');
+        }
+
+        console.log('FileContent', fileContent);
+      } else {
+        console.log('Invalid URI');
+      }
+
       console.log('FileContent', fileContent)
-      console.log('FileContent', )
-      
-          // Determine the file type based on the MIME type
+      console.log(res);
       let fileType;
-      if (res[0].type === 'application/pdf') {
+      if (res[0].type == 'application/pdf') {
         fileType = 'pdf';
-      } else if (res[0].type.startsWith('image/')) {
+      } else if (res[0].type.startsWith('image')) {
         fileType = 'image';
       } else {
-        // Handle other file types if needed
         fileType = 'unknown';
       }
-      console.log('====================================');
-      console.log("type");
-      console.log('====================================');
       
-      // fileContent = RNFS.readFile(res[0].uri, 'base64');
-  
-      // handleCredentials('photoImage', {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
-      setSubmitData({...submitData, timeSheet: {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name}})
-      console.log(`File ${'photoImage'} converted to base64:`, `data:${res.type};base64,${"io"}`);
+      setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}})
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -369,13 +379,17 @@ export default function Shift ({ navigation }) {
                 {it.map((item, index) => 
                   <View key={index} style={{flexDirection: 'row', width: '100%', gap: 10}}>
                     <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
-                    <Text style={[
-                      styles.content, 
-                      item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
-                    ]}>{item.content}</Text>
+                    {item.title == "TimeSheet" ? (
+                      <Text
+                        style={[styles.content, { color: '#2a53c1', textDecorationLine: 'underline' }]}
+                        onPress={() => { handleShowFile(it); }}
+                      >{item.content}</Text>
+                    ) : (
+                      <Text style={styles.content}>{item.content}</Text>
+                    )}
                   </View>
                 )}
-                <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#3d94f6', marginLeft: '20%'}]} onPress = {() => handleUploadEdit(it[0].content)}>
+                <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#22138e', marginLeft: '20%'}]} onPress = {() => handleUploadEdit(it[0].content)}>
                   <Text style={{color: 'white'}}> Upload Timesheet</Text>
                 </TouchableOpacity>
               </View>)
@@ -501,7 +515,12 @@ export default function Shift ({ navigation }) {
                   </View>
                   <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
                     <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[2].title}</Text>
-                    {detailedInfos[2].content && <Text style={[styles.content, {lineHeight: 20, marginTop: 0, color: 'blue', width: '100%'}]}>{detailedInfos[2].content}<Text style={{color: 'blue'}} onPress= {handleDelete}>&nbsp;&nbsp;remove</Text></Text>}
+                    {detailedInfos[2].content && 
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(detailedInfos); }}>{detailedInfos[2].content}</Text>
+                        <Text style={{color: 'blue'}} onPress= {handleDelete}>&nbsp;&nbsp;remove</Text>
+                      </View>
+                    }
                   </View>
                   <View style={{flexDirection: 'row', width: '100%'}}>
                     <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>

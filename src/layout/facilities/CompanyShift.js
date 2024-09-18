@@ -219,6 +219,7 @@ export default function CompanyShift({ navigation }) {
       setCurJobId(id);
     } else {
       setCurJobId(id);
+      setSelectedJob(data.jobData);
       setTSVerifyStatus(data.jobData.timeSheetVerified ? 1 : 2);
       setIsJobTSVerifyModal(true);
     }
@@ -247,6 +248,7 @@ export default function CompanyShift({ navigation }) {
     console.log(JSON.stringify(response));
     if (!response?.error) {
       console.log('success');
+      getData();
       setIsAwardJobModal(false);
     } else {
       console.log('failure', response.error);
@@ -366,6 +368,10 @@ export default function CompanyShift({ navigation }) {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  const handleShowFile = () => {
+    navigation.navigate("FileViewer", { jobId: curJobId });
   };
 
   const itemsToShow = getItemsForPage(currentPage);
@@ -821,7 +827,7 @@ export default function CompanyShift({ navigation }) {
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Timesheet Upload</Text>
-                      <Text style={styles.content}>{selectedJob?.timeSheet?.name}</Text>
+                      <Text style={[styles.content, { color: 'blue' }]} onPress={() => { handleShowFile(); }}>{selectedJob?.timeSheet?.name}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Rating</Text>
@@ -989,10 +995,15 @@ export default function CompanyShift({ navigation }) {
                         />
                       </View>
                     </View>
-            
                     <View>
                       <Text style={{ fontWeight: 'bold', marginTop: 20, fontSize: 14, marginBottom: 5 }}>Timesheet Upload</Text>
                     </View>
+                    {selectedJob?.timeSheet?.name && 
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(); }}>{selectedJob?.timeSheet?.name}</Text>
+                        <Text style={{color: 'blue'}}>&nbsp;&nbsp;remove</Text>
+                      </View>
+                    }
                     <View style={{flexDirection: 'row', width: '100%'}}>
                       <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
                         <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>

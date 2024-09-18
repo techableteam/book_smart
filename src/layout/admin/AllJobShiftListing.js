@@ -111,6 +111,11 @@ export default function AllJobShiftListing({ navigation }) {
     }, [])
   );
 
+  const handleShowFile = (jobId) => {
+    console.log('clicked => ', jobId);
+    navigation.navigate("FileViewer", { jobId: jobId });
+  };
+
   //---------------DropDown--------------
   const pageItems = [
     {label: '10 per page', value: '1'},
@@ -161,6 +166,7 @@ export default function AllJobShiftListing({ navigation }) {
     const response = await setAwarded({ jobId: jobId, bidderId: bidderId, status: awardedStatus }, 'jobs');
     if (!response?.error) {
       console.log('success');
+      getData();
       setIsAwardJobModal(false);
     } else {
       console.log('failure', response.error);
@@ -647,14 +653,26 @@ export default function AllJobShiftListing({ navigation }) {
                             </View>
                           );
                         } else {
-                          return (
-                            <Text
-                              key={cellIndex}
-                              style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
-                            >
-                              {cellData}
-                            </Text>
-                          );
+                          if (cellIndex == 15) {
+                            return (
+                              <Text
+                                key={cellIndex}
+                                style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                onPress={() => { handleShowFile(rowData[2]) }}
+                              >
+                                {cellData}
+                              </Text>
+                            );
+                          } else {
+                            return (
+                              <Text
+                                key={cellIndex}
+                                style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
+                              >
+                                {cellData}
+                              </Text>
+                            );
+                          }
                         }
                       })}
                     </View>
@@ -825,7 +843,7 @@ export default function AllJobShiftListing({ navigation }) {
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Timesheet Upload</Text>
-                        <Text style={styles.content}>{selectedJob?.timeSheet?.name}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => { handleShowFile(selectedJob?.jobId); }}>{selectedJob?.timeSheet?.name}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Rating</Text>

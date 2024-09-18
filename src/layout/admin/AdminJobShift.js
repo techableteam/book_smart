@@ -9,7 +9,7 @@ import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { PostJob, Jobs } from '../../utils/useApi';
+import { PostJob, Jobs, getFacility } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
 
 export default function AdminJobShift({ navigation }) {
@@ -54,7 +54,7 @@ export default function AdminJobShift({ navigation }) {
   ]);
 
   async function getData() {
-    let data = await Jobs('jobs', 'Admin');
+    let data = await getFacility('facilities', 'Admin');
     if(!data) {
       setData(['No Data'])
     } else {
@@ -62,16 +62,18 @@ export default function AdminJobShift({ navigation }) {
     }
     const uniqueValues = new Set();
     const transformed = [];
+    console.log(data);
 
     data.forEach(subarray => {
-      const value = subarray[11];
+      const value = subarray[3];
       if (!uniqueValues.has(value)) {
         uniqueValues.add(value);
         transformed.push({ label: value, value: value });
       }
     });
 
-    transformed.unshift({ label: 'Select...', value: 'Select...' })
+    transformed.unshift({ label: 'Select...', value: 'Select...' });
+    console.log(transformed);
     setFacility(transformed);
   };
 
@@ -121,8 +123,9 @@ export default function AdminJobShift({ navigation }) {
   };
 
   const handleSubmit = async () => {
+    console.log(credentials);
     if (credentials.shift === '') {
-        showAlerts('Shift')
+      showAlerts('Shift')
     } else if (credentials.shiftDate === '') {
       showAlerts('Shift Date')
     } else {
@@ -130,7 +133,7 @@ export default function AdminJobShift({ navigation }) {
         const response = await PostJob(credentials, 'jobs');
         navigation.goBack();
       } catch (error) {
-        console.error('Job Shift failed: ', error)
+        console.error('Job Shift failed: ', error);
       }
     }
   };

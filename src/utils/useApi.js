@@ -222,6 +222,29 @@ export const PostJob = async (jobData, endpoint) => {
   }
 };
 
+export const getFacility = async (endpoint, role) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get(`api/${endpoint}/facility`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`,
+        Role: role
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired');
+    }
+    return response.data.jobData;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 export const Jobs = async (endpoint, role) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
@@ -244,8 +267,7 @@ export const Jobs = async (endpoint, role) => {
     }
     return response.data.jobData;
   } catch (error) {
-    console.log(error);
-    throw error;
+    return { error: error };
   }
 };
 
@@ -424,6 +446,28 @@ export const getClientInfoWithJobId = async (data, endpoint) => {
       // navigation.navigate('Home')
     }
     return response.data.userData;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const getTimesheet = async (data) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/jobs/getTimesheet`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } else if (response.status === 401) {
+      console.log('Token is expired');
+    }
+    return response.data.data;
   } catch (error) {
     return { error: error };
   }
