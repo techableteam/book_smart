@@ -57,7 +57,9 @@ export default function FileViewer({ navigation, route }) {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.filename}>{fileInfo.name}</Text>
+                <Text style={[styles.headerTitle, { fontWeight: 'normal' }]} onPress={() => navigation.goBack()}>{"Back"}</Text>
+                <Text style={styles.headerTitle}>{fileInfo.name}</Text>
+                <Text></Text>
             </View>
             {fileInfo.type === 'pdf' ? (
                 <Pdf
@@ -78,18 +80,17 @@ export default function FileViewer({ navigation, route }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingTop: 100
     },
     webView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 70,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
     },
     pdf: {
         flex: 1,
-        marginTop: 70,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
     },
@@ -97,10 +98,12 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'space-between',
+        paddingHorizontal: 5
     },
-    filename: {
+    headerTitle: {
         fontSize: 16,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: 'black'
     }
 });
