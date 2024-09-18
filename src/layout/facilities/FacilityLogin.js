@@ -398,8 +398,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: 'white',
     fontSize: 16,
   },
   drinksButton: {

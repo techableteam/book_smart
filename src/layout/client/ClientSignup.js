@@ -557,7 +557,7 @@ export default function ClientSignUp({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"

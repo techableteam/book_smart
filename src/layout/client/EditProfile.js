@@ -179,7 +179,7 @@ export default function EditProfile({ navigation }) {
   };
 
   const handleBack = () => {
-    navigation.navigate('MyProfile');
+    navigation.navigate('MyHome');
   }
 
     //Alert
@@ -460,7 +460,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -500,7 +500,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -534,7 +534,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -567,7 +567,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -601,7 +601,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -635,7 +635,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -669,7 +669,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -703,7 +703,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -737,7 +737,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -771,7 +771,7 @@ export default function EditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%'}]}
+                  style={[styles.input, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -986,8 +986,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: 'white',
     fontSize: 16,
   },
   drinksButton: {

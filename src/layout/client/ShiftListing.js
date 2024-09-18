@@ -263,7 +263,7 @@ export default function ShiftListing ({ navigation }) {
           <Text style={styles.text}>View and Apply for Shifts below, once applied the Facility will be notified, and if <Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> the shift will appear on your <Text style={{fontWeight: 'bold'}}>&nbsp;"MY SHIFTS TAB"&nbsp;</Text>.</Text>
           <View style={styles.imageButton}>
             <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
-            <ImageButton title={"My Profile"} onPress={() => handleNavigate('MyProfile')} />
+            <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
             <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
             <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
           </View>
@@ -637,8 +637,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: 'white',
     fontSize: 16,
   },
   searchBar: {

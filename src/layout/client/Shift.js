@@ -322,7 +322,7 @@ export default function Shift ({ navigation }) {
           <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARD"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"COMPLETE"&nbsp;</Text>.</Text>
           <View style={styles.imageButton}>
             <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
-            <ImageButton title={"My Profile"} onPress={() => handleNavigate('MyProfile')} />
+            <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
             <ImageButton title={"All Shift Listings"} onPress={() => handleNavigate('ShiftListing')} />
             <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
           </View>
@@ -389,7 +389,7 @@ export default function Shift ({ navigation }) {
                     )}
                   </View>
                 )}
-                <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#22138e', marginLeft: '20%'}]} onPress = {() => handleUploadEdit(it[0].content)}>
+                <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#A020F0', marginLeft: '20%'}]} onPress = {() => handleUploadEdit(it[0].content)}>
                   <Text style={{color: 'white'}}> Upload Timesheet</Text>
                 </TouchableOpacity>
               </View>)
@@ -527,11 +527,11 @@ export default function Shift ({ navigation }) {
                       <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                     </TouchableOpacity>
                     <TextInput
-                      style={[styles.input, {width: '70%'}]}
+                      style={[styles.input, {width: '70%', color: 'black'}]}
                       placeholder=""
                       autoCorrect={false}
                       autoCapitalize="none"
-                      value={submitData.timeSheet.name|| ''}
+                      value={submitData.timeSheet.name || ''}
                     />
                   </View>
                 </View>
@@ -798,8 +798,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: 'white',
     fontSize: 16,
   },
   timeSheet: {

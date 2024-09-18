@@ -223,7 +223,7 @@ export default function Reporting ({ navigation }) {
           </View>
           <View style={styles.imageButton}>
             <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
-            <ImageButton title={"My Profile"} onPress={() => handleNavigate('MyProfile')} />
+            <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
             <ImageButton title={"All Shift Listings"} onPress={() => handleNavigate('ShiftListing')} />
             <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
           </View>

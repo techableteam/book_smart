@@ -1009,7 +1009,7 @@ export default function CompanyShift({ navigation }) {
                         <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                       </TouchableOpacity>
                       <TextInput
-                        style={[styles.input, { width: '60%' }]}
+                        style={[styles.input, { width: '60%', color: 'black' }]}
                         placeholder={timeSheetFile?.name}
                         autoCorrect={false}
                         autoCapitalize="none"
