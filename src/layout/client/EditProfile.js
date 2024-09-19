@@ -39,8 +39,6 @@ import {
 import { Update } from '../../utils/useApi';
 
 export default function EditProfile({ navigation }) {
-
-  const theme = useTheme();
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
   const [email, setEmail] = useAtom(emailAtom);
@@ -61,7 +59,8 @@ export default function EditProfile({ navigation }) {
   const [resume, setResume] = useAtom(resumeAtom); 
   const [covidCard, setCovidCard] = useAtom(covidCardAtom);
   const [bls, setBls] = useAtom(blsAtom); 
-  //--------------------------------------------Credentials-----------------------------
+  console.log(driverLicense);
+
   const [ credentials, setCredentials ] = useState({
     firstName: firstName,
     lastName: lastName,
@@ -139,8 +138,7 @@ export default function EditProfile({ navigation }) {
         // Handle other file types if needed
         fileType = 'unknown';
       }
-      handleCredentials(name, {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
-      console.log(`File ${name} converted to base64:`, `data:${res.type};base64,${fileContent}`);
+      handleCredentials(name, {content: `${fileContent}`, type: fileType, name: res[0].name});
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -200,7 +198,6 @@ export default function EditProfile({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    console.log('password');
     if (credentials.email === '' || 
       credentials.firstName === '' || 
       credentials.lastName ==='' || 
@@ -239,7 +236,7 @@ export default function EditProfile({ navigation }) {
         setCovidCard(response.user.covidCard);
         setBls(response.user.bls);
         console.log('successfully Updated')
-        navigation.navigate("MyProfile")
+        navigation.navigate("MyHome")
       } catch (error) {
         console.error('Update failed: ', error)
       }
@@ -247,9 +244,13 @@ export default function EditProfile({ navigation }) {
   }
 
   const handleRemove = (name) => {
-    handleCredentials(name, '');
-    // setPhotoName('');
-  }
+    handleCredentials(name, {
+      content: '',
+      name: '',
+      type: ''
+    });
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar 
@@ -437,17 +438,7 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Pic. (Optional)</Text>
-              {credentials.photoImage.type === "image" ? credentials.photoImage.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.photoImage.content}` }}
-                />
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('photoImage')}
-                >remove</Text>
-              </View>:
-              credentials.photoImage.type === "pdf" &&<View style={{marginBottom: 10}}>
+              {credentials.photoImage.name !== "" && <View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                 >{credentials.photoImage.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
@@ -457,7 +448,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('photoImage')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -476,19 +467,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Driver's License</Text>
-              {credentials.driverLicense.type === "image" ?credentials.driverLicense.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.driverLicense.content}` }}
-                />
+              {credentials.driverLicense.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('driverLicense')}
-                >remove</Text>
-              </View>
-              :
-              credentials.driverLicense.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.driverLicense })}
                 >{credentials.driverLicense.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('driverLicense')}
@@ -497,7 +478,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('driverLicense')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -510,19 +491,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Social Security Card</Text>
-              {credentials.socialCard.type === "image" ? credentials.socialCard.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.socialCard.content}` }}
-                />
+              {credentials.socialCard.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {()=>handleRemove('socialCard')}
-                >remove</Text>
-              </View>
-              :
-              credentials.socialCard.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.socialCard })}
                 >{credentials.socialCard.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('socialCard')}
@@ -531,7 +502,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('socialCard')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -544,18 +515,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Physical Exam</Text>
-              {credentials.physicalExam.type === "image" ? credentials.physicalExam.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.physicalExam.content}` }}
-                />
+              {credentials.physicalExam.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {()=>handleRemove('physicalExam')}
-                >remove</Text>
-              </View>:
-              credentials.physicalExam.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.physicalExam })}
                 >{credentials.physicalExam.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('physicalExam')}
@@ -564,7 +526,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('physicalExam')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -577,19 +539,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> PPD (TB Test)</Text>
-              {credentials.ppd.type==="image" ? credentials.ppd.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.ppd.content}` }}
-                />
+              {credentials.ppd.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('ppd')}
-                >remove</Text>
-              </View>
-              :
-              credentials.ppd.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.ppd })}
                 >{credentials.ppd.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('ppd')}
@@ -598,7 +550,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('ppd')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -611,19 +563,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> MMR (Immunizations)</Text>
-              {credentials.mmr.type === "image" ? credentials.mmr.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.mmr.content}` }}
-                />
+              {credentials.mmr.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('mmr')}
-                >remove</Text>
-              </View>
-              :
-              credentials.mmr.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.mmr })}
                 >{credentials.mmr.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('mmr')}
@@ -632,7 +574,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('mmr')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -645,19 +587,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Healthcare License</Text>
-              {credentials.healthcareLicense.type === "image" ? credentials.healthcareLicense.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.healthcareLicense.content}` }}
-                />
+              {credentials.healthcareLicense.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {()=>handleRemove('healthcareLicense')}
-                >remove</Text>
-              </View>
-              :
-              credentials.healthcareLicense.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.healthcareLicense })}
                 >{credentials.healthcareLicense.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('healthcareLicense')}
@@ -666,7 +598,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('healthcareLicense')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -679,19 +611,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Resume</Text>
-              {credentials.resume.type === "image" ? credentials.resume.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.resume.content}` }}
-                />
+              {credentials.resume.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('resume')}
-                >remove</Text>
-              </View>
-              :
-              credentials.resume.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.resume })}
                 >{credentials.resume.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('resume')}
@@ -700,7 +622,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('resume')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -713,19 +635,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> COVID Card</Text>
-              {credentials.covidCard.type === "image" ? credentials.covidCard.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.covidCard.content}` }}
-                />
+              {credentials.covidCard.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {()=>handleRemove('covidCard')}
-                >remove</Text>
-              </View>
-              :
-              credentials.covidCard.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.covidCard })}
                 >{credentials.covidCard.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('covidCard')}
@@ -734,7 +646,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('covidCard')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -747,19 +659,9 @@ export default function EditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> BLS(CPR card)</Text>
-              {credentials.bls.type === "image" ? credentials.bls.content &&
-              <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.bls.content}` }}
-                />
+              {credentials.bls.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('bls')}
-                >remove</Text>
-              </View>
-              :
-              credentials.bls.type === "pdf" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.bls })}
                 >{credentials.bls.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('bls')}
@@ -768,7 +670,7 @@ export default function EditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile('bls')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}

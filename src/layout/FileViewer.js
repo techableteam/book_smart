@@ -5,7 +5,7 @@ import Pdf from 'react-native-pdf';
 import { getTimesheet } from '../utils/useApi';
 
 export default function FileViewer({ navigation, route }) {
-    const { jobId } = route.params;
+    const { jobId, fileData } = route.params;
     const [htmlContent, setHtmlContent] = useState('');
     const [fileInfo, setFileInfo] = useState({ content: '', type: '', name: '' });
 
@@ -50,8 +50,41 @@ export default function FileViewer({ navigation, route }) {
         }
     };
 
+    const setData = async () => {
+        const fetchedFileInfo = fileData;
+        let content = '';
+
+        if (fetchedFileInfo.type === 'pdf') {
+            // For PDF, no need to generate HTML
+            setFileInfo(fetchedFileInfo);
+        } else if (fetchedFileInfo.type === 'image') {
+            content = `
+                <html>
+                <body style="margin: 0; padding: 0;">
+                    <img src="data:image/jpeg;base64,${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
+                </body>
+                </html>
+            `;
+            setHtmlContent(content);
+            setFileInfo(fetchedFileInfo);
+        } else {
+            content = `
+                <html>
+                    <body style="margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100%;">
+                        <p>No valid file type found.</p>
+                    </body>
+                </html>
+            `;
+            setHtmlContent(content);
+        }
+    };
+
     useEffect(() => {
-        getData();
+        if (jobId) {
+            getData();
+        } else {
+            setData();
+        }
     }, []);
 
     return (

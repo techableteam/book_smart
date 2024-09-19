@@ -172,7 +172,7 @@ export default function Shift ({ navigation }) {
   const handleShowFile = (data) => {
     const jobIdObject = data.find(item => item.title === 'Job-ID');
     const jobId = jobIdObject ? jobIdObject.content : null;
-    navigation.navigate("FileViewer", { jobId: jobId });
+    navigation.navigate("FileViewer", { jobId: jobId, fileData: '' });
   };
 
   const handleUploadSubmit = async () => {

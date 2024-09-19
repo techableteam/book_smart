@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
+import { TouchableWithoutFeedback, FlatList, Dimensions, Alert, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
 import { Text, PaperProvider, DataTable, useTheme, Button } from 'react-native-paper';
 import images from '../../assets/images';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -13,14 +13,24 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
 // import MapView from 'react-native-maps';
 import * as Progress from 'react-native-progress';
-import { Jobs, Update, Clinician } from '../../utils/useApi';
+import { Jobs, Update, Clinician, updatePassword, getUserProfile } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
+import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function AllCaregivers({ navigation }) {
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [appliedList, setAppliedList] = useState([]);
+  const [awardedList, setAwardedList] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [tmpPassword, setTmpPassword] = useState('');
+  const [userProfileModal, setUserProfileModal] = useState(false);
+  const [resetPWModal, setResetPWModal] = useState(false);
 
   //---------------------------------------Animation of Background---------------------------------------
   const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
@@ -48,42 +58,41 @@ export default function AllCaregivers({ navigation }) {
     'Entry Date',
     'Name',
     'Phone',
+    'Degree/Discipline',
     'Email',
-    'User Status',
+    'View Shifts / Profile',
+    'Verification',
+    '✏️ User Status',
+    'Awarded',
+    'Applied for',
+    'Ratio',
+    'P.W.'
   ];
-  // const tableData = [
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  // ]
+  const widths = [120, 150, 150, 180, 300, 150, 150, 150, 80, 100, 80, 120];
+
   const [clinicians, setClinicians] = useState([]);
 
   function formatData(data) {
     return data.map(item => {
-        // Parse the date and format to MM/DD/YYYY
         const date = new Date(item[0]);
         const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
-
-        // Combine the second and third elements
         const fullName = `${item[1]} ${item[2]}`;
-
-        // Return the new structure
-        return [formattedDate, fullName, item[3], item[4], item[5]];
+        return [formattedDate, fullName, item[3], item[4], item[5], item[6], item[7], item[8], item[9], item[10], item[11], item[12], item[13]];
     });
   }
 
+  const formatDate = (origin) => {
+    const date = new Date(origin);
+    const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
+    return formattedDate;
+  };
+
   async function getData() {
-    let Data = await Clinician('clinical/clinician', 'Admin');
-    if(!Data) {
+    let data = await Clinician('clinical/clinician', 'Admin');
+    if(!data) {
       setData(['No Data'])
-    }
-    else {
-      const modifiedData = formatData(Data);
-      console.log(modifiedData)
-      // const modifiedArray = Data.map(subarray => {
-      //   const newArray = [...subarray]; // Create a copy of the subarray
-      //   newArray.pop(); // Remove the last item
-      //   return newArray; // Return the modified subarray
-      // });
+    } else {
+      const modifiedData = formatData(data);
       setData(modifiedData)
     }
     const uniqueValues = new Set();
@@ -97,16 +106,130 @@ export default function AllCaregivers({ navigation }) {
           transformed.push({ label: value, value: value }); // Add to transformed array
       }
     });
-
-    console.log(transformed);
     setClinicians(transformed);
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
-  }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
+  );
+
+  const handleResetPW = async () => {
+    if (password != confirmPassword) {
+      Alert.alert(
+        'Warning!',
+        "The Password doesn't matched. Please try again.",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setPassword('');
+              setConfirmPassword('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      return;
+    }
+
+    let response = await updatePassword({ userId: selectedUserId, password, tmpPassword }, 'admin');
+    getData();
+    toggleRestPWModal();
+  };
+
+  const toggleRestPWModal = () => {
+    setResetPWModal(!resetPWModal);
+  };
+
+  const toggleUserProfileModal = () => {
+    setUserProfileModal(!userProfileModal);
+  };
+
+  const handleShowProfileModal = async () => {
+    let response = await getUserProfile({ userId: selectedUserId }, 'clinical');
+
+    if (!response?.error) {
+      let appliedData = response.appliedList;
+      appliedData.unshift(appliedTableHeader);
+
+      let awardedData = response.awardedList;
+      awardedData.unshift(awardedTableHeader);
+
+      setSelectedUser(response.userData);
+      setAppliedList(appliedData);
+      setAwardedList(awardedData);
+
+      toggleUserProfileModal();
+    } else {
+      setSelectedUser(null);
+      setAppliedList([]);
+      setAwardedList([]);
+    }
+  };
+
+  
+  const appliedTableHeaderWidth = [150, 150, 140, 400];
+  const appliedTableHeader = ['Bid-ID', 'Entry Date', 'Job', 'Message From Applicant'];
+  const RenderItem = ({ item, index }) => (
+    <View
+      key={index}
+      style={{
+        backgroundColor: index == 0 ? '#ccffff' : '#fff',
+        flexDirection: 'row',
+      }}
+    >
+      {appliedTableHeaderWidth.map((width, idx) => {
+        return (
+          <Text
+            key={idx}
+            style={[styles.tableText, { width, textAlign: 'center' }]}
+          >
+            {item[idx]}
+          </Text>
+        );
+      })}
+    </View>
+  );
+
+  const awardedTableHeaderWidth = [150, 150, 140, 150];
+  const awardedTableHeader = ['Job-ID', 'Entry Date', 'Facility', 'Job Status'];
+  const RenderItem1 = ({ item, index }) => (
+    <View
+      key={index}
+      style={{
+        backgroundColor: index == 0 ? '#ccffff' : '#fff',
+        flexDirection: 'row',
+      }}
+    >
+      {awardedTableHeaderWidth.map((width, idx) => {
+        return (
+          <Text
+            key={idx}
+            style={[styles.tableText, { width, textAlign: 'center' }]}
+          >
+            {item[idx]}
+          </Text>
+        );
+      })}
+    </View>
+  );
+  
+  const AppliedListTable = () => (
+    <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
+      {appliedList.map((item, index) => (
+        <RenderItem key={index} item={item} index={index} />
+      ))}
+    </View>
+  );
+
+  const AwardedListTable = () => (
+    <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
+      {awardedList.map((item, index) => (
+        <RenderItem1 key={index} item={item} index={index} />
+      ))}
+    </View>
   );
 
   //---------------DropDown--------------
@@ -120,19 +243,7 @@ export default function AllCaregivers({ navigation }) {
   ]
 
   const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };  
-  const widths = [120, 100, 150, 150, 100];
+  const [isFocus, setIsFocus] = useState(false); 
   const [modal, setModal] = useState(false)
   const toggleModal = () => {
     setModal(!modal);
@@ -140,9 +251,7 @@ export default function AllCaregivers({ navigation }) {
   const [cellData, setCellData] = useState(null);
   const [rowData, setRowData] = useState(null);
   const [modalItem, setModalItem] = useState(0);
-  const [showCalendar, setShowCalendar] = useState(false);
   const [label, setLabel] = useState(null);
-  const [date,setDate] = useState(new Date());
   const handleCellClick = (cellData, rowIndex, cellIndex) => {
     // Handle row click event here
     console.log('Row clicked:', cellData, rowIndex, cellIndex);
@@ -165,10 +274,6 @@ export default function AllCaregivers({ navigation }) {
     // }
   };
 
-  const handleDay = (day) => {
-    setDate(day);
-    setLabel(moment(day).format("MM/DD/YYYY"));
-  }
 
   //---------------DropDown--------------
   const [location, setLocation] = useState([
@@ -228,9 +333,6 @@ export default function AllCaregivers({ navigation }) {
         userStatus: sendData // Use sendData for location
       };
     }
-    console.log('====================================');
-    console.log(sendingData);
-    console.log('====================================');
     let Data = await Update(sendingData, 'clinical');
     if(Data) setSuc(suc+1);
     else setSuc(suc);
@@ -320,21 +422,106 @@ export default function AllCaregivers({ navigation }) {
               />
               <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
-                  <Row
-                    data={tableHead}
-                    style={styles.head}
-                    widthArr={[120, 100, 150, 150, 100]}
-                    textStyle={styles.tableText}
-                  />
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
+                    {tableHead.map((item, index) => (
+                      <Text
+                        key={index}
+                        style={[styles.tableText, { width: widths[index], textAlign: 'center' }]}
+                      >
+                        {item}
+                      </Text>
+                    ))}
+                  </View>
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
-                      {rowData.map((cellData, cellIndex) => (
-                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
-                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
-                            <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
-                          </View>
-                        </TouchableWithoutFeedback> 
-                      ))}
+                      {rowData.map((cellData, cellIndex) => {
+                        if (cellData === 'view_shift') {
+                          return (
+                            <View key={cellIndex} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  console.log('user => ', rowData[12]);
+                                  setSelectedUserId(rowData[12]);
+                                  handleShowProfileModal()
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>View Here</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else if (cellData === 'verification') {
+                          return (
+                            <View key={cellIndex} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  console.log('user =>', rowData[12]);
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>View here</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else if (cellData === 'pw') {
+                          return (
+                            <View key={cellIndex} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  console.log('user > ', rowData[12]);
+                                  setSelectedUserId(rowData[12]);
+                                  toggleRestPWModal();
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>Reset</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else if (cellIndex >= tableHead.length) {
+                          return (<View key={cellIndex}></View>);
+                        } else {
+                          if (cellIndex == 2 || cellIndex == 4) {
+                            return (
+                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                                <Text style={[styles.tableText, {borderWidth: 0, color: 'blue' }]}>{cellData}</Text>
+                              </View>
+                            );
+                          } else {
+                            return (
+                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                                <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
+                              </View>
+                            );
+                          }
+                        }
+                        // <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
+                        //   <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                        //     <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
+                        //   </View>
+                        // </TouchableWithoutFeedback> 
+                      })}
                     </View>
                   ))}
                 </Table>
@@ -434,6 +621,176 @@ export default function AllCaregivers({ navigation }) {
               </View>
             </View>
           </Modal>
+          <Modal
+            visible={resetPWModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setResetPWModal(!resetPWModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Reset Password</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleRestPWModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={styles.modalBody}>
+                    <Text style={styles.subtitle}> Password <Text style={{color: 'red'}}>*</Text></Text>
+                    <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      secureTextEntry={true}
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder="Password"
+                      onChangeText={e => setPassword(e)}
+                      value={password}
+                    />
+                    <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      secureTextEntry={true}
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder="Confirm Password"
+                      onChangeText={e => setConfirmPassword(e)}
+                      value={confirmPassword}
+                    />
+                    <Text style={styles.subtitle}> Temp Password </Text>
+                    <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder=""
+                      onChangeText={e => setTmpPassword(e)}
+                      value={tmpPassword}
+                    />
+                    <Text>Enter Password again to send in email notification</Text>
+                    <TouchableOpacity style={styles.button} onPress={handleResetPW}>
+                      <Text style={styles.buttonText}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={userProfileModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setUserProfileModal(!userProfileModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.calendarContainer, { height: '80%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Facility View Job Details</Text>
+                  <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleUserProfileModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <ScrollView>
+                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ CAREGIVER PROFILE</Text>
+                        </View>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Image
+                          resizeMode="cover"
+                          style={styles.nurse}
+                          source={selectedUser?.photoImage?.content ? 'data:image/jpeg;base64,' + selectedUser?.photoImage?.content : images.profile}
+                        />
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Entry Date</Text>
+                        <Text style={styles.content}>{formatDate(selectedUser?.entryDate)}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#F7F70059', marginBottom: 5, paddingLeft: 2}]}>Name</Text>
+                        <Text style={styles.content}>{selectedUser?.firstName} {selectedUser?.lastName}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Email</Text>
+                        <Text style={[styles.content, { color: 'blue' }]}>{selectedUser?.email}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Phone</Text>
+                        <Text style={styles.content}>{selectedUser?.phoneNumber}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Degree/Discipline</Text>
+                        <Text style={styles.content}>{selectedUser?.title}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Total Bids / Offers</Text>
+                        <Text style={styles.content}>{selectedUser?.appliedCnt}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Total Awarded</Text>
+                        <Text style={styles.content}>{selectedUser?.awardedCnt}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Bid to Award Ratio</Text>
+                        <Text style={styles.content}>{selectedUser?.ratio}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Nurse Aver. Job Rating</Text>
+                        <Text style={styles.content}>
+                          <StarRatingDisplay
+                            rating={selectedUser?.avgJobRating}
+                            maxStars={5}
+                            starSize={25}
+                          />
+                        </Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Bnak Name</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Routing Number</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Account Number</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Bank Account Type</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ SHIFTS APPLIED FOR</Text>
+                        </View>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
+                        <ScrollView horizontal={true} style={{width: '100%'}}>
+                          <AppliedListTable />
+                        </ScrollView>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ SHIFTS AWARDED</Text>
+                        </View>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
+                        <ScrollView horizontal={true} style={{width: '100%'}}>
+                          <AwardedListTable />
+                        </ScrollView>
+                      </View>
+                    </View>
+                  </ScrollView>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       </ScrollView>
       <MFooter />
@@ -456,6 +813,11 @@ const styles = StyleSheet.create({
     width: '80%',
     position: 'relative'
   },
+  nurse: {
+    width: 200,
+    height: 200,
+    margin: 10
+  },
   backTitle: {
     backgroundColor: 'black',
     width: '100%',
@@ -468,6 +830,17 @@ const styles = StyleSheet.create({
     zIndex: 500,
     color: 'black',
     top: 10
+  },
+  content: {
+    fontSize: 16,
+    lineHeight: 30,
+    width: '60%'
+  },
+  titles: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    lineHeight: 30,
+    width: '35%'
   },
   title: {
     fontSize: 18,
@@ -551,10 +924,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
-    height: '20%',
+    height: 80,
     padding: 20,
     borderBottomColor: '#c4c4c4',
     borderBottomWidth: 1,
+  },
+  subtitle: {
+    backgroundColor: '#F7F70059',
+    marginBottom: 5
   },
   headerText: {
     fontSize: 18,
@@ -567,7 +944,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingHorizontal: 20,
     paddingBottom: 30,
-    marginBottom: 30
+    marginBottom: 100
   },
   modalContainer: {
     flex: 1,
@@ -576,12 +953,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   calendarContainer: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#e3f2f1',
     borderRadius: 30,
     elevation: 5,
-    width: '80%',
-    marginLeft: '20',
-    flexDirection: 'flex-start',
+    width: '90%',
+    flexDirection: 'column',
     borderWidth: 3,
     borderColor: '#7bf4f4',
   },
@@ -590,8 +966,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
-    marginTop: 30,
-    paddingLeft: '5%'
+    paddingLeft: '5%',
   },
   searchBar: {
     flexDirection: 'row',
@@ -702,20 +1077,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007BFF', // Button color
-    padding: 10,    
-    marginLeft: '35%',
-    marginTop: 30,           // Padding inside the button
-    borderRadius: 5,          // Rounded corners
-    
+    backgroundColor: '#007BFF',
+    padding: 10,
+    marginTop: 30,
+    borderRadius: 5,
   },
   buttonText: {
-    color: 'white',            // Text color
-    fontSize: 16,              // Text size
+    color: 'white',
+    fontSize: 16,
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
+    height: 40, 
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',

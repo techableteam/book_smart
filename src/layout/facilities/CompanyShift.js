@@ -371,7 +371,7 @@ export default function CompanyShift({ navigation }) {
   };
 
   const handleShowFile = () => {
-    navigation.navigate("FileViewer", { jobId: curJobId });
+    navigation.navigate("FileViewer", { jobId: curJobId, fileData: '' });
   };
 
   const itemsToShow = getItemsForPage(currentPage);

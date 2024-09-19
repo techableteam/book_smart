@@ -113,7 +113,7 @@ export default function AllJobShiftListing({ navigation }) {
 
   const handleShowFile = (jobId) => {
     console.log('clicked => ', jobId);
-    navigation.navigate("FileViewer", { jobId: jobId });
+    navigation.navigate("FileViewer", { jobId: jobId, fileData: '' });
   };
 
   //---------------DropDown--------------
@@ -1331,7 +1331,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
-    height: '20%,',
+    height: '20%',
     padding: 20,
     borderBottomColor: '#c4c4c4',
     borderBottomWidth: 1,
@@ -1375,7 +1375,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
-    marginTop: 30,
     paddingLeft: '5%'
   },
   searchBar: {

@@ -9,7 +9,7 @@ import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { PostJob, Jobs, getFacility } from '../../utils/useApi';
+import { PostJob, getFacility, getDegreeList, addDegreeItem } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
 
 export default function AdminJobShift({ navigation }) {
@@ -77,9 +77,24 @@ export default function AdminJobShift({ navigation }) {
     setFacility(transformed);
   };
 
+  async function getDegree() {
+    const response = await getDegreeList('degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
+    }
+  }
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
+      getDegree();
     }, [])
   );
 
@@ -122,9 +137,28 @@ export default function AdminJobShift({ navigation }) {
     );
   };
 
+  const showAlerts1 = (name) => {
+    Alert.alert(
+      'Warning!',
+      `You have to select ${name}!`,
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('OK pressed')
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   const handleSubmit = async () => {
-    console.log(credentials);
-    if (credentials.shift === '') {
+    if (credentials.facility === '') {
+      showAlerts1('Facility');
+    } else if (credentials.degree === '') {
+      showAlerts1('Degree');
+    } else if (credentials.shift === '') {
       showAlerts('Shift')
     } else if (credentials.shiftDate === '') {
       showAlerts('Shift Date')
@@ -142,13 +176,25 @@ export default function AdminJobShift({ navigation }) {
     setItem(e);
   };
 
-  const handleModal = (title, item) => {
-    if (title === 'degree'){
-      console.log('degree', item)
-      setDegree([...degree, {label: item, value: item}])
-    } else if (title === 'location') {
-      console.log('location', item)
-      setLocation([...location, {label: item, value: item},])
+  const handleModal = async (title, item) => {
+    // if (title === 'degree'){
+    //   setDegree([...degree, {label: item, value: item}])
+    // } else if (title === 'location') {
+    //   setLocation([...location, {label: item, value: item},])
+    // }
+    console.log(item);
+    const response = await addDegreeItem({ item }, 'degree');
+    console.log(response);
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      console.log(tempArr);
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
     }
     setShowModal(!showModal)
     setItem('')
@@ -166,7 +212,7 @@ export default function AdminJobShift({ navigation }) {
           </View>
           <View style={styles.authInfo}>
             <View>
-              <Text style={styles.subtitle}> Select Facility </Text>
+              <Text style={styles.subtitle}> Select Facility <Text style={{color: 'red'}}>*</Text></Text>
               <Dropdown
                 style={[styles.dropdown, isFacilityFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
@@ -200,7 +246,7 @@ export default function AdminJobShift({ navigation }) {
               />
             </View>
             <View>
-              <Text style={styles.subtitle}> Degree/Discipline </Text>
+              <Text style={styles.subtitle}> Degree/Discipline <Text style={{color: 'red'}}>*</Text></Text>
               <Dropdown
                 style={[styles.dropdown, isDegreeFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
@@ -209,12 +255,10 @@ export default function AdminJobShift({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={degree}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
+                placeholder={'Select ...'}
                 value={degreeValue ? degreeValue : degree[0]?.value}
                 onFocus={() => setIsDegreeFocus(true)}
                 onBlur={() => setIsDegreeFocus(false)}
@@ -312,10 +356,6 @@ export default function AdminJobShift({ navigation }) {
                   />
                 )}
               />
-              <TouchableOpacity style={styles.addItems} onPress={() => {handleItemPress(); setTitle('location')}}>
-                <Image source={images.plus} style={{width: 15, height: 15}} />
-                <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
-              </TouchableOpacity>
             </View>
             <View>
               <Text style={styles.subtitle}> Pay Rate </Text>
@@ -354,7 +394,7 @@ export default function AdminJobShift({ navigation }) {
         <View style={styles.modalContainer}>
           <View style={styles.calendarContainer}>
             <View style={styles.header}>
-              <Text style={styles.headerText}>Add a new option</Text>
+              <Text style={[styles.headerText, { color: 'black' }]}>Add a new option</Text>
               <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
                 <Image source = {images.close} style={{width: 20, height: 20,}}/>
               </TouchableOpacity>

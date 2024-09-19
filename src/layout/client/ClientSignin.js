@@ -6,7 +6,31 @@ import { useAtom } from 'jotai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUniqueId, getManufacturer } from 'react-native-device-info';
 import { useFocusEffect } from '@react-navigation/native';
-import { firstNameAtom, lastNameAtom, addressAtom, clinicalAcknowledgeTerm, socialSecurityNumberAtom, entryDateAtom, birthdayAtom, phoneNumberAtom, signatureAtom, titleAtom, emailAtom, photoImageAtom, userRoleAtom, passwordAtom } from '../../context/ClinicalAuthProvider'
+import { 
+  firstNameAtom, 
+  lastNameAtom, 
+  emailAtom, 
+  titleAtom, 
+  userRoleAtom, 
+  birthdayAtom, 
+  entryDateAtom, 
+  phoneNumberAtom, 
+  addressAtom, 
+  socialSecurityNumberAtom, 
+  photoImageAtom, 
+  driverLicenseAtom,
+  socialCardAtom,
+  physicalExamAtom,
+  ppdAtom,
+  mmrAtom,
+  healthcareLicenseAtom,
+  resumeAtom,
+  covidCardAtom,
+  signatureAtom,
+  passwordAtom,
+  blsAtom,
+  clinicalAcknowledgeTerm
+ } from '../../context/ClinicalAuthProvider';
 import { Signin } from '../../utils/useApi';
 import { deviceNumberAtom } from '../../context/BackProvider';
 import HButton from '../../components/Hbutton';
@@ -29,23 +53,26 @@ export default function ClientSignIn({ navigation }) {
   const [password, setPassword] = useAtom(passwordAtom);
   const [clinicalAcknowledgement, setClinicalAcknowledgement] = useAtom(clinicalAcknowledgeTerm);
   const [deviceNum, setDeviceNum] = useAtom(deviceNumberAtom);
-  const theme = useTheme();
+  const [driverLicense, setDriverLicense] = useAtom(driverLicenseAtom); 
+  const [socialCard, setSocialCard] = useAtom(socialCardAtom);
+  const [physicalExam, setPhysicalExam] = useAtom(physicalExamAtom); 
+  const [ppd, setPPD] = useAtom(ppdAtom);
+  const [mmr, setMMR] = useAtom(mmrAtom); 
+  const [healthcareLicense, setHealthcareLicense] = useAtom(healthcareLicenseAtom);
+  const [resume, setResume] = useAtom(resumeAtom); 
+  const [covidCard, setCovidCard] = useAtom(covidCardAtom);
+  const [bls, setBls] = useAtom(blsAtom); 
   const [ credentials, setCredentials ] = useState({
     email: '',
     password: '',
     userRole: 'Clinician',
     device: '',
   });
-  const [uniqueId, setUniqueId] = useState('');
-  const [manufacturer, setManufacturer] = useState('');
+
   const fetchDeviceInfo = async () => {
     try {
       const id = await getUniqueId();
-      setUniqueId(id);
-      console.log(credentials, '.....');
-      
-      const manu = await getManufacturer();
-      setManufacturer(manu);
+      handleCredentials('device', id)
     } catch (error) {
       console.error('Error fetching device info:', error);
     }
@@ -54,7 +81,7 @@ export default function ClientSignIn({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       fetchDeviceInfo();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
   const [checked, setChecked] = useState(false);
 
@@ -108,7 +135,6 @@ export default function ClientSignIn({ navigation }) {
 
   const handleSubmit = async () => {
     try {
-      setCredentials({...credentials, ["device"]: uniqueId});
       const response = await Signin(credentials, 'clinical');
 
       if (response?.user) {
@@ -126,7 +152,17 @@ export default function ClientSignIn({ navigation }) {
         setClinicalAcknowledgement(response.user.clinicalAcknowledgeTerm);
         setAddress(response.user.address);
         setPassword(response.user.password);
-        setDeviceNum(uniqueId);
+        setDriverLicense(response.user.driverLicense);
+        setSocialCard(response.user.socialCard);
+        setPhysicalExam(response.user.physicalExam);
+        setPPD(response.user.ppd);
+        setMMR(response.user.mmr);
+        setHealthcareLicense(response.user.healthcareLicense);
+        setResume(response.user.resume);
+        setCovidCard(response.user.covidCard);
+        setBls(response.user.bls);
+        setDeviceNum(response.device);
+        console.log(credentials);
 
         await AsyncStorage.setItem('clinicalPhoneNumber', response.user.phoneNumber);
 
@@ -136,7 +172,11 @@ export default function ClientSignIn({ navigation }) {
         }
 
         if (response.user.clinicalAcknowledgeTerm) {
-          handleSignInNavigate('ClientPhone');
+          if (response.phoneAuth) {
+            handleSignInNavigate('ClientPhone');
+          } else {
+            handleSignInNavigate('MyHome');
+          }
         } else {
           handleSignInNavigate("ClientPermission");
         }

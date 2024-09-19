@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
-import { TextInput, useTheme, } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import RNFS from 'react-native-fs'
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
@@ -33,12 +33,15 @@ export default function ClientSignUp({ navigation }) {
     type: '',
     name: ''
   });
-  const [signature, setSignature] = useState('');
+  const [signature, setSignature] = useState({content: ''});
   const [userRole, setuserRole] = useState('Clinician');
   const [showModal, setShowModal] = useState(false);
   const [showCalender, setShowCalendar] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   
   let signatureRef = useRef(null);
+  let signautreData = '';
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -60,20 +63,6 @@ export default function ClientSignUp({ navigation }) {
 
     Animated.loop(sequenceAnimation).start();
   }, [fadeAnim]);
-
-
-
-  const handleCredentials = (target, e) => {
-    if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
-      let value = e;
-      if (target === 'email') {
-        value = e.toLowerCase();
-      }
-      setCredentials({...credentials, [target]: value});
-    } else {
-      setCredentials({...credentials, address: {...credentials.address, [target]: e}})
-    }
-  };
 
   const handleItemPress = (text) => {
     setTitle(text);
@@ -133,7 +122,20 @@ export default function ClientSignUp({ navigation }) {
   };
 
   const onSaveEvent = (result) => {
-    setSignature(result.encoded);
+    signautreData = result.encoded;
+    setSignature((prev) => ({...prev, content: result.encoded}));
+  };
+
+  const getSignature = () => {
+    if (signatureRef.current) {
+      signatureRef.current.saveImage();
+    }
+  };
+
+  const resetSignature = () => {
+    if (signatureRef.current) {
+      signatureRef.current.resetImage();
+    }
   };
   
   const formatPhoneNumber = (input) => {
@@ -204,6 +206,16 @@ export default function ClientSignUp({ navigation }) {
     }));
   };
 
+  const handlePreSubmit = () => {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      getSignature();
+      setTimeout(() => {
+        handleSubmit();
+      }, 2000);
+    }
+  };
+
   const handleSubmit = async () => {
     if (email === '' || 
       firstName === '' || 
@@ -218,11 +230,13 @@ export default function ClientSignUp({ navigation }) {
       address.state === '' || 
       address.zip === '' || 
       password === '' ||
-      signature === ''
+      signature.content === ''
     ) {
       showWrongAlerts();
+      setIsSubmitting(false);
     } else if (password !== confirmPassword) {
       showPswWrongAlert();
+      setIsSubmitting(false);
     } else {
       try {
         const credentials = {
@@ -237,7 +251,7 @@ export default function ClientSignUp({ navigation }) {
           verifiedSocialSecurityNumber: verifySSNumber,
           address,
           photoImage,
-          signature,
+          signature: signature.content,
           userRole,
         };
 
@@ -245,7 +259,9 @@ export default function ClientSignUp({ navigation }) {
 
         if (!response?.error) {
           successAlerts();
+          setIsSubmitting(false);
         } else {
+          setIsSubmitting(false);
           if (response.error.status == 500) {
             Alert.alert(
               'Warning!',
@@ -305,6 +321,7 @@ export default function ClientSignUp({ navigation }) {
           }
         }
       } catch (error) {
+        setIsSubmitting(false);
         console.error('Signup failed: ', error);
         Alert.alert(
           'Failure!',
@@ -578,13 +595,19 @@ export default function ClientSignUp({ navigation }) {
             <View style={styles.password}>
               <Text style={styles.subtitle}>Signature<Text style={{color: 'red'}}>*</Text> </Text>  
               
-              <SignatureCapture
-                style={styles.signature}
-                ref={signatureRef}
-                onSaveEvent={onSaveEvent}
-                saveImageFileInExtStorage={false}
-                showNativeButtons={true}
-              />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <SignatureCapture
+                  style={styles.signature}
+                  ref={signatureRef}
+                  onSaveEvent={onSaveEvent}
+                  saveImageFileInExtStorage={false}
+                  showNativeButtons={false}
+                />
+                <TouchableOpacity onPress={resetSignature} style={{ backgroundColor: '#ccc', padding: 5, width: 'auto', height: 'auto', marginLeft: 5 }}>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Reset</Text>
+                </TouchableOpacity>
+              </View>
+
             </View>
             
             <View style={[styles.email, {marginTop: 20}]}>
@@ -595,7 +618,7 @@ export default function ClientSignUp({ navigation }) {
             </View>
 
             <View style={[styles.btn, {marginTop: 20}]}>
-              <HButton style={styles.subBtn} onPress={ handleSubmit }>
+              <HButton style={styles.subBtn} onPress={ handlePreSubmit }>
                 Submit
               </HButton>
             </View>
