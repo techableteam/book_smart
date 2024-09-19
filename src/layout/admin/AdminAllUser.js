@@ -258,7 +258,7 @@ export default function AdminAllUser({ navigation }) {
       <AHeader navigation={navigation}  currentPage={5} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView
-        style={{ width: '100%', marginTop: 140 }}
+        style={{ width: '100%', marginTop: 155 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>

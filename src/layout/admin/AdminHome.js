@@ -52,7 +52,7 @@ export default function AdminHome ({ navigation }) {
         />
         <AHeader currentPage={3} navigation={navigation} style={{zIndex: 10}}/>
         <SubNavbar navigation={navigation} name={"AdminLogin"} style={{zIndex: 0}}/>
-        <ScrollView style={{width: '100%', marginTop: 119}}
+        <ScrollView style={{width: '100%', marginTop: 155}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>

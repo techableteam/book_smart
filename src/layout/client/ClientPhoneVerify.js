@@ -107,10 +107,10 @@ export default function ClientPhoneVerify ({ navigation }) {
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
-            <Text style={styles.subject}> You Received Verify Code? </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your verify code below. </Text>
+            {/* <Text style={styles.subject}> You Received Verify Code? </Text> */}
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', marginTop: 30}]}> Enter your verificaiton code below. </Text>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Verify Code </Text>
+              <Text style={styles.subtitle}> Verification Code </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 {/* <TextInput
                   style={[styles.input, {width: '100%'}]}
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   cell: {
     width: 40,
     height: 50,
-    lineHeight: 20,
+    lineHeight: 40,
     fontSize: 20,
     fontWeight: '700',
     textAlign: 'center',

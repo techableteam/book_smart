@@ -496,19 +496,19 @@ export default function AllJobShiftListing({ navigation }) {
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>When A New "Job / Shift" is added the status will appear as <Text style={{ backgroundColor: '#ffff99' }}>"AVAILABLE"</Text> & will appear on Caregivers Dashboard</Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>When A New "Job / Shift" is added the status will appear as <Text style={{ backgroundColor: '#ffff99' }}>"AVAILABLE"</Text> & will appear on Nurses Dashboard</Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 5 }} />
+            <Text style={[styles.text, { textAlign: 'left', marginTop: -5 }]}>Nurses can "Bid" or show interest on all "Job / Shifts" - Available</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Caregivers can "Bid" or show interest on all "Job / Shifts" - Available</Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Admins can view all bids and award a shift to the nurse of choice, once awarded the Job / Shift will update to a stus of <Text style={{ backgroundColor: '#ccffff' }}>"AWARDED"</Text></Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Facilities can view all bids and award a shift to the nurse of choice, once awarded the Job / Shift will update to a stus of <Text style={{ backgroundColor: '#ccffff' }}>"AWARDED"</Text></Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Once the Caregiver has completed the "Job / Shift" and uploads there timesheet, the status will update to <Text style={{ backgroundColor: '#ccffcc' }}>"COMPLETED"</Text></Text>
+            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Once the Nurse has completed the "Job / Shift" and uploads there timesheet, the status will update to <Text style={{ backgroundColor: '#ccffcc' }}>"COMPLETED"</Text></Text>
           </View>
         </View>
         <View>

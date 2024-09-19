@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 151,
+    marginTop: 155,
   },
   backTitle: {
     backgroundColor: 'black',

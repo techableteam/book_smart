@@ -170,7 +170,7 @@ export default function AccountSettings ({ route, navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"ClientSignIn"} />
-        <ScrollView style={{width: '100%', marginTop: 139}}
+        <ScrollView style={{width: '100%', marginTop: 155}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.authInfo}>

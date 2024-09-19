@@ -226,14 +226,10 @@ const styles = StyleSheet.create({
   },
   cell: {
     width: 40,
-    height: 50,
-    lineHeight: 20,
-    fontSize: 20,
-    fontWeight: '700',
-    textAlign: 'center',
-    textAlignVertical:'center',
+    height: 40,
+    lineHeight: 40,
+    fontSize: 40,
     marginLeft: "2.8%",
-    borderRadius: 10,
     backgroundColor: '#dddddd',
     color: 'black'
   },

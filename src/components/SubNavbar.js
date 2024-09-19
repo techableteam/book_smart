@@ -27,29 +27,31 @@ export default function SubNavbar({name, navigation}) {
   }
   return (
     <Card style={styles.shadow}>
-      <Text style={styles.text}>
-        Logged in as&nbsp;
-        <Text style={{fontWeight: 'bold'}}>{firstName}</Text>&nbsp;-&nbsp;
-        <Text 
-          style={{
-            color: '#2a53c1', 
-            textDecorationLine: 'underline'
-          }}
-          onPress={()=>handleNavigate('AccountSettings')}
-        >
-          Account Settings
+      <View>
+        <Text style={styles.text}>
+          Logged in as&nbsp;
+          <Text style={{fontWeight: 'bold'}}>{firstName}</Text>&nbsp;-&nbsp;
+          <Text 
+            style={{
+              color: '#2a53c1', 
+              textDecorationLine: 'underline'
+            }}
+            onPress={()=>handleNavigate('AccountSettings')}
+          >
+            Account Settings
+          </Text>
         </Text>
-        &nbsp;- &nbsp;
+      </View>
+      <View style={styles.actionsContainer}>
         <Text 
-          style={{
-            color: '#2a53c1', 
-            textDecorationLine: 'underline'
-          }}
-          onPress={()=>handleNavigate(name)}
-        >
-          Log Out
-        </Text>
-      </Text>
+            style={{
+              color: '#2a53c1', 
+              textDecorationLine: 'underline'
+            }}
+            onPress={()=>handleNavigate(name)}>
+            Log Out
+          </Text>
+      </View>
     </Card>
   );
 }
@@ -58,18 +60,18 @@ const styles = StyleSheet.create({
   shadow: {
     borderRadius: 0,
     backgroundColor: 'hsl(0, 0%, 80%)',
-    top: 98,
-    position:'absolute',
+    position: 'absolute',
+    top: 95,
     width: '100%',
     flexDirection: 'row',
-    justifyContent:'flex-end',
-    zIndex: 0
-  },
-  text: {
+    justifyContent: 'flex-end',
     paddingHorizontal: 10,
-    paddingVertical: 10,
-    color: '#101010',
-    fontSize: 16,
-    textAlign: 'right',
+    paddingVertical: 10
   },
+  actionsContainer: {
+    width: '100%',
+    marginTop: 5,
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+  }
 });

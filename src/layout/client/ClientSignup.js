@@ -351,7 +351,7 @@ export default function ClientSignUp({ navigation }) {
             <Animated.View style={[styles.backTitle, { opacity: fadeAnim, backgroundColor: '#0f00c4' }]}></Animated.View>
             <Text style={styles.title}>CAREGIVERS REGISTER HERE!</Text>
             <View style={{flexDirection:'row', justifyContent: 'center', marginVertical: 10}}>
-              <View style={styles.marker} />
+              {/* <View style={styles.marker} /> */}
               <Text style={[styles.text, {flexDirection:'row'}]}>
                 NOTE: Your Registration will be in <Text style={[styles.text, {color:'#0000ff'}]}>"PENDING"</Text> {"\n"}
                 &nbsp;Status until your information is verified. Once
@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -725,6 +725,7 @@ const styles = StyleSheet.create({
     marginLeft: '10%',
     fontSize: 18,
     borderRadius: 5,
+    textAlign: 'center'
   },
   mark: {
     width: '70%',
