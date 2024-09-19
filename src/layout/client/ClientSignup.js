@@ -11,8 +11,12 @@ import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
 
 export default function ClientSignUp({ navigation }) {
+  const [showModal, setShowModal] = useState(false);
+  const [birthday, setBirthday] = useState(new Date());
+  const [showCalender, setShowCalendar] = useState(false);
+
   //---------------------------------------Animation of Background---------------------------------------
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const increaseAnimation = Animated.timing(fadeAnim, {
@@ -33,8 +37,6 @@ export default function ClientSignUp({ navigation }) {
 
     Animated.loop(sequenceAnimation).start();
   }, [fadeAnim]);
-
-  const theme = useTheme();
 
   //--------------------------------------------Credentials-----------------------------
   const [ credentials, setCredentials ] = useState({
@@ -73,30 +75,21 @@ export default function ClientSignUp({ navigation }) {
     } else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }
-  }
+  };
 
-  const [selectedValue, setSelectedValue] = useState('Selected Value...');
-
-  const handleTitle = (target, e) => {
-    handleCredentials(target, e);
-    setSelectedValue(e)
-  }
-  const [showModal, setShowModal] = useState(false);
   const handleItemPress = (text) => {
     handleCredentials('title', text);
     setShowModal(!showModal);
-  }
+  };
+
   const handleTitles = () => {
     setShowModal(!showModal);
-  }
+  };
 
-  //-------------------------------------------Date Picker---------------------------------------
-  const [birthday, setBirthday] = useState(new Date());
-  const [showCalender, setShowCalendar] = useState(false);
   const handleDayChange = (target, day) => {
     setBirthday(day);
     handleCredentials(target, day);
-  }
+  };
 
   const pickFile = async () => {
     try {
@@ -115,9 +108,7 @@ export default function ClientSignUp({ navigation }) {
       } else {
         fileType = 'unknown';
       }
-  
-      handleCredentials('photoImage', {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
-      console.log(`File ${'photoImage'} converted to base64:`, `data:${res.type};base64,${fileContent}`);
+      handleCredentials('photoImage', {content: `${fileContent}`, type: fileType, name: res[0].name});
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -127,11 +118,9 @@ export default function ClientSignUp({ navigation }) {
     }
   };
 
-  //--------------------------------------------password--------------------------
-  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  //Alert
-  const showAlert = () => {
+
+  const showPswWrongAlert = () => {
     Alert.alert(
       'Warning!',
       "The Password doesn't matched. Please try again.",
@@ -139,72 +128,54 @@ export default function ClientSignUp({ navigation }) {
         {
           text: 'OK',
           onPress: () => {
-            setPassword('');
+            handleCredentials('password', '');
             setConfirmPassword('');
-            console.log('OK pressed')
           },
         },
       ],
       { cancelable: false }
     );
   };
-  
-  const handlePassword = () => {
-    console.log(credentials.password, confirmPassword);
-    if (credentials.password !== confirmPassword ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
-  //--------------------------------------signature--------------------
-  let signatureRef = null;
-  const [key, setKey] = useState(0); // Initialize the key state
+  let signatureRef = useRef(null);
 
   const onSaveEvent = (result) => {
-    console.log(result.encoded)
     handleCredentials('signature', result.encoded)
-  }
+  };
   
-  //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
-    // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
 
-    // If the cleaned input has 1 or 2 characters, return it as is
     if (cleaned.length === 1 || cleaned.length === 2) {
-        return cleaned;
+      return cleaned;
     }
 
-    // Apply the desired phone number format
     let formattedNumber = '';
     if (cleaned.length >= 3) {
-        formattedNumber = `(${cleaned.slice(0, 3)})`;
+      formattedNumber = `(${cleaned.slice(0, 3)})`;
     }
     if (cleaned.length > 3) {
-        formattedNumber += ` ${cleaned.slice(3, 6)}`;
+      formattedNumber += ` ${cleaned.slice(3, 6)}`;
     }
     if (cleaned.length > 6) {
-        formattedNumber += `-${cleaned.slice(6, 10)}`;
+      formattedNumber += `-${cleaned.slice(6, 10)}`;
     }
     return formattedNumber;
   };
+
   const handlePhoneNumberChange = (text) => {
-    console.log(text)
     const formattedNumber = formatPhoneNumber(text);
     handleCredentials('phoneNumber', formattedNumber);
   };
 
   const handleBack = () => {
     navigation.navigate('ClientSignIn');
-  }
+  };
 
-    //Alert
-  const showAlerts = (name) => {
+  const showWrongAlerts = () => {
     Alert.alert(
       'Warning!',
-      `You have to input ${name}!`,
+      `You have to input all gaps!`,
       [
         {
           text: 'OK',
@@ -225,14 +196,13 @@ export default function ClientSignUp({ navigation }) {
         {
           text: 'OK',
           onPress: () => {
-            console.log('OK pressed')
             navigation.navigate("ClientFinishSignup")
           },
         },
       ],
       { cancelable: false }
     )
-  }
+  };
 
   const handleSubmit = async () => {
     if (credentials.email === '' || 
@@ -250,10 +220,9 @@ export default function ClientSignUp({ navigation }) {
       credentials.password ==='' ||
       credentials.signature === ''
     ) {
-      console.log(credentials);
-      showAlerts('all gaps');
-    } else if (handlePassword()) {
-      showAlert();
+      showWrongAlerts();
+    } else if (credentials.password !== confirmPassword) {
+      showPswWrongAlert();
     } else {
       try {
         const response = await Signup(credentials, 'clinical');
@@ -340,20 +309,13 @@ export default function ClientSignUp({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent" />
       <MHeader navigation={navigation}/>
-      <ScrollView style = {styles.scroll}    
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.intro}>
             <View style={styles.backTitle} />
-            <Animated.View 
-              style={[styles.backTitle, {opacity: fadeAnim, backgroundColor: '#0f00c4'},] 
-              }>
-            </Animated.View>
+            <Animated.View style={[styles.backTitle, { opacity: fadeAnim, backgroundColor: '#0f00c4' }]}></Animated.View>
             <Text style={styles.title}>CAREGIVERS REGISTER HERE!</Text>
             <View style={{flexDirection:'row', justifyContent: 'center', marginVertical: 10}}>
               <View style={styles.marker} />
@@ -365,7 +327,7 @@ export default function ClientSignUp({ navigation }) {
             </View>
           </View>
           <View style={styles.authInfo}>
-            <Text style={styles.subject} onPress={handleTitles}> CONTACT INFORMATION </Text>
+            <Text style={styles.subject}> CONTACT INFORMATION </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Name <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
@@ -418,7 +380,6 @@ export default function ClientSignUp({ navigation }) {
                     style={[styles.input, {width: '100%', zIndex: 0, position: 'absolute', top: 0}]}
                     placeholder=""
                     editable= {false}
-                    // onChangeText={e => handleCredentials('firstName', e)}
                     value={credentials.title ? credentials.title : 'Select Title...' }
                   />
                 {showModal && <Modal
@@ -540,7 +501,6 @@ export default function ClientSignUp({ navigation }) {
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
-                      // keyboardType="numeric" // Set the keyboardType to "numeric" for zip input
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
@@ -571,7 +531,6 @@ export default function ClientSignUp({ navigation }) {
                 <Text style={{
                   backgroundColor: 'yellow', 
                   marginBottom: 10, 
-                  // width: 140, 
                   fontSize: 16, 
                   fontWeight: 'bold', 
                   color: 'black'}}> 
@@ -595,7 +554,6 @@ export default function ClientSignUp({ navigation }) {
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""
                 onChangeText={e => setConfirmPassword(e)}
-                onSubmitEditing={handlePassword} // This handles the "Enter" key press event
                 value={confirmPassword || ''}
               />
               <Text style={[styles.subtitle, { fontStyle:'italic', fontSize: 14, color: 'red' }]}> Create your password to access the platform </Text>
@@ -605,17 +563,12 @@ export default function ClientSignUp({ navigation }) {
               <Text style={styles.subtitle}>Signature<Text style={{color: 'red'}}>*</Text> </Text>  
               
               <SignatureCapture
-                key={key} // Use the key to force a re-render
                 style={styles.signature}
                 ref={signatureRef}
                 onSaveEvent={onSaveEvent}
                 saveImageFileInExtStorage={false}
                 showNativeButtons={true}
               />
-              {/* <TouchableOpacity onPress={handleUndoLastStroke} style={{textAlign: 'center', flexDirection: 'row', width: '100%', justifyContent:'space-between'}}>
-                <Text style={{fontWeight: '400', padding: 0, fontSize: 14}} onPress={handleSaveImage}>Save Signature</Text>
-                <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Clear</Text>
-              </TouchableOpacity> */}
             </View>
             
             <View style={[styles.email, {marginTop: 20}]}>
