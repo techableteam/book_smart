@@ -11,13 +11,36 @@ import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
 
 export default function ClientSignUp({ navigation }) {
-  const [showModal, setShowModal] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [title, setTitle] = useState('');
   const [birthday, setBirthday] = useState(new Date());
+  const [ssNumber, setSSNumber] = useState('');
+  const [verifySSNumber, setVerifySSNumber] = useState('');
+  const [address, setAddress] = useState({
+    streetAddress: '',
+    streetAddress2: '',
+    city: '',
+    state: '',
+    zip: '',
+  });
+  const [photoImage, setPhotoImage] = useState({
+    content: '',
+    type: '',
+    name: ''
+  });
+  const [signature, setSignature] = useState('');
+  const [userRole, setuserRole] = useState('Clinician');
+  const [showModal, setShowModal] = useState(false);
   const [showCalender, setShowCalendar] = useState(false);
+  
+  let signatureRef = useRef(null);
 
-  //---------------------------------------Animation of Background---------------------------------------
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
   useEffect(() => {
     const increaseAnimation = Animated.timing(fadeAnim, {
       toValue: 1,
@@ -38,32 +61,7 @@ export default function ClientSignUp({ navigation }) {
     Animated.loop(sequenceAnimation).start();
   }, [fadeAnim]);
 
-  //--------------------------------------------Credentials-----------------------------
-  const [ credentials, setCredentials ] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    phoneNumber: '',
-    title: '',
-    birthday: new Date(),
-    socialSecurityNumber: '',
-    verifiedSocialSecurityNumber: '',
-    address: {
-      streetAddress: '',
-      streetAddress2: '',
-      city: '',
-      state: '',
-      zip: '',
-    },
-    photoImage: {
-      content: '',
-      type: ''
-    },
-    password: '',
-    signature: '',
-    userRole: 'Clinician'
-  });
+
 
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
@@ -78,7 +76,7 @@ export default function ClientSignUp({ navigation }) {
   };
 
   const handleItemPress = (text) => {
-    handleCredentials('title', text);
+    setTitle(text);
     setShowModal(!showModal);
   };
 
@@ -86,9 +84,8 @@ export default function ClientSignUp({ navigation }) {
     setShowModal(!showModal);
   };
 
-  const handleDayChange = (target, day) => {
+  const handleDayChange = (day) => {
     setBirthday(day);
-    handleCredentials(target, day);
   };
 
   const pickFile = async () => {
@@ -108,7 +105,7 @@ export default function ClientSignUp({ navigation }) {
       } else {
         fileType = 'unknown';
       }
-      handleCredentials('photoImage', {content: `${fileContent}`, type: fileType, name: res[0].name});
+      setPhotoImage({content: `${fileContent}`, type: fileType, name: res[0].name});
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -118,8 +115,6 @@ export default function ClientSignUp({ navigation }) {
     }
   };
 
-  const [confirmPassword, setConfirmPassword] = useState('');
-
   const showPswWrongAlert = () => {
     Alert.alert(
       'Warning!',
@@ -128,7 +123,7 @@ export default function ClientSignUp({ navigation }) {
         {
           text: 'OK',
           onPress: () => {
-            handleCredentials('password', '');
+            setPassword('');
             setConfirmPassword('');
           },
         },
@@ -137,10 +132,8 @@ export default function ClientSignUp({ navigation }) {
     );
   };
 
-  let signatureRef = useRef(null);
-
   const onSaveEvent = (result) => {
-    handleCredentials('signature', result.encoded)
+    setSignature(result.encoded);
   };
   
   const formatPhoneNumber = (input) => {
@@ -165,7 +158,7 @@ export default function ClientSignUp({ navigation }) {
 
   const handlePhoneNumberChange = (text) => {
     const formattedNumber = formatPhoneNumber(text);
-    handleCredentials('phoneNumber', formattedNumber);
+    setPhoneNumber(formattedNumber);
   };
 
   const handleBack = () => {
@@ -196,7 +189,7 @@ export default function ClientSignUp({ navigation }) {
         {
           text: 'OK',
           onPress: () => {
-            navigation.navigate("ClientFinishSignup")
+            navigation.navigate("ClientFinishSignup");
           },
         },
       ],
@@ -204,27 +197,50 @@ export default function ClientSignUp({ navigation }) {
     )
   };
 
+  const handleInputAddress = (field, value) => {
+    setAddress(prevState => ({
+      ...prevState,
+      [field]: value,
+    }));
+  };
+
   const handleSubmit = async () => {
-    if (credentials.email === '' || 
-      credentials.firstName === '' || 
-      credentials.lastName ==='' || 
-      credentials.phoneNumber ==='' || 
-      credentials.title ==='' || 
-      credentials.birthday ==='' || 
-      credentials.socialSecurityNumber ==='' || 
-      credentials.verifiedSocialSecurityNumber ==='' || 
-      credentials.address.streetAddress ==='' || 
-      credentials.address.city ==='' || 
-      credentials.address.state ==='' || 
-      credentials.address.zip ==='' || 
-      credentials.password ==='' ||
-      credentials.signature === ''
+    if (email === '' || 
+      firstName === '' || 
+      lastName === '' || 
+      phoneNumber === '' || 
+      title === '' || 
+      birthday === '' || 
+      ssNumber === '' || 
+      verifySSNumber === '' || 
+      address.streetAddress === '' || 
+      address.city === '' || 
+      address.state === '' || 
+      address.zip === '' || 
+      password === '' ||
+      signature === ''
     ) {
       showWrongAlerts();
-    } else if (credentials.password !== confirmPassword) {
+    } else if (password !== confirmPassword) {
       showPswWrongAlert();
     } else {
       try {
+        const credentials = {
+          firstName,
+          lastName,
+          email,
+          password,
+          phoneNumber,
+          title,
+          birthday,
+          socialSecurityNumber: ssNumber,
+          verifiedSocialSecurityNumber: verifySSNumber,
+          address,
+          photoImage,
+          signature,
+          userRole,
+        };
+
         const response = await Signup(credentials, 'clinical');
 
         if (!response?.error) {
@@ -327,21 +343,21 @@ export default function ClientSignUp({ navigation }) {
             </View>
           </View>
           <View style={styles.authInfo}>
-            <Text style={styles.subject}> CONTACT INFORMATION </Text>
+            <Text style={styles.subject}>CONTACT INFORMATION</Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Name <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   style={[styles.input, {width: '50%'}]}
                   placeholder="First"
-                  onChangeText={e => handleCredentials('firstName', e)}
-                  value={credentials.firstName || ''}
+                  onChangeText={e => setFirstName(e)}
+                  value={firstName || ''}
                 />
                 <TextInput
                   style={[styles.input, {width: '50%'}]}
                   placeholder="Last"
-                  onChangeText={e => handleCredentials('lastName', e)}
-                  value={credentials.lastName || ''}
+                  onChangeText={e => setLastName(e)}
+                  value={lastName || ''}
                 />
               </View>
             </View>
@@ -354,8 +370,8 @@ export default function ClientSignUp({ navigation }) {
                   autoCorrect={false}
                   autoCapitalize="none"
                   keyboardType="email-address"
-                  onChangeText={e => handleCredentials('email', e)}
-                  value={credentials.email || ''}
+                  onChangeText={e => setEmail(e)}
+                  value={email || ''}
                 />
               </View>
             </View>
@@ -364,9 +380,9 @@ export default function ClientSignUp({ navigation }) {
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   placeholder="(___) ___-____"
-                  value={credentials.phoneNumber}
+                  value={phoneNumber}
                   style={[styles.input, {width: '100%'}]}
-                  onChangeText={(e) =>handlePhoneNumberChange(e)}
+                  onChangeText={(e) => handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
                 />
               </View>
@@ -380,7 +396,7 @@ export default function ClientSignUp({ navigation }) {
                     style={[styles.input, {width: '100%', zIndex: 0, position: 'absolute', top: 0}]}
                     placeholder=""
                     editable= {false}
-                    value={credentials.title ? credentials.title : 'Select Title...' }
+                    value={title ? title : 'Select Title...' }
                   />
                 {showModal && <Modal
                   Visible={false}
@@ -392,10 +408,10 @@ export default function ClientSignUp({ navigation }) {
                 >
                   <View style={styles.modalContainer}>
                     <View style={styles.calendarContainer}>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('')}>Select Title...</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('CNA')}>CNA</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('LPN')}>LPN</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('RN')}>RN</Text>
+                      <Text style={styles.subtitle} onPress={()=> handleItemPress('')}>Select Title...</Text>
+                      <Text style={styles.subtitle} onPress={()=> handleItemPress('CNA')}>CNA</Text>
+                      <Text style={styles.subtitle} onPress={()=> handleItemPress('LPN')}>LPN</Text>
+                      <Text style={styles.subtitle} onPress={()=> handleItemPress('RN')}>RN</Text>
                     </View>
                   </View>
                 </Modal>}
@@ -404,7 +420,7 @@ export default function ClientSignUp({ navigation }) {
             <View style={styles.email}>
               <Text style={styles.subtitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowCalendar(true)} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0, color: 'black'}]}
                   placeholder=""
@@ -416,7 +432,7 @@ export default function ClientSignUp({ navigation }) {
                     <DatePicker
                       date={birthday}
                       theme='light'
-                      onDateChange={(day) => handleDayChange('birthday', day)}
+                      onDateChange={(day) => handleDayChange(day)}
                       mode="date"
                       androidVariant="native"
                     />
@@ -433,9 +449,9 @@ export default function ClientSignUp({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  keyboardType="numeric" // Set the keyboardType to "numeric"
-                  onChangeText={e => handleCredentials('socialSecurityNumber', e)}
-                  value={credentials.socialSecurityNumber || ''}
+                  keyboardType="numeric"
+                  onChangeText={e => setSSNumber(e)}
+                  value={ssNumber || ''}
                 />
               </View>
             </View>
@@ -447,9 +463,9 @@ export default function ClientSignUp({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  keyboardType="numeric" // Set the keyboardType to "numeric"
-                  onChangeText={e => handleCredentials('verifiedSocialSecurityNumber', e)}
-                  value={credentials.verifiedSocialSecurityNumber || ''}
+                  keyboardType="numeric"
+                  onChangeText={e => setVerifySSNumber(e)}
+                  value={verifySSNumber || ''}
                 />
               </View>
             </View>
@@ -462,8 +478,8 @@ export default function ClientSignUp({ navigation }) {
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
-                    onChangeText={e => handleCredentials('streetAddress', e)}
-                    value={credentials.address.streetAddress || ''}
+                    onChangeText={e => handleInputAddress('streetAddress', e)}
+                    value={address.streetAddress || ''}
                   />
                   <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address</Text>
                 </View>
@@ -473,8 +489,8 @@ export default function ClientSignUp({ navigation }) {
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
-                    onChangeText={e => handleCredentials('streetAddress2', e)}
-                    value={credentials.address.streetAddress2 || ''}
+                    onChangeText={e => handleInputAddress('streetAddress2', e)}
+                    value={address.streetAddress2 || ''}
                   />
                   <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address2</Text>
                 </View>
@@ -483,8 +499,8 @@ export default function ClientSignUp({ navigation }) {
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
-                      onChangeText={e => handleCredentials('city', e)}
-                      value={credentials.address.city || ''}
+                      onChangeText={e => handleInputAddress('city', e)}
+                      value={address.city || ''}
                     />
                     <Text style={{ color: 'black', paddingLeft: 5 }}>City</Text>
                   </View>
@@ -492,8 +508,8 @@ export default function ClientSignUp({ navigation }) {
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0, paddingLeft: 1}]}
-                      onChangeText={e => handleCredentials('state', e)}
-                      value={credentials.address.state || ''}
+                      onChangeText={e => handleInputAddress('state', e)}
+                      value={address.state || ''}
                     />
                     <Text style={{ color: 'black', paddingLeft: 5 }}>State</Text>
                   </View>
@@ -501,8 +517,8 @@ export default function ClientSignUp({ navigation }) {
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
-                      onChangeText={e => handleCredentials('zip', e)}
-                      value={credentials.address.zip || ''}
+                      onChangeText={e => handleInputAddress('zip', e)}
+                      value={address.zip || ''}
                     />
                     <Text style={{ color: 'black', paddingLeft: 5 }}>Zip</Text>
                   </View>
@@ -521,7 +537,7 @@ export default function ClientSignUp({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.photoImage.name || ''}
+                  value={photoImage.name || ''}
                 />
               </View>
             </View>
@@ -544,8 +560,8 @@ export default function ClientSignUp({ navigation }) {
                 secureTextEntry={true}
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""
-                onChangeText={e => handleCredentials('password', e)}
-                value={credentials.password || ''}
+                onChangeText={e => setPassword(e)}
+                value={password || ''}
               />
               <TextInput
                 autoCorrect={false}
