@@ -88,9 +88,18 @@ export default function Shift ({ navigation }) {
         title: 'Pay Rate',
         content: item.payRate
       },{
-        title: 'SHIFT STATUS',
+        title: 'Shift Status',
         content: item.shiftStatus
-      },{
+      },
+      {
+        title: 'Date',
+        content: item.entryDate
+      },
+      {
+        title: 'Shift',
+        content: item.shiftDateTime
+      },
+      {
         title: 'Caregiver',
         content: item.caregiver
       },{

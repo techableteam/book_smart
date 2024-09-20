@@ -525,12 +525,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#194f69'
   },
   edit: {
-    backgroundColor: '#BC222F',
+    backgroundColor: '#A020F0',
     padding: 5,
     borderRadius: 10,
     fontWeight: 'bold',
     color: 'white',
-    width: '45%',
+    width: '55%',
     paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'center',

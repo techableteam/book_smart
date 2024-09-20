@@ -44,7 +44,26 @@ export default function ClientSignUp({ navigation }) {
   const [showModal, setShowModal] = useState(false);
   const [showCalender, setShowCalendar] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
+  useEffect(() => {
+    const isBirthdayValid = birthday instanceof Date && !isNaN(birthday.getTime());
+    const areRequiredFieldsFilled =
+      firstName.trim() !== '' &&
+      lastName.trim() !== '' &&
+      email.trim() !== '' &&
+      phoneNumber.trim() !== '' &&
+      title.trim() !== '' &&
+      ssNumber.trim() !== '' &&
+      verifySSNumber.trim() !== '' &&
+      password.trim() !== '' &&
+      confirmPassword.trim() !== '' &&
+      signature.content.trim() !== '' &&
+      isBirthdayValid; // Check if signature content exists
+
+    setIsButtonEnabled(areRequiredFieldsFilled); // Enable button if required fields are filled
+  }, [firstName, lastName, email, phoneNumber, title, birthday,
+      ssNumber, verifySSNumber, password, confirmPassword, signature]);
   
   let signatureRef = useRef(null);
   let signautreData = '';
@@ -660,7 +679,8 @@ export default function ClientSignUp({ navigation }) {
             </View>
 
             <View style={[styles.btn, {marginTop: 20}]}>
-              <HButton style={styles.subBtn} onPress={ handlePreSubmit }>
+              <HButton style={styles.subBtn} 
+                onPress={ handlePreSubmit }>
                 Submit
               </HButton>
             </View>
@@ -892,7 +912,7 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
+    backgroundColor: '#A020F0',
     color: 'black',
     fontSize: 16,
   },
