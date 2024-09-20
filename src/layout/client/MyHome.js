@@ -43,7 +43,7 @@ export default function MyHome ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: 139}}
+        <ScrollView style={{width: '100%', marginTop: 157}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>

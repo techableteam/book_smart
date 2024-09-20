@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 140,
+    marginTop: 158,
   },
   headBar: {
     textAlign: 'center',
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Shadow opacity
     shadowRadius: 3, // Shadow radius
     elevation: 0, // Elevation for Android devices
-    backgroundColor: "#e3f6ff",
+    backgroundColor: "#dcd6fa",
   },
   input: {
     backgroundColor: 'white', 
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
+    backgroundColor: '#A020F0',
     color: 'black',
     fontSize: 16,
   },
@@ -599,6 +599,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: "black"
   },
   closeButton: {
     color: 'red',

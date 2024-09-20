@@ -265,7 +265,7 @@ export default function FacilityEditProfile({ navigation }) {
                     onChangeText={e => handleCredentials('street', e)}
                     value={credentials.address.street || ''}
                   />
-                  <Text>Street Address</Text>
+                  <Text style = {{color : 'black', marginLeft: 5}}>Street Address</Text>
                 </View>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
@@ -276,7 +276,7 @@ export default function FacilityEditProfile({ navigation }) {
                     onChangeText={e => handleCredentials('street2', e)}
                     value={credentials.address.street2 || ''}
                   />
-                  <Text>Street Address2</Text>
+                  <Text style = {{color : 'black', marginLeft: 5}}>Street Address2</Text>
                 </View>
                 <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
                   <View style={[styles.input, {width: '45%'}]}>
@@ -286,7 +286,7 @@ export default function FacilityEditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text>City</Text>
+                    <Text style = {{color : 'black', marginLeft: 5}}>City</Text>
                   </View>
                   <View style={[styles.input, {width: '20%'}]}>
                     <TextInput
@@ -295,7 +295,7 @@ export default function FacilityEditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text>State</Text>
+                    <Text style = {{color : 'black', marginLeft: 5}}>State</Text>
                   </View>
                   <View style={[styles.input, {width: '30%'}]}>
                     <TextInput
@@ -305,7 +305,7 @@ export default function FacilityEditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text>Zip</Text>
+                    <Text style = {{color : 'black', marginLeft: 5}}>Zip</Text>
                   </View>
                 </View>
               </View>
@@ -325,7 +325,7 @@ export default function FacilityEditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>pickFile()} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color:"black"}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Shadow opacity
     shadowRadius: 3, // Shadow radius
     elevation: 0, // Elevation for Android devices
-    backgroundColor: "#e3f6ff",
+    backgroundColor: "#dcd6fa",
   },
   intro: {
     marginTop: 30
@@ -523,14 +523,15 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 130
   },
-  btn: {flexDirection: 'column',
+  btn: {
+    flexDirection: 'column',
     gap: 20,
     marginBottom: 30,
   },
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
+    backgroundColor: '#A020F0',
     color: 'black',
     fontSize: 16,
   },

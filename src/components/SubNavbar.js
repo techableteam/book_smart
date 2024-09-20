@@ -28,9 +28,9 @@ export default function SubNavbar({name, navigation}) {
   return (
     <Card style={styles.shadow}>
       <View>
-        <Text style={styles.text}>
+        <Text style={{color: "black"}}>
           Logged in as&nbsp;
-          <Text style={{fontWeight: 'bold'}}>{firstName}</Text>&nbsp;-&nbsp;
+          <Text style={{fontWeight: 'bold', color:"black"}}>{firstName}</Text>&nbsp;-&nbsp;
           <Text 
             style={{
               color: '#2a53c1', 

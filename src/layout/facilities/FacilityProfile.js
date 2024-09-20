@@ -73,7 +73,7 @@ export default function FacilityProfile ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"FacilityLogin"}/>
-        <ScrollView style={{width: '100%', marginTop: 140}}
+        <ScrollView style={{width: '100%', marginTop: 157}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>

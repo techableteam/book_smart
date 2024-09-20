@@ -472,7 +472,7 @@ export default function AllJobShiftListing({ navigation }) {
       />
       <AHeader navigation={navigation}  currentPage={1} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 140 }}
+      <ScrollView style={{ width: '100%', marginTop: 157 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
@@ -1349,7 +1349,6 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   body: {
-    marginTop: 10,
     paddingHorizontal: 20,
     paddingBottom: 30,
     marginBottom: 100

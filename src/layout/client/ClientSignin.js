@@ -61,7 +61,11 @@ export default function ClientSignIn({ navigation }) {
   const [healthcareLicense, setHealthcareLicense] = useAtom(healthcareLicenseAtom);
   const [resume, setResume] = useAtom(resumeAtom); 
   const [covidCard, setCovidCard] = useAtom(covidCardAtom);
-  const [bls, setBls] = useAtom(blsAtom); 
+  const [bls, setBls] = useAtom(blsAtom);
+  const [device, setDevice] = useState('');
+  const [loginEmail, setLoginEmail] =  useState('');
+  const [loginPW, setLoginPW] = useState('');
+  const [checked, setChecked] = useState(false);
   const [ credentials, setCredentials ] = useState({
     email: '',
     password: '',
@@ -72,7 +76,7 @@ export default function ClientSignIn({ navigation }) {
   const fetchDeviceInfo = async () => {
     try {
       const id = await getUniqueId();
-      handleCredentials('device', id)
+      setDevice(id);
     } catch (error) {
       console.error('Error fetching device info:', error);
     }
@@ -83,9 +87,7 @@ export default function ClientSignIn({ navigation }) {
       fetchDeviceInfo();
     }, [])
   );
-  const [checked, setChecked] = useState(false);
 
-  //Alert
   const showAlert = (name) => {
     Alert.alert(
       'Warning!',
@@ -110,32 +112,29 @@ export default function ClientSignIn({ navigation }) {
     const getCredentials = async() => {
       const emails = (await AsyncStorage.getItem('clinicalEmail')) || '';
       const password = (await AsyncStorage.getItem('clinicalPassword')) || '';
-      setCredentials({...credentials, email: emails, password: password});
+      setLoginEmail(emails);
+      setLoginPW(password);
     }
     getCredentials();
-  }, [])
-
-  const handleCredentials = (target, e) => {
-    setCredentials({...credentials, [target]: e});
-  }
+  }, []);
 
   const handleSignInNavigate = (url) => {
-    if (credentials.email === '') {
+    if (loginEmail === '') {
       showAlert('email')
-    } else if (credentials.password === '') {
+    } else if (loginPW === '') {
       showAlert('password')
     } else {
       navigation.navigate(url);
     }
-  }
+  };
 
   const handleSignUpNavigate = () => {
     navigation.navigate('ClientSignUp');
-  }
+  };
 
   const handleSubmit = async () => {
     try {
-      const response = await Signin(credentials, 'clinical');
+      const response = await Signin({ email: loginEmail, password: loginPW, device: device, userRole: 'Clinician' }, 'clinical');
 
       if (response?.user) {
         setFirstName(response.user.firstName);
@@ -162,13 +161,12 @@ export default function ClientSignIn({ navigation }) {
         setCovidCard(response.user.covidCard);
         setBls(response.user.bls);
         setDeviceNum(response.device);
-        console.log(credentials);
 
         await AsyncStorage.setItem('clinicalPhoneNumber', response.user.phoneNumber);
 
         if (checked) {
-          await AsyncStorage.setItem('clinicalEmail', credentials.email);
-          await AsyncStorage.setItem('clinicalPassword', credentials.password);
+          await AsyncStorage.setItem('clinicalEmail', loginEmail);
+          await AsyncStorage.setItem('clinicalPassword', loginPW);
         }
 
         if (response.user.clinicalAcknowledgeTerm) {
@@ -275,8 +273,8 @@ export default function ClientSignIn({ navigation }) {
               <TextInput
                 style={{ backgroundColor: 'white', height: 40, marginBottom: 10, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
                 placeholder=""
-                onChangeText={e => handleCredentials('email', e)}
-                value={credentials.email || ''}
+                onChangeText={e => setLoginEmail(e)}
+                value={loginEmail || ''}
               />
             </View>
             <View style={styles.password}>
@@ -294,9 +292,9 @@ export default function ClientSignIn({ navigation }) {
               <TextInput
                 style={{ backgroundColor: 'white', height: 40, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
                 placeholder=""
-                onChangeText={e => handleCredentials('password', e)}
+                onChangeText={e => setLoginPW(e)}
                 secureTextEntry={true}
-                value={credentials.password || ''}
+                value={loginPW || ''}
               />
               <Pressable 
                 onPress={handleToggle}

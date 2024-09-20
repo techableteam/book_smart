@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, TouchableOpacity } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -17,8 +17,8 @@ export default function FacilityPermission ({ navigation }) {
   const [facilityAcknowledgement, setFacilityAcknowledgement] = useAtom(facilityAcknowledgementAtom);
   const [signature, setSignature] = useAtom(signatureAtom);
   const items = [
-    {label: 'Yes', value: '1'},
-    {label: 'No', value: '2'},
+    {label: 'Yes', value: 1},
+    {label: 'No', value: 2},
   ];
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
@@ -27,20 +27,42 @@ export default function FacilityPermission ({ navigation }) {
     facilityAcknowledgeTerm: facilityAcknowledgement
   });
   const [key, setKey] = useState(0);
-  let signatureRef = null;
+  let signatureRef = useRef(null);
 
   const onSaveEvent = (result) => {
     console.log(result)
     setCredentials({...credentials, ["signature"] :result.encoded})
   }
 
+  const getSignature = () => {
+    if (signatureRef.current) {
+      signatureRef.current.saveImage();
+    }
+  };
+
+  const resetSignature = () => {
+    if (signatureRef.current) {
+      signatureRef.current.resetImage();
+    }
+  };
+
+  const handlePreSubmit = () => {
+    getSignature();
+    setTimeout(() => {
+        handleUploadSubmit();
+    }, 1000);
+  };
+
   const handleUploadSubmit = async () => {
+    if (value != 1) {
+      return;
+    }
     try {
       const response = await Update(credentials, 'facilities');
       if (!response?.error) {
         Alert.alert(
           'Success!',
-          response?.message,
+          "You're in",
           [
             {
               text: 'OK',
@@ -92,7 +114,7 @@ export default function FacilityPermission ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-        <ScrollView style={{width: '100%', marginTop: 140}}
+        <ScrollView style={{width: '100%', marginTop: 157}}
           showsVerticalScrollIndicator={false}
         >
           <Hyperlink linkDefault={true}>
@@ -169,14 +191,14 @@ export default function FacilityPermission ({ navigation }) {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  placeholder={'100 per page'}
+                  placeholder={''}
                   value={value ? value : items[1].value}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={item => {
                     setValue(item.value);
                     setIsFocus(false);
-                    if (item.value ==1) {
+                    if (item.value == 1) {
                       setCredentials({...credentials, ["facilityAcknowledgeTerm"] : true})
                     } else 
                       setCredentials({...credentials, ["facilityAcknowledgeTerm"] : false})
@@ -194,17 +216,24 @@ export default function FacilityPermission ({ navigation }) {
               <View style={styles.titleBar}>
                 <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>Facility Acknowledge Terms Signature <Text style={{color: '#f00'}}>*</Text></Text>
               
-                <SignatureCapture
-                  key={key} // Use the key to force a re-render
-                  style={styles.signature}
-                  ref={signatureRef}
-                  onSaveEvent={onSaveEvent}
-                  saveImageFileInExtStorage={false}
-                  showNativeButtons={true}
-                />
+                {value == 1 && <View style={styles.titleBar}>
+                  <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Signature <Text style={{color: '#f00'}}>*</Text></Text>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <SignatureCapture
+                      style={styles.signature}
+                      ref={signatureRef}
+                      onSaveEvent={onSaveEvent}
+                      saveImageFileInExtStorage={false}
+                      showNativeButtons={false}
+                    />
+                    <TouchableOpacity onPress={resetSignature} style={{ backgroundColor: '#ccc', padding: 5, width: 'auto', height: 'auto', marginLeft: 5 }}>
+                      <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Reset</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>}
               </View>
               <View style={[styles.btn, {marginTop: 20, width: '90%'}]}>
-                <HButton style={styles.subBtn} onPress={ handleUploadSubmit }>
+                <HButton style={styles.subBtn} onPress={ handlePreSubmit }>
                   Submit
                 </HButton>
               </View>
@@ -316,8 +345,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: 'white',
     fontSize: 16,
   },
 });

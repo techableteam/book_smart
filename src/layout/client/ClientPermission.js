@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Image, Alert } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -17,8 +17,8 @@ export default function ClientPermission ({ navigation }) {
     const [clinicalAcknowledgement, setClientAcknowledgement] = useAtom(clinicalAcknowledgeTerm);
     const [signature, setSignature] = useAtom(signatureAtom);
     const items = [
-        {label: 'Yes', value: '1'},
-        {label: 'No', value: '2'},
+        {label: 'Yes', value: 1},
+        {label: 'No', value: 2},
     ];
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
@@ -27,20 +27,42 @@ export default function ClientPermission ({ navigation }) {
         signature: signature,
         clinicalAcknowledgeTerm: clinicalAcknowledgement
     });
-    let signatureRef = null;
+    let signatureRef = useRef(null);
 
     const onSaveEvent = (result) => {
         setCredentials({...credentials, ["signature"] :result.encoded})
-    }
+    };
+
+    const getSignature = () => {
+        if (signatureRef.current) {
+            signatureRef.current.saveImage();
+        }
+    };
+
+    const resetSignature = () => {
+        if (signatureRef.current) {
+            signatureRef.current.resetImage();
+        }
+    };
+
+    const handlePreSubmit = () => {
+        getSignature();
+        setTimeout(() => {
+            handleUploadSubmit();
+        }, 1000);
+    };
 
     const handleUploadSubmit = async () => {
+        console.log(value);
+        if (value != 1) {
+            return;
+        }
         try {
             const response = await Update(credentials, 'clinical');
-            console.log(JSON.stringify(response));
             if (!response?.error) {
                 Alert.alert(
                     'Success!',
-                    response?.message,
+                    "You're in.",
                     [
                         {
                         text: 'OK',
@@ -73,12 +95,12 @@ export default function ClientPermission ({ navigation }) {
                 'Failed!',
                 "Network Error",
                 [
-                {
-                    text: 'OK',
-                    onPress: () => {
-                    console.log('OK pressed')
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            console.log('OK pressed')
+                        },
                     },
-                },
                 ],
                 { cancelable: false }
             );
@@ -90,7 +112,7 @@ export default function ClientPermission ({ navigation }) {
             <StatusBar translucent backgroundColor="transparent"/>
             <MHeader navigation={navigation} />
             <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-            <ScrollView style={{width: '100%', marginTop: 140}} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{width: '100%', marginTop: 160}} showsVerticalScrollIndicator={false} >
                 <Hyperlink linkDefault={true}>
                     <View style={styles.permission}>
                         <View style={styles.titleBar}>
@@ -143,7 +165,7 @@ export default function ClientPermission ({ navigation }) {
                             <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>(e) Service Fee. </Text>A fee of $2/hour will be deducted for use of BOOKSMART™ and processing of payments and insurances (“Service Fee”). Further information about these insurances and carriers may be available at WhyBookDumb.com/Insurance or on this app from time to time. By accessing/using BOOKSMART™ you consent and agree to these terms.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>5. Safety & Work-Related Injury Policy. </Text>Safety is a top priority. Each Independent Contractor is expected to obey general safety rules and exercise caution and common sense in all work activities.</Text>
+                            <Text style={styles.subTitle}><Text style={{fontWeight: 'bold'}}>5. Safety & Work-Related Injury Policy. </Text>Safety is a top priority. Each Independent Contractor is expected to obey general safety rules and exercise caution and common sense in all work activities.</Text>
                             <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>All Independent Contractors must agree to comply with the following safe working practices:</Text>
                             <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree to follow established departmental safety procedures;</Text>
                             <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree to know and adhere to all work site specific safety rules and policies;</Text>
@@ -157,25 +179,25 @@ export default function ClientPermission ({ navigation }) {
                             <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>6. HIPAA. </Text>Users expressly understand and acknowledge that as a result of the provision of Caregiver Services using BOOKSMART™ you may be considered a covered entity under the Health Insurance Portability and Accountability Act (“HIPAA”). You expressly agree to observe the Privacy, Security, and Breach Notification Rules set forth under HIPAA. You understand that failure to adhere to these three HIPAA Rules may result in the imposition of civil, or some cases, criminal sanctions.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>7. Third-Party Beneficiaries. </Text>Users agree that the Terms of this Agreement shall apply only to you and are not for the benefit of any third-party beneficiaries.</Text>
+                            <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>7. Third-Party Beneficiaries. </Text>Users agree that the Terms of this Agreement shall apply only to you and are not for the benefit of any third-party beneficiaries.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>8. Attorney’s Fees. </Text>In the event a court of competent jurisdiction determines that any User has materially breached the Terms under this Agreement, BOOKSMART™ shall be entitled to an award of any costs and reasonable attorney’s fees incurred by BOOKSMART™ because of such breach.</Text>
+                            <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>8. Attorney’s Fees. </Text>In the event a court of competent jurisdiction determines that any User has materially breached the Terms under this Agreement, BOOKSMART™ shall be entitled to an award of any costs and reasonable attorney’s fees incurred by BOOKSMART™ because of such breach.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>9. Governing Law. </Text>The Terms under this Agreement be construed in accordance with and governed by the laws of the State of New York, without regard to conflicts of laws principles. You agree that the exclusive venue for resolving any dispute arising under this Agreement shall be in the state and federal courts located in the County Erie, State of New York, and you consent to the jurisdiction of the federal and state courts located in Erie County, New York. You hereby waive any objection to Erie County, New York as venue for the hearing of any dispute between you and BOOKSMART™ that is not compelled to arbitration for any reason, including but not limited to any objection based on convenience.</Text>
+                            <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>9. Governing Law. </Text>The Terms under this Agreement be construed in accordance with and governed by the laws of the State of New York, without regard to conflicts of laws principles. You agree that the exclusive venue for resolving any dispute arising under this Agreement shall be in the state and federal courts located in the County Erie, State of New York, and you consent to the jurisdiction of the federal and state courts located in Erie County, New York. You hereby waive any objection to Erie County, New York as venue for the hearing of any dispute between you and BOOKSMART™ that is not compelled to arbitration for any reason, including but not limited to any objection based on convenience.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>10. Indemnification. </Text>BOOKSMART™ will have no liability and you will indemnify, defend and hold BOOKSMART™ harmless against any loss, damage, cost, liability and expense (including reasonable attorneys’ fees and expenses) arising from any action or claim resulting from: (i) Your Content; (ii) your violation of the TERMS under this Agreement, any law or regulation, or any rights (including Intellectual Property) of another party; (iii) your access to or use of BOOKSMART™; and/or (iv) the classification of an independent contractor by BOOKSMART™ or by any Client.</Text>
+                            <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>10. Indemnification. </Text>BOOKSMART™ will have no liability and you will indemnify, defend and hold BOOKSMART™ harmless against any loss, damage, cost, liability and expense (including reasonable attorneys’ fees and expenses) arising from any action or claim resulting from: (i) Your Content; (ii) your violation of the TERMS under this Agreement, any law or regulation, or any rights (including Intellectual Property) of another party; (iii) your access to or use of BOOKSMART™; and/or (iv) the classification of an independent contractor by BOOKSMART™ or by any Client.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>11. Disclaimer of Warranties. </Text>You are solely responsible for your interactions and transactions with other Users. You agree to look solely to such other Users for any claim, damage or liability associated with any communication or transaction via BOOKSMART™. YOU EXPRESSLY WAIVE AND RELEASE BOOKSMART™ FROM ANY AND ALL legal responsibilities, CLAIMS, rights of action, causes of action, suits, debts, judgments, demands, DAMAGES AND LIABILITIES ARISING OUT OF ANY ACT OR OMISSION OF ANY OTHER USER OR THIRD PARTY, INCLUDING DAMAGES RELATING TO MONETARY CLAIMS, PERSONAL INJURY OR DESTRUCTION OF PROPERTY, mental anguish, interest, costs, attorneys’ fees, and expenses. YOUR SOLE REMEDIES WITH RESPECT THERETO SHALL BE BETWEEN YOU AND THE APPLICABLE USER OR OTHER THIRD-PARTY. BOOKSMART™ RESERVES THE RIGHT, BUT HAS NO OBLIGATION, TO MONITOR DISPUTES BETWEEN USERS. BOOKSMART™ IS A MARKETPLACE SERVICE FOR USERS TO CONNECT ONLINE. EACH USER IS SOLELY RESPONSIBLE FOR INTERACTING WITH AND SELECTING ANOTHER USER, CONDUCTING ALL NECESSARY DUE DILIGENCE, AND COMPLYING WITH ALL APPLICABLE LAWS.</Text>
+                            <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>11. Disclaimer of Warranties. </Text>You are solely responsible for your interactions and transactions with other Users. You agree to look solely to such other Users for any claim, damage or liability associated with any communication or transaction via BOOKSMART™. YOU EXPRESSLY WAIVE AND RELEASE BOOKSMART™ FROM ANY AND ALL legal responsibilities, CLAIMS, rights of action, causes of action, suits, debts, judgments, demands, DAMAGES AND LIABILITIES ARISING OUT OF ANY ACT OR OMISSION OF ANY OTHER USER OR THIRD PARTY, INCLUDING DAMAGES RELATING TO MONETARY CLAIMS, PERSONAL INJURY OR DESTRUCTION OF PROPERTY, mental anguish, interest, costs, attorneys’ fees, and expenses. YOUR SOLE REMEDIES WITH RESPECT THERETO SHALL BE BETWEEN YOU AND THE APPLICABLE USER OR OTHER THIRD-PARTY. BOOKSMART™ RESERVES THE RIGHT, BUT HAS NO OBLIGATION, TO MONITOR DISPUTES BETWEEN USERS. BOOKSMART™ IS A MARKETPLACE SERVICE FOR USERS TO CONNECT ONLINE. EACH USER IS SOLELY RESPONSIBLE FOR INTERACTING WITH AND SELECTING ANOTHER USER, CONDUCTING ALL NECESSARY DUE DILIGENCE, AND COMPLYING WITH ALL APPLICABLE LAWS.</Text>
                         </View>
                         <View style={styles.titleBar}>
                             <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>IMPORTANT! BE SURE YOU HAVE SCROLLED THROUGH AND CAREFULLY READ ALL of the above Terms and conditions of this Agreement before electronically signing and/or clicking an “Agree” or similar button and/or USING THE SITE (“acceptance”). This Agreement is legally binding between you and BOOKSMART. By electronically signing and/or clicking an “Agree” or similar button and/or using the SITE, you AFFIRM THAT YOU ARE OF THE LEGAL AGE OF 18 AND NOT OVER 70 YEARS OLD AND HAVE THE LEGAL CAPACITY TO ENTER INTO THE AGREEMENT, AND YOU agree to abide by all of the Terms and conditions stated or referenced herein. If you do not agree to abide by these Terms and conditions, do not electronically sign and/or click an “agree” or similar button and do not use the SITE. You must accept and abide by these Terms and conditions in the Service Terms as presented to you.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>Clinical Acknowledge Terms? Yes/No</Text>
+                            <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Acknowledge Terms? Yes/No</Text>
                             <Dropdown
                                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                                 placeholderStyle={styles.placeholderStyle}
@@ -210,19 +232,23 @@ export default function ClientPermission ({ navigation }) {
                                 )}
                             />
                         </View>
-                        <View style={styles.titleBar}>
-                            <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>Clinical Acknowledge Terms Signature <Text style={{color: '#f00'}}>*</Text></Text>
-                            <SignatureCapture
-                                key={key}
-                                style={styles.signature}
-                                ref={signatureRef}
-                                onSaveEvent={onSaveEvent}
-                                saveImageFileInExtStorage={false}
-                                showNativeButtons={true}
-                            />
-                        </View>
+                        {value == 1 && <View style={styles.titleBar}>
+                            <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Signature <Text style={{color: '#f00'}}>*</Text></Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <SignatureCapture
+                                    style={styles.signature}
+                                    ref={signatureRef}
+                                    onSaveEvent={onSaveEvent}
+                                    saveImageFileInExtStorage={false}
+                                    showNativeButtons={false}
+                                />
+                                <TouchableOpacity onPress={resetSignature} style={{ backgroundColor: '#ccc', padding: 5, width: 'auto', height: 'auto', marginLeft: 5 }}>
+                                    <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Reset</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>}
                         <View style={[styles.btn, {marginTop: 20, width: '90%'}]}>
-                            <HButton style={styles.subBtn} onPress={ handleUploadSubmit }>
+                            <HButton style={styles.subBtn} onPress={ handlePreSubmit }>
                                 Submit
                             </HButton>
                         </View>
@@ -319,7 +345,7 @@ const styles = StyleSheet.create({
   signature: {
     flex: 1,
     width: '100%',
-    height: 150,
+    height: 200,
   },
   homepage: {
     width: 250,
@@ -334,8 +360,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: 'white',
     fontSize: 16,
   },
 });

@@ -251,7 +251,7 @@ export default function ShiftListing ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-        <ScrollView style={{width: '100%', marginTop: 140}}
+        <ScrollView style={{width: '100%', marginTop: 155}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
   },
   subBar: {
     width: '100%',
-    backgroundColor: "#f0fbfe",
+    backgroundColor: "#dcd6fa",
     padding: 20,
     borderRadius: 20,
     borderWidth: 2,
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
     marginBottom: 100
   },
   modalBody: {
-    backgroundColor: '#e3f2f1',
+    backgroundColor: '#dcd6fa',
     borderRadius: 10,
     borderColor: '#c6c5c5',
     borderWidth: 2,

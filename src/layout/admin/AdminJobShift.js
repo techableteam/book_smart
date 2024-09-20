@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 155,
+    marginTop: 158,
   },
   headBar: {
     textAlign: 'center',
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Shadow opacity
     shadowRadius: 3, // Shadow radius
     elevation: 0, // Elevation for Android devices
-    backgroundColor: "#e3f6ff",
+    backgroundColor: "#dcd6fa",
   },
   input: {
     backgroundColor: 'white', 

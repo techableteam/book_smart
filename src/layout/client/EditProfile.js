@@ -358,7 +358,7 @@ export default function EditProfile({ navigation }) {
                     onChangeText={e => handleCredentials('streetAddress', e)}
                     value={credentials.address.streetAddress || ''}
                   />
-                  <Text>Street Address</Text>
+                  <Text style = {{color: "black", marginLeft: 5}}>Street Address</Text>
                 </View>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
@@ -369,7 +369,7 @@ export default function EditProfile({ navigation }) {
                     onChangeText={e => handleCredentials('streetAddress2', e)}
                     value={credentials.address.streetAddress2 || ''}
                   />
-                  <Text>Street Address2</Text>
+                  <Text style = {{color: "black", marginLeft: 5}}>Street Address2</Text>
                 </View>
                 <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
                   <View style={[styles.input, {width: '45%'}]}>
@@ -379,7 +379,7 @@ export default function EditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text>City</Text>
+                    <Text style = {{color: "black", marginLeft: 5}}>City</Text>
                   </View>
                   <View style={[styles.input, {width: '20%'}]}>
                     <TextInput
@@ -388,7 +388,7 @@ export default function EditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text>State</Text>
+                    <Text style = {{color: "black", marginLeft: 5}}>State</Text>
                   </View>
                   <View style={[styles.input, {width: '30%'}]}>
                     <TextInput
@@ -398,7 +398,7 @@ export default function EditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text>Zip</Text>
+                    <Text style = {{color: "black", marginLeft: 5}}>Zip</Text>
                   </View>
                 </View>
               </View>
@@ -818,7 +818,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Shadow opacity
     shadowRadius: 3, // Shadow radius
     elevation: 0, // Elevation for Android devices
-    backgroundColor: "#e3f6ff",
+    backgroundColor: "#dcd6fa",
   },
   intro: {
     marginTop: 30
