@@ -1,18 +1,13 @@
 import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import React, { useState } from 'react';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { TextInput } from 'react-native-paper';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import PhoneInput from 'react-native-phone-input';
-import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
-import DocumentPicker from 'react-native-document-picker';
-import { Signup } from '../../utils/useApi';
 import MSubNavbar from '../../components/MSubNavbar';
-import RNFS from 'react-native-fs'
 import { useAtom } from 'jotai';
 import { 
   firstNameAtom, 
@@ -37,13 +32,16 @@ import {
   blsAtom
  } from '../../context/ClinicalAuthProvider';
 import { Update } from '../../utils/useApi';
+// Choose file
+import DocumentPicker from 'react-native-document-picker';
+import { launchCamera } from 'react-native-image-picker';
+import RNFS from 'react-native-fs'
 
 export default function EditProfile({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
   const [email, setEmail] = useAtom(emailAtom);
   const [userRole, setUserRole] = useAtom(userRoleAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
   const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
   const [address, setAddress] = useAtom(addressAtom);
   const [photoImage, setPhotoImage] = useAtom(photoImageAtom);
@@ -59,7 +57,8 @@ export default function EditProfile({ navigation }) {
   const [resume, setResume] = useAtom(resumeAtom); 
   const [covidCard, setCovidCard] = useAtom(covidCardAtom);
   const [bls, setBls] = useAtom(blsAtom); 
-  console.log(driverLicense);
+  const [sfileType, setFiletype] = useState('');
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
 
   const [ credentials, setCredentials ] = useState({
     firstName: firstName,
@@ -86,23 +85,11 @@ export default function EditProfile({ navigation }) {
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
       setCredentials({...credentials, [target]: e});
-    }
-    else {
+    } else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }
-    console.log(credentials);
   }
 
-  //-------------------------------------------ComboBox------------------------
-  const placeholder = {
-    label: 'Select an item...',
-    value: null,
-  };
-  const items = [
-    { label: 'CNA', value: 'CNA' },
-    { label: 'LPN', value: 'LPN' },
-    { label: 'RN', value: 'RN' },
-  ];
 
   const [showModal, setShowModal] = useState(false);
   const handleItemPress = (text) => {
@@ -119,8 +106,44 @@ export default function EditProfile({ navigation }) {
   }
 
   //-------------------------------------------File Upload----------------------------
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+  
+  const handleChangeFileType = (name) => {
+    setFiletype(name);
+    toggleFileTypeSelectModal();
+  };
 
-  const pickFile = async (name) => {
+  const openCamera = async () => {
+    const options = {
+      mediaType: 'photo', // Use 'video' for video capture
+      quality: 1, // 1 for high quality, 0 for low quality
+    };
+  
+    launchCamera(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.error('Camera error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // Handle the response
+        const fileUri = response.assets[0].uri;
+        const fileContent = await RNFS.readFile(fileUri, 'base64');
+        
+        handleCredentials(sfileType, {
+          content: fileContent,
+          type: 'image',
+          name: response.assets[0].fileName,
+        });
+        toggleFileTypeSelectModal();
+      }
+    });
+  };
+
+  const pickFile = async () => {
     try {
       let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
       const res = await DocumentPicker.pick({
@@ -138,7 +161,8 @@ export default function EditProfile({ navigation }) {
         // Handle other file types if needed
         fileType = 'unknown';
       }
-      handleCredentials(name, {content: `${fileContent}`, type: fileType, name: res[0].name});
+      handleCredentials(sfileType, {content: `${fileContent}`, type: fileType, name: res[0].name});
+      toggleFileTypeSelectModal();
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -447,7 +471,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('photoImage')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('photoImage')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -477,7 +501,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('driverLicense')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('driverLicense')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -501,7 +525,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('socialCard')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('socialCard')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -525,7 +549,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('physicalExam')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('physicalExam')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -549,7 +573,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('ppd')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('ppd')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -573,7 +597,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('mmr')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('mmr')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -597,7 +621,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('healthcareLicense')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('healthcareLicense')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -621,7 +645,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('resume')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('resume')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -645,7 +669,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('covidCard')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('covidCard')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -669,7 +693,7 @@ export default function EditProfile({ navigation }) {
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile('bls')} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('bls')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -701,6 +725,42 @@ export default function EditProfile({ navigation }) {
         >
           Back to 🏚️ Caregiver Profile
         </Text>
+        {fileTypeSelectModal && (
+          <Modal
+            visible={fileTypeSelectModal} // Changed from Visible to visible
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setFiletypeSelectModal(false); // Close the modal
+            }}
+          >
+            <StatusBar translucent backgroundColor='transparent' />
+            <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
+              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Choose File</Text>
+                  <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
+                    <Image source={images.close} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={[styles.modalBody, { marginBottom: 20 }]}>
+                    <View style={styles.cameraContain}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {openCamera();}}>
+                        <Icon name="camera-front" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Camera</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickFile();}}>
+                        <Icon name="file-image" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
+        )}
       </ScrollView>
       <MFooter />
     </View>
@@ -943,4 +1003,74 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 20
   },
+  modalsContainer: {
+    paddingTop: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  viewContainer: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    elevation: 5,
+    width: '90%',
+    marginLeft: '5%',
+    flexDirection: 'flex-start',
+    borderWidth: 3,
+    borderColor: '#7bf4f4',
+    marginBottom: 100
+  },
+  modalBody: {
+    backgroundColor: '#e3f2f1',
+    borderRadius: 10,
+    borderColor: '#c6c5c5',
+    borderWidth: 2,
+    paddingHorizontal: 20,
+    paddingVertical: 20
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    height: '20%,',
+    padding: 20,
+    borderBottomColor: '#c4c4c4',
+    borderBottomWidth: 1,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black'
+  },
+  closeButton: {
+    color: 'red',
+  },
+  cameraContain: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+		flexDirection: 'row'
+	},
+  pressBtn:{
+    top: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingRight: 10
+  },
+  btnSheet: {
+		height: 100,
+		width:100,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
+  textStyle: {
+    color: 'black'
+  }
 });

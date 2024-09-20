@@ -1,12 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
+import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Image } from 'react-native';
 import { TextInput, useTheme, } from 'react-native-paper';
-import DocumentPicker from 'react-native-document-picker';
-import RNFS from 'react-native-fs'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
+// Choose file
+import DocumentPicker from 'react-native-document-picker';
+import { launchCamera } from 'react-native-image-picker';
+import RNFS from 'react-native-fs'
 
 export default function FacilitySignUp({ navigation }) {
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
@@ -31,7 +35,8 @@ export default function FacilitySignUp({ navigation }) {
     Animated.loop(sequenceAnimation).start();
   }, [fadeAnim]);
 
-  const theme = useTheme();
+  const [fileType, setFiletype] = useState('');
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
 
   //--------------------------------------------Credentials-----------------------------
   const [credentials, setCredentials] = useState({
@@ -69,10 +74,44 @@ export default function FacilitySignUp({ navigation }) {
       setCredentials({ ...credentials, address: { ...credentials.address, [target]: e } })
     }
   }
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+  
+  const handleChangeFileType = (mode) => {
+    setFiletype(mode);
+    toggleFileTypeSelectModal();
+  };
+
+  const openCamera = async () => {
+    const options = {
+      mediaType: 'photo', // Use 'video' for video capture
+      quality: 1, // 1 for high quality, 0 for low quality
+    };
+  
+    launchCamera(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.error('Camera error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // Handle the response
+        const fileUri = response.assets[0].uri;
+        const fileContent = await RNFS.readFile(fileUri, 'base64');
+        
+        handleCredentials('avatar', {
+          content: fileContent,
+          type: 'image',
+          name: response.assets[0].fileName,
+        });
+      }
+    });
+  };
 
   const pickFile = async () => {
     try {
-      console.log("picker")
       let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
       const res = await DocumentPicker.pick({
         type: type,
@@ -91,7 +130,6 @@ export default function FacilitySignUp({ navigation }) {
       }
 
       handleCredentials('avatar', { content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name });
-      console.log("name", credentials.name);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -463,7 +501,7 @@ export default function FacilitySignUp({ navigation }) {
             <View style={styles.email}>
               <Text style={styles.subtitle}> Logo / Pic</Text>
               <View style={{ flexDirection: 'row', width: '100%' }}>
-                <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
                   <Text style={{ fontWeight: '400', padding: 0, fontSize: 14, color: 'black' }}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -490,7 +528,42 @@ export default function FacilitySignUp({ navigation }) {
             </Text>
           </View>
         </View>
-
+        {fileTypeSelectModal && (
+          <Modal
+            visible={fileTypeSelectModal} // Changed from Visible to visible
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setFiletypeSelectModal(false); // Close the modal
+            }}
+          >
+            <StatusBar translucent backgroundColor='transparent' />
+            <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
+              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Choose File</Text>
+                  <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
+                    <Image source={images.close} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={[styles.modalBody, { marginBottom: 20 }]}>
+                    <View style={styles.cameraContain}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
+                        <Icon name="camera" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Camera</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                        <Icon name="image" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
+        )}
       </ScrollView>
       <MFooter />
     </View>
@@ -714,4 +787,78 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 20
   },
+  modalsContainer: {
+    paddingTop: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  viewContainer: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    elevation: 5,
+    width: '90%',
+    marginLeft: '5%',
+    flexDirection: 'flex-start',
+    borderWidth: 3,
+    borderColor: '#7bf4f4',
+    marginBottom: 100
+  },
+  modalBody: {
+    backgroundColor: '#e3f2f1',
+    borderRadius: 10,
+    borderColor: '#c6c5c5',
+    borderWidth: 2,
+    paddingHorizontal: 20,
+    paddingVertical: 20
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    height: '20%,',
+    padding: 20,
+    borderBottomColor: '#c4c4c4',
+    borderBottomWidth: 1,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black'
+  },
+  textStyle: {
+    color: 'black'
+  },
+  closeButton: {
+    color: 'red',
+  },
+  body: {
+    marginTop: 10,
+    paddingHorizontal:20,
+  },
+  cameraContain: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+		flexDirection: 'row'
+	},
+  pressBtn:{
+    top: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingRight: 10
+  },
+  btnSheet: {
+		height: 100,
+		width:100,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
 });

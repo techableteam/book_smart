@@ -1,21 +1,19 @@
-import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
+import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
 import React, { useState } from 'react';
 import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { TextInput, useTheme } from 'react-native-paper';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import PhoneInput from 'react-native-phone-input';
-import SignatureCapture from 'react-native-signature-capture';
-import DatePicker from 'react-native-date-picker';
-import DocumentPicker from 'react-native-document-picker';
-import { Signup, Update } from '../../utils/useApi';
+import { Update } from '../../utils/useApi';
 import MSubNavbar from '../../components/MSubNavbar';
-import RNFS from 'react-native-fs';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, entryDateAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom, passwordAtom } from '../../context/FacilityAuthProvider'
-
+import { firstNameAtom, lastNameAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom } from '../../context/FacilityAuthProvider'
+// Choose file
+import DocumentPicker from 'react-native-document-picker';
+import { launchCamera } from 'react-native-image-picker';
+import RNFS from 'react-native-fs'
 
 export default function FacilityEditProfile({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -27,8 +25,8 @@ export default function FacilityEditProfile({ navigation }) {
   const [avatar, setAvatar] = useAtom(avatarAtom);
   const [userRole, setUserRole]= useAtom(userRoleAtom);
   const [address, setAddress]= useAtom(addressAtom);
-
-  const theme = useTheme();
+  const [fileType, setFiletype] = useState('');
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
 
   //--------------------------------------------Credentials-----------------------------
   const [ credentials, setCredentials ] = useState({
@@ -47,31 +45,48 @@ export default function FacilityEditProfile({ navigation }) {
   const handleCredentials = (target, e) => {
     if (target !== "street" && target !== "street2" && target !== "city" && target !== "state" && target !== "zip") {
       setCredentials({...credentials, [target]: e});
-    }
-    else {
+    } else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }
-    console.log(credentials);
-  }
-
-  //-------------------------------------------ComboBox------------------------
-  const placeholder = {
-    label: 'Select an item...',
-    value: null,
-  };
-  const items = [
-    { label: 'CNA', value: 'CNA' },
-    { label: 'LPN', value: 'LPN' },
-    { label: 'RN', value: 'RN' },
-  ];
-
-  const [showModal, setShowModal] = useState(false);
-  const handleItemPress = (text) => {
-    handleCredentials('title', text);
-    setShowModal(false);
   }
 
   //-------------------------------------------File Upload----------------------------
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+  
+  const handleChangeFileType = (mode) => {
+    setFiletype(mode);
+    toggleFileTypeSelectModal();
+  };
+
+  const openCamera = async () => {
+    const options = {
+      mediaType: 'photo', // Use 'video' for video capture
+      quality: 1, // 1 for high quality, 0 for low quality
+    };
+  
+    launchCamera(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.error('Camera error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // Handle the response
+        const fileUri = response.assets[0].uri;
+        const fileContent = await RNFS.readFile(fileUri, 'base64');
+        
+        handleCredentials('avatar', {
+          content: fileContent,
+          type: 'image',
+          name: response.assets[0].fileName,
+        });
+      }
+    });
+  };
+
   const pickFile = async () => {
     try {
       console.log("picker")
@@ -93,7 +108,6 @@ export default function FacilityEditProfile({ navigation }) {
       }
   
       handleCredentials('avatar', {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
-      console.log("name",credentials.name);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -101,12 +115,6 @@ export default function FacilityEditProfile({ navigation }) {
         // Handle other errors
       }
     }
-  };
-
-  const [checked, setChecked] = useState(false);
-  
-  const handleToggle = () => {
-    setChecked(!checked);
   };
   
   //------------------------------------------Phone Input----------------
@@ -132,19 +140,12 @@ export default function FacilityEditProfile({ navigation }) {
     }
     return formattedNumber;
   };  
+
   const handlePhoneNumberChange = (text) => {
     const formattedNumber = formatPhoneNumber(text);
     handleCredentials('contactPhone', formattedNumber);
   };
-  const handleSignUpNavigate = () => {
-    navigation.navigate('ClientPending');
-  }
 
-  const handleBack = () => {
-    navigation.navigate('MyProfile');
-  }
-
-    //Alert
   const showAlerts = (name) => {
     Alert.alert(
       'Warning!',
@@ -166,8 +167,7 @@ export default function FacilityEditProfile({ navigation }) {
       credentials.firstName === '' || 
       credentials.lastName ==='') {
         showAlerts('all gaps')
-    }
-    else {
+    } else {
       try {
         console.log('credentials: ', credentials);
         const response = await Update(credentials, "facilities");
@@ -189,6 +189,7 @@ export default function FacilityEditProfile({ navigation }) {
   const handleRemove = (name) => {
     handleCredentials(name, {type: "", content: "", name: ""});
   }
+
   return (
     <View style={styles.container}>
       <StatusBar 
@@ -312,19 +313,16 @@ export default function FacilityEditProfile({ navigation }) {
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Logo / Pic </Text>
-              {credentials.avatar.content &&
+              {credentials.avatar.name &&
               <View style={{marginBottom: 10}}>
-                <Image
-                  style={{ width: 100, height: 100,  }}
-                  source={{ uri: `${credentials.avatar.content}` }}
-                />
+                <Text style={{ color: 'blue' }}>{credentials.avatar.content}</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('avatar')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={()=>pickFile()} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color:"black"}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -343,6 +341,42 @@ export default function FacilityEditProfile({ navigation }) {
             </View>
           </View>
         </View>
+        {fileTypeSelectModal && (
+          <Modal
+            visible={fileTypeSelectModal} // Changed from Visible to visible
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setFiletypeSelectModal(false); // Close the modal
+            }}
+          >
+            <StatusBar translucent backgroundColor='transparent' />
+            <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
+              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Choose File</Text>
+                  <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
+                    <Image source={images.close} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={[styles.modalBody, { marginBottom: 20 }]}>
+                    <View style={styles.cameraContain}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
+                        <Icon name="camera" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Camera</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                        <Icon name="image" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
+        )}
       </ScrollView>
       <MFooter />
     </View>
@@ -586,4 +620,74 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 20
   },
+  modalsContainer: {
+    paddingTop: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  viewContainer: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    elevation: 5,
+    width: '90%',
+    marginLeft: '5%',
+    flexDirection: 'flex-start',
+    borderWidth: 3,
+    borderColor: '#7bf4f4',
+    marginBottom: 100
+  },
+  modalBody: {
+    backgroundColor: '#e3f2f1',
+    borderRadius: 10,
+    borderColor: '#c6c5c5',
+    borderWidth: 2,
+    paddingHorizontal: 20,
+    paddingVertical: 20
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    height: '20%,',
+    padding: 20,
+    borderBottomColor: '#c4c4c4',
+    borderBottomWidth: 1,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black'
+  },
+  closeButton: {
+    color: 'red',
+  },
+  cameraContain: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+		flexDirection: 'row'
+	},
+  pressBtn:{
+    top: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingRight: 10
+  },
+  btnSheet: {
+		height: 100,
+		width:100,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
+  textStyle: {
+    color: 'black'
+  }
 });

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, TextInput, View, Animated, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
-import DocumentPicker from 'react-native-document-picker';
-import RNFS from 'react-native-fs'
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
@@ -12,6 +11,10 @@ import SubNavbar from '../../components/SubNavbar';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Job, Jobs, RemoveJos, setAwarded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native';
+// Choose file
+import DocumentPicker from 'react-native-document-picker';
+import { launchCamera } from 'react-native-image-picker';
+import RNFS from 'react-native-fs'
 
 export default function CompanyShift({ navigation }) {
   const [totalPages, setTotalPages] = useState(1);
@@ -31,22 +34,12 @@ export default function CompanyShift({ navigation }) {
   const [selectedBidders, setSelectedBidders] = useState([]);
   const [awardedStatus, setAwardedStatus] = useState(2);
   const [tsVerifyStatus, setTSVerifyStatus] = useState(2);
+  const [fileType, setFiletype] = useState('');
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [timeSheetFile, setTimesheetFile] = useState({
     content: '',
     name: '',
     type: ''
-  });
-
-  const [ credentials, setCredentials ] = useState({
-    facility: '',
-    degree: '',
-    shiftTime: "",
-    shiftDate: '',
-    jobNum: '',
-    location: '',
-    payRate: '',
-    bonus: '',
-    rating: 0,
   });
 
   const radioButtons = useMemo(() => ([
@@ -295,6 +288,42 @@ export default function CompanyShift({ navigation }) {
 
   const handleShowJobEditModal = async () => {
     console.log(selectedJob);
+  };
+
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+  
+  const handleChangeFileType = (mode) => {
+    setFiletype(mode);
+    toggleFileTypeSelectModal();
+  };
+
+  const openCamera = async () => {
+    const options = {
+      mediaType: 'photo', // Use 'video' for video capture
+      quality: 1, // 1 for high quality, 0 for low quality
+    };
+  
+    launchCamera(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.error('Camera error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // Handle the response
+        const fileUri = response.assets[0].uri;
+        const fileContent = await RNFS.readFile(fileUri, 'base64');
+
+        setTimesheetFile({
+          content: fileContent,
+          type: 'image',
+          name: response.assets[0].fileName,
+        });
+      }
+    });
   };
 
   const pickFile = async () => {
@@ -1005,7 +1034,7 @@ export default function CompanyShift({ navigation }) {
                       </View>
                     }
                     <View style={{flexDirection: 'row', width: '100%'}}>
-                      <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
+                      <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
                         <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                       </TouchableOpacity>
                       <TextInput
@@ -1065,6 +1094,42 @@ export default function CompanyShift({ navigation }) {
             </View>
           </View>
         </Modal>
+        {fileTypeSelectModal && (
+          <Modal
+            visible={fileTypeSelectModal} // Changed from Visible to visible
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setFiletypeSelectModal(false); // Close the modal
+            }}
+          >
+            <StatusBar translucent backgroundColor='transparent' />
+            <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
+              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Choose File</Text>
+                  <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
+                    <Image source={images.close} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                </View>
+                <View style={{  marginTop: 10, paddingHorizontal: 20, marginBottom: 20 }}>
+                  <View style={{ backgroundColor: '#e3f2f1', borderRadius: 10, borderColor: '#c6c5c5', borderWidth: 2, paddingHorizontal: 20, paddingVertical: 20 }}>
+                    <View style={styles.cameraContain}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
+                        <Icon name="camera" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Camera</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                        <Icon name="image" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
+        )}
       </ScrollView>
       <MFooter />
     </View>
@@ -1092,6 +1157,7 @@ const styles = StyleSheet.create({
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
+    paddingVertical: 5
   },
   chooseFile: {
     width: '30%', 
@@ -1396,4 +1462,49 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
+  cameraContain: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+		flexDirection: 'row'
+	},
+  pressBtn:{
+    top: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingRight: 10
+  },
+  btnSheet: {
+		height: 100,
+		width:100,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
+  modalsContainer: {
+    paddingTop: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  viewContainer: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    elevation: 5,
+    width: '90%',
+    marginLeft: '5%',
+    flexDirection: 'flex-start',
+    borderWidth: 3,
+    borderColor: '#7bf4f4',
+    marginBottom: 100
+  },
+  textStyle: {
+    color: 'black'
+  }
 });

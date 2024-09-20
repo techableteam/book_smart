@@ -1,33 +1,63 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Modal, TextInput, View, Image, Animated, Alert, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity, Button } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { Modal, TextInput, View, Image, Platform, Animated, Alert, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFocusEffect } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { MyShift, updateTimeSheet } from '../../utils/useApi';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
-import { Dropdown } from 'react-native-element-dropdown';
+// Choose file
 import DocumentPicker from 'react-native-document-picker';
+import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
-// import TimePicker from 'react-time-picker';
-import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-// import MapView from 'react-native-maps';
-import { Jobs, PostJob, MyShift, updateTimeSheet } from '../../utils/useApi';
-import { useFocusEffect } from '@react-navigation/native';
 
 export default function Shift ({ navigation }) {
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
+  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [isModal, setModal] = useState(false);
   const [isUpload, setUpload] = useState(false);
-  const [selectedTime, setSelectedTime] = useState(new Date());
+  const [value, setValue] = useState(100);
+  const [isFocus, setIsFocus] = useState(false);
+  const [data, setData] = useState([]);
+  const [userInfos, setUserInfo] = useState([]);
+  const [detailedInfos, setDetailedInfos] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [submitData, setSubmitData] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [fileType, setFiletype] = useState('');
+  const [downloading, setDownloading] = useState(false);
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  const [content, setContent] = useState({
+    startTime: '',
+    endTime: '',
+    lunch: '',
+    comments: ''
+  });
+  const [info, setInfo] = useState([
+    {title: 'Job-ID', content: ""},
+    {title: 'Entry Date', content: ''},
+    {title: 'Caregiver', content: ''},
+    {title: 'Date', content: ''},
+    {title: 'Hours Worked', content: ""},
+    {title: 'Hours Submitted?', content: "yes"},
+    {title: 'Hours Approved?', content: "pending"},
+  ]);
+  const pageItems = [
+    {label: '10 per page', value: '10'},
+    {label: '25 per page', value: '25'},
+    {label: '50 per page', value: '50'},
+    {label: '100 per page', value: '100'},
+    {label: '500 per page', value: '500'},
+    {label: '1000 per page', value: '1000'},
+  ];
+  let colorIndex = 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Generate a random color
       if(colorIndex >= 0.9) {
         colorIndex = 0;
       } else {
@@ -36,66 +66,18 @@ export default function Shift ({ navigation }) {
 
       const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
       setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
 
-  const theme = useTheme();
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [userRole, setUserRole] = useAtom(userRoleAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
-  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [address, setAddress] = useAtom(addressAtom);
-  const handleNavigate = (navigateUrl) => {
-    navigation.navigate(navigateUrl);
-  }
-
-  // const userInfo = [
-  //   {title: 'Entry Date', content: firstName},
-  //   {title: 'Phone', content: phoneNumber},
-  //   {title: 'email', content: userRole},
-  //   {title: 'Caregiver', content: caregiver},
-  // ]
-  //-----------------------------DropDown----------------------------
-  
-  const pageItems = [
-    {label: '10 per page', value: '10'},
-    {label: '25 per page', value: '25'},
-    {label: '50 per page', value: '50'},
-    {label: '100 per page', value: '100'},
-    {label: '500 per page', value: '500'},
-    {label: '1000 per page', value: '1000'},
-  ]
-
-  const [value, setValue] = useState(100);
-  const [isFocus, setIsFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-  const [data, setData] = useState([]);
-  const [userInfos, setUserInfo] = useState([]);
-  const [detailedInfos, setDetailedInfos] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [submitData, setSubmitData] = useState({});
-  async function getData() {
+  const getData = async () => {
     let data = await MyShift('jobs', 'Clinician');
+    console.log(data);
+
     if(!data) {
       setData(['No Data'])
-    }
-    else {
+    } else {
       setData(data);
-      console.log("----------------",data);
       const transformedData = data.reportData.map(item => [{
         title: 'Job-ID',
         content: item.jobId
@@ -121,49 +103,29 @@ export default function Shift ({ navigation }) {
       const page = Math.ceil(len / value);
       setTotalPages(page);
     }
-  }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
     }, [])
   );
 
-  //------------------hour event------------------------
-  const [content, setContent] = useState({
-    startTime: '',
-    endTime: '',
-    lunch: '',
-    comments: ''
-  });
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+
+  const handleNavigate = (navigateUrl) => {
+    navigation.navigate(navigateUrl);
+  };
 
   const handleContent = (target, e) => {
     setContent({...content, [target]: e});
-  }
+  };
+
   const handleSubmit = () => {
     toggleModal();
-  }
-  
-  const [detailedInfo, setDetailedInfo] = useState([
-    {
-      jobId: '344', 
-      entryDate: '07/11/2024', 
-      caregiver: 'Dale', 
-      payRate: '$35.00', 
-      shiftDateTime: '',
-      hoursWorked: '11:50am to 12:50pm = 1.00',
-      hoursSubmitted: 'no', 
-      hoursApproved: 'no',
-    }
-  ]);
-  const [info, setInfo] = useState([
-    {title: 'Job-ID', content: ""},
-    {title: 'Entry Date', content: ''},
-    {title: 'Caregiver', content: ''},
-    {title: 'Date', content: ''},
-    {title: 'Hours Worked', content: ""},
-    {title: 'Hours Submitted?', content: "yes"},
-    {title: 'Hours Approved?', content: "pending"},
-  ]);
+  };
   
   const toggleModal = () => {
     setModal(!isModal);
@@ -176,20 +138,32 @@ export default function Shift ({ navigation }) {
   };
 
   const handleUploadSubmit = async () => {
-    const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet}
+    const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet};
     if (submitData.timeSheet?.name != '') {
       const response = await updateTimeSheet(data, 'jobs');
-      setUpload(!isUpload);
-      getData();
-      Alert.alert('Success!', 'Your timesheet has been submitted', [
-        {
-          text: 'OK',
-          onPress: () => {
-            console.log('');
+      if (!response?.error) {
+        setUpload(!isUpload);
+        getData();
+        Alert.alert('Success!', 'Your timesheet has been submitted', [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
           },
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+          { text: 'Cancel', style: 'cancel' },
+        ]);
+      } else {
+        Alert.alert('Failure!', 'Pleae try later', [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+          { text: 'Cancel', style: 'cancel' },
+        ]);
+      }
     } else {
       Alert.alert('Failure!', 'Please upload documentation', [
         {
@@ -208,10 +182,6 @@ export default function Shift ({ navigation }) {
   };
 
   const handleUploadEdit = (id) => {
-    console.log('handleEdit--->', id);
-    let cnt = 0;
-    console.log(data, 'ddddd');
-    
     let infoData = data.reportData.find(item => item.jobId === id)
     setSubmitData(infoData);
     setDetailedInfos([
@@ -219,40 +189,57 @@ export default function Shift ({ navigation }) {
       { title: 'Caregiver', content: infoData.caregiver },
       { title: 'TimeSheet', content: infoData.timeSheet.name },
     ]);
-
-    console.log("dfdsafafdafdafd" ,submitData);
     toggleUploadModal();
   };
+
   //-----------------------------------------File Upload---------------------
+  const handleChangeFileType = (mode) => {
+    setFiletype(mode);
+    toggleFileTypeSelectModal();
+  };
+
+  const openCamera = async () => {
+    const options = {
+      mediaType: 'photo', // Use 'video' for video capture
+      quality: 1, // 1 for high quality, 0 for low quality
+    };
+  
+    launchCamera(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.error('Camera error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // Handle the response
+        const fileUri = response.assets[0].uri;
+        const fileContent = await RNFS.readFile(fileUri, 'base64');
+        
+        setSubmitData({
+          ...submitData,
+          timeSheet: {
+            content: fileContent,
+            type: 'image',
+            name: response.assets[0].fileName,
+          },
+        });
+      }
+    });
+  };
+
   const pickFile = async () => {
     try {
-      console.log('pick Data')
-      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf];
       const res = await DocumentPicker.pick({
         type: type,
       });
-      // Read file content using RNFS
+
       let fileUri = res[0].uri;
       let fileContent;
-
-      // Ensure we have a valid URI
-      if (fileUri) {
-        // Read the file as base64
-        fileContent = await RNFS.readFile(fileUri, 'base64');
-        
-        // Check if fileContent is correctly base64 encoded
-        if (!/^[A-Za-z0-9+/]+={0,2}$/.test(fileContent)) {
-          console.log('Invalid base64 encoding');
-        }
-
-        console.log('FileContent', fileContent);
-      } else {
-        console.log('Invalid URI');
-      }
-
-      console.log('FileContent', fileContent)
-      console.log(res);
       let fileType;
+      fileContent = await RNFS.readFile(fileUri, 'base64');
+
       if (res[0].type == 'application/pdf') {
         fileType = 'pdf';
       } else if (res[0].type.startsWith('image')) {
@@ -271,8 +258,60 @@ export default function Shift ({ navigation }) {
     }
   };
 
+  const fileDownload = async () => {
+    const fileName = 'BookSmart_Timesheet.pdf';
+    let dir = RNFS.DownloadDirectoryPath;
+
+    if (Platform.OS === 'ios') {
+      dir = RNFS.LibraryDirectoryPath;
+    }
+
+    const filePath = dir + '/' + fileName;
+
+    RNFS.unlink(filePath)
+      .then(() => {
+        console.log('Previous file deleted');
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  
+    const options = {
+      fromUrl: 'https://lyntex.io/wp-content/uploads/2024/04/BookSmart-Timesheet-2024.pdf',
+      toFile: filePath,
+      background: true,
+      discretionary: true,
+      progress: (res) => {
+        setDownloading(true);
+        const progress = (res.bytesWritten / res.contentLength) * 100;
+        console.log('progress => ', progress.toFixed(2));
+      }
+    };
+
+    console.log('filepath +.', filePath);
+
+    RNFS.downloadFile(options)
+      .promise.then((result) => {
+        console.log('downloaded');
+        setDownloading(false);
+        Alert.alert('Success!', 'The Tiemsheet has been downloaded', [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+          { text: 'Cancel', style: 'cancel' },
+        ]);
+      })
+      .catch((error) => {
+        console.log('There was an error opening the file');
+        console.log(error);
+      });
+  };
+
   const handleDelete = () => {
-    setDetailedInfo(prevUploadInfo => {
+    setDetailedInfos(prevUploadInfo => {
       return prevUploadInfo.map((item, index) => {
         if (index === 2) { // Index 2 corresponds to the third item (0-based index)
             return { ...item, content: '' }; // Update the content of the third item
@@ -282,7 +321,6 @@ export default function Shift ({ navigation }) {
     });
   };
   
-  const [currentPage, setCurrentPage] = useState(1);
   const getItemsForPage = (page) => {
     const startIndex = (page-1) * value;
     const endIndex = Math.min(startIndex + value, userInfos.length);
@@ -291,14 +329,14 @@ export default function Shift ({ navigation }) {
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-        setCurrentPage(currentPage + 1);
+      setCurrentPage(currentPage + 1);
     }
   };
 
   const handlePrevPage = () => {
-      if (currentPage > 1) {
-          setCurrentPage(currentPage - 1);
-      }
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   const itemsToShow = getItemsForPage(currentPage);
@@ -310,7 +348,7 @@ export default function Shift ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: 140}}
+        <ScrollView style={{width: '100%', marginTop: 160}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -320,6 +358,11 @@ export default function Shift ({ navigation }) {
             <View style={styles.bottomBar}/>
           </View>
           <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARD"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"COMPLETE"&nbsp;</Text>.</Text>
+          {downloading ? (
+            <Text style={styles.text}>Downloading...</Text>
+          ) : (
+            <Text style={[styles.text, { marginTop: 15, color: 'blue', textDecorationLine: 'underline' }]} onPress={fileDownload}>DOWNLOAD TIMESHEET HERE</Text>
+          )}
           <View style={styles.imageButton}>
             <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
             <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
@@ -523,7 +566,7 @@ export default function Shift ({ navigation }) {
                     }
                   </View>
                   <View style={{flexDirection: 'row', width: '100%'}}>
-                    <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
+                    <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
                       <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                     </TouchableOpacity>
                     <TextInput
@@ -544,10 +587,48 @@ export default function Shift ({ navigation }) {
             </View>
           </ScrollView>
         </Modal>}
+
+        {fileTypeSelectModal && (
+          <Modal
+            visible={fileTypeSelectModal} // Changed from Visible to visible
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setFiletypeSelectModal(false); // Close the modal
+            }}
+          >
+            <StatusBar translucent backgroundColor='transparent' />
+            <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
+              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Choose File</Text>
+                  <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
+                    <Image source={images.close} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={[styles.modalBody, { marginBottom: 20 }]}>
+                    <View style={styles.cameraContain}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
+                        <Icon name="camera" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Camera</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                        <Icon name="image" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
+        )}
+
         <MFooter />
       </View>
   )
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -621,10 +702,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#b0b0b0',
     marginBottom: 100
-    // elevation: 1,
-    // // shadowColor: 'rgba(0, 0, 0, 0.4)',
-    // // shadowOffset: { width: 1, height: 1 },
-    // shadowRadius: 0,
   },
   titles: {
     fontWeight: 'bold',
@@ -682,10 +759,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalsContainer: {
-    // flex: 1,
-    // justifyContent: 'flex-start',
     paddingTop: 30,
-    // alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   calendarContainer: {
@@ -825,5 +899,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black',
   },
+  cameraContain: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+		flexDirection: 'row'
+	},
+  pressBtn:{
+    top: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingRight: 10
+  },
+  btnSheet: {
+		height: 100,
+		width:100,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
 });
   

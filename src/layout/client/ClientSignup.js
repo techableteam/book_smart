@@ -1,14 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
+import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button, Image } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import RNFS from 'react-native-fs'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
-import DocumentPicker from 'react-native-document-picker';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
+import images from '../../assets/images';
+// Choose file
+import DocumentPicker from 'react-native-document-picker';
+import { launchCamera } from 'react-native-image-picker';
+import RNFS from 'react-native-fs'
 
 export default function ClientSignUp({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -21,6 +25,8 @@ export default function ClientSignUp({ navigation }) {
   const [birthday, setBirthday] = useState(new Date());
   const [ssNumber, setSSNumber] = useState('');
   const [verifySSNumber, setVerifySSNumber] = useState('');
+  const [fileType, setFiletype] = useState('');
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [address, setAddress] = useState({
     streetAddress: '',
     streetAddress2: '',
@@ -75,6 +81,42 @@ export default function ClientSignUp({ navigation }) {
 
   const handleDayChange = (day) => {
     setBirthday(day);
+  };
+
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+
+  const handleChangeFileType = (mode) => {
+    setFiletype(mode);
+    toggleFileTypeSelectModal();
+  };
+
+  const openCamera = async () => {
+    const options = {
+      mediaType: 'photo', // Use 'video' for video capture
+      quality: 1, // 1 for high quality, 0 for low quality
+    };
+  
+    launchCamera(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.error) {
+        console.error('Camera error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        // Handle the response
+        const fileUri = response.assets[0].uri;
+        const fileContent = await RNFS.readFile(fileUri, 'base64');
+        
+        setPhotoImage({
+          content: fileContent,
+          type: 'image',
+          name: response.assets[0].fileName,
+        });
+      }
+    });
   };
 
   const pickFile = async () => {
@@ -546,7 +588,7 @@ export default function ClientSignUp({ navigation }) {
             <View style={styles.email}>
               <Text style={styles.subtitle}> Upload Pic. (Optional)</Text>
               <View style={{flexDirection: 'row', width: '100%'}}>
-                <TouchableOpacity title="Select File" onPress={pickFile} style={styles.chooseFile}>
+                <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
@@ -630,7 +672,42 @@ export default function ClientSignUp({ navigation }) {
             </Text>
           </View>
         </View>
-
+        {fileTypeSelectModal && (
+          <Modal
+            visible={fileTypeSelectModal} // Changed from Visible to visible
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setFiletypeSelectModal(false); // Close the modal
+            }}
+          >
+            <StatusBar translucent backgroundColor='transparent' />
+            <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
+              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Choose File</Text>
+                  <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
+                    <Image source={images.close} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={[styles.modalBody, { marginBottom: 20 }]}>
+                    <View style={styles.cameraContain}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
+                        <Icon name="camera" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Camera</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                        <Icon name="image" size={50} color="#ccc" />
+                        <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
+        )}
       </ScrollView>
       <MFooter />
     </View>
@@ -670,6 +747,9 @@ const styles = StyleSheet.create({
     width: '90%',
     backgroundColor: 'transparent'
   },
+  textStyle: {
+    color: 'black'
+  },
   marker: {
     width: 5,
     height: 5,
@@ -705,6 +785,46 @@ const styles = StyleSheet.create({
   },
   intro: {
     marginTop: 30
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalsContainer: {
+    paddingTop: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  viewContainer: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    elevation: 5,
+    width: '90%',
+    marginLeft: '5%',
+    flexDirection: 'flex-start',
+    borderWidth: 3,
+    borderColor: '#7bf4f4',
+    marginBottom: 100
+  },
+  modalBody: {
+    backgroundColor: '#e3f2f1',
+    borderRadius: 10,
+    borderColor: '#c6c5c5',
+    borderWidth: 2,
+    paddingHorizontal: 20,
+    paddingVertical: 20
+  },
+  calendarContainer: {
+    backgroundColor: 'white',
+    borderRadius: 5,
+    elevation: 5,
+    width: '60%',
+    height: '30%',
+    marginLeft: '20',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    padding: 20
   },
   input: {
     backgroundColor: 'white', 
@@ -827,4 +947,52 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 20
   },
+  cameraContain: {
+		flex: 1,
+		alignItems: 'flex-start',
+		justifyContent: 'center',
+		flexDirection: 'row'
+	},
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    height: '20%,',
+    padding: 20,
+    borderBottomColor: '#c4c4c4',
+    borderBottomWidth: 1,
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black'
+  },
+  closeButton: {
+    color: 'red',
+  },
+  body: {
+    marginTop: 10,
+    paddingHorizontal:20,
+  },
+  pressBtn:{
+    top: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingRight: 10
+  },
+  btnSheet: {
+		height: 100,
+		width:100,
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
 });
