@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -36,6 +36,7 @@ export default function AdminJobShift({ navigation }) {
     payRate: '',
     bonus: '',
   });
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
   const [degree, setDegree] = useState([
     {label: 'Select...', value: 'Select...'},
@@ -52,6 +53,16 @@ export default function AdminJobShift({ navigation }) {
     {label: 'Warsaw, NY', value: 'Warsaw, NY'},
     {label: 'Williansville', value: 'Williansville'},
   ]);
+
+  useEffect(() => {
+    const areRequiredFieldsFilled = 
+      credentials.facility.trim() !== '' &&
+      credentials.degree.trim() !== '' &&
+      credentials.shiftTime.trim() !== '' &&
+      credentials.shiftDate.trim() !== '';
+
+    setIsButtonEnabled(areRequiredFieldsFilled);
+  }, [credentials]);
 
   async function getData() {
     let data = await getFacility('facilities', 'Admin');
@@ -376,7 +387,10 @@ export default function AdminJobShift({ navigation }) {
               />
             </View>
             <View style={[styles.btn, {marginTop: 20}]}>
-              <HButton style={styles.subBtn} onPress={ handleSubmit }>
+              <HButton style={[
+                styles.subBtn, 
+                  { backgroundColor: isButtonEnabled ? '#6a1b9a' : '#c1c1c1' }
+                ]} onPress={ handleSubmit} disabled={!isButtonEnabled} >
                 Submit
               </HButton>
             </View>
