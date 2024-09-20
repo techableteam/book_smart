@@ -93,11 +93,11 @@ export default function Shift ({ navigation }) {
       },
       {
         title: 'Date',
-        content: item.entryDate
+        content: item.shiftDate
       },
       {
         title: 'Shift',
-        content: item.shiftDateTime
+        content: item.shiftTime
       },
       {
         title: 'Caregiver',

@@ -78,6 +78,26 @@ export const VerifyPhoneCodeSend = async (credentials, endpoint) => {
   }
 }
 
+export const getUserInfo = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/getUserInfo`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    return {error: error}
+  }
+};
+
 export const getUserProfile = async (data, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
