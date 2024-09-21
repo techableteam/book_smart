@@ -65,15 +65,12 @@ export const VerifyCodeSend = async (credentials, endpoint) => {
 
 export const VerifyPhoneCodeSend = async (credentials, endpoint) => {
   try {
-    console.log("login", credentials);
     const response = await axios.post(`api/${endpoint}/verifyPhone`, credentials);
-    console.log(response);
     if (response.data.verifyCode) {
       await AsyncStorage.setItem('token', response.data.verifyCode);
     }
     return response.data;
   } catch (error) {
-    console.error(error)    
     return {error: error.response.data.message};
   }
 }

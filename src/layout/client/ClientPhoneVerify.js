@@ -70,16 +70,11 @@ export default function ClientPhoneVerify ({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    // console.log('email: ', email, value);
     handleCredentials('verifyCode', value)
     const response = await VerifyPhoneCodeSend({verifyCode: value, phoneNumber: verifyPhone, device: device, email: email}, 'clinical');
-    console.log(response)
     if (!response.error) {
-      console.log('success');
-      
       navigation.navigate('MyHome')
-    }
-    else {
+    } else {
       Alert.alert(
         'Failed!',
         `${response.error}`,
@@ -94,10 +89,12 @@ export default function ClientPhoneVerify ({ navigation }) {
         { cancelable: false }
       );
     }
-  }
+  };
+
   const handleBack = () => {
     navigation.navigate('ClientSignIn');
-  }
+  };
+  
   return (
       <View style={styles.container}>
         <StatusBar 

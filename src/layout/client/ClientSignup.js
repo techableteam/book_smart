@@ -66,7 +66,6 @@ export default function ClientSignUp({ navigation }) {
       ssNumber, verifySSNumber, password, confirmPassword, signature]);
   
   let signatureRef = useRef(null);
-  let signautreData = '';
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -183,7 +182,6 @@ export default function ClientSignUp({ navigation }) {
   };
 
   const onSaveEvent = (result) => {
-    signautreData = result.encoded;
     setSignature((prev) => ({...prev, content: result.encoded}));
   };
 
@@ -268,12 +266,13 @@ export default function ClientSignUp({ navigation }) {
   };
 
   const handlePreSubmit = () => {
+    handleSubmit();
     if (!isSubmitting) {
-      setIsSubmitting(true);
-      getSignature();
-      setTimeout(() => {
-        handleSubmit();
-      }, 2000);
+      // setIsSubmitting(true);
+      // getSignature();
+      // setTimeout(() => {
+      //   handleSubmit();
+      // }, 2000);
     }
   };
 
@@ -293,12 +292,31 @@ export default function ClientSignUp({ navigation }) {
       password === '' ||
       signature.content === ''
     ) {
+      if (signature.content === '') {
+        Alert.alert(
+          'Warning!',
+          "signature required",
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      } else {
+        showWrongAlerts();
+      }
+      console.log(email, firstName, lastName, phoneNumber, title, birthday, ssNumber, verifySSNumber, address, password, signature.content.length, signautreData.length);
       showWrongAlerts();
       setIsSubmitting(false);
     } else if (password !== confirmPassword) {
       showPswWrongAlert();
       setIsSubmitting(false);
     } else {
+      console.log('call api');
       try {
         const credentials = {
           firstName,
@@ -656,7 +674,15 @@ export default function ClientSignUp({ navigation }) {
             <View style={styles.password}>
               <Text style={styles.subtitle}>Signature<Text style={{color: 'red'}}>*</Text> </Text>  
               
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <SignatureCapture
+                style={styles.signature}
+                ref={signatureRef}
+                onSaveEvent={onSaveEvent}
+                saveImageFileInExtStorage={false}
+                showNativeButtons={true}
+              />
+
+              {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <SignatureCapture
                   style={styles.signature}
                   ref={signatureRef}
@@ -667,7 +693,7 @@ export default function ClientSignUp({ navigation }) {
                 <TouchableOpacity onPress={resetSignature} style={{ backgroundColor: '#ccc', padding: 5, width: 'auto', height: 'auto', marginLeft: 5 }}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Reset</Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
 
             </View>
             
@@ -913,7 +939,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     padding: 10,
     backgroundColor: '#A020F0',
-    color: 'black',
+    color: 'white',
     fontSize: 16,
   },
   drinksButton: {
