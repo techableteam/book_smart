@@ -58,6 +58,7 @@ import ClientPhoneVerify from './client/ClientPhoneVerify.js';
 import ClientProfile from './facilities/ClientProfile.js';
 import ClientPermission from './client/ClientPermission.js';
 import FileViewer from './FileViewer.js';
+import AddNewFacility from './admin/AddNewFacility.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -92,6 +93,11 @@ function Layout() {
       <Stack.Screen 
         name= 'MyProfile'
         component = {MyProfile}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AddNewFacility'
+        component = {AddNewFacility}
         options={{headerShown: false}}
       />
       <Stack.Screen 

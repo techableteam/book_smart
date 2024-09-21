@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider, atom } from 'jotai';
 
+export const facilityIdAtom = atom('');
 export const companyNameAtom = atom('');
 export const firstNameAtom = atom('');
 export const lastNameAtom = atom('');

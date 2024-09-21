@@ -1,15 +1,12 @@
 import { StyleSheet, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { CheckBox } from 'react-native-elements';
 import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState } from '../../context/ClinicalAuthProvider';
-import { useNavigation } from '@react-navigation/native';
+import { TextInput, useTheme } from 'react-native-paper';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, facilityAcknowledgementAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, entryDateAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom, passwordAtom } from '../../context/FacilityAuthProvider'
+import { facilityIdAtom, firstNameAtom, lastNameAtom, facilityAcknowledgementAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, entryDateAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom, passwordAtom } from '../../context/FacilityAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -25,11 +22,8 @@ export default function FacilityLogin({ navigation }) {
   const [userRole, setUserRole]= useAtom(userRoleAtom);
   const [address, setAddress]= useAtom(addressAtom);
   const [password, setPassword] = useAtom(passwordAtom);
+  const [facilityId, setFacilityID] = useAtom(facilityIdAtom);
   const [facilityAcknowledgement, setFacilityAcknowledgement] = useAtom(facilityAcknowledgementAtom);
-  // const navigation = useNavigation(false);
-  const theme = useTheme();
-  // const { auth, setAuth } = AuthState();
-  // const { isAuthenticated } = auth || {};
   const [ credentials, setCredentials ] = useState({
     contactEmail: '',
     password: '',
@@ -44,9 +38,8 @@ export default function FacilityLogin({ navigation }) {
       setCredentials({...credentials, contactEmail: emails, password: password});
     }
     getCredentials();
-  }, [])
+  }, []);
 
-  //Alert
   const showAlert = (name) => {
     Alert.alert(
       'Warning!',
@@ -69,29 +62,28 @@ export default function FacilityLogin({ navigation }) {
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e});
-  }
+  };
 
   const handleSignInNavigate = () => {
     if (credentials.contactEmail === '') {
       showAlert('email')
-    }
-    else if (credentials.password === '') {
+    } else if (credentials.password === '') {
       showAlert('password')
-    }
-    else {
+    } else {
       navigation.navigate('FacilityPermission');
     }
-  }
+  };
 
   const handleSignUpNavigate = () => {
     navigation.navigate('FacilitySignUp');
-  }
+  };
 
   const handleSubmit = async () => {
     try {
       const response = await Signin(credentials, 'facilities');
 
       if (!response.error) {
+        setFacilityID(response.user.aic);
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
         setContactEmail(response.user.contactEmail);
@@ -104,10 +96,12 @@ export default function FacilityLogin({ navigation }) {
         setUserRole(response.user.userRole);
         setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
         setPassword(response.user.password);
+
         if (checked) {
           await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
           await AsyncStorage.setItem('facilityPassword', credentials.password);
         }
+
         if (response.user.facilityAcknowledgeTerm) {
           navigation.navigate("FacilityProfile");
         } else {

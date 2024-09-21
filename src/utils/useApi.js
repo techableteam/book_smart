@@ -165,7 +165,87 @@ export const Update = async (updateData, endpoint) => {
   }
 }
 
+export const addDegreeItem = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/addItem`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    return {error: error}
+  }
+}
+
 export const getDegreeList = async (endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get(`api/${endpoint}/getList`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    return {error: error}
+  }
+}
+
+export const getFacilityInfo = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/getFacilityInfo`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    return {error: error}
+  }
+}
+
+export const addLocationItem = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/addItem`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    return {error: error}
+  }
+}
+
+export const getLocationList = async (endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
     const response = await axios.get(`api/${endpoint}/getList`, {
@@ -209,26 +289,6 @@ export const removeAccount = async (data, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
     const response = await axios.post(`api/${endpoint}/removeAccount`, data, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-
-    if (response.status === 200) {
-      if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
-    } 
-    return response.data;
-  } catch (error) {
-    return {error: error}
-  }
-}
-
-export const addDegreeItem = async (data, endpoint) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/addItem`, data, {
       headers: {
         Authorization: `Bearer ${existingToken}`
       }

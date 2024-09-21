@@ -4,20 +4,53 @@ import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Table, Row } from 'react-native-table-component';
-import { useAtom } from 'jotai';
-import moment from 'moment';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import AHeader from '../../components/Aheader';
-import { invoiceFetchAtom } from '../../context/BackProvider';
-import { Update, Clinician, sendInvoice } from '../../utils/useApi';
+import { Clinician, getFacilityInfo, updatePassword, updateUserInfo } from '../../utils/useApi';
 
 export default function AdminFacilities({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [data, setData] = useState([]);
-  const [invoiceData, setInvoiceData] = useAtom(invoiceFetchAtom);
+  const [cellData, setCellData] = useState(null);
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+  const [statusModal, setStatusModal] = useState(false);
+  const [status, setStatus] = useState('');
+  const [isStatusFocus, setStatusIsFocus] = useState(false);
+  const [resetPWModal, setResetPWModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [tmpPassword, setTmpPassword] = useState('');
+  const [facility, setFacility] = useState(null);
+  const [shifts, setShifts] = useState([]);
+  const [userProfileModal, setUserProfileModal] = useState(false);
   let colorIndex = 0;
+  const widths = [100, 150, 250, 150, 150, 100, 100, 100];
+  const tableHead = [
+    'ID',
+    'Date Added',
+    'Company Name',
+    'Contact Name',
+    '✏️ User Status',
+    'User Roles',
+    'View Shifts',
+    'P.W.'
+  ];
+  const pageItems = [
+    {label: '10 per page', value: '1'},
+    {label: '25 per page', value: '2'},
+    {label: '50 per page', value: '3'},
+    {label: '100 per page', value: '4'},
+    {label: '500 per page', value: '5'},
+    {label: '1000 per page', value: '6'},
+  ];
+  const statusList = [
+    {label: 'activate', value: 'activate'},
+    {label: 'inactivate', value: 'inactivate'},
+    {label: 'pending approval', value: 'pending approval'},
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,236 +65,184 @@ export default function AdminFacilities({ navigation }) {
     return () => clearInterval(interval);
   }, []);
 
-  const tableHead = [
-    'Entry Date',
-    'Name',
-    'Company Name',
-    'Email',
-    'User Status',
-    "Send Invoice"
-  ];
-
-  const [clinicians, setClinicians] = useState([]);
-
-  function formatData(data) {
-    return data.map(item => {
-        // Parse the date and format to MM/DD/YYYY
-        const date = new Date(item[0]);
-        const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
-
-        // Combine the second and third elements
-        const fullName = `${item[1]} ${item[2]}`;
-
-        // Return the new structure
-        return [formattedDate, fullName, item[3], item[4], item[5], 'Send Invoice'];
-    });
-  }
-
   async function getData() {
-    let Data = await Clinician('facilities/facility', 'Admin');
-    if(!Data) {
+    let data = await Clinician('facilities/getFacilityList', 'Admin');
+    if(!data) {
       setData(['No Data'])
+    } else {
+      setData(data)
     }
-    else {
-      const modifiedData = formatData(Data);
-      console.log(modifiedData)
-      // const modifiedArray = Data.map(subarray => {
-      //   const newArray = [...subarray]; // Create a copy of the subarray
-      //   newArray.pop(); // Remove the last item
-      //   return newArray; // Return the modified subarray
-      // });
-      setData(modifiedData)
-    }
-    const uniqueValues = new Set();
-    const transformed = [];
+  };
 
-    // Iterate over each subarray
-    data.forEach(subarray => {
-      const value = subarray[1]; // Get the second element
-      if (!uniqueValues.has(value)) { // Check if it's already in the Set
-          uniqueValues.add(value); // Add to Set
-          transformed.push({ label: value, value: value }); // Add to transformed array
-      }
-    });
-
-    console.log(transformed);
-    setClinicians(transformed);
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
-  }
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
 
-  //---------------DropDown--------------
-  const pageItems = [
-    {label: '10 per page', value: '1'},
-    {label: '25 per page', value: '2'},
-    {label: '50 per page', value: '3'},
-    {label: '100 per page', value: '4'},
-    {label: '500 per page', value: '5'},
-    {label: '1000 per page', value: '6'},
-  ]
+  const toggleStatusModal = () => {
+    setStatusModal(!statusModal);
+  };
 
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
+  const handleCellClick = (data) => {
+    setCellData(data);
+    setStatus(data[4]);
+    toggleStatusModal();
+  };
 
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
+  const handleUpdate = async () => {
+    try {
+      const response = await updateUserInfo({userEmail: cellData[8], userRole: cellData[5], status: status, password: ''}, 'admin');
+      if (!response?.error) {
+        getData();
+        toggleStatusModal();
+      } else {
+        Alert.alert(
+          'Failure!',
+          'Network Error',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        'Failure!',
+        'Network Error',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed');
+            },
+          },
+        ],
+        { cancelable: false }
       );
     }
-    return null;
-  };  
-  const widths = [120, 100, 150, 150, 100, 125];
-  const [modal, setModal] = useState(false)
-  const toggleModal = () => {
-    setModal(!modal);
-  }
-  const [cellData, setCellData] = useState(null);
-  const [rowData, setRowData] = useState(null);
-  const [modalItem, setModalItem] = useState(0);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [invoiceName, setInvoiceName] = useState('');
-  const [label, setLabel] = useState(null);
-  const [date,setDate] = useState(new Date());
-  const handleCellClick = (cellData, rowIndex, cellIndex) => {
-    // Handle row click event here
-    console.log('Row clicked:', cellData, rowIndex, cellIndex);
-    // if (cellIndex==9) {
-      setCellData(cellData);
-      const rowD = data[rowIndex][3];
-      console.log(rowD);
-      setModalItem(cellIndex);
-      if(cellIndex==1) {
-        const name = cellData.split(' ');
-        setLabel({firstName: name[0], lastName: name[1]});
-      }
-      else {
-        setLabel(cellData.toString());
-      }
-      setRowData(rowD);
-      if (cellIndex !== 0 ) {
-        toggleModal();
-      }
-      setInvoiceName(data[rowIndex][2]);
-    // }
   };
 
-  const handleDay = (day) => {
-    setDate(day);
-    setLabel(moment(day).format("MM/DD/YYYY"));
-  }
-
-  //---------------DropDown--------------
-  const [location, setLocation] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'activate', value: 'activate'},
-    {label: 'inactivate', value: 'inactivate'},
-    {label: 'pending', value: 'pending'},
-  ])
-
-  const formatPhoneNumber = (input) => {
-    // Remove all non-numeric characters from the input
-    const cleaned = input.replace(/\D/g, '');
-
-    // Apply the desired phone number format
-    let formattedNumber = '';
-    if (cleaned.length >= 3) {
-      formattedNumber = `(${cleaned.slice(0, 3)})`;
-    }
-    if (cleaned.length > 3) {
-      formattedNumber += ` ${cleaned.slice(3, 6)}`;
-    }
-    if (cleaned.length > 6) {
-      formattedNumber += `-${cleaned.slice(6, 10)}`;
-    }
-
-    return formattedNumber;
+  const toggleRestPWModal = () => {
+    setResetPWModal(!resetPWModal);
   };
 
-  const [jobValue, setJobValue] = useState(null);
-  const [isJobFocus, setJobIsFocus] = useState(false);
-
-  const [suc, setSuc] = useState(0);
-  const handlePress = async() => {
-    let sendData = label;
-    let sendingData = {}
-    if (modalItem !== 5) {
-      if (modalItem === 1) {
-        const emailData = {contactEmail: rowData}
-        sendingData = {
-          ...emailData, // Ensure rowData is defined and contains the appropriate value
-          ...sendData // Use sendData for jobNum
-        };
-      } else if (modalItem === 2) {
-        sendingData = {
-          contactEmail: rowData,
-          phoneNumber: sendData // Use sendData for location
-        };
-      } else if (modalItem === 3)  {
-        // Handle other modalItems as needed
-        sendingData = {
-          contactEmail: rowData,
-          updateEmail: sendData // Use sendData for location
-        };
-      } else if (modalItem === 4)  {
-        // Handle other modalItems as needed
-        sendingData = {
-          contactEmail: rowData,
-          userStatus: sendData // Use sendData for location
-        };
-      }
-      console.log('====================================');
-      console.log(sendingData);
-      console.log('====================================');
-      let Data = await Update(sendingData, 'facilities');
-      if(Data) setSuc(suc+1);
-      else setSuc(suc);
+  const handleResetPW = async () => {
+    if (password != confirmPassword) {
+      Alert.alert(
+        'Warning!',
+        "The Password doesn't matched. Please try again.",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setPassword('');
+              setConfirmPassword('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      return;
     }
-    else {
-      const filteredData = invoiceData.filter(item => item.facilityId === invoiceName && item.status === true);
-      if (filteredData) {
-        console.log(rowData);
-        
-        let result = await sendInvoice(invoiceName, rowData);
-        if (!result.error) {
-            Alert.alert('Success', 'Invoice generated successfully!');
-        }
-        else {
-            Alert.alert('Failed', response.error);
-        }
-      }
-      else {
-        Alert.alert('Failed', "There is no new invoice.");
 
-      }
-    }
-    toggleModal();
+    let response = await updatePassword({ userId: cellData[0], userRole: 'Facilities', password, tmpPassword }, 'admin');
     getData();
+    toggleRestPWModal();
   };
+
+  const formatDate = (origin) => {
+    const date = new Date(origin);
+    const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
+    return formattedDate;
+  };
+
+  const toggleUserProfileModal = () => {
+    setUserProfileModal(!userProfileModal);
+  };
+
+  const handleShowFacilityInfoModal = async (data) => {
+    let response = await getFacilityInfo({ userId: data[0] }, 'facilities');
+    if (!response.error) {
+      let shiftsData = response.jobData;
+      shiftsData.unshift(shiftsTableHeader);
+
+      setFacility(response.userData);
+      setShifts(shiftsData);
+      toggleUserProfileModal();
+    } else {
+      Alert.alert(
+        'Warning!',
+        "Can't get facility, Please try again later",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setPassword('');
+              setConfirmPassword('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
+  const shiftsTableHeaderWidth = [100, 150, 100, 150, 200];
+  const shiftsTableHeader = ['Job-ID', 'Entry Date', 'Job #', 'Job Status', 'Shift Dates & Times'];
+  const RenderItem = ({ item, index }) => (
+    <View
+      key={index}
+      style={{
+        backgroundColor: index == 0 ? '#ccffff' : '#fff',
+        flexDirection: 'row',
+      }}
+    >
+      {shiftsTableHeaderWidth.map((width, idx) => {
+        return (
+          <Text
+            key={idx}
+            style={[styles.tableText, { width, textAlign: 'center' }]}
+          >
+            {item[idx]}
+          </Text>
+        );
+      })}
+    </View>
+  );
+
+  const ShiftListTable = () => (
+    <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
+      {shifts.map((item, index) => (
+        <RenderItem key={index} item={item} index={index} />
+      ))}
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <StatusBar
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <AHeader navigation={navigation}  currentPage={6} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 155 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ width: '100%', marginTop: 155 }} showsVerticalScrollIndicator={false}>
         <View style={styles.topView}>
           <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>COMPANY JOBS / SHIFTS</Text>
+            <Text style={styles.title}>ALL PLATFORM FACILITIES</Text>
           </Animated.View>
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
+          <TouchableOpacity style={[styles.subBtn, { width: 'auto' }]} onPress={() => navigation.navigate('AddNewFacility')}>
+            <View style={{ backgroundColor: 'white', borderRadius: 10, width: 16, height: 16, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+              <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', lineHeight: 16 }}>+</Text>
+            </View>
+            <Text style={styles.profileTitle}>Add A New Facility</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.profile}>
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
@@ -286,12 +267,6 @@ export default function AdminFacilities({ navigation }) {
               <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
                 <Text style={styles.profileTitle}>🖥️ ALL PLATFORM FACILITIES</Text>
               </View>
-              <View style={styles.searchBar}>
-                {/* <TextInput style={styles.searchText} /> */}
-                {/* <TouchableOpacity style={styles.searchBtn}>
-                  <Text>Add filters</Text>
-                </TouchableOpacity> */}
-              </View>
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
@@ -300,12 +275,10 @@ export default function AdminFacilities({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={pageItems}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
                 value={value ? value : pageItems[3].value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
@@ -324,123 +297,259 @@ export default function AdminFacilities({ navigation }) {
               />
               <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
-                  <Row
-                    data={tableHead}
-                    style={styles.head}
-                    widthArr={[120, 100, 150, 150, 100, 125]}
-                    textStyle={styles.tableText}
-                  />
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
+                    {tableHead.map((item, index) => (
+                      <Text
+                        key={index}
+                        style={[styles.tableText, { width: widths[index], textAlign: 'center' }]}
+                      >
+                        {item}
+                      </Text>
+                    ))}
+                  </View>
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
-                      {rowData.map((cellData, cellIndex) => (
-                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
-                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
-                            <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
-                          </View>
-                        </TouchableWithoutFeedback> 
-                      ))}
+                      {rowData.map((cellData, cellIndex) => {
+                        if (cellIndex == 4) {
+                          return (
+                            <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(rowData)}>
+                              <View style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
+                                <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
+                              </View>
+                            </TouchableWithoutFeedback>
+                          );
+                        } else if (cellIndex >= tableHead.length) {
+                          return (<View key={cellIndex}></View>);
+                        } else if (cellIndex == 6) {
+                          return (
+                            <View key={cellIndex} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  handleShowFacilityInfoModal(rowData);
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>View</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else if (cellIndex == 7) {
+                          return (
+                            <View key={cellIndex} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  setCellData(rowData);
+                                  toggleRestPWModal();
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>Reset</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else {
+                          return (
+                            <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                              <Text style={[styles.tableText, cellIndex == 1 ? { borderWidth: 0, color: 'blue' } : { borderWidth: 0 }]}>{cellData}</Text>
+                            </View>
+                          );
+                        }
+                      })}
                     </View>
                   ))}
                 </Table>
               </ScrollView>
             </View>
           </View>
-          
           <Modal
-            visible={modal}
+            visible={resetPWModal}
             transparent= {true}
             animationType="slide"
             onRequestClose={() => {
-              setModal(!modal);
+              setResetPWModal(!resetPWModal);
             }}
           >
             <View style={styles.modalContainer}>
               <View style={styles.calendarContainer}>
                 <View style={styles.header}>
-                  <Text style={styles.headerText}>{tableHead[modalItem]}</Text>
-                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
+                  <Text style={styles.headerText}>Reset Password</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleRestPWModal}>
                     <Image source = {images.close} style={{width: 20, height: 20,}}/>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.body}>
                   <View style={styles.modalBody}>
-                    {
-                      (modalItem === 4) ?
-                        <Dropdown
-                          style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          inputSearchStyle={styles.inputSearchStyle}
-                          itemTextStyle={styles.itemTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={location}
-                          // search
-                          maxHeight={300}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={cellData}
-                          // searchPlaceholder="Search..."
-                          value={jobValue}
-                          onFocus={() => setJobIsFocus(true)}
-                          onBlur={() => setJobIsFocus(false)}
-                          onChange={item => {
-                            setJobValue(item.value);
-                            setLabel(item.label);
-                            setJobIsFocus(false);
-                          }}
-                          renderLeftIcon={() => (
-                            <View
-                              style={styles.icon}
-                              color={isJobFocus ? 'blue' : 'black'}
-                              name="Safety"
-                              size={20}
-                            />
-                          )}
+                    <Text style={styles.subtitle}> Password <Text style={{color: 'red'}}>*</Text></Text>
+                    <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      secureTextEntry={true}
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder="Password"
+                      onChangeText={e => setPassword(e)}
+                      value={password}
+                    />
+                    <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      secureTextEntry={true}
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder="Confirm Password"
+                      onChangeText={e => setConfirmPassword(e)}
+                      value={confirmPassword}
+                    />
+                    <Text style={styles.subtitle}> Temp Password </Text>
+                    <TextInput
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      style={[styles.input, {width: '100%', color: 'black'}]}
+                      placeholder=""
+                      onChangeText={e => setTmpPassword(e)}
+                      value={tmpPassword}
+                    />
+                    <Text>Enter Password again to send in email notification</Text>
+                    <TouchableOpacity style={styles.button} onPress={handleResetPW}>
+                      <Text style={styles.buttonText}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={statusModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setStatusModal(!statusModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>User Status</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleStatusModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <View style={styles.modalBody}>
+                    <Dropdown
+                      style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      itemTextStyle={styles.itemTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={statusList}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={''}
+                      value={status}
+                      onFocus={() => setStatusIsFocus(true)}
+                      onBlur={() => setStatusIsFocus(false)}
+                      onChange={item => {
+                        setStatus(item.value);
+                        setStatusIsFocus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <View
+                          style={styles.icon}
+                          color={isStatusFocus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
                         />
-                      :
-                      (modalItem === 2) || (modalItem === 3) ?
-                        (<TextInput
-                          style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black'}]}
-                          placeholder=""
-                          onChangeText={e => {
-                            const formattedNumber = formatPhoneNumber(e);
-                            if (modalItem === 2) {setLabel(formattedNumber)}
-                            else {setLabel(e)}
-                          }}
-                          value={label || ''}
-                          keyboardType={modalItem && "phone-pad"}
-                        />)
-                      :
-                      (modalItem === 1) ?
-                        (<View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: 20}}>
-                          <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black'}]}
-                            placeholder=""
-                            onChangeText={e => setLabel({...label, firstName: e})}
-                            value={label.firstName || ''}
-                          />
-                          <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center', color: 'black'}]}
-                            placeholder=""
-                            onChangeText={e => setLabel({...label, lastName: e})}
-                            value={label.lastName || ''}
-                          />
-                        </View>
-                        )
-                      :
-                      (modalItem === 5) ?
-                        (<Text style={{ color: "black" }}>
-                          {invoiceName+'.pdf'}
-                        </Text>)
-                      :
-                      <></>
-                    }
-                    <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
+                      )}
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleUpdate} underlayColor="#0056b3">
                       <Text style={styles.buttonText}>
-                        { modalItem === 5 ? 'Send Invoice': 'Update' } 
+                        Submit
                       </Text>
                     </TouchableOpacity>
                   </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={userProfileModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setUserProfileModal(!userProfileModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.calendarContainer, { height: '80%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Facility Details / Shifts</Text>
+                  <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleUserProfileModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ paddingHorizontal: 10 }}>
+                  <ScrollView>
+                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10, margin: 0 }]}>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        {facility?.avatar.name != "" ? (<Image
+                          resizeMode="cover"
+                          style={styles.nurse}
+                          source={{uri: 'data:image/jpeg;base64,' + facility?.avatar.content}}
+                        />) : (
+                          <></>
+                        )}
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Date Added</Text>
+                        <Text style={styles.content}>{formatDate(facility?.entryDate)}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>ID</Text>
+                        <Text style={styles.content}>{facility?.firstName} {facility?.aic}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Company Name</Text>
+                        <Text style={styles.content}>{facility?.companyName}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Contact Name</Text>
+                        <Text style={styles.content}>{facility?.firstname} {facility?.lastName}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Contact Email</Text>
+                        <Text style={[styles.content, { color: 'blue' }]}>{facility?.contactEmail}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Contact Phone</Text>
+                        <Text style={[styles.content, { color: 'blue' }]}>{facility?.contactPhone}</Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ ALL FACILITY SHIFT LISTINGS</Text>
+                        </View>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
+                        <ScrollView horizontal={true} style={{width: '100%'}}>
+                          <ShiftListTable />
+                        </ScrollView>
+                      </View>
+                    </View>
+                  </ScrollView>
                 </View>
               </View>
             </View>
@@ -461,6 +570,11 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%'
   },
+  content: {
+    fontSize: 16,
+    lineHeight: 30,
+    width: '60%'
+  },
   topView: {
     marginTop: 30,
     marginLeft: '10%',
@@ -479,6 +593,12 @@ const styles = StyleSheet.create({
     zIndex: 500,
     color: 'black',
     top: 10
+  },
+  titles: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    lineHeight: 30,
+    width: '35%'
   },
   title: {
     fontSize: 18,
@@ -722,20 +842,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007BFF', // Button color
-    padding: 10,    
-    marginLeft: '35%',
-    marginTop: 30,           // Padding inside the button
-    borderRadius: 5,          // Rounded corners
-    
+    backgroundColor: '#A020F0',
+    padding: 10,
+    marginTop: 30,
+    borderRadius: 5,
   },
   buttonText: {
-    color: 'white',            // Text color
-    fontSize: 16,              // Text size
+    color: 'white',
+    fontSize: 16,
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
+    height: 40, 
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',

@@ -1,56 +1,79 @@
-import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
-import React, { useState } from 'react';
-import images from '../../assets/images';
+import React, { useState, useRef, useEffect } from 'react';
+import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Image } from 'react-native';
+import { TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { TextInput, useTheme } from 'react-native-paper';
+import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { Update } from '../../utils/useApi';
-import MSubNavbar from '../../components/MSubNavbar';
-import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom } from '../../context/FacilityAuthProvider'
+import { Signup } from '../../utils/useApi';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 
-export default function FacilityEditProfile({ navigation }) {
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [companyName, setCompanyName] = useAtom(companyNameAtom);
-  const [contactPhone, setContactPhone] = useAtom(contactPhoneAtom);
-  const [contactPassword, setContactPassword] = useAtom(contactPasswordAtom);
-  const [contactEmail, setContactEmail] = useAtom(contactEmailAtom);
-  const [avatar, setAvatar] = useAtom(avatarAtom);
-  const [userRole, setUserRole]= useAtom(userRoleAtom);
-  const [address, setAddress]= useAtom(addressAtom);
+export default function AddNewFacility({ navigation }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+
+  useEffect(() => {
+    const increaseAnimation = Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 5000,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    });
+
+    const decreaseAnimation = Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 5000,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    });
+
+    const sequenceAnimation = Animated.sequence([increaseAnimation, decreaseAnimation]);
+
+    Animated.loop(sequenceAnimation).start();
+  }, [fadeAnim]);
+
   const [fileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
 
   //--------------------------------------------Credentials-----------------------------
-  const [ credentials, setCredentials ] = useState({
-    firstName: firstName,
-    lastName: lastName,
-    contactEmail: contactEmail,
-    contactPassword: contactPassword,
-    contactPhone: contactPhone,
-    companyName: companyName,
-    birthday: Date("07/24/2024"),
-    socialSecurityNumber: '123123123',
-    address: address,
-    avatar: avatar,
+  const [credentials, setCredentials] = useState({
+    companyName: '',
+    firstName: '',
+    lastName: '',
+    contactEmail: '',
+    password: '',
+    contactPhone: '',
+    address: {
+      street: '',
+      street2: '',
+      city: '',
+      state: '',
+      zip: '',
+    },
+    avatar: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    confirmPassword: '',
+    signature: '',
+    userRole: 'Facilities'
   })
 
   const handleCredentials = (target, e) => {
     if (target !== "street" && target !== "street2" && target !== "city" && target !== "state" && target !== "zip") {
-      setCredentials({...credentials, [target]: e});
+      let value = e;
+      if (target === 'contactEmail') {
+        value = e.toLowerCase();
+      }
+      setCredentials({...credentials, [target]: value});
     } else {
-      setCredentials({...credentials, address: {...credentials.address, [target]: e}})
+      setCredentials({ ...credentials, address: { ...credentials.address, [target]: e } })
     }
   }
-
-  //-------------------------------------------File Upload----------------------------
   const toggleFileTypeSelectModal = () => {
     setFiletypeSelectModal(!fileTypeSelectModal);
   };
@@ -89,14 +112,13 @@ export default function FacilityEditProfile({ navigation }) {
 
   const pickFile = async () => {
     try {
-      console.log("picker")
       let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
       const res = await DocumentPicker.pick({
         type: type,
       });
-  
+
       const fileContent = await RNFS.readFile(res[0].uri, 'base64');
-          // Determine the file type based on the MIME type
+      // Determine the file type based on the MIME type
       let fileType;
       if (res[0].type === 'application/pdf') {
         fileType = 'pdf';
@@ -106,8 +128,8 @@ export default function FacilityEditProfile({ navigation }) {
         // Handle other file types if needed
         fileType = 'unknown';
       }
-  
-      handleCredentials('avatar', {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
+
+      handleCredentials('avatar', { content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name });
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -116,7 +138,35 @@ export default function FacilityEditProfile({ navigation }) {
       }
     }
   };
-  
+
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  //Alert
+  const showAlert = () => {
+    Alert.alert(
+      'Warning!',
+      "The Password doesn't matched. Please try again.",
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setConfirmPassword('');
+            console.log('OK pressed')
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handlePassword = () => {
+    if (credentials.password !== confirmPassword ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+ 
   //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
     // Remove all non-numeric characters from the input
@@ -139,13 +189,18 @@ export default function FacilityEditProfile({ navigation }) {
         formattedNumber += `-${cleaned.slice(6, 10)}`;
     }
     return formattedNumber;
-  };  
+  };
 
   const handlePhoneNumberChange = (text) => {
-    const formattedNumber = formatPhoneNumber(text);
+    const formattedNumber = formatPhoneNumber(text); 
     handleCredentials('contactPhone', formattedNumber);
   };
 
+  const handleBack = () => {
+    navigation.navigate('AdminFacilities');
+  }
+
+  //Alert
   const showAlerts = (name) => {
     Alert.alert(
       'Warning!',
@@ -162,66 +217,183 @@ export default function FacilityEditProfile({ navigation }) {
     );
   };
 
-  const handleSubmit = async () => {
-    if (credentials.contactEmail === '' || 
-      credentials.firstName === '' || 
-      credentials.lastName ==='') {
-        showAlerts('all gaps')
-    } else {
-      try {
-        console.log('credentials: ', credentials);
-        const response = await Update(credentials, "facilities");
-        setFirstName(response.user.firstName);
-        setLastName(response.user.lastName);
-        setContactEmail(response.user.contactEmail);
-        setContactPhone(response.user.contactPhone);
-        setCompanyName(response.user.companyName);
-        setAddress(response.user.address);
-        setAvatar(response.user.avatar);
-        console.log('Signup successful: ', response)
-        navigation.navigate('FacilityProfile');
-      } catch (error) {
-        console.error('Signup failed: ', error)
+  const validation = () => {
+    // Create an array of checks for each required field with corresponding error messages
+    const fieldChecks = [
+      { field: credentials.companyName, message: 'Company Name is required' },
+      { field: credentials.contactEmail, message: 'Contact Email is required' },
+      { field: credentials.firstName, message: 'First Name is required' },
+      { field: credentials.lastName, message: 'Last Name is required' },
+      { field: credentials.contactPhone, message: 'Contact Phone is required' },
+      { field: credentials.password, message: 'Password is required' },
+      { field: credentials.confirmPassword, message: 'Password is required' },
+      { field: credentials.address?.street, message: 'Street Address is required' },
+      { field: credentials.address?.city, message: 'City is required' },
+      { field: credentials.address?.state, message: 'State is required' },
+      { field: credentials.address?.zip, message: 'ZIP code is required' },
+    ];
+  
+    // Iterate over the field checks and show an alert for the first empty field
+    for (const check of fieldChecks) {
+      if (!check.field || check.field === '') {
+        Alert.alert(
+          'Validation Error',
+          check.message,
+          [{ text: 'OK', onPress: () => console.log(`${check.message} alert acknowledged`) }],
+          { cancelable: false }
+        );
+        return false; // Return false if any field is invalid
       }
     }
-  }
 
-  const handleRemove = (name) => {
-    handleCredentials(name, {type: "", content: "", name: ""});
-  }
+    if (credentials.password !== credentials.confirmPassword) {
+      showPswWrongAlert();
+      return false;
+    }
+  
+    return true; // Return true if all fields are valid
+  };
 
+  const showPswWrongAlert = () => {
+    Alert.alert(
+      'Warning!',
+      "The Password doesn't matched. Please try again.",
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setPassword('');
+            setConfirmPassword('');
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!validation()) {
+      return;
+    }
+    try {
+      const response = await Signup(credentials, "facilities");
+      if (!response?.error) {
+        navigation.navigate('AdminFacilities');
+      } else {
+        if (response.error.status == 500) {
+          Alert.alert(
+            'Warning!',
+            "Can't register now",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 409) {
+          Alert.alert(
+            'Alert',
+            "The Email is already registered",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 405) {
+          Alert.alert(
+            'Alert',
+            "User not approved",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          Alert.alert(
+            'Failure!',
+            'Network Error',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Signup failed: ', error);
+      Alert.alert(
+        'Failure!',
+        'Network Error',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  }
   return (
     <View style={styles.container}>
-      <StatusBar 
-        translucent backgroundColor="transparent"
-      />
-      <MHeader navigation={navigation}/>
-      <MSubNavbar navigation={navigation} name={"Facilities"} />
-      <ScrollView style = {styles.scroll}    
-        showsVerticalScrollIndicator={false}
-      >
+      <StatusBar translucent backgroundColor="transparent"/>
+      <MHeader navigation={navigation} />
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
+          <View style={styles.intro}>
+            <View style={styles.backTitle} />
+            <Animated.View
+              style={[styles.backTitle, { opacity: fadeAnim, backgroundColor: '#0f00c4' }]
+              }>
+            </Animated.View>
+            <Text style={styles.title}>Add A New Facility</Text>
+          </View>
           <View style={styles.authInfo}>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Company Name </Text>
+              <Text style={styles.subtitle}> Company Name <Text style={{ color: 'red' }}>*</Text>  </Text>
+              <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
-                  style={[styles.input, {width: '100%'}]}
-                  placeholder="Last"
-                  onChangeText={e => handleCredentials('lastName', e)}
+                  style={[styles.input, { width: '100%' }]}
+                  placeholder=""
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  onChangeText={e => handleCredentials('companyName', e)}
                   value={credentials.companyName || ''}
                 />
+              </View>
             </View>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Contact Name <Text style={{color: 'red'}}>*</Text> </Text>
-              <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+              <Text style={styles.subtitle}> Contact Name <Text style={{ color: 'red' }}>*</Text> </Text>
+              <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
-                  style={[styles.input, {width: '50%'}]}
+                  style={[styles.input, { width: '50%' }]}
                   placeholder="First"
                   onChangeText={e => handleCredentials('firstName', e)}
                   value={credentials.firstName || ''}
                 />
                 <TextInput
-                  style={[styles.input, {width: '50%'}]}
+                  style={[styles.input, { width: '50%' }]}
                   placeholder="Last"
                   onChangeText={e => handleCredentials('lastName', e)}
                   value={credentials.lastName || ''}
@@ -229,10 +401,10 @@ export default function FacilityEditProfile({ navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Contact Email <Text style={{color: 'red'}}>*</Text> </Text>
-              <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+              <Text style={styles.subtitle}> Contact Email <Text style={{ color: 'red' }}>*</Text> </Text>
+              <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
-                  style={[styles.input, {width: '100%'}]}
+                  style={[styles.input, { width: '100%' }]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -243,102 +415,158 @@ export default function FacilityEditProfile({ navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Contact Phone <Text style={{color: 'red'}}>*</Text> </Text>
-              <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+              <Text style={styles.subtitle}> Contact Phone <Text style={{ color: 'red' }}>*</Text> </Text>
+              <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
                   value={credentials.contactPhone}
                   style={[styles.input, {width: '100%'}]}
-                  onChangeText={handlePhoneNumberChange}
+                  onChangeText={e => handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
-                  placeholder={credentials.contactPhone}
+                  placeholder=""
                 />
               </View>
             </View>
+            <View style={styles.password}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{
+                  backgroundColor: 'yellow',
+                  marginBottom: 10,
+                  // width: 140, 
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: 'black'
+                }}>
+                  Create Password
+                </Text>
+                <Text style={{ color: 'red' }}>*</Text>
+              </View>
+              <TextInput
+                autoCorrect={false}
+                autoCapitalize="none"
+                secureTextEntry={true}
+                style={[styles.input, { width: '100%' }]}
+                placeholder="Password"
+                onChangeText={e => handleCredentials('password', e)}
+                value={credentials.password || ''}
+              />
+              <TextInput
+                autoCorrect={false}
+                autoCapitalize="none"
+                secureTextEntry={true}
+                style={[styles.input, { width: '100%' }]}
+                placeholder="Confirm Password"
+                onChangeText={e => handleCredentials('confirmPassword', e)}
+                value={credentials.confirmPassword || ''}
+              />
+              <Text style={[styles.subtitle, { fontStyle: 'italic', fontSize: 14, color: 'red' }]}>Create your password to access the platform</Text>
+            </View>
+            {/* <View style={styles.password}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{
+                  marginBottom: 10,
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: 'black'
+                }}>
+                  Enter Password Again
+                </Text>
+              </View>
+              <TextInput
+                autoCorrect={false}
+                autoCapitalize="none"
+                // secureTextEntry={true}
+                style={[styles.input, { width: '100%' }]}
+                placeholder=""
+                onChangeText={e => handleCredentials('contactPassword', e)}
+                value={credentials.contactPassword || ''}
+              />
+              <Text style={[styles.subtitle, { fontSize: 14, fontWeight: '400' }]}> Send yourself a copy of your login information! ( optional ) </Text>
+            </View> */}
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Address </Text>
-              <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
-                <View style={{width: '100%', marginBottom: 10}}>
+              <Text style={styles.subtitle}> Address <Text style={{color: 'red'}}>*</Text></Text>
+              <View style={{ flexDirection: 'column', width: '100%', gap: 5 }}>
+                <View style={{ width: '100%', marginBottom: 10 }}>
                   <TextInput
-                    style={[styles.input, {width: '100%', marginBottom: 0}]}
+                    style={[styles.input, { width: '100%', marginBottom: 0 }]}
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
                     onChangeText={e => handleCredentials('street', e)}
                     value={credentials.address.street || ''}
                   />
-                  <Text style = {{color : 'black', marginLeft: 5}}>Street Address</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address<Text style={{color: 'red'}}> *</Text></Text>
                 </View>
-                <View style={{width: '100%', marginBottom: 10}}>
+                <View style={{ width: '100%', marginBottom: 10 }}>
                   <TextInput
-                    style={[styles.input, {width: '100%', marginBottom: 0}]}
+                    style={[styles.input, { width: '100%', marginBottom: 0 }]}
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
                     onChangeText={e => handleCredentials('street2', e)}
                     value={credentials.address.street2 || ''}
                   />
-                  <Text style = {{color : 'black', marginLeft: 5}}>Street Address2</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address2</Text>
                 </View>
-                <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
-                  <View style={[styles.input, {width: '45%'}]}>
+                <View style={{ flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30 }}>
+                  <View style={[styles.input, { width: '45%' }]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, {width: '100%', marginBottom: 0}]}
+                      style={[styles.input, { width: '100%', marginBottom: 0 }]}
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text style = {{color : 'black', marginLeft: 5}}>City</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>City<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
-                  <View style={[styles.input, {width: '20%'}]}>
+                  <View style={[styles.input, { width: '20%' }]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, {width: '100%', marginBottom: 0}]}
+                      style={[styles.input, { width: '100%', marginBottom: 0 }]}
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text style = {{color : 'black', marginLeft: 5}}>State</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>State<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
-                  <View style={[styles.input, {width: '30%'}]}>
+                  <View style={[styles.input, { width: '30%' }]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, {width: '100%', marginBottom: 0}]}
-                      // keyboardType="numeric" // Set the keyboardType to "numeric" for zip input
+                      style={[styles.input, { width: '100%', marginBottom: 0 }]}
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text style = {{color : 'black', marginLeft: 5}}>Zip</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                 </View>
               </View>
             </View>
+
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Logo / Pic </Text>
-              {credentials.avatar.name &&
-              <View style={{marginBottom: 10}}>
-                <Text style={{ color: 'blue' }}>{credentials.avatar.name}</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('avatar')}
-                >remove</Text>
-              </View>}
-              
-              <View style={{flexDirection: 'row', width: '100%'}}>
+              <Text style={styles.subtitle}> Logo / Pic</Text>
+              <View style={{ flexDirection: 'row', width: '100%' }}>
                 <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color:"black"}}>Choose File</Text>
+                  <Text style={{ fontWeight: '400', padding: 0, fontSize: 14, color: 'black' }}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[styles.input, { width: '70%', color: 'black' }]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
                   value={credentials.avatar.name || ''}
                 />
               </View>
+              <Text style={{ color: 'black' }}> "optional"</Text>
             </View>
-            <View style={[styles.btn, {marginTop: 20}]}>
-              <HButton style={styles.subBtn} onPress={ handleSubmit }>
+
+            <View style={[styles.btn, { marginTop: 20 }]}>
+              <HButton style={styles.subBtn} onPress={handleSubmit}>
                 Submit
               </HButton>
             </View>
+
+            <Text style={{ textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100 }}
+              onPress={handleBack}
+            >
+              Back to 🏚️ All Facilities
+            </Text>
           </View>
         </View>
         {fileTypeSelectModal && (
@@ -418,10 +646,10 @@ const styles = StyleSheet.create({
   },
   container: {
     marginBottom: 0,
-    backgroundColor: '#fffff8'
+    backgroundColor: 'rgba(155, 155, 155, 0.61))'
   },
   scroll: {
-    marginTop: 151,
+    marginTop: 97,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -442,26 +670,6 @@ const styles = StyleSheet.create({
     padding: 15,
     width: '90%',
     backgroundColor: 'transparent'
-  },
-  bottomBar: {
-    marginTop: 20,
-    height: 5,
-    backgroundColor: '#C0D1DD',
-    width: '100%'
-  },
-  profileTitleBg: {
-    backgroundColor: '#BC222F',
-    padding: 10,
-    borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '80%',
-    marginLeft: '10%',
-    marginVertical: 20
-  },
-  profileTitle: {
-    fontWeight: 'bold',
-    color: 'white',
   },
   marker: {
     width: 5,
@@ -494,16 +702,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1, // Shadow opacity
     shadowRadius: 3, // Shadow radius
     elevation: 0, // Elevation for Android devices
-    backgroundColor: "#dcd6fa",
+    backgroundColor: '#ffffffa8',
   },
   intro: {
     marginTop: 30
   },
   input: {
-    backgroundColor: 'white', 
-    height: 30, 
-    marginBottom: 10, 
-    borderWidth: 1, 
+    backgroundColor: 'white',
+    height: 30,
+    marginBottom: 10,
+    borderWidth: 1,
     borderColor: 'hsl(0, 0%, 86%)',
   },
   subject: {
@@ -516,7 +724,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 30,
     marginLeft: '10%',
-    fontSize: 20,
+    fontSize: 18,
     borderRadius: 5,
   },
   mark: {
@@ -549,7 +757,7 @@ const styles = StyleSheet.create({
   authInfo: {
     marginLeft: 20,
     marginRight: 20,
-    marginBottom: 50,
+
   },
   buttonWrapper: {
     flexDirection: 'row',
@@ -566,7 +774,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     padding: 10,
     backgroundColor: '#A020F0',
-    color: 'black',
+    color: 'white',
     fontSize: 16,
   },
   drinksButton: {
@@ -594,9 +802,9 @@ const styles = StyleSheet.create({
     height: 150,
   },
   chooseFile: {
-    width: '30%', 
-    height: 30, 
-    flexDirection: 'row', 
+    width: '30%',
+    height: 30,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f0f0f0',
@@ -657,8 +865,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black'
   },
+  textStyle: {
+    color: 'black'
+  },
   closeButton: {
     color: 'red',
+  },
+  body: {
+    marginTop: 10,
+    paddingHorizontal:20,
   },
   cameraContain: {
 		flex: 1,
@@ -687,7 +902,4 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 3, height: 3 },
 		marginVertical: 14, padding: 5,
 	},
-  textStyle: {
-    color: 'black'
-  }
 });

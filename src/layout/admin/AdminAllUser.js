@@ -96,6 +96,7 @@ export default function AdminAllUser({ navigation }) {
   };
 
   const handleCellClick = (data) => {
+    console.log(data);
     setCellData(data);
     setStatus(data[3]);
     toggleModal();

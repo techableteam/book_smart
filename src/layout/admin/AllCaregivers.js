@@ -280,7 +280,7 @@ export default function AllCaregivers({ navigation }) {
       return;
     }
 
-    let response = await updatePassword({ userId: selectedUserId, password, tmpPassword }, 'admin');
+    let response = await updatePassword({ userId: selectedUserId, userRole: 'Clinician', password, tmpPassword }, 'admin');
     getData();
     toggleRestPWModal();
   };

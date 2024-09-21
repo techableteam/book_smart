@@ -1,91 +1,34 @@
-import { Alert, StyleSheet, View, Image, Button, Platform, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Pressable } from 'react-native';
+import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
 import React, { useState } from 'react';
-import images from '../../assets/images';
-import { Divider, TextInput, ActivityIndicator, useTheme, Card } from 'react-native-paper';
-import { AuthState, firstNameAtom, lastNameAtom, socialSecurityNumberAtom, verifiedSocialSecurityNumberAtom } from '../../context/ClinicalAuthProvider';
-import { useNavigation } from '@react-navigation/native';
+import DatePicker from 'react-native-date-picker';
+import { Dropdown } from 'react-native-element-dropdown';
+import { useFocusEffect } from '@react-navigation/native';
+import { TextInput } from 'react-native-paper';
+import moment from 'moment';
+import { useAtom } from 'jotai';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import PhoneInput from 'react-native-phone-input';
-import SignatureCapture from 'react-native-signature-capture';
-import DatePicker from 'react-native-date-picker';
-import DocumentPicker from 'react-native-document-picker';
-import { PostJob, Signup } from '../../utils/useApi';
-import MSubNavbar from '../../components/MSubNavbar';
+import images from '../../assets/images';
+import { addDegreeItem, addLocationItem, getDegreeList, getLocationList, PostJob } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
-import { Dropdown } from 'react-native-element-dropdown';
-import RNFS from 'react-native-fs'
-import moment from 'moment';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useAtom } from 'jotai';
-import { companyNameAtom } from '../../context/FacilityAuthProvider'
-
+import { companyNameAtom, facilityIdAtom } from '../../context/FacilityAuthProvider'
 
 export default function AddJobShift({ navigation }) {
-
-  const theme = useTheme();
-  //-----------------------------------Degree DropDown----------------------------
-  
-  const [degree, setDegree] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'CNA', value: 'CNA'},
-    {label: 'LPN', value: 'LPN'},
-    {label: 'STNA', value: 'STNA'},
-  ])
-
   const [facility, setFacility] = useAtom(companyNameAtom);
-
+  const [facilityId, setFacilityId] = useAtom(facilityIdAtom);
+  const [degree, setDegree] = useState([])
   const [degreeValue, setDegreeValue] = useState(null);
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
-
-  const renderLabel = () => {
-    if (degreeValue || isDegreeFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const [isAddDegree, setIsAddDegree] = useState(false);
-  const handleAddDegree = () => {
-    setIsAddDegree(!isAddDegree)
-  }
-
-  //-----------------------------------Unit DropDown----------------------------
-  
-  const [location, setLocation] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'Lancaster, NY', value: 'Lancaster, NY'},
-    {label: 'Skilled Nursing Facility', value: 'Skilled Nursing Facility'},
-    {label: 'Springville, NY', value: 'Springville, NY'},
-    {label: 'Warsaw, NY', value: 'Warsaw, NY'},
-    {label: 'Williansville', value: 'Williansville'},
-  ])
-
   const [locationValue, setLocationValue] = useState(null);
   const [isLocationFocus, setIsLocationFocus] = useState(false);
-
-  const renderLocationLabel = () => {
-    if (locationValue || isLocationFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }, {width: 100}]}>
-          Dropdown label
-        </Text>
-      );
-    }
-    return null;
-  };
-
-  const [isAddLocation, setIsAddLocation] = useState(false);
-  const handleAddLocation = () => {
-    setIsAddLocation(!isAddLocation)
-  }
-  //--------------------------------------------Credentials-----------------------------
+  const [degreeItem, setDegreeItem] = useState('');
+  const [showAddDegreeModal, setShowAddDegreeModal] = useState(false);
+  const [shiftFromDay, setShiftFromDay] = useState(new Date());
+  const [showCalender, setShowCalendar] = useState(false);
+  const [showAddLocationModal, setShowAddLocationModal] = useState(false);
+  const [locationItem, setLocationItem] = useState('');
+  const [location, setLocation] = useState([]);
   const [ credentials, setCredentials ] = useState({
     jobNum: '',
     degree: '',
@@ -94,74 +37,67 @@ export default function AddJobShift({ navigation }) {
     location: '',
     payRate: '',
     bonus: '',
-    facility: facility
-  })
+    facility: facility,
+    facilityId: facilityId
+  });
+
+  const getDegree = async () => {
+    const response = await getDegreeList('degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
+    }
+  };
+
+  const getLocation = async () => {
+    const response = await getLocationList('location');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.locationName, value: item.locationName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setLocation(tempArr);
+    } else {
+      setLocation([]);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getDegree();
+      getLocation();
+    }, [])
+  );
 
   const handleCredentials = (target, e) => {
     if (target === "streetAddress" || target === "streetAddress2" || target === "city" || target === "state" || target === "zip") {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
-    }
-    else if (target === "timeFrom" || target === "dateFrom" || target === "dateTo" || target === "timeTo") {
-      console.log('success')
+    } else if (target === "timeFrom" || target === "dateFrom" || target === "dateTo" || target === "timeTo") {
       setCredentials({...credentials, shiftsDateAndTimes: {...credentials.shiftsDateAndTimes, [target]: e}})
-    }
-    else {
+    } else {
       setCredentials({...credentials, [target]: e});
     }
-    console.log(credentials);
   }
 
-  //-------------------------------------CheckBox-----------------------------
-  const [checked, setChecked] = useState(false);
-  
-  const handleToggle = () => {
-    setChecked(!checked);
-  };
-  const [check, setCheck] = useState(false);
-  
-  const handleCheckToggle = () => {
-    setCheck(!check);
+  const toggleAddDegreeModal = () => {
+    setShowAddDegreeModal(!showAddDegreeModal);
   };
 
-  //-------------------------------------CheckBox2-----------------------------
-  const [isChecked, setIsChecked] = useState(false);
+  const toggleAddLocationModal = () => {
+    setShowAddLocationModal(!showAddLocationModal);
+  };
 
-  const handleIsToggle = () => {
-    setIsChecked(!isChecked);
-  };
-  const [isCheck, setIsCheck] = useState(false);
-  
-  const handleIsCheckToggle = () => {
-    setIsCheck(!isCheck);
-  };
-  //-------------------------------------------ComboBox------------------------
-  const placeholder = {
-    label: 'Select an item...',
-    value: null,
-  };
-  const items = [
-    { label: 'CNA', value: 'CNA' },
-    { label: 'LPN', value: 'LPN' },
-    { label: 'RN', value: 'RN' },
-  ];
-  //-------------------------------------------Modal-------------------------
-  const [showModal, setShowModal] = useState(false);
-  const handleItemPress = () => {
-    // handleCredentials('title', text);
-    setShowModal(!showModal);
-  }
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  }
-
-  //-------------------------------------------Date Picker---------------------------------------
-  const [shiftFromDay, setShiftFromDay] = useState(new Date());
-  const [showCalender, setShowCalendar] = useState(false);
   const handleDayChange = (target, day) => {
     handleCredentials(target, moment(day).format("MM/DD/YYYY"));
-  }
+  };
 
-    //Alert
   const showAlerts = (name) => {
     Alert.alert(
       'Warning!',
@@ -179,41 +115,53 @@ export default function AddJobShift({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    if (credentials.shift === '') {
-        showAlerts('Shift')
-    }
-    else if (credentials.shiftDate === '') {
-      showAlerts('Shift Date')
-    }
-    else {
+    if (credentials.degree === '') {
+      showAlerts('Degree');
+    } else if (credentials.shift === '') {
+      showAlerts('Shift');
+    } else if (credentials.shiftDate === '') {
+      showAlerts('Shift Date');
+    } else {
       try {
-        console.log('credentials: ', credentials);
         const response = await PostJob(credentials, 'jobs');
-        console.log('Signup successful: ', response)
         navigation.navigate('CompanyShift');
       } catch (error) {
         console.error('Job Shift failed: ', error)
       }
     }
-  }
-  const [item, setItem] = useState('');
-  const [title, setTitle] = useState('degree')
-  const handleItemChange = (e) => {
-    setItem(e);
-  }
+  };
 
-  const handleModal = (title, item) => {
-    if (title === 'degree'){
-      console.log('degree', item)
-      setDegree([...degree, {label: item, value: item}])
+  const handleAddDegree = async () => {
+    let response = await addDegreeItem({ item: degreeItem }, 'degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
     }
-    else if (title === 'location') {
-      console.log('location', item)
-      setLocation([...location, {label: item, value: item},])
+    setDegreeItem('');
+    toggleAddDegreeModal();
+  };
+
+  const handleAddLocation = async () => {
+    let response = await addLocationItem({ item: locationItem }, 'location');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.locationName, value: item.locationName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setLocation(tempArr);
+    } else {
+      setLocation([]);
     }
-    setShowModal(!showModal)
-    setItem('')
-  }
+    setLocationItem('');
+    toggleAddLocationModal();
+  };
 
   return (
     <View style={styles.container}>
@@ -251,13 +199,11 @@ export default function AddJobShift({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={degree}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
-                value={degreeValue ? degreeValue : degree[0].value}
+                placeholder={''}
+                value={degreeValue}
                 onFocus={() => setIsDegreeFocus(true)}
                 onBlur={() => setIsDegreeFocus(false)}
                 onChange={item => {
@@ -274,7 +220,7 @@ export default function AddJobShift({ navigation }) {
                   />
                 )}
               />
-              <TouchableOpacity style={styles.addItems} onPress={() => {handleItemPress(); setTitle('degree')}}>
+              <TouchableOpacity style={styles.addItems} onPress={() => {toggleAddDegreeModal}}>
                 <Image source={images.plus} style={{width: 15, height: 15}} />
                 <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
               </TouchableOpacity>
@@ -323,13 +269,11 @@ export default function AddJobShift({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={location}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
-                value={locationValue ? locationValue : location[0].value}
+                placeholder={''}
+                value={locationValue}
                 onFocus={() => setIsLocationFocus(true)}
                 onBlur={() => setIsLocationFocus(false)}
                 onChange={item => {
@@ -346,7 +290,7 @@ export default function AddJobShift({ navigation }) {
                   />
                 )}
               />
-              <TouchableOpacity style={styles.addItems} onPress={() => {handleItemPress(); setTitle('location')}}>
+              <TouchableOpacity style={styles.addItems} onPress={toggleAddLocationModal}>
                 <Image source={images.plus} style={{width: 15, height: 15}} />
                 <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
               </TouchableOpacity>
@@ -377,19 +321,19 @@ export default function AddJobShift({ navigation }) {
           </View>
         </View>
       </ScrollView>
-      {showModal && <Modal
+      {showAddDegreeModal && <Modal
         Visible={false}
         transparent= {true}
         animationType="slide"
         onRequestClose={() => {
-          setShowModal(!showModal);
+          setShowAddDegreeModal(!showAddDegreeModal);
         }}
       >
         <View style={styles.modalContainer}>
           <View style={styles.calendarContainer}>
             <View style={styles.header}>
               <Text style={styles.headerText}>Add a new option</Text>
-              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddDegreeModal}>
                 <Image source = {images.close} style={{width: 20, height: 20,}}/>
               </TouchableOpacity>
             </View>
@@ -399,13 +343,42 @@ export default function AddJobShift({ navigation }) {
                   <TextInput
                     style={[styles.input, {width: '100%'}]}
                     placeholder=""
-                    onChangeText={e => handleItemChange(e)}
-                    value={item || ''}
+                    onChangeText={e => setDegreeItem(e)}
+                    value={degreeItem}
                   />
-                  {/* <TouchableOpacity style={styles.searchBtn}>
-                    <Text>Submit</Text>
-                  </TouchableOpacity> */}
-                  <Button title="Submit" onPress={() => handleModal(title, item) } />
+                  <Button title="Submit" onPress={handleAddDegree} />
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>}
+      {showAddLocationModal && <Modal
+        Visible={false}
+        transparent= {true}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowAddLocationModal(!showAddLocationModal);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.calendarContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Add a new location</Text>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddLocationModal}>
+                <Image source = {images.close} style={{width: 20, height: 20,}}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.modalBody}>
+                <View style={styles.searchBar}>
+                  <TextInput
+                    style={[styles.input, {width: '100%'}]}
+                    placeholder=""
+                    onChangeText={e => setLocationItem(e)}
+                    value={locationItem}
+                  />
+                  <Button title="Submit" onPress={handleAddLocation} />
                 </View>
               </View>
             </View>
@@ -550,7 +523,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     padding: 10,
     backgroundColor: '#A020F0',
-    color: 'black',
+    color: 'white',
     fontSize: 16,
   },
   drinksButton: {
