@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Alert, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { Alert, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Text } from 'react-native-paper';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { useFocusEffect } from '@react-navigation/native';
 import { Table } from 'react-native-table-component';
 import RadioGroup from 'react-native-radio-buttons-group';
-import { Update, Clinician, updatePassword, getUserProfile, getUserInfo } from '../../utils/useApi';
+import { Update, Clinician, updatePassword, getUserProfile, getUserInfo, updateUserStatus } from '../../utils/useApi';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -28,6 +28,7 @@ export default function AllCaregivers({ navigation }) {
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [verificationModal, setVerificationModal] = useState(false);
   const [resetPWModal, setResetPWModal] = useState(false);
+  const [updateStatusModal, setUpdateStatusModal] = useState(false);
   const [data, setData] = useState([]);
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false); 
@@ -38,14 +39,127 @@ export default function AllCaregivers({ navigation }) {
   const [label, setLabel] = useState(null);
   const [jobValue, setJobValue] = useState(null);
   const [isJobFocus, setJobIsFocus] = useState(false);
+  const [isStatusFocus, setStatusIsFocus] = useState(false);
   const [suc, setSuc] = useState(0);
+  const [userStatus, setUserStatus] = useState('inactivate');
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [clinicians, setClinicians] = useState([]);
   const [sfileType, setFiletype] = useState('');
-  const [downloading, setDownloading] = useState(false);
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const widths = [120, 150, 150, 180, 300, 150, 150, 150, 80, 100, 80, 120];
   let colorIndex = 0;
+  const [credentials, setCredentials] = useState({
+    email: '',
+    driverLicense: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    driverLicenseStatus: 0,
+    socialCard: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    socialCardStatus: 0,
+    physicalExam: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    physicalExamStatus: 0,
+    ppd: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    ppdStatus: 0,
+    mmr: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    mmrStatus: 0,
+    healthcareLicense: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    healthcareLicenseStatus: 0,
+    resume: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    resumeStatus: 0,
+    covidCard: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    covidCardStatus: 0,
+    bls: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    blsStatus: 0,
+    hepB: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    hepBStatus: 0,
+    flu: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    fluStatus: 0,
+    cna: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    cnaStatus: 0,
+    taxForm: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    taxFormStatus: 0,
+    chrc102: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    chrc102Status: 0,
+    chrc103: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    chrc103Status: 0,
+    drug: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    drugStatus: 0,
+    ssc: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    sscStatus: 0,
+    copyOfTB: {
+      type: '',
+      content: '',
+      name: ''
+    },
+    copyOfTBStatus: 0,
+    userStatus: 'pending approval'
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -67,7 +181,7 @@ export default function AllCaregivers({ navigation }) {
       value: true
     },
     {
-      id: 2,
+      id: 0,
       label: 'No',
       value: false
     }
@@ -95,12 +209,15 @@ export default function AllCaregivers({ navigation }) {
     {label: '500 per page', value: '5'},
     {label: '1000 per page', value: '6'},
   ];
-  const location = [
-    {label: 'Select...', value: 'Select...'},
+  const statusList = [
     {label: 'activate', value: 'activate'},
     {label: 'inactivate', value: 'inactivate'},
-    {label: 'pending', value: 'pending'},
+    {label: 'pending approval', value: 'pending approval'},
   ];
+
+  const handleCredentials = (target, e) => {
+    setCredentials({...credentials, [target]: e});
+  }
 
   function formatData(data) {
     return data.map(item => {
@@ -109,7 +226,7 @@ export default function AllCaregivers({ navigation }) {
         const fullName = `${item[1]} ${item[2]}`;
         return [formattedDate, fullName, item[3], item[4], item[5], item[6], item[7], item[8], item[9], item[10], item[11], item[12], item[13]];
     });
-  }
+  };
 
   const formatDate = (origin) => {
     const date = new Date(origin);
@@ -168,6 +285,64 @@ export default function AllCaregivers({ navigation }) {
     toggleRestPWModal();
   };
 
+  const handleSubmitVerification = async () => {
+    let data = await Update(credentials, 'clinical');
+    if (!data?.error) {
+      getData();
+      toggleVerificationModal();
+    } else {
+      Alert.alert(
+        'Warning!',
+        "Please try again later.",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
+  const handleUpdateStatus = async () => {
+    let response = await updateUserStatus({ userId: selectedUserId, status: userStatus }, 'clinical');
+
+    if (!response?.error) {
+      getData();
+      toggleUpdateStatusModal();
+      Alert.alert(
+        'Success!',
+        "Successfully Updated",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      Alert.alert(
+        'Warning!',
+        "Please try again later.",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
   const toggleRestPWModal = () => {
     setResetPWModal(!resetPWModal);
   };
@@ -180,6 +355,10 @@ export default function AllCaregivers({ navigation }) {
     setVerificationModal(!verificationModal);
   };
 
+  const toggleUpdateStatusModal = () => {
+    setUpdateStatusModal(!updateStatusModal);
+  };
+
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -189,6 +368,19 @@ export default function AllCaregivers({ navigation }) {
 
     if (!response?.error) {
       setSelectedUser(response.userData);
+      const updatedCredentials = { ...credentials };
+      Object.keys(updatedCredentials).forEach((key) => {
+        if (response.userData[key]) {
+          if (typeof updatedCredentials[key] === 'object') {
+            updatedCredentials[key] = { ...updatedCredentials[key], ...response.userData[key] };
+          } else {
+            updatedCredentials[key] = response.userData[key] == true ? 1 : 0;
+          }
+        }
+      });
+      updatedCredentials.userStatus = response.userData.userStatus;
+      updatedCredentials.email = response.userData.email;
+      setCredentials(updatedCredentials);
       toggleVerificationModal();
     } else {
       setSelectedUser(null);
@@ -279,20 +471,23 @@ export default function AllCaregivers({ navigation }) {
     </View>
   );
 
-  const handleCellClick = (cellData, rowIndex, cellIndex) => {
-    setCellData(cellData);
-    const rowD = data[rowIndex][3];
-    setModalItem(cellIndex);
-    if(cellIndex==1) {
-      const name = cellData.split(' ');
-      setLabel({firstName: name[0], lastName: name[1]});
-    } else {
-      setLabel(cellData.toString());
-    }
-    setRowData(rowD);
-    if (cellIndex !== 0 ) {
-      toggleModal();
-    }
+  const handleCellClick = (userData) => {
+    console.log(userData);
+    setUserStatus(userData[7]);
+    setUpdateStatusModal(true);
+    // setCellData(cellData);
+    // const rowD = data[rowIndex][3];
+    // setModalItem(cellIndex);
+    // if(cellIndex==1) {
+    //   const name = cellData.split(' ');
+    //   setLabel({firstName: name[0], lastName: name[1]});
+    // } else {
+    //   setLabel(cellData.toString());
+    // }
+    // setRowData(rowD);
+    // if (cellIndex !== 0 ) {
+    //   toggleModal();
+    // }
   };
 
   const formatPhoneNumber = (input) => {
@@ -417,6 +612,11 @@ export default function AllCaregivers({ navigation }) {
     }
   };
 
+  const handleShowFile = (data) => {
+    toggleVerificationModal();
+    navigation.navigate("FileViewer", { jobId: '', fileData: data });
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -429,7 +629,7 @@ export default function AllCaregivers({ navigation }) {
       >
         <View style={styles.topView}>
           <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>COMPANY JOBS / SHIFTS</Text>
+            <Text style={styles.title}>ALL PLATFORM CAREGIVERS</Text>
           </Animated.View>
           <View style={styles.bottomBar} />
         </View>
@@ -476,12 +676,10 @@ export default function AllCaregivers({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={pageItems}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
                 value={value ? value : pageItems[3].value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
@@ -553,7 +751,7 @@ export default function AllCaregivers({ navigation }) {
                                   handleShowUserInfoModal();
                                 }}
                               >
-                                <Text style={styles.profileTitle}>View here</Text>
+                                <Text style={styles.profileTitle}>View Here</Text>
                               </TouchableOpacity>
                             </View>
                           );
@@ -584,23 +782,26 @@ export default function AllCaregivers({ navigation }) {
                         } else {
                           if (cellIndex == 2 || cellIndex == 4) {
                             return (
-                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
                                 <Text style={[styles.tableText, {borderWidth: 0, color: 'blue' }]}>{cellData}</Text>
                               </View>
                             );
+                          } else if (cellIndex == 7) {
+                            return (
+                              <TouchableWithoutFeedback key={cellIndex} onPress={() => { setSelectedUserId(rowData[12]); handleCellClick(rowData); }}>
+                                <View style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
+                                  <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
+                                </View>
+                              </TouchableWithoutFeedback>
+                            );
                           } else {
                             return (
-                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
                                 <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
                               </View>
                             );
                           }
                         }
-                        // <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
-                        //   <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
-                        //     <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
-                        //   </View>
-                        // </TouchableWithoutFeedback> 
                       })}
                     </View>
                   ))}
@@ -702,6 +903,60 @@ export default function AllCaregivers({ navigation }) {
             </View>
           </Modal>
           <Modal
+            visible={updateStatusModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setUpdateStatusModal(!updateStatusModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Update Status</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleUpdateStatusModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.body, { marginBottom: 0 }]}>
+                  <View style={styles.modalBody}>
+                    <Dropdown
+                      style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      itemTextStyle={styles.itemTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={statusList}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={''}
+                      value={userStatus}
+                      onFocus={() => setStatusIsFocus(true)}
+                      onBlur={() => setStatusIsFocus(false)}
+                      onChange={item => {
+                        setUserStatus(item.value);
+                        setStatusIsFocus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <View
+                          style={styles.icon}
+                          color={isStatusFocus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
+                        />
+                      )}
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleUpdateStatus} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Update</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
             visible={resetPWModal}
             transparent= {true}
             animationType="slide"
@@ -781,11 +1036,17 @@ export default function AllCaregivers({ navigation }) {
                         </View>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                        <Image
+                        {selectedUser?.photoImage?.name != "" ? (<Image
                           resizeMode="cover"
                           style={styles.nurse}
-                          source={selectedUser?.photoImage?.name != "" ? 'data:image/jpeg;base64,' + selectedUser?.photoImage?.content : images.profile}
-                        />
+                          source={{uri: 'data:image/jpeg;base64,' + selectedUser?.photoImage?.content}}
+                        />) : (
+                          <Image
+                            resizeMode="cover"
+                            style={styles.nurse}
+                            source={images.profile}
+                          />
+                        )}
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Entry Date</Text>
@@ -925,10 +1186,10 @@ export default function AllCaregivers({ navigation }) {
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Signature</Text>
-                        {selectedUser?.signature != "" && <Image
+                        {selectedUser?.signature && selectedUser?.signature.length > 0 && <Image
                           resizeMode="cover"
                           style={{ width: '90%', height: 'auto' }}
-                          source={'data:image/jpeg;base64,' + selectedUser?.signature}
+                          source={{ url: 'data:image/jpeg;base64,' + selectedUser?.signature }}
                         />}
                       </View>
 
@@ -940,11 +1201,11 @@ export default function AllCaregivers({ navigation }) {
                         </View>
                       </View>
 
-                      <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                      <View style={{flexDirection: 'column', width: '100%', gap: 10}} key={1}>
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Driver's License</Text>
+                        {credentials?.driverLicense.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.driverLicense); }}>{credentials?.driverLicense.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -957,14 +1218,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.driverLicense.name || ''}
                           />
                         </View>
                         <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('driverLicenseStatus', val)}
+                          selectedId={credentials.driverLicenseStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -978,15 +1239,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Physical Exam</Text>
+                        {credentials?.physicalExam.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.physicalExam); }}>{credentials?.physicalExam.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('physicalExam')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('physicalExam')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -994,14 +1255,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.physicalExam.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Physical Exam - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('physicalExamStatus', val)}
+                          selectedId={credentials.physicalExamStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1015,15 +1276,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Social Security Card</Text>
+                        {credentials?.socialCard.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.socialCard); }}>{credentials?.socialCard.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('socialCard')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('socialCard')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1031,14 +1292,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.socialCard.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Social Security Card - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('socialCardStatus', val)}
+                          selectedId={credentials.socialCardStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1052,15 +1313,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>PPD (TB Test)</Text>
+                        {credentials.ppd.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials.ppd); }}>{credentials.ppd.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('ppd')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('ppd')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1068,14 +1329,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials.ppd.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>PPD (TB Test) - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('ppdStatus', val)}
+                          selectedId={credentials.ppdStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1089,15 +1350,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>MMR (Immunizations)</Text>
+                        {credentials?.mmr.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.mmr) }}>{credentials?.mmr.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('mmr')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('mmr')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1105,14 +1366,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.mmr.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>MMR (Immunizations) - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('mmrStatus', val)}
+                          selectedId={credentials.mmrStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1126,15 +1387,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Hep B (shot or declination)</Text>
+                        {credentials?.hepB.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.hepB) }}>{credentials?.hepB.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('hepB')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('hepB')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1142,14 +1403,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.hepB.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Hep B (shot or declination) - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('hepBStatus', val)}
+                          selectedId={credentials.hepBStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1163,15 +1424,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Flu (shot or declination)</Text>
+                        {credentials.flu.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials.flu); }}>{credentials.flu.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('flu')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('flu')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1179,14 +1440,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials.flu.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Flu (shot or declination) - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('fluStatus', val)}
+                          selectedId={credentials.fluStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1200,15 +1461,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CNA Certificate or LPN/RN License</Text>
+                        {credentials?.cna.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.cna); }}>{credentials?.cna.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('cna')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('cna')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1216,14 +1477,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.cna.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>CNA Certificate or LPN/RN License - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('cnaStatus', val)}
+                          selectedId={credentials.cnaStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1237,15 +1498,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>BLS (CPR card)</Text>
+                        {credentials?.bls.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.bls); }}>{credentials?.bls.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('bls')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('bls')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1253,14 +1514,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.bls.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>BLS (CPR card) - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('blsStatus', val)}
+                          selectedId={credentials.blsStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1274,15 +1535,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>COVID Card</Text>
+                        {credentials?.covidCard.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.covidCard); }}>{credentials?.covidCard.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('covidCard')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('covidCard')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1290,14 +1551,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.covidCard.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>COVID Card - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('covidCardStatus', val)}
+                          selectedId={credentials.covidCardStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1311,15 +1572,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Resume</Text>
+                        {credentials?.resume.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.resume); }}>{credentials?.resume.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('resume')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('resume')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1327,14 +1588,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.resume.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Resume - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('resumeStatus', val)}
+                          selectedId={credentials.resumeStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1348,15 +1609,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Tax Form</Text>
+                        {credentials.taxForm.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials.taxForm); }}>{credentials.taxForm.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('taxForm')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('taxForm')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1364,14 +1625,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials.taxForm.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Tax Form - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('taxFormStatus', val)}
+                          selectedId={credentials.taxFormStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1385,15 +1646,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Healthcare License</Text>
+                        {credentials?.healthcareLicense.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.healthcareLicense); }}>{credentials?.healthcareLicense.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('healthcareLicense')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('healthcareLicense')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1401,14 +1662,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.healthcareLicense.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Healthcare License - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('healthcareLicenseStatus', val)}
+                          selectedId={credentials.healthcareLicenseStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1422,15 +1683,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 102 Form</Text>
+                        {credentials?.chrc102.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.chrc102); }}>{credentials?.chrc102.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('chrc102')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('chrc102')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1438,14 +1699,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.chrc102.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>CHRC 102 Form - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('chrc102Status', val)}
+                          selectedId={credentials.chrc102Status}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1459,15 +1720,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 103 Form</Text>
+                        {credentials?.chrc103.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.chrc103); }}>{credentials?.chrc103.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('chrc103')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('chrc103')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1475,14 +1736,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.chrc103.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>CHRC 103 Form - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('chrc103Status', val)}
+                          selectedId={credentials.chrc103Status}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1496,15 +1757,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Drug Test</Text>
+                        {credentials?.drug.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.drug); }}>{credentials?.drug.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('drug')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('drug')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1512,14 +1773,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.drug.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Drug Test - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('drugStatus', val)}
+                          selectedId={credentials.drugStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1534,15 +1795,15 @@ export default function AllCaregivers({ navigation }) {
 
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Standard State Criminal</Text>
+                        {credentials?.ssc.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.ssc); }}>{credentials?.ssc.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('ssc')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('ssc')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1550,14 +1811,14 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.ssc.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Standard State Criminal - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
-                          selectedId={1}
+                          onPress={(val) => handleCredentials('sscStatus', val)}
+                          selectedId={credentials.sscStatus}
                           containerStyle={{
                             flexDirection: 'column',
                             alignItems: 'flex-start'
@@ -1571,15 +1832,15 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {marginBottom: 5, backgroundColor: '#F7F70059'}]}>Driver's License</Text>
-                        {selectedUser?.driverLicense?.name != "" && 
+                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Copy Of TB Test</Text>
+                        {credentials?.copyOfTB.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(selectedUser?.driverLicense); }}>{selectedUser?.driverLicense?.name}</Text>
-                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
+                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(credentials?.copyOfTB); }}>{credentials?.copyOfTB.name}</Text>
+                            <Text style={{color: 'blue'}} onPress= {() => handleRemove('copyOfTB')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
-                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
+                          <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('copyOfTB')} style={styles.chooseFile}>
                             <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
@@ -1587,13 +1848,47 @@ export default function AllCaregivers({ navigation }) {
                             placeholder=""
                             autoCorrect={false}
                             autoCapitalize="none"
-                            value={selectedUser?.driverLicense?.name || ''}
+                            value={credentials?.copyOfTB.name || ''}
                           />
                         </View>
-                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Driver's License - Verified?</Text>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Copy Of TB Test - Verified?</Text>
                         <RadioGroup 
                           radioButtons={radioButtons} 
-                          onPress={() => console.log('clicked')}
+                          onPress={(val) => handleCredentials('copyOfTBStatus', val)}
+                          selectedId={credentials.copyOfTBStatus}
+                          containerStyle={{
+                            flexDirection: 'column',
+                            alignItems: 'flex-start'
+                          }}
+                          labelStyle={{
+                            color: 'black'
+                          }}
+                        />
+                      </View>
+                      
+                      <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
+
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#F7F70059', marginBottom: 5, paddingLeft: 2}]}>Bank Name</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Bank Account Type</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#F7F70059', marginBottom: 5, paddingLeft: 2}]}>Routing Number</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#F7F70059', marginBottom: 5, paddingLeft: 2}]}>Account Number</Text>
+                        <Text style={styles.content}></Text>
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, { marginBottom: 5, width: '100%' }]}>Bank Info Verified?</Text>
+                        <RadioGroup 
+                          radioButtons={radioButtons} 
+                          onPress={(val) => console.log(val)}
                           selectedId={1}
                           containerStyle={{
                             flexDirection: 'column',
@@ -1607,7 +1902,44 @@ export default function AllCaregivers({ navigation }) {
                       
                       <View style={[styles.line, { backgroundColor: '#8d8dff' }]}></View>
 
-                      
+                      <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, {backgroundColor: '#ccffcc', marginBottom: 5, paddingLeft: 2, width: '50%'}]}>Approve Caregiver?</Text>
+                        <Dropdown
+                          style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          itemTextStyle={styles.itemTextStyle}
+                          iconStyle={styles.iconStyle}
+                          data={statusList}
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={''}
+                          value={credentials.userStatus}
+                          onFocus={() => setStatusIsFocus(true)}
+                          onBlur={() => setStatusIsFocus(false)}
+                          onChange={item => {
+                            handleCredentials('userStatus', item.value);
+                            setStatusIsFocus(false);
+                          }}
+                          renderLeftIcon={() => (
+                            <View
+                              style={styles.icon}
+                              color={isStatusFocus ? 'blue' : 'black'}
+                              name="Safety"
+                              size={20}
+                            />
+                          )}
+                        />
+                      </View>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                        <Text style={[styles.titles, { marginBottom: 5, paddingLeft: 2, width: '100%'}]}>If "Yes" is selected, the Caregiver will receiver a welcome email, and can login to view shifts</Text>
+                      </View>
+
+                      <TouchableOpacity style={styles.button} onPress={handleSubmitVerification} underlayColor="#0056b3">
+                        <Text style={styles.buttonText}>Submit</Text>
+                      </TouchableOpacity>
                     </View>
                   </ScrollView>
                 </View>

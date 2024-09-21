@@ -5,16 +5,13 @@ import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import { Table, Row } from 'react-native-table-component';
-import { UpdateUser, Clinician, updateUserInfo } from '../../utils/useApi';
+import { UpdateUser, Clinician, updateUserInfo, removeAccount } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function AdminAllUser({ navigation }) {
-  let colorIndex = 0;
-  const widths = [120, 200, 150, 100];
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
+  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [data, setData] = useState([]);
   const [cellData, setCellData] = useState(null);
   const [rowData, setRowData] = useState(null);
@@ -29,14 +26,14 @@ export default function AdminAllUser({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState('');
-
+  const widths = [120, 250, 150, 150, 80];
   const tableHead = [
     'Name',
     'Email',
     'userRole',
-    'User Status',
+    '✏️ User Status',
+    'Delete'
   ];
-
   const pageItems = [
     {label: '10 per page', value: '1'},
     {label: '25 per page', value: '2'},
@@ -45,19 +42,12 @@ export default function AdminAllUser({ navigation }) {
     {label: '500 per page', value: '5'},
     {label: '1000 per page', value: '6'},
   ];
-
-  const [role, setRole] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'Admin', value: 'Admin'},
-    {label: 'Clinician', value: 'Clinician'},
-    {label: 'Facilities', value: 'Facilities'},
-  ]);
-
-  const [userStatus, setUserStatus] = useState([
+  const userStatus = [
     {label: 'activate', value: 'activate'},
     {label: 'inactivate', value: 'inactivate'},
     {label: 'pending approval', value: 'pending approval'}
-  ]);
+  ];
+  let colorIndex = 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,7 +56,6 @@ export default function AdminAllUser({ navigation }) {
       } else {
         colorIndex += 0.1;
       }
-
       const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
       setBackgroundColor(randomColor);
     }, 500);
@@ -76,35 +65,24 @@ export default function AdminAllUser({ navigation }) {
   function formatData(data) {
     return data.map(item => {
       const fullName = `${item[1]} ${item[2]}`;
-      return [fullName, item[4], item[6], item[5]];
+      return [fullName, item[4], item[6], item[5], ""];
     });
   };
 
-  async function getData() {
-    let data = await Clinician('clinical/clinician', 'Admin');
+  const getData = async () => {
+    let clinicalData = await Clinician('clinical/getAllList', 'Admin');
     let adminData = await Clinician('admin/admin', "Admin")
     let facilityData = await Clinician('facilities/facility', 'Admin')
     
-    if(!data) {
+    if(!clinicalData) {
       setData(['No Data'])
     } else {
-      const modifiedData1 = formatData(data);
+      const modifiedData1 = clinicalData;
       const modifiedData2 = formatData(adminData);
       const modifiedData3 = formatData(facilityData);
       const modifiedArray = [...modifiedData1, ...modifiedData2, ...modifiedData3];
       setData(modifiedArray);
     }
-    const uniqueValues = new Set();
-    const transformed = [];
-
-    // Iterate over each subarray
-    data.forEach(subarray => {
-      const value = subarray[1]; // Get the second element
-      if (!uniqueValues.has(value)) { // Check if it's already in the Set
-        uniqueValues.add(value); // Add to Set
-        transformed.push({ label: value, value: value }); // Add to transformed array
-      }
-    });
   };
 
   useFocusEffect(
@@ -117,51 +95,70 @@ export default function AdminAllUser({ navigation }) {
     setModal(!modal);
   };
 
-  const handleCellClick = (data, rowIndex, cellIndex) => {
+  const handleCellClick = (data) => {
     setCellData(data);
     setStatus(data[3]);
-    // const rowD = data[rowIndex];
-    // let rowD2 = data[rowIndex][2];
-    // console.log(rowD);
-    // setModalItem(cellIndex);
-    // if(cellIndex==0) {
-    //   const name = data.split(' ');
-    //   setLabel({firstName: name[0], lastName: name[1]});
-    // }
-    // else {
-    //   setLabel(data.toString());
-    // }
-    // setRowData(rowD);
-    // setUserRole(rowD2)
     toggleModal();
   };
 
-
-
-  const handleUpdate = async () => {
-    console.log(cellData);
-    console.log(status, password, confirmPassword);
-
-    if (password != '') {
-      if (password != confirmPassword) {
+  const handleRemove = async (data) => {
+    try {
+      let response = await removeAccount({ email: data[1], role: data[2] }, "admin");
+      if (!response?.error) {
+        getData();
+      } else {
         Alert.alert(
-          'Warning!',
-          "The Password doesn't matched. Please try again.",
+          'Failure!',
+          'Please retry again later',
           [
             {
               text: 'OK',
               onPress: () => {
-                setPassword('');
-                setConfirmPassword('');
-                console.log('OK pressed')
+                console.log('OK pressed');
               },
             },
           ],
           { cancelable: false }
         );
-        return;
       }
+    } catch (e) {
+      Alert.alert(
+        'Failure!',
+        'Network Error',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
+  };
+
+  const handleUpdate = async () => {
+    // if (password != '') {
+    //   if (password != confirmPassword) {
+    //     Alert.alert(
+    //       'Warning!',
+    //       "The Password doesn't matched. Please try again.",
+    //       [
+    //         {
+    //           text: 'OK',
+    //           onPress: () => {
+    //             setPassword('');
+    //             setConfirmPassword('');
+    //             console.log('OK pressed')
+    //           },
+    //         },
+    //       ],
+    //       { cancelable: false }
+    //     );
+    //     return;
+    //   }
+    // }
 
     try {
       const response = await updateUserInfo({userEmail: cellData[1], userRole: cellData[2], status: status, password: password}, 'admin');
@@ -263,7 +260,7 @@ export default function AdminAllUser({ navigation }) {
       >
         <View style={styles.topView}>
           <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>COMPANY JOBS / SHIFTS</Text>
+            <Text style={styles.title}>ALL PLATFORM USERS</Text>
           </Animated.View>
           <View style={styles.bottomBar} />
         </View>
@@ -327,21 +324,63 @@ export default function AdminAllUser({ navigation }) {
               />
               <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
-                  <Row
-                    data={tableHead}
-                    style={styles.head}
-                    widthArr={[120, 200, 150, 100]}
-                    textStyle={styles.tableText}
-                  />
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
+                    {tableHead.map((item, index) => (
+                      <Text
+                        key={index}
+                        style={[styles.tableText, { width: widths[index], textAlign: 'center' }]}
+                      >
+                        {item}
+                      </Text>
+                    ))}
+                  </View>
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
-                      {rowData.map((cellData, cellIndex) => (
-                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(rowData, rowIndex, cellIndex)}>
-                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
-                            <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
-                          </View>
-                        </TouchableWithoutFeedback> 
-                      ))}
+                      {rowData.map((cellData, cellIndex) => {
+                        if (cellIndex == 3) {
+                          return (
+                            <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(rowData)}>
+                              <View style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
+                                <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
+                              </View>
+                            </TouchableWithoutFeedback>
+                          );
+                        } else if (cellIndex == 4) {
+                          return (
+                            <View key={cellIndex} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
+                              <TouchableOpacity
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  paddingHorizontal: 20,
+                                  paddingVertical: 5,
+                                  backgroundColor: 'green',
+                                  borderRadius: 20,
+                                }}
+                                onPress={() => {
+                                  Alert.alert('Alert!', 'Are you sure you want to delete this?', [
+                                    {
+                                      text: 'OK',
+                                      onPress: () => {
+                                        handleRemove(rowData);
+                                      },
+                                    },
+                                    { text: 'Cancel', style: 'cancel' },
+                                  ]);
+                                }}
+                              >
+                                <Text style={styles.profileTitle}>Del</Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        } else {
+                          return (
+                            <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
+                              <Text style={[styles.tableText, cellIndex == 1 ? { borderWidth: 0, color: 'blue' } : { borderWidth: 0 }]}>{cellData}</Text>
+                            </View>
+                          );
+                        }
+                      })}
                     </View>
                   ))}
                 </Table>
@@ -397,7 +436,7 @@ export default function AdminAllUser({ navigation }) {
                       )}
                     />
 
-                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Change Password</Text>
+                    {/* <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Change Password</Text>
 
                     <TextInput
                       autoCorrect={false}
@@ -416,7 +455,7 @@ export default function AdminAllUser({ navigation }) {
                       placeholder="Please enter confirm password"
                       onChangeText={e => setConfirmPassword(e)}
                       value={confirmPassword}
-                    />
+                    /> */}
                     
                     <TouchableOpacity style={styles.button} onPress={handleUpdate} underlayColor="#0056b3">
                       <Text style={styles.buttonText}>Update</Text>

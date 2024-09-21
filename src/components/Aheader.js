@@ -83,7 +83,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 25,
     textAlign: 'center',
-    // marginRight: 20
+  },
+  headerText: {
+    color: 'black',
+    fontSize: 16,
+    fontWeight: 'bold'
   },
   bottomStyle: {
     width: '100%',

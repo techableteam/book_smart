@@ -1,49 +1,35 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity, Alert } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme, Button } from 'react-native-paper';
-import images from '../../assets/images';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
-import MFooter from '../../components/Mfooter';
-import MHeader from '../../components/Mheader';
-import SubNavbar from '../../components/SubNavbar';
-import ImageButton from '../../components/ImageButton';
-import { Table, Row, Rows } from 'react-native-table-component';
-import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-import { invoiceFetchAtom } from '../../context/BackProvider';
-// import MapView from 'react-native-maps';
-import * as Progress from 'react-native-progress';
-import { Jobs, Update, Clinician, sendInvoice } from '../../utils/useApi';
-import { Dropdown } from 'react-native-element-dropdown';
-import AHeader from '../../components/Aheader';
-import DatePicker from 'react-native-date-picker';
-import moment from 'moment';
+import React, { useState, useEffect } from 'react';
+import { TouchableWithoutFeedback, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { Table, Row } from 'react-native-table-component';
+import { useAtom } from 'jotai';
+import moment from 'moment';
+import images from '../../assets/images';
+import MFooter from '../../components/Mfooter';
+import SubNavbar from '../../components/SubNavbar';
+import AHeader from '../../components/Aheader';
+import { invoiceFetchAtom } from '../../context/BackProvider';
+import { Update, Clinician, sendInvoice } from '../../utils/useApi';
 
 export default function AdminFacilities({ navigation }) {
-
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
+  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [data, setData] = useState([]);
   const [invoiceData, setInvoiceData] = useAtom(invoiceFetchAtom);
+  let colorIndex = 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Generate a random color
       if (colorIndex >= 0.9) {
         colorIndex = 0;
       } else {
         colorIndex += 0.1;
       }
-
       const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
       setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
 
   const tableHead = [
@@ -54,10 +40,7 @@ export default function AdminFacilities({ navigation }) {
     'User Status',
     "Send Invoice"
   ];
-  // const tableData = [
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  // ]
+
   const [clinicians, setClinicians] = useState([]);
 
   function formatData(data) {

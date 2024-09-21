@@ -37,7 +37,7 @@ export default function AdminEditProfile({ navigation }) {
     socialSecurityNumber: '123123123',
     address: address,
     photoImage: avatar,
-  })
+  });
 
   const handleCredentials = (target, e) => {
     if (target !== "street" && target !== "street2" && target !== "city" && target !== "state" && target !== "zip") {
@@ -105,7 +105,7 @@ export default function AdminEditProfile({ navigation }) {
         fileType = 'unknown';
       }
   
-      handleCredentials('photoImage', {content: `data:${res.type};base64,${fileContent}`, type: fileType, name: res[0].name});
+      handleCredentials('photoImage', {content: fileContent, type: fileType, name: res[0].name});
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -174,7 +174,7 @@ export default function AdminEditProfile({ navigation }) {
         setPhone(response.user.phone);
         setCompanyName(response.user.companyName);
         setAddress(response.user.address);
-        setAvatar(response.user.avatar);
+        setAvatar(response.user.photoImage);
         console.log('Signup successful: ', response)
         navigation.goBack();
       } catch (error) {
@@ -186,6 +186,10 @@ export default function AdminEditProfile({ navigation }) {
   const handleRemove = (name) => {
     handleCredentials(name, {type: "", content: "", name: ""});
   }
+
+  const handleShowFile = (data) => {
+    navigation.navigate("FileViewer", { jobId: '', fileData: data });
+  };
 
   return (
     <View style={styles.container}>
@@ -255,9 +259,9 @@ export default function AdminEditProfile({ navigation }) {
               <Text style={styles.subtitle}> Logo </Text>
               {credentials.photoImage.name &&
               <View style={{marginBottom: 10}}>
-                <Text style={{ color: 'blue' }}>{credentials.photoImage.name}</Text>
+                <Text style={{ color: 'blue' }} onPress={() => handleShowFile(credentials.photoImage)}>{credentials.photoImage.name}</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress = {() => handleRemove('avatar')}
+                  onPress = {() => handleRemove('photoImage')}
                 >remove</Text>
               </View>}
               

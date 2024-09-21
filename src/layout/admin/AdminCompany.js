@@ -1,17 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
-import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
+import React, { useEffect, useState } from 'react';
+import { View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
-import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
-import ImageButton from '../../components/ImageButton';
 import AHeader from '../../components/Aheader';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, companyNameAtom, phoneAtom, entryDateAtom, addressAtom,  emailAtom, photoImageAtom, userRoleAtom } from '../../context/AdminAuthProvider'
-// import MapView from 'react-native-maps';
+import { firstNameAtom, lastNameAtom, companyNameAtom, phoneAtom, emailAtom, photoImageAtom } from '../../context/AdminAuthProvider'
 
 export default function AdminCompany ({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -20,47 +14,27 @@ export default function AdminCompany ({ navigation }) {
   const [phone, setPhone] = useAtom(phoneAtom);
   const [email, setEmail] = useAtom(emailAtom);
   const [avatar, setAvatar] = useAtom(photoImageAtom);
-  const [userRole, setUserRole]= useAtom(userRoleAtom);
-  const [address, setAddress]= useAtom(addressAtom);
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
+  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   let colorIndex = 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Generate a random color
       if(colorIndex >= 0.9) {
         colorIndex = 0;
       } else {
         colorIndex += 0.1;
       }
-
       const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
       setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
-
-
-
-  const theme = useTheme();
-  const handleNavigate = (navigateUrl) => {
-      navigation.navigate(navigateUrl);
-  }
 
   const userInfo = [
     {title: 'Company', content: companyName},
     {title: 'Email', content: email},
     {title: 'Phone', content: phone},
   ]
-
-  // const userInfo = [
-  //   {title: 'Contact Name', content: "Dale Wong"},
-  //   {title: 'Email', content: "dalewong008@gmail.com"},
-  //   {title: 'Phone', content: '1231231234'},
-  // ]
 
   const handleEdit = () => {
     console.log('handleEdit')
@@ -88,11 +62,11 @@ export default function AdminCompany ({ navigation }) {
               <Text style={styles.profileTitle}>ADMIN / COMPANY PROFILE</Text>
             </View>
             {avatar.content && <Image
-              source={{ uri: `${avatar.content}` }}
+              source={{ uri: `data:image/jpeg;base64,${avatar.content}` }}
               resizeMode="cover"
               style={styles.nurse}
             />}
-            <Text style={styles.name}>{firstName || "DaleWong"}</Text>
+            <Text style={styles.name}>{firstName || ""} {lastName || ""}</Text>
             <TouchableOpacity style={styles.edit} onPress = {() => handleEdit()}>
               <Text style={{color: 'white'}}> Edit Profile</Text>
             </TouchableOpacity>
@@ -206,10 +180,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#b0b0b0',
     marginBottom: 100
-    // elevation: 1,
-    // // shadowColor: 'rgba(0, 0, 0, 0.4)',
-    // // shadowOffset: { width: 1, height: 1 },
-    // shadowRadius: 0,
   },
   titles: {
     fontWeight: 'bold',
@@ -245,7 +215,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   edit: {
-    backgroundColor: '#BC222F',
+    backgroundColor: '#A020F0',
     padding: 10,
     borderRadius: 10,
     fontWeight: 'bold',

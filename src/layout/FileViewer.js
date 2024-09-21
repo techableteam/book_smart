@@ -91,7 +91,7 @@ export default function FileViewer({ navigation, route }) {
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={[styles.headerTitle, { fontWeight: 'normal' }]} onPress={() => navigation.goBack()}>{"Back"}</Text>
-                <Text style={styles.headerTitle}>{fileInfo.name}</Text>
+                <Text style={[styles.headerTitle, { width: '70%' }]}>{fileInfo.name}</Text>
                 <Text></Text>
             </View>
             {fileInfo.type === 'pdf' ? (

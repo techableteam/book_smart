@@ -1,114 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { TouchableWithoutFeedback, FlatList, Dimensions, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme, Button } from 'react-native-paper';
-import images from '../../assets/images';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
+import React, { useState, useEffect } from 'react';
+import { TouchableWithoutFeedback, View, Animated, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { Text } from 'react-native-paper';
+import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
-import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
-import ImageButton from '../../components/ImageButton';
-import { Table, Row, Rows } from 'react-native-table-component';
-import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-// import MapView from 'react-native-maps';
-import * as Progress from 'react-native-progress';
-import { Jobs, Update, Clinician } from '../../utils/useApi';
+import { Table, Row } from 'react-native-table-component';
+import { getCaregiverTimesheets, Jobs } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
-import DatePicker from 'react-native-date-picker';
-import moment from 'moment';
 
 export default function CaregiverTimeSheet({ navigation }) {
-
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
+  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a random color
-      if (colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
-
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
   const tableHead = [
     'Job-ID',
     'Nurse',
     'Job Shift & Time',
     'Job Status',
     'Caregiver Hours Worked',
+    'Pre Time',
+    'Lunch',
+    'Lunch Equation',
+    'Final Hours Equatioin'
   ];
-  // const tableData = [
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  //   [ '07/23/2024', 'Mariah Smith', '(716) 292-2405', 'LPN', '	mariahsmith34@gmail.com', 'View Here', 'View Here', 'activate', '', '', '', 'Reset'],
-  // ]
-  const [clinicians, setClinicians] = useState([]);
-
-  function formatData(data) {
-    return data.map(item => {
-        // Parse the date and format to MM/DD/YYYY
-        const date = new Date(item[0]);
-        const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
-
-        // Combine the second and third elements
-        const fullName = `${item[5]} ${item[6]}`;
-        
-
-        // Return the new structure
-        return [item[2], item[1], fullName, item[9], item[12]];
-    });
-  }
-
-  async function getData() {
-    let Data = await Jobs('jobs', 'Admin');
-    if(!Data) {
-      setData(['No Data'])
-    }
-    else {
-      const modifiedData = formatData(Data);
-      console.log(modifiedData)
-      // const modifiedArray = Data.map(subarray => {
-      //   const newArray = [...subarray]; // Create a copy of the subarray
-      //   newArray.pop(); // Remove the last item
-      //   return newArray; // Return the modified subarray
-      // });
-      setData(modifiedData)
-    }
-    const uniqueValues = new Set();
-    const transformed = [];
-
-    // Iterate over each subarray
-    data.forEach(subarray => {
-      const value = subarray[1]; // Get the second element
-      if (!uniqueValues.has(value)) { // Check if it's already in the Set
-          uniqueValues.add(value); // Add to Set
-          transformed.push({ label: value, value: value }); // Add to transformed array
-      }
-    });
-
-    console.log(transformed);
-    setClinicians(transformed);
-    // // setTableData(Data[0].degree)
-    // tableScan(Data);
-  }
-  useEffect(() => {
-    getData();
-    // tableData = tableScan(Data);
-  }, []);
-
-  //---------------DropDown--------------
   const pageItems = [
     {label: '10 per page', value: '1'},
     {label: '25 per page', value: '2'},
@@ -116,173 +32,55 @@ export default function CaregiverTimeSheet({ navigation }) {
     {label: '100 per page', value: '4'},
     {label: '500 per page', value: '5'},
     {label: '1000 per page', value: '6'},
-  ]
+  ];
+  const widths = [100, 150, 150, 180, 250, 100, 100, 150, 200];
+  let colorIndex = 0;
 
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (colorIndex >= 0.9) {
+        colorIndex = 0;
+      } else {
+        colorIndex += 0.1;
+      }
+      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
+      setBackgroundColor(randomColor);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
 
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
-        </Text>
-      );
+  const getData = async () => {
+    let data = await getCaregiverTimesheets('jobs', 'Admin');
+    console.log(data);
+    if(!data.error) {
+      setData(data);
+    } else {
+      setData(['No Data']);
     }
-    return null;
-  };  
-  const widths = [120, 100, 150, 150, 150];
-  const [modal, setModal] = useState(false)
-  const toggleModal = () => {
-    setModal(!modal);
-  }
-  const [cellData, setCellData] = useState(null);
-  const [rowData, setRowData] = useState(null);
-  const [modalItem, setModalItem] = useState(0);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [label, setLabel] = useState(null);
-  const [date,setDate] = useState(new Date());
-  const handleCellClick = (cellData, rowIndex, cellIndex) => {
-    // Handle row click event here
-    console.log('Row clicked:', cellData, rowIndex, cellIndex);
-    // if (cellIndex==9) {
-      setCellData(cellData);
-      const rowD = data[rowIndex][3];
-      console.log(rowD);
-      setModalItem(cellIndex);
-      if(cellIndex==1) {
-        const name = cellData.split(' ');
-        setLabel({firstName: name[0], lastName: name[1]});
-      }
-      else {
-        setLabel(cellData.toString());
-      }
-      setRowData(rowD);
-      if (cellIndex !== 0 ) {
-        toggleModal();
-      }
-    // }
   };
 
-  const handleDay = (day) => {
-    setDate(day);
-    setLabel(moment(day).format("MM/DD/YYYY"));
-  }
-
-  //---------------DropDown--------------
-  const [location, setLocation] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'activate', value: 'activate'},
-    {label: 'inactivate', value: 'inactivate'},
-    {label: 'pending', value: 'pending'},
-  ])
-
-  const formatPhoneNumber = (input) => {
-    // Remove all non-numeric characters from the input
-    const cleaned = input.replace(/\D/g, '');
-
-    // Apply the desired phone number format
-    let formattedNumber = '';
-    if (cleaned.length >= 3) {
-      formattedNumber = `(${cleaned.slice(0, 3)})`;
-    }
-    if (cleaned.length > 3) {
-      formattedNumber += ` ${cleaned.slice(3, 6)}`;
-    }
-    if (cleaned.length > 6) {
-      formattedNumber += `-${cleaned.slice(6, 10)}`;
-    }
-
-    return formattedNumber;
-  };
-
-  const [jobValue, setJobValue] = useState(null);
-  const [isJobFocus, setJobIsFocus] = useState(false);
-
-  const [suc, setSuc] = useState(0);
-  const handlePress = async() => {
-    let sendData = label;
-    let sendingData = {}
-    if (modalItem === 1) {
-      const emailData = {contactEmail: rowData}
-      sendingData = {
-        ...emailData, // Ensure rowData is defined and contains the appropriate value
-        ...sendData // Use sendData for jobNum
-      };
-    } else if (modalItem === 2) {
-      sendingData = {
-        contactEmail: rowData,
-        phoneNumber: sendData // Use sendData for location
-      };
-    } else if (modalItem === 3)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        contactEmail: rowData,
-        updateEmail: sendData // Use sendData for location
-      };
-    } else if (modalItem === 4)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        contactEmail: rowData,
-        userStatus: sendData // Use sendData for location
-      };
-    }
-    console.log('====================================');
-    console.log(sendingData);
-    console.log('====================================');
-    let Data = await Update(sendingData, 'facilities');
-    if(Data) setSuc(suc+1);
-    else setSuc(suc);
-    toggleModal();
-    getData();
-  };
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, [])
+  );
+  
   return (
     <View style={styles.container}>
-      <StatusBar
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <AHeader navigation={navigation}  currentPage={7} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 140 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ width: '100%', marginTop: 140 }} showsVerticalScrollIndicator={false}>
         <View style={styles.topView}>
           <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>COMPANY JOBS / SHIFTS</Text>
+            <Text style={styles.title}>Jobs</Text>
           </Animated.View>
           <View style={styles.bottomBar} />
         </View>
-        <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
-        </View>
-        <View style={styles.profile}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ backgroundColor: '#000080', color: 'white', paddingHorizontal: 5 }}>TOOL TIPS</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Displays all Facilities within the platform.</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Click <Text style={{fontWeight: 'bold'}}>"VIEW SHIFT"</Text> - to view all shifts associated with the facility.</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginTop: 20 }} />
-            <Text style={[styles.text, { textAlign: 'left', marginTop: 10 }]}>Change status to <Text style={{ color: '#ff0000', fontWeight: 'bold' }}>"INACTIVE"</Text> to deactivate facility.</Text>
-          </View>
-        </View>
+        <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}></View>
         <View>
           <View style={styles.body}>
             <View style={styles.modalBody}>
-              <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                <Text style={styles.profileTitle}>🖥️ ALL PLATFORM FACILITIES</Text>
-              </View>
-              <View style={styles.searchBar}>
-                {/* <TextInput style={styles.searchText} /> */}
-                {/* <TouchableOpacity style={styles.searchBtn}>
-                  <Text>Add filters</Text>
-                </TouchableOpacity> */}
-              </View>
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
@@ -291,12 +89,10 @@ export default function CaregiverTimeSheet({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={pageItems}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
                 value={value ? value : pageItems[3].value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
@@ -315,23 +111,39 @@ export default function CaregiverTimeSheet({ navigation }) {
               />
               <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
-                  <Row
-                    data={tableHead}
-                    style={styles.head}
-                    widthArr={[120, 100, 150, 150, 150]}
-                    textStyle={styles.tableText}
-                  />
-                  {data.map((rowData, rowIndex) => (
-                    <View key={rowIndex} style={{ flexDirection: 'row' }}>
-                      {rowData.map((cellData, cellIndex) => (
-                        <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(cellData, rowIndex, cellIndex)}>
-                          <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2' }, {width: widths[cellIndex]}]}>
-                            <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
-                          </View>
-                        </TouchableWithoutFeedback> 
-                      ))}
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
+                    {tableHead.map((item, index) => (
+                      <Text
+                        key={index}
+                        style={[styles.tableText, { width: widths[index], textAlign: 'center' }]}
+                      >
+                        {item}
+                      </Text>
+                    ))}
+                  </View>
+                  {data.length > 0 ? (
+                    data.map((rowData, rowIndex) => (
+                      <View key={rowIndex} style={{ flexDirection: 'row' }}>
+                        {
+                          rowData.length > 0 ? (
+                            rowData.map((cellData, cellIndex) => (
+                              <TouchableWithoutFeedback key={cellIndex}>
+                                <View style={{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
+                                  <Text style={[styles.tableText, { borderWidth: 0 }]}>{cellData}</Text>
+                                </View>
+                              </TouchableWithoutFeedback> 
+                            ))
+                          ) : (
+                            <Text>No cells available</Text>
+                          )
+                        }
+                      </View>
+                    ))
+                  ) : (
+                    <View style={{ padding: 20 }}>
+                      <Text>No data available</Text>
                     </View>
-                  ))}
+                  )}
                 </Table>
               </ScrollView>
             </View>
@@ -471,7 +283,6 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   body: {
-    marginTop: 10,
     paddingHorizontal: 20,
     paddingBottom: 30,
     marginBottom: 30
@@ -499,7 +310,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
-    marginTop: 30,
     paddingLeft: '5%'
   },
   searchBar: {

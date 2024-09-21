@@ -37,24 +37,15 @@ export default function AdminDashboard ({ navigation }) {
 
     return () => clearInterval(interval); // Clean up the interval on component unmount
   }, []);
-  
-  const [myJobInfo, setMyJobInfo] = useState({
-    totalJob: 0,
-    totalAvailable: 0,
-    totalAwarded: 0,
-    totalCompleted: 0,
-    totalCanceled: 0,
-  })
 
   const [jobInfo, setJobInfo] = useState([
-    {title: 'TOT. - JOBS / SHIFTS', content: myJobInfo.totalJob},
-    {title: 'TOT. - AVAILABLE', content: myJobInfo.totalAvailable},
-    {title: 'TOT. - AWARDED', content: myJobInfo.totalAwarded},
-    {title: 'TOT. - COMPLETED', content: myJobInfo.totalCompleted},
-    {title: 'TOT. - CANCELED', content: myJobInfo.totalCanceled},
-  ])
+    {title: 'TOT. - JOBS / SHIFTS', content: 0},
+    {title: 'TOT. - AVAILABLE', content: 0},
+    {title: 'TOT. - AWARDED', content: 0},
+    {title: 'TOT. - COMPLETED', content: 0},
+    {title: 'TOT. - CANCELED', content: 0},
+  ]);
 
-  const [data, setData] = useState([]);
   const [tableData1, setTableData1] = useState([]);
   const [tableData2, setTableData2] = useState([]);
   const [tableData3, setTableData3] = useState([]);
@@ -63,31 +54,58 @@ export default function AdminDashboard ({ navigation }) {
   const [sum3,setSum3] = useState(0);
   
   async function getData() {
-    let Data = await GetDashboardData('jobs', 'Admin');
-    if(!Data) {
-      setData(['No Data'])
-    }
-    else {
-      setData(Data) 
-      const newTableData1 = Data.job.map(item => [item._id, item.count]);
+    let data = await GetDashboardData('jobs', 'Admin');
+    if(data) {
+      const newTableData1 = data.job.map(item => [item._id, item.count]);
       setTableData1(newTableData1); // Update state
-      const newTableData2 = Data.nurse.map(item => [item._id, item.count]);
+      const newTableData2 = data.nurse.map(item => [item._id, item.count]);
       setTableData2(newTableData2); // Update state
-      const newTableData3 = Data.cal.map(item => [item._id, item.count]);
+      const newTableData3 = data.cal.map(item => [item._id, item.count]);
       setTableData3(newTableData3); // Update state
-      console.log('--------------------------', newTableData1);
+
       let s1=0;
       let s2=0;
       let s3=0;
-      Data.job.map((item, index) => {
+
+      data.job.map((item, index) => {
         s1 += item.count;
-      })
-      Data.nurse.map((item, index) => {
+      });
+
+      data.nurse.map((item, index) => {
         s2 += item.count;
-      })
-      Data.cal.map((item, index) => {
+      });
+
+      data.cal.map((item, index) => {
         s3 += item.count;
-      })
+      });
+
+      let totalAvailableJobCnt = 0;
+      let totalAwardedJobCnt = 0;
+      let totalCompletedJobCnt = 0;
+      let totalCancelledJobCnt = 0;
+
+      if (newTableData1.length > 0) {
+        newTableData1.forEach((item) => {
+          if (item[0] == 'Available') {
+            totalAvailableJobCnt = item[1];
+          } else if (item[0] == 'Awarded') {
+            totalAwardedJobCnt = item[1]
+          } else if (item[0] == 'Paid') {
+            totalCompletedJobCnt = item[1];
+          } else if (item[0] == 'Cancelled') {
+            totalCancelledJobCnt = item[1];
+          }
+        });
+      }
+
+      setJobInfo([
+        {title: 'TOT. - JOBS / SHIFTS', content: s1},
+        {title: 'TOT. - AVAILABLE', content: totalAvailableJobCnt},
+        {title: 'TOT. - AWARDED', content: totalAwardedJobCnt},
+        {title: 'TOT. - COMPLETED', content: totalCompletedJobCnt},
+        {title: 'TOT. - CANCELED', content: totalCancelledJobCnt},
+      ]);
+
       setSum1(s1)
       setSum2(s2)
       setSum3(s3)
@@ -129,17 +147,6 @@ export default function AdminDashboard ({ navigation }) {
       final: ['Sum',sum3],
     }
   ]
-
-  const theme = useTheme();
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [lastName, setLastNameAtom] = useAtom(lastNameAtom);
-  const [userRole, setUserRole] = useAtom(userRoleAtom);
-
-  const userInfo = [
-    {title: 'Name', content: firstName + " "+lastName},
-    {title: 'User Roles', content: userRole},
-  ]
-  
 
   return (
       <View style={styles.container}>

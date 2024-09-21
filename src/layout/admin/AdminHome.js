@@ -57,14 +57,14 @@ export default function AdminHome ({ navigation }) {
         >
           <View style={styles.topView}>
             <Animated.View style={[styles.backTitle, {backgroundColor}]}>
-              <Text style={styles.title}>CAREGIVER PROFILE & DOCS</Text>
+              <Text style={styles.title}>WELCOME TO BOOK SMART!</Text>
             </Animated.View>
             <View style={styles.bottomBar}/>
           </View>
             {
               userInfo.map((item, index) => 
-                <View key={index} style={{flexDirection: 'row', width: '90%', marginLeft: '10%'}}>
-                  <Text style={[styles.titles, item.title == "Name" ? {fontWeight: 'bold'} : '']}>{item.title}</Text>
+                <View key={index} style={{flexDirection: 'row', width: '90%', marginLeft: '10%', marginBottom: 5}}>
+                  <Text style={[styles.titles, { fontWeight: 'bold', backgroundColor: '#ccc'}]}>{item.title}</Text>
                   <Text style={[
                     styles.content, 
                     item.title == "Phone" || item.title == "Email" ? {color: '#2a53c1', textDecorationLine:'underline', width: '100%'} : {}
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10
   },
   bottomBar: {
-    marginTop: 30,
+    marginVertical: 30,
     height: 5,
     backgroundColor: '#4f70ee1c',
     width: '100%'
@@ -126,13 +126,15 @@ const styles = StyleSheet.create({
   titles: {
     fontWeight: 'bold',
     fontSize: 16,
-    lineHeight: 40,
-    width: '40%'
+    lineHeight: 30,
+    width: '35%',
+    marginRight: '3%',
+    paddingHorizontal: 5
   },
   content: {
     fontSize: 16,
     width: '60%',
-    lineHeight: 40,
+    lineHeight: 30,
   },
 });
   

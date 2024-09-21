@@ -137,12 +137,7 @@ export const updatePassword = async (data, endpoint) => {
 
 export const ResetPassword = async (credentials, endpoint) => {
   try {
-    console.log("login", credentials);
     const response = await axios.post(`api/${endpoint}/resetPassword`, credentials);
-    console.log(response);
-    // if (response.data.verifyCode) {
-    //   await AsyncStorage.setItem('token', response.data.verifyCode);
-    // }
     return response.data;
   } catch (error) {
     console.error(error)    
@@ -174,6 +169,46 @@ export const getDegreeList = async (endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
     const response = await axios.get(`api/${endpoint}/getList`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    return {error: error}
+  }
+}
+
+export const updateUserStatus = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/updateUserStatus`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    } 
+    return response.data;
+  } catch (error) {
+    return {error: error}
+  }
+}
+
+export const removeAccount = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/removeAccount`, data, {
       headers: {
         Authorization: `Bearer ${existingToken}`
       }
@@ -337,6 +372,25 @@ export const getFacility = async (endpoint, role) => {
       console.log('Token is expired');
     }
     return response.data.jobData;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const getCaregiverTimesheets = async (endpoint, role) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get(`api/${endpoint}/getCaregiverTimesheets`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`,
+        Role: role
+      }
+    });
+
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data.timesheet;
   } catch (error) {
     return { error: error };
   }
@@ -732,8 +786,7 @@ export const fetchInvoices = async () => {
     
     return response.data
   } catch (error) {
-      console.error('Error generating invoice:', error);
-      return {error: error.response.data.message}
+    return {error: error.response.data.message}
   }
 };
 
