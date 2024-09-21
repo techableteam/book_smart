@@ -58,7 +58,7 @@ export default function FacilitySignUp({ navigation }) {
       content: '',
       name: ''
     },
-    contactPassword: '',
+    confirmPassword: '',
     signature: '',
     userRole: 'Facilities'
   })
@@ -217,100 +217,142 @@ export default function FacilitySignUp({ navigation }) {
     );
   };
 
-  const handleSubmit = async () => {
-    if (credentials.contactEmail === '' ||
-      credentials.firstName === '' ||
-      credentials.lastName === '' ||
-      credentials.contactPhone === '' ||
-      credentials.password === '' ||
-      credentials.address.street ==='' || 
-      credentials.address.city ==='' || 
-      credentials.address.state ==='' || 
-      credentials.address.zip ===''
-    ) {
-      showAlerts('all gaps')
-    } else if (handlePassword()) {
-      showAlert();
-    } else {
-      try {
-        const response = await Signup(credentials, "facilities");
-        if (!response?.error) {
-          navigation.navigate('FacilityFinishSignup');
-        } else {
-          if (response.error.status == 500) {
-            Alert.alert(
-              'Warning!',
-              "Can't register now",
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          } else if (response.error.status == 409) {
-            Alert.alert(
-              'Alert',
-              "The Email is already registered",
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          } else if (response.error.status == 405) {
-            Alert.alert(
-              'Alert',
-              "User not approved",
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          } else {
-            Alert.alert(
-              'Failure!',
-              'Network Error',
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          }
-        }
-      } catch (error) {
-        console.error('Signup failed: ', error);
+  const validation = () => {
+    // Create an array of checks for each required field with corresponding error messages
+    const fieldChecks = [
+      { field: credentials.companyName, message: 'Company Name is required' },
+      { field: credentials.contactEmail, message: 'Contact Email is required' },
+      { field: credentials.firstName, message: 'First Name is required' },
+      { field: credentials.lastName, message: 'Last Name is required' },
+      { field: credentials.contactPhone, message: 'Contact Phone is required' },
+      { field: credentials.password, message: 'Password is required' },
+      { field: credentials.confirmPassword, message: 'Password is required' },
+      { field: credentials.address?.street, message: 'Street Address is required' },
+      { field: credentials.address?.city, message: 'City is required' },
+      { field: credentials.address?.state, message: 'State is required' },
+      { field: credentials.address?.zip, message: 'ZIP code is required' },
+    ];
+  
+    // Iterate over the field checks and show an alert for the first empty field
+    for (const check of fieldChecks) {
+      if (!check.field || check.field === '') {
         Alert.alert(
-          'Failure!',
-          'Network Error',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed');
-              },
-            },
-          ],
+          'Validation Error',
+          check.message,
+          [{ text: 'OK', onPress: () => console.log(`${check.message} alert acknowledged`) }],
           { cancelable: false }
         );
+        return false; // Return false if any field is invalid
       }
+    }
+
+    if (credentials.password !== credentials.confirmPassword) {
+      showPswWrongAlert();
+      return false;
+    }
+  
+    return true; // Return true if all fields are valid
+  };
+
+  const showPswWrongAlert = () => {
+    Alert.alert(
+      'Warning!',
+      "The Password doesn't matched. Please try again.",
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setPassword('');
+            setConfirmPassword('');
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!validation()) {
+      return;
+    }
+    try {
+      const response = await Signup(credentials, "facilities");
+      if (!response?.error) {
+        navigation.navigate('FacilityFinishSignup');
+      } else {
+        if (response.error.status == 500) {
+          Alert.alert(
+            'Warning!',
+            "Can't register now",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 409) {
+          Alert.alert(
+            'Alert',
+            "The Email is already registered",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 405) {
+          Alert.alert(
+            'Alert',
+            "User not approved",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          Alert.alert(
+            'Failure!',
+            'Network Error',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Signup failed: ', error);
+      Alert.alert(
+        'Failure!',
+        'Network Error',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
   }
   return (
@@ -329,7 +371,7 @@ export default function FacilitySignUp({ navigation }) {
           </View>
           <View style={styles.authInfo}>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Company Name </Text>
+              <Text style={styles.subtitle}> Company Name <Text style={{ color: 'red' }}>*</Text>  </Text>
               <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
                   style={[styles.input, { width: '100%' }]}
@@ -413,13 +455,12 @@ export default function FacilitySignUp({ navigation }) {
                 secureTextEntry={true}
                 style={[styles.input, { width: '100%' }]}
                 placeholder="Confirm Password"
-                onChangeText={e => setConfirmPassword(e)}
-                onSubmitEditing={handlePassword}
-                value={confirmPassword || ''}
+                onChangeText={e => handleCredentials('confirmPassword', e)}
+                value={credentials.confirmPassword || ''}
               />
               <Text style={[styles.subtitle, { fontStyle: 'italic', fontSize: 14, color: 'red' }]}>Create your password to access the platform</Text>
             </View>
-            <View style={styles.password}>
+            {/* <View style={styles.password}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={{
                   marginBottom: 10,
@@ -440,9 +481,9 @@ export default function FacilitySignUp({ navigation }) {
                 value={credentials.contactPassword || ''}
               />
               <Text style={[styles.subtitle, { fontSize: 14, fontWeight: '400' }]}> Send yourself a copy of your login information! ( optional ) </Text>
-            </View>
+            </View> */}
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Address </Text>
+              <Text style={styles.subtitle}> Address <Text style={{color: 'red'}}>*</Text></Text>
               <View style={{ flexDirection: 'column', width: '100%', gap: 5 }}>
                 <View style={{ width: '100%', marginBottom: 10 }}>
                   <TextInput
@@ -453,7 +494,7 @@ export default function FacilitySignUp({ navigation }) {
                     onChangeText={e => handleCredentials('street', e)}
                     value={credentials.address.street || ''}
                   />
-                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address<Text style={{color: 'red'}}> *</Text></Text>
                 </View>
                 <View style={{ width: '100%', marginBottom: 10 }}>
                   <TextInput
@@ -474,7 +515,7 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>City</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>City<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                   <View style={[styles.input, { width: '20%' }]}>
                     <TextInput
@@ -483,7 +524,7 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>State</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>State<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                   <View style={[styles.input, { width: '30%' }]}>
                     <TextInput
@@ -492,7 +533,7 @@ export default function FacilitySignUp({ navigation }) {
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                 </View>
               </View>

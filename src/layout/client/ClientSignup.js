@@ -276,146 +276,306 @@ export default function ClientSignUp({ navigation }) {
     }
   };
 
-  const handleSubmit = async () => {
-    if (email === '' || 
-      firstName === '' || 
-      lastName === '' || 
-      phoneNumber === '' || 
-      title === '' || 
-      birthday === '' || 
-      ssNumber === '' || 
-      verifySSNumber === '' || 
-      address.streetAddress === '' || 
-      address.city === '' || 
-      address.state === '' || 
-      address.zip === '' || 
-      password === '' ||
-      signature.content === ''
-    ) {
-      if (signature.content === '') {
+  const validation = () => {
+    // Create an array of checks for each field with corresponding error messages
+    const fieldChecks = [
+      { field: email, message: 'Email is required' },
+      { field: firstName, message: 'First name is required' },
+      { field: lastName, message: 'Last name is required' },
+      { field: phoneNumber, message: 'Phone number is required' },
+      { field: title, message: 'Title is required' },
+      { field: birthday, message: 'Birthday is required' },
+      { field: ssNumber, message: 'Social Security Number is required' },
+      { field: verifySSNumber, message: 'Verify Social Security Number is required' },
+      { field: address.streetAddress, message: 'Street address is required' },
+      { field: address.city, message: 'City is required' },
+      { field: address.state, message: 'State is required' },
+      { field: address.zip, message: 'ZIP code is required' },
+      { field: password, message: 'Password is required' },
+    ];
+  
+    // Check each field; if one is empty, show the corresponding alert and return false
+    for (const check of fieldChecks) {
+      if (check.field === '') {
         Alert.alert(
           'Warning!',
-          "signature required",
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed');
-              },
-            },
-          ],
+          check.message,
+          [{ text: 'OK', onPress: () => console.log(`${check.message} alert acknowledged`) }],
           { cancelable: false }
         );
-      } else {
-        showWrongAlerts();
+        return false; // Return false if any validation fails
       }
-      console.log(email, firstName, lastName, phoneNumber, title, birthday, ssNumber, verifySSNumber, address, password, signature.content.length, signautreData.length);
-      showWrongAlerts();
-      setIsSubmitting(false);
-    } else if (password !== confirmPassword) {
+    }
+  
+    // Check if password and confirmPassword match
+    if (password !== confirmPassword) {
       showPswWrongAlert();
-      setIsSubmitting(false);
-    } else {
-      console.log('call api');
-      try {
-        const credentials = {
-          firstName,
-          lastName,
-          email,
-          password,
-          phoneNumber,
-          title,
-          birthday,
-          socialSecurityNumber: ssNumber,
-          verifiedSocialSecurityNumber: verifySSNumber,
-          address,
-          photoImage,
-          signature: signature.content,
-          userRole,
-        };
+      return false;
+    }
 
-        const response = await Signup(credentials, 'clinical');
-
-        if (!response?.error) {
-          successAlerts();
-          setIsSubmitting(false);
-        } else {
-          setIsSubmitting(false);
-          if (response.error.status == 500) {
-            Alert.alert(
-              'Warning!',
-              "Can't register now",
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          } else if (response.error.status == 409) {
-            Alert.alert(
-              'Alert',
-              "The Email is already registered",
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          } else if (response.error.status == 405) {
-            Alert.alert(
-              'Alert',
-              "User not approved",
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          } else {
-            Alert.alert(
-              'Failure!',
-              'Network Error',
-              [
-                {
-                  text: 'OK',
-                  onPress: () => {
-                    console.log('OK pressed');
-                  },
-                },
-              ],
-              { cancelable: false }
-            );
-          }
-        }
-      } catch (error) {
-        setIsSubmitting(false);
-        console.error('Signup failed: ', error);
-        Alert.alert(
-          'Failure!',
-          'Network Error',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed');
-              },
+    if (signature.content === '') {
+      Alert.alert(
+        'Warning!',
+        "signature required",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed');
             },
-          ],
-          { cancelable: false }
-        );
+          },
+        ],
+        { cancelable: false }
+      );
+      return false;
+    }
+  
+    return true; // Return true if all fields are valid
+  };
+
+  const handleSubmit = async () => {
+    // if (email === '' || 
+    //   firstName === '' || 
+    //   lastName === '' || 
+    //   phoneNumber === '' || 
+    //   title === '' || 
+    //   birthday === '' || 
+    //   ssNumber === '' || 
+    //   verifySSNumber === '' || 
+    //   address.streetAddress === '' || 
+    //   address.city === '' || 
+    //   address.state === '' || 
+    //   address.zip === '' || 
+    //   password === '' ||
+    //   signature.content === ''
+    // ) {
+    //   if (signature.content === '') {
+    //     Alert.alert(
+    //       'Warning!',
+    //       "signature required",
+    //       [
+    //         {
+    //           text: 'OK',
+    //           onPress: () => {
+    //             console.log('OK pressed');
+    //           },
+    //         },
+    //       ],
+    //       { cancelable: false }
+    //     );
+    //   } else {
+    //     showWrongAlerts();
+    //   }
+    //   console.log(email, firstName, lastName, phoneNumber, title, birthday, ssNumber, verifySSNumber, address, password, signature.content.length, signautreData.length);
+    //   showWrongAlerts();
+    //   setIsSubmitting(false);
+    // } else if (password !== confirmPassword) {
+    //   showPswWrongAlert();
+    //   setIsSubmitting(false);
+    // } else {
+    //   console.log('call api');
+    //   try {
+    //     const credentials = {
+    //       firstName,
+    //       lastName,
+    //       email,
+    //       password,
+    //       phoneNumber,
+    //       title,
+    //       birthday,
+    //       socialSecurityNumber: ssNumber,
+    //       verifiedSocialSecurityNumber: verifySSNumber,
+    //       address,
+    //       photoImage,
+    //       signature: signature.content,
+    //       userRole,
+    //     };
+
+    //     const response = await Signup(credentials, 'clinical');
+
+    //     if (!response?.error) {
+    //       successAlerts();
+    //       setIsSubmitting(false);
+    //     } else {
+    //       setIsSubmitting(false);
+    //       if (response.error.status == 500) {
+    //         Alert.alert(
+    //           'Warning!',
+    //           "Can't register now",
+    //           [
+    //             {
+    //               text: 'OK',
+    //               onPress: () => {
+    //                 console.log('OK pressed');
+    //               },
+    //             },
+    //           ],
+    //           { cancelable: false }
+    //         );
+    //       } else if (response.error.status == 409) {
+    //         Alert.alert(
+    //           'Alert',
+    //           "The Email is already registered",
+    //           [
+    //             {
+    //               text: 'OK',
+    //               onPress: () => {
+    //                 console.log('OK pressed');
+    //               },
+    //             },
+    //           ],
+    //           { cancelable: false }
+    //         );
+    //       } else if (response.error.status == 405) {
+    //         Alert.alert(
+    //           'Alert',
+    //           "User not approved",
+    //           [
+    //             {
+    //               text: 'OK',
+    //               onPress: () => {
+    //                 console.log('OK pressed');
+    //               },
+    //             },
+    //           ],
+    //           { cancelable: false }
+    //         );
+    //       } else {
+    //         Alert.alert(
+    //           'Failure!',
+    //           'Network Error',
+    //           [
+    //             {
+    //               text: 'OK',
+    //               onPress: () => {
+    //                 console.log('OK pressed');
+    //               },
+    //             },
+    //           ],
+    //           { cancelable: false }
+    //         );
+    //       }
+    //     }
+    //   } catch (error) {
+    //     setIsSubmitting(false);
+    //     console.error('Signup failed: ', error);
+    //     Alert.alert(
+    //       'Failure!',
+    //       'Network Error',
+    //       [
+    //         {
+    //           text: 'OK',
+    //           onPress: () => {
+    //             console.log('OK pressed');
+    //           },
+    //         },
+    //       ],
+    //       { cancelable: false }
+    //     );
+    //   }
+    // }
+    if (!validation()) {
+      setIsSubmitting(false); // Validation failed, stop submission
+      return;
+    }
+    try {
+      const credentials = {
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        title,
+        birthday,
+        socialSecurityNumber: ssNumber,
+        verifiedSocialSecurityNumber: verifySSNumber,
+        address,
+        photoImage,
+        signature: signature.content,
+        userRole,
+      };
+
+      const response = await Signup(credentials, 'clinical');
+
+      if (!response?.error) {
+        successAlerts();
+        setIsSubmitting(false);
+      } else {
+        setIsSubmitting(false);
+        if (response.error.status == 500) {
+          Alert.alert(
+            'Warning!',
+            "Can't register now",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 409) {
+          Alert.alert(
+            'Alert',
+            "The Email is already registered",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else if (response.error.status == 405) {
+          Alert.alert(
+            'Alert',
+            "User not approved",
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        } else {
+          Alert.alert(
+            'Failure!',
+            'Network Error',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('OK pressed');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
       }
+    } catch (error) {
+      setIsSubmitting(false);
+      console.error('Signup failed: ', error);
+      Alert.alert(
+        'Failure!',
+        'Network Error',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     }
   }
 
@@ -577,7 +737,7 @@ export default function ClientSignUp({ navigation }) {
                     onChangeText={e => handleInputAddress('streetAddress', e)}
                     value={address.streetAddress || ''}
                   />
-                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address</Text>
+                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address<Text style={{color: 'red'}}> *</Text></Text>
                 </View>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
@@ -598,7 +758,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleInputAddress('city', e)}
                       value={address.city || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>City</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>City<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                   <View style={[styles.input, {width: '20%'}]}>
                     <TextInput
@@ -607,7 +767,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleInputAddress('state', e)}
                       value={address.state || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>State</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>State<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                   <View style={[styles.input, {width: '30%'}]}>
                     <TextInput
@@ -616,7 +776,7 @@ export default function ClientSignUp({ navigation }) {
                       onChangeText={e => handleInputAddress('zip', e)}
                       value={address.zip || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip</Text>
+                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                 </View>
               </View>
