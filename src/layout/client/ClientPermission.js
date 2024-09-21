@@ -3,29 +3,23 @@ import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Image,
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
-import { useAtom } from 'jotai';
 import Hyperlink from 'react-native-hyperlink';
 import { Dropdown } from 'react-native-element-dropdown';
 import SignatureCapture from 'react-native-signature-capture';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
-import { clinicalAcknowledgeTerm, signatureAtom } from '../../context/ClinicalAuthProvider';
 import { Update } from '../../utils/useApi';
 
-
 export default function ClientPermission ({ navigation }) {
-    const [clinicalAcknowledgement, setClientAcknowledgement] = useAtom(clinicalAcknowledgeTerm);
-    const [signature, setSignature] = useAtom(signatureAtom);
     const items = [
         {label: 'Yes', value: 1},
         {label: 'No', value: 2},
     ];
-    const [value, setValue] = useState(null);
+    const [value, setValue] = useState(2);
     const [isFocus, setIsFocus] = useState(false);
-    const [key, setKey] = useState(0);
     const [credentials, setCredentials] = useState({
-        signature: signature,
-        clinicalAcknowledgeTerm: clinicalAcknowledgement
+        signature: '',
+        clinicalAcknowledgeTerm: false
     });
     let signatureRef = useRef(null);
 
@@ -33,49 +27,59 @@ export default function ClientPermission ({ navigation }) {
         setCredentials({...credentials, ["signature"] :result.encoded})
     };
 
-    const getSignature = () => {
-        if (signatureRef.current) {
-            signatureRef.current.saveImage();
-        }
-    };
-
-    const resetSignature = () => {
-        if (signatureRef.current) {
-            signatureRef.current.resetImage();
-        }
-    };
-
-    const handlePreSubmit = () => {
-        getSignature();
-        setTimeout(() => {
-            handleUploadSubmit();
-        }, 1000);
-    };
-
     const handleUploadSubmit = async () => {
-        console.log(value);
-        if (value != 1) {
-            return;
+        if (value == 2) {
+            return; // If No, Can't call sumnit function
         }
-        try {
-            const response = await Update(credentials, 'clinical');
-            if (!response?.error) {
-                Alert.alert(
-                    'Success!',
-                    "You're in.",
-                    [
-                        {
-                        text: 'OK',
-                        onPress: () => {
-                            console.log('OK pressed')
-                        },
-                        },
-                    ],
-                    { cancelable: false }
-                );
-                setClientAcknowledgement(response.user.clinicalAcknowledgeTerm);
-                navigation.navigate("ClientPhone")
-            } else {
+
+        if (credentials.signature === '') {
+            Alert.alert(
+              'Warning!',
+              "signature required",
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK pressed');
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+        } else {
+            try {
+                const response = await Update(credentials, 'clinical');
+                if (!response?.error) {
+                    Alert.alert(
+                        'Success!',
+                        "You're in.",
+                        [
+                            {
+                            text: 'OK',
+                            onPress: () => {
+                                console.log('OK pressed')
+                            },
+                            },
+                        ],
+                        { cancelable: false }
+                    );
+                    navigation.navigate("ClientPhone")
+                } else {
+                    Alert.alert(
+                        'Failed!',
+                        "Sorry, Please retry again later",
+                        [
+                            {
+                                text: 'OK',
+                                onPress: () => {
+                                    console.log('OK pressed')
+                                }
+                            },
+                        ],
+                        { cancelable: false }
+                    );
+                }
+            } catch (error) {
                 Alert.alert(
                     'Failed!',
                     "Network Error",
@@ -84,27 +88,14 @@ export default function ClientPermission ({ navigation }) {
                             text: 'OK',
                             onPress: () => {
                                 console.log('OK pressed')
-                            }
+                            },
                         },
                     ],
                     { cancelable: false }
                 );
             }
-        } catch (error) {
-            Alert.alert(
-                'Failed!',
-                "Network Error",
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            console.log('OK pressed')
-                        },
-                    },
-                ],
-                { cancelable: false }
-            );
         }
+        
     };
 
     return (
@@ -234,21 +225,16 @@ export default function ClientPermission ({ navigation }) {
                         </View>
                         {value == 1 && <View style={styles.titleBar}>
                             <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Signature <Text style={{color: '#f00'}}>*</Text></Text>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <SignatureCapture
-                                    style={styles.signature}
-                                    ref={signatureRef}
-                                    onSaveEvent={onSaveEvent}
-                                    saveImageFileInExtStorage={false}
-                                    showNativeButtons={false}
-                                />
-                                <TouchableOpacity onPress={resetSignature} style={{ backgroundColor: '#ccc', padding: 5, width: 'auto', height: 'auto', marginLeft: 5 }}>
-                                    <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Reset</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <SignatureCapture
+                                style={styles.signature}
+                                ref={signatureRef}
+                                onSaveEvent={onSaveEvent}
+                                saveImageFileInExtStorage={false}
+                                showNativeButtons={true}
+                            />
                         </View>}
                         <View style={[styles.btn, {marginTop: 20, width: '90%'}]}>
-                            <HButton style={styles.subBtn} onPress={ handlePreSubmit }>
+                            <HButton style={styles.subBtn} onPress={ handleUploadSubmit }>
                                 Submit
                             </HButton>
                         </View>
