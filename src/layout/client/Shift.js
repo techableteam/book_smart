@@ -4,6 +4,7 @@ import { Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { PermissionsAndroid } from 'react-native';
 import { MyShift, updateTimeSheet } from '../../utils/useApi';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton'
@@ -15,6 +16,7 @@ import ImageButton from '../../components/ImageButton';
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import Loader from '../Loader';
 
 export default function Shift ({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -119,6 +121,25 @@ export default function Shift ({ navigation }) {
       getData();
     }, [])
   );
+
+  async function requestStoragePermission() {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'App needs access to your storage to delete files',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        }
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  }
 
   const toggleFileTypeSelectModal = () => {
     setFiletypeSelectModal(!fileTypeSelectModal);
@@ -270,20 +291,34 @@ export default function Shift ({ navigation }) {
   const fileDownload = async () => {
     const fileName = 'BookSmart_Timesheet.pdf';
     let dir = RNFS.DownloadDirectoryPath;
-
+  
     if (Platform.OS === 'ios') {
       dir = RNFS.LibraryDirectoryPath;
     }
+  
+    const filePath = `${dir}/${fileName}`;
+  
+    try {
+      // Check if the file exists before attempting to delete
+      const fileExists = await RNFS.exists(filePath);
+      if (fileExists) {
 
-    const filePath = dir + '/' + fileName;
-
-    RNFS.unlink(filePath)
-      .then(() => {
-        console.log('Previous file deleted');
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
+        const hasPermission = await requestStoragePermission();
+        if (hasPermission) {
+          await RNFS.unlink(filePath)
+            .then(() => {
+              console.log('Previous file deleted successfully');
+            })
+            .catch((err) => {
+              console.log('delete file erro => ', err);
+            });
+        } else {
+          console.log('Permission denied.');
+        }
+      }
+    } catch (err) {
+      console.log('Error deleting the previous file:', err.message);
+    }
   
     const options = {
       fromUrl: 'https://lyntex.io/wp-content/uploads/2024/04/BookSmart-Timesheet-2024.pdf',
@@ -291,33 +326,52 @@ export default function Shift ({ navigation }) {
       background: true,
       discretionary: true,
       progress: (res) => {
-        setDownloading(true);
         const progress = (res.bytesWritten / res.contentLength) * 100;
-        console.log('progress => ', progress.toFixed(2));
+        setDownloading(true);
+        console.log(`Download progress: ${progress.toFixed(2)}%`);
       }
     };
-
-    console.log('filepath +.', filePath);
-
-    RNFS.downloadFile(options)
-      .promise.then((result) => {
-        console.log('downloaded');
-        setDownloading(false);
-        Alert.alert('Success!', 'The Tiemsheet has been downloaded', [
+  
+    console.log('File path:', filePath);
+  
+    try {
+      const result = await RNFS.downloadFile(options).promise;
+      console.log('Download result:', result);
+      setDownloading(false);
+  
+      Alert.alert(
+        'Alert',
+        'The Timesheet has been downloaded',
+        [
           {
             text: 'OK',
-            onPress: () => {
-              console.log('');
-            },
+            onPress: () => console.log('OK pressed'),
           },
-          { text: 'Cancel', style: 'cancel' },
-        ]);
-      })
-      .catch((error) => {
-        console.log('There was an error opening the file');
-        console.log(error);
-      });
-  };
+        ],
+        { cancelable: false }
+      );
+    } catch (error) {
+      console.log('There was an error downloading the file:', error.message);
+  
+      // Retry file download if file creation fails
+      if (error.code === 'ENOENT') {
+        console.log('Retrying file download...');
+        // Retry downloading the file by attempting the same logic again
+        // await fileDownload();
+        Alert.alert(
+          'Alert',
+          'Already downloaded',
+          [
+            {
+              text: 'OK',
+              onPress: () => console.log('OK pressed'),
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+    }
+  };  
 
   const handleDelete = () => {
     setDetailedInfos(prevUploadInfo => {
@@ -350,6 +404,12 @@ export default function Shift ({ navigation }) {
 
   const itemsToShow = getItemsForPage(currentPage);
 
+  if (downloading) {
+    return (
+      <Loader />
+    );
+  }
+
   return (
       <View style={styles.container}>
         <StatusBar 
@@ -368,9 +428,11 @@ export default function Shift ({ navigation }) {
           </View>
           <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARD"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"COMPLETE"&nbsp;</Text>.</Text>
           {downloading ? (
-            <Text style={styles.text}>Downloading...</Text>
+            <Text style={[styles.text, { marginTop: 15 }]}>Downloading...</Text>
           ) : (
-            <Text style={[styles.text, { marginTop: 15, color: 'blue', textDecorationLine: 'underline' }]} onPress={fileDownload}>DOWNLOAD TIMESHEET HERE</Text>
+            <TouchableOpacity onPress={fileDownload}>
+              <Text style={[styles.text, { marginTop: 15, color: 'blue', textDecorationLine: 'underline' }]}>DOWNLOAD TIMESHEET HERE</Text>
+            </TouchableOpacity>
           )}
           <View style={styles.imageButton}>
             <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />

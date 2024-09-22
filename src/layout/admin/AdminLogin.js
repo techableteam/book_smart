@@ -60,7 +60,6 @@ export default function AdminLogin({ navigation }) {
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e});
-    console.log(credentials);
   }
 
   const handleSignInNavigate = async () => {
@@ -76,7 +75,6 @@ export default function AdminLogin({ navigation }) {
   const handleSubmit = async () => {
     try {
       const response = await Signin(credentials, 'Admin');
-      console.log('SignIn Successful: ', response);
       if (!response.error) {
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);

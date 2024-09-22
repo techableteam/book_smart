@@ -7,7 +7,7 @@ import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import { Table } from 'react-native-table-component';
-import { Jobs, Update, Clinician, removeJob, Job, setAwarded, updateHoursStatus } from '../../utils/useApi';
+import { Jobs, Update, Clinician, removeJob, Job, setAwarded, updateHoursStatus, getAllUsersName, getBidIDs, PostJob } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
@@ -15,10 +15,7 @@ import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function AllJobShiftListing({ navigation }) {
-
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
+  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [data, setData] = useState([]);
   const [isJobDetailModal, setIsJobDetailModal] = useState(false);
   const [isAwardJobModal, setIsAwardJobModal] = useState(false);
@@ -36,6 +33,16 @@ export default function AllJobShiftListing({ navigation }) {
   const [content, setContent] = useState('');
   const [approved, setApproved] = useState(false);
   const [clinicians, setClinicians] = useState([]);
+  const [isJobEditModal, setIsJobEditModal] = useState(false);
+  const [accouts, setAccounts] = useState([]);
+  const [bidList, setBidList] = useState([]);
+  const [entryDate, setEntryDate] = useState(new Date());
+  const [showEntryDate, setShowEntryDate] = useState(false);
+  const [selectedBidId, setSelectedBidId] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState('');
+  const [isFocusBidList, setIsFocusBidList] = useState(false);
+  const [isFocusAccountList, setIsFocusAccountList] = useState(false);
+  let colorIndex = 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -95,19 +102,47 @@ export default function AllJobShiftListing({ navigation }) {
     const uniqueNames = Array.from(new Set(extractData.filter(name => name)));
 
     uniqueNames.forEach(subarray => {
-      const value = subarray; // Get the second element
-      if (!uniqueValues.has(value)) { // Check if it's already in the Set
-          uniqueValues.add(value); // Add to Set
-          transformed.push({ label: value, value: value }); // Add to transformed array
+      const value = subarray;
+      if (!uniqueValues.has(value)) {
+          uniqueValues.add(value);
+          transformed.push({ label: value, value: value });
       }
     });
 
     setClinicians(transformed);
   }
 
+  const getAccounts = async () => {
+    const data = await getAllUsersName();
+    if (data) {
+      let tempArr = [];
+      data.map(item => {
+        tempArr.push({ label: item, value: item });
+      });
+      setAccounts(tempArr);
+    } else {
+      setAccounts([]);
+    }
+  };
+
+  const getBidderList = async () => {
+    const data = await getBidIDs();
+    if (data) {
+      let tempArr = [];
+      data.map(item => {
+        tempArr.push({ label: item.toString(), value: item });
+      });
+      setBidList(tempArr);
+    } else {
+      setBidList([]);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
+      getAccounts();
+      getBidderList();
     }, [])
   );
 
@@ -154,6 +189,10 @@ export default function AllJobShiftListing({ navigation }) {
     setIsHoursDetailModal(!isHoursDetailModal);
   };
 
+  const toggleJobEditModal = () => {
+    setIsJobEditModal(!isJobEditModal);
+  };
+
   const toggleJobDetailModal = () => {
     setIsJobDetailModal(!isJobDetailModal);
   };
@@ -165,7 +204,6 @@ export default function AllJobShiftListing({ navigation }) {
   const handleChangeAwardStatus = async (bidderId, jobId) => {
     const response = await setAwarded({ jobId: jobId, bidderId: bidderId, status: awardedStatus }, 'jobs');
     if (!response?.error) {
-      console.log('success');
       getData();
       setIsAwardJobModal(false);
     } else {
@@ -177,9 +215,15 @@ export default function AllJobShiftListing({ navigation }) {
             console.log('');
           },
         },
-        { text: 'Cancel', style: 'cancel' },
+        { cancelable: false },
       ]);
     }
+  };
+
+  const handlechangeJobInfo = async () => {
+    let response = await PostJob({ jobId: selectedJob?.jobId, bid: selectedBidId, account: selectedAccount, entryDate: moment(entryDate).format("MM/DD/YYYY") }, 'jobs');
+    toggleJobEditModal();
+    getData();
   };
 
   const radioButtons = useMemo(() => ([
@@ -235,7 +279,7 @@ export default function AllJobShiftListing({ navigation }) {
             console.log('removed');
           },
         },
-        { text: 'Cancel', style: 'cancel' },
+        { cancelable: false },
       ]);
       getData();
     } else {
@@ -289,7 +333,8 @@ export default function AllJobShiftListing({ navigation }) {
   };
 
   const handleShowJobEditModal = async () => {
-    console.log(selectedJob);
+    toggleJobDetailModal();
+    toggleJobEditModal();
   };
 
   const handleShowJobAwardModal = async (id) => {
@@ -484,7 +529,7 @@ export default function AllJobShiftListing({ navigation }) {
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
           <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => navigation.navigate('AdminJobShift')}>
             <View style={{ backgroundColor: 'white', borderRadius: 10, width: 16, height: 16, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-              <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', marginTop: 0 }}>+</Text>
+              <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', marginTop: 0, lineHeight: 16 }}>+</Text>
             </View>
             <Text style={styles.profileTitle}>Add A New Job / Shift
             </Text>
@@ -550,133 +595,139 @@ export default function AllJobShiftListing({ navigation }) {
               />
               <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
-                  <View style={[styles.tableText, { flexDirection: 'row', backgroundColor: '#ccffff' }]}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
                     {tableHead.map((item, index) => (
                       <Text
                         key={index}
-                        style={{ width: widths[index], justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}
+                        style={[styles.tableText, { width: widths[index], textAlign: 'center' }]}
                       >
                         {item}
                       </Text>
                     ))}
                   </View>
-                  {data.map((rowData, rowIndex) => (
-                    <View key={rowIndex} style={{ flexDirection: 'row' }}>
-                      {rowData.map((cellData, cellIndex) => {
-                        if (cellData === 'view_shift') {
-                          return (
-                            <View
-                              key={cellIndex}
-                              style={[
-                                styles.tableItemStyle,
-                                { flex: 1, justifyContent: 'center', alignItems: 'center', width: 200 },
-                              ]}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  paddingHorizontal: 20,
-                                  paddingVertical: 5,
-                                  backgroundColor: 'green',
-                                  borderRadius: 20,
-                                }}
-                                onPress={() => {
-                                  console.log('job id => ', rowData[2]);
-                                  handleShowJobDetailModal(rowData[2]);
-                                }}
-                              >
-                                <Text style={styles.profileTitle}>View</Text>
-                              </TouchableOpacity>
-                            </View>
-                          );
-                        } else if (cellData === 'view_hours') {
-                          return (
-                            <View
-                              key={cellIndex}
-                              style={[
-                                styles.tableItemStyle,
-                                { flex: 1, justifyContent: 'center', alignItems: 'center', width: 150 },
-                              ]}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  paddingHorizontal: 20,
-                                  paddingVertical: 5,
-                                  backgroundColor: 'green',
-                                  borderRadius: 20,
-                                }}
-                                onPress={() => {
-                                  console.log('job id =>', rowData[2]);
-                                  handleShowHoursModal(rowData[2]);
-                                }}
-                              >
-                                <Text style={styles.profileTitle}>View</Text>
-                              </TouchableOpacity>
-                            </View>
-                          );
-                        } else if (cellData === 'delete') {
-                          return (
-                            <View
-                              key={cellIndex}
-                              style={[
-                                styles.tableItemStyle,
-                                { flex: 1, justifyContent: 'center', alignItems: 'center', width: widths[cellIndex] },
-                              ]}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  paddingHorizontal: 20,
-                                  paddingVertical: 5,
-                                  backgroundColor: 'green',
-                                  borderRadius: 20,
-                                }}
-                                onPress={() => {
-                                  Alert.alert('Alert!', 'Are you sure you want to delete this?', [
-                                    {
-                                      text: 'OK',
-                                      onPress: () => {
-                                        console.log('job id > ', rowData[2]);
-                                        handleRemove(rowData[2]);
-                                      },
-                                    },
-                                    { text: 'Cancel', style: 'cancel' },
-                                  ]);
-                                }}
-                              >
-                                <Text style={styles.profileTitle}>Delete</Text>
-                              </TouchableOpacity>
-                            </View>
-                          );
-                        } else {
-                          if (cellIndex == 15) {
-                            return (
-                              <Text
-                                key={cellIndex}
-                                style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
-                                onPress={() => { handleShowFile(rowData[2]) }}
-                              >
-                                {cellData}
-                              </Text>
-                            );
-                          } else {
-                            return (
-                              <Text
-                                key={cellIndex}
-                                style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
-                              >
-                                {cellData}
-                              </Text>
-                            );
-                          }
-                        }
-                      })}
-                    </View>
-                  ))}
+                  {data && data.length > 0 ? (
+                    data.map((rowData, rowIndex) => (
+                      rowData && rowData.length > 0 ? (
+                        <View key={rowIndex} style={{ flexDirection: 'row' }}>
+                          {rowData.map((cellData, cellIndex) => {
+                            if (cellData === 'view_shift') {
+                              return (
+                                <View
+                                  key={cellIndex}
+                                  style={[
+                                    styles.tableItemStyle,
+                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: 200 },
+                                  ]}
+                                >
+                                  <TouchableOpacity
+                                    style={{
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      paddingHorizontal: 20,
+                                      paddingVertical: 5,
+                                      backgroundColor: 'green',
+                                      borderRadius: 20,
+                                    }}
+                                    onPress={() => {
+                                      console.log('job id => ', rowData[2]);
+                                      handleShowJobDetailModal(rowData[2]);
+                                    }}
+                                  >
+                                    <Text style={styles.profileTitle}>View</Text>
+                                  </TouchableOpacity>
+                                </View>
+                              );
+                            } else if (cellData === 'view_hours') {
+                              return (
+                                <View
+                                  key={cellIndex}
+                                  style={[
+                                    styles.tableItemStyle,
+                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: 150 },
+                                  ]}
+                                >
+                                  <TouchableOpacity
+                                    style={{
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      paddingHorizontal: 20,
+                                      paddingVertical: 5,
+                                      backgroundColor: 'green',
+                                      borderRadius: 20,
+                                    }}
+                                    onPress={() => {
+                                      console.log('job id =>', rowData[2]);
+                                      handleShowHoursModal(rowData[2]);
+                                    }}
+                                  >
+                                    <Text style={styles.profileTitle}>View</Text>
+                                  </TouchableOpacity>
+                                </View>
+                              );
+                            } else if (cellData === 'delete') {
+                              return (
+                                <View
+                                  key={cellIndex}
+                                  style={[
+                                    styles.tableItemStyle,
+                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: widths[cellIndex] },
+                                  ]}
+                                >
+                                  <TouchableOpacity
+                                    style={{
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      paddingHorizontal: 20,
+                                      paddingVertical: 5,
+                                      backgroundColor: 'green',
+                                      borderRadius: 20,
+                                    }}
+                                    onPress={() => {
+                                      Alert.alert('Alert!', 'Are you sure you want to delete this?', [
+                                        {
+                                          text: 'OK',
+                                          onPress: () => {
+                                            console.log('job id > ', rowData[2]);
+                                            handleRemove(rowData[2]);
+                                          },
+                                        },
+                                        { text: 'Cancel', style: 'cancel' },
+                                      ]);
+                                    }}
+                                  >
+                                    <Text style={styles.profileTitle}>Delete</Text>
+                                  </TouchableOpacity>
+                                </View>
+                              );
+                            } else {
+                              if (cellIndex == 15) {
+                                return (
+                                  <Text
+                                    key={cellIndex}
+                                    style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                    onPress={() => { handleShowFile(rowData[2]) }}
+                                  >
+                                    {cellData}
+                                  </Text>
+                                );
+                              } else {
+                                return (
+                                  <Text
+                                    key={cellIndex}
+                                    style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
+                                  >
+                                    {cellData}
+                                  </Text>
+                                );
+                              }
+                            }
+                          })}
+                        </View>
+                      ) : null
+                    ))
+                  ) : (
+                    <Text>No data available</Text>
+                  )}
                 </Table>
               </ScrollView>
             </View>
@@ -792,7 +843,7 @@ export default function AllJobShiftListing({ navigation }) {
           >
             <View style={styles.modalContainer}>
               <View style={[styles.calendarContainer, { height: '80%' }]}>
-                <View style={styles.header}>
+                <View style={[styles.header, { height: 80 }]}>
                   <Text style={styles.headerText}>Facility View Job Details</Text>
                   <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobDetailModal}>
                     <Image source = {images.close} style={{width: 20, height: 20}}/>
@@ -890,7 +941,7 @@ export default function AllJobShiftListing({ navigation }) {
           >
             <View style={styles.modalContainer}>
               <View style={[styles.calendarContainer, { height: '80%' }]}>
-                <View style={styles.header}>
+                <View style={[styles.header, { height: 80 }]}>
                   <Text style={styles.headerText}>Award Job To Applicant</Text>
                   <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobAwardModal}>
                     <Image source = {images.close} style={{width: 20, height: 20}}/>
@@ -983,7 +1034,7 @@ export default function AllJobShiftListing({ navigation }) {
           >
             <View style={styles.modalContainer}>
               <View style={[styles.calendarContainer, { height: '80%' }]}>
-                <View style={styles.header}>
+                <View style={[styles.header, { height: 80 }]}>
                   <Text style={styles.headerText}>View Hours</Text>
                   <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleHoursDetailModal}>
                     <Image source = {images.close} style={{width: 20, height: 20}}/>
@@ -1022,7 +1073,7 @@ export default function AllJobShiftListing({ navigation }) {
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ffff99', marginBottom: 5, paddingLeft: 2}]}>Hours Worked</Text>
-                        <Text style={styles.content}>{selectedJob?.shiftStartTime ? selectedJob?.shiftStartTime.split(' ')[1] + 'pm to ' + selectedJob?.shiftEndTime.split(' ')[1] + 'pm = ' + selectedJob?.workedHours : selectedJob?.workedHours}</Text>
+                        <Text style={styles.content}>{selectedJob?.workedHours}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Hours Approved?</Text>
@@ -1037,7 +1088,7 @@ export default function AllJobShiftListing({ navigation }) {
 
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ffff99', marginBottom: 5, paddingLeft: 2, fontSize: 20}]}>Hours Worked</Text>
-                        <Text style={[styles.content, { fontSize: 20 }]}>{selectedJob?.shiftStartTime != '' ? selectedJob?.shiftStartTime.split(' ')[1] + 'pm to ' + selectedJob?.shiftEndTime.split(' ')[1] + 'pm = ' + selectedJob?.workedHours : selectedJob?.workedHours}</Text>
+                        <Text style={[styles.content, { fontSize: 20 }]}>{selectedJob?.workedHours}</Text>
                       </View>
 
                       <View style={{flexDirection: 'row', width: '100%'}}>
@@ -1064,7 +1115,7 @@ export default function AllJobShiftListing({ navigation }) {
                               <DatePicker
                                 date={fromDate}
                                 onDateChange={(day) => setFromDate(day)}
-                                mode="date"
+                                mode="datetime"
                                 theme='light'
                                 androidVariant="native"
                               />
@@ -1092,7 +1143,7 @@ export default function AllJobShiftListing({ navigation }) {
                                 date={toDate}
                                 theme="light"
                                 onDateChange={(day) => setToDate(day)}
-                                mode="date"
+                                mode="datetime"
                                 androidVariant="native"
                               />
                               <Button style={{ width: 300 }} buttonColor='rgb(26,115,232)' textColor='#fff' onPress={() =>setShowToDate((prev) => !prev)}>Confirm</Button>
@@ -1189,6 +1240,137 @@ export default function AllJobShiftListing({ navigation }) {
                       <TouchableOpacity
                         style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
                         onPress={handlechangeHoursStatus} underlayColor="#0056b3"
+                      >
+                        <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </ScrollView>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={isJobEditModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setIsJobEditModal(!isJobEditModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.calendarContainer, { height: '80%' }]}>
+                <View style={[styles.header, { height: 80 }]}>
+                  <Text style={styles.headerText}>Edit Job</Text>
+                  <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleJobEditModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.body}>
+                  <ScrollView>
+                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                      <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
+                        <Text style={styles.subtitle}>Job-ID</Text>
+                        <Text style={styles.content}>{selectedJob?.jobId}</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.subtitle}>Entry Date</Text>
+                        <View style={{ flexDirection: 'column', width: '100%', gap: 5, position: 'relative' }}>
+                          <TouchableOpacity onPress={() => setShowEntryDate((prev) => !prev)} style={{ width: 300, height: 40, zIndex: 2 }}>
+                            <View>
+                              <TextInput
+                                style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
+                                placeholder=""
+                                value={entryDate.toDateString()}
+                                editable={false}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {showEntryDate && (
+                            <>
+                              <DatePicker
+                                date={entryDate}
+                                onDateChange={(day) => setEntryDate(day)}
+                                mode="date"
+                                theme='light'
+                                androidVariant="native"
+                              />
+                              <Button style={{ width: 300 }} buttonColor='rgb(26,115,232)' textColor='#fff' onPress={() =>setShowEntryDate((prev) => !prev)}>Confirm</Button>
+                            </>
+                          )}
+                        </View>
+                      </View>
+                      <View>
+                        <Text style={styles.subtitle}>Bid</Text>
+                        <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                        <Dropdown
+                            style={[styles.dropdown, isFocusBidList && { borderColor: 'blue' }]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            itemTextStyle={styles.itemTextStyle}
+                            iconStyle={styles.iconStyle}
+                            data={bidList}
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={''}
+                            value={selectedBidId ? selectedBidId : bidList[0]?.value}
+                            onFocus={() => setIsFocusBidList(true)}
+                            onBlur={() => setIsFocusBidList(false)}
+                            onChange={item => {
+                              setSelectedBidId(item.value);
+                              setIsFocusBidList(false);
+                            }}
+                            renderLeftIcon={() => (
+                              <View
+                                style={styles.icon}
+                                color={isFocusBidList ? 'blue' : 'black'}
+                                name="Safety"
+                                size={20}
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+
+                      <View>
+                        <Text style={styles.subtitle}>Account</Text>
+                        <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                          <Dropdown
+                            style={[styles.dropdown, isFocusAccountList && { borderColor: 'blue' }]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            itemTextStyle={styles.itemTextStyle}
+                            iconStyle={styles.iconStyle}
+                            data={accouts}
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={''}
+                            value={selectedAccount ? selectedAccount : accouts[0]?.value}
+                            onFocus={() => setIsFocusAccountList(true)}
+                            onBlur={() => setIsFocusAccountList(false)}
+                            onChange={item => {
+                              setSelectedAccount(item.value);
+                              setIsFocusAccountList(false);
+                            }}
+                            renderLeftIcon={() => (
+                              <View
+                                style={styles.icon}
+                                color={isFocusAccountList ? 'blue' : 'black'}
+                                name="Safety"
+                                size={20}
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                    <View style={{flexDirection: 'row', width: '100%'}}>
+                      <TouchableOpacity
+                        style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                        onPress={handlechangeJobInfo} underlayColor="#0056b3"
                       >
                         <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
                       </TouchableOpacity>
@@ -1478,7 +1660,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#A020F0',
     padding: 10,
     marginTop: 30,  
     borderRadius: 5,

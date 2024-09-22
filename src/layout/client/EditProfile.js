@@ -36,6 +36,7 @@ import { Update } from '../../utils/useApi';
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import Loader from '../Loader';
 
 export default function EditProfile({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -59,6 +60,7 @@ export default function EditProfile({ navigation }) {
   const [bls, setBls] = useAtom(blsAtom); 
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [ credentials, setCredentials ] = useState({
     firstName: firstName,
@@ -234,14 +236,10 @@ export default function EditProfile({ navigation }) {
       credentials.address.state ==='' || 
       credentials.address.zip ==='') {
         showAlerts('all gaps')
-    }
-    else {
-      // navigation.navigate('MyHome');
+    } else {
+      setIsSubmitting(true);
       try {
-        console.log('update------------>')
-        // console.log('credentials: ', credentials);
         const response = await Update(credentials, 'clinical');
-        console.log('Signup successful: ', response)
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
         setBirthdays(response.user.birthday);
@@ -260,8 +258,10 @@ export default function EditProfile({ navigation }) {
         setCovidCard(response.user.covidCard);
         setBls(response.user.bls);
         console.log('successfully Updated')
+        setIsSubmitting(false);
         navigation.navigate("MyHome")
       } catch (error) {
+        setIsSubmitting(false);
         console.error('Update failed: ', error)
       }
     }
@@ -274,6 +274,10 @@ export default function EditProfile({ navigation }) {
       type: ''
     });
   };
+
+  if (isSubmitting == true) {
+    return <Loader />;
+  }
 
   return (
     <View style={styles.container}>

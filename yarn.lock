@@ -3172,6 +3172,7 @@ __metadata:
     react-native-month-year-picker: ^1.9.0
     react-native-paper: ^5.12.3
     react-native-pdf: ^6.7.5
+    react-native-permissions: ^4.1.5
     react-native-phone-input: ^1.3.7
     react-native-phone-number-input: ^2.1.0
     react-native-progress: ^5.0.1
@@ -8825,6 +8826,20 @@ __metadata:
     react-native: "*"
     react-native-blob-util: ">=0.13.7"
   checksum: fa07d2e972efd0fd4f8b8d061ffbc63306766e4f792855f7010fc28814692c62b7ab942777b914a4d471a45044013793a854357fab19740596ad64034832f368
+  languageName: node
+  linkType: hard
+
+"react-native-permissions@npm:^4.1.5":
+  version: 4.1.5
+  resolution: "react-native-permissions@npm:4.1.5"
+  peerDependencies:
+    react: ">=18.1.0"
+    react-native: ">=0.70.0"
+    react-native-windows: ">=0.70.0"
+  peerDependenciesMeta:
+    react-native-windows:
+      optional: true
+  checksum: dc4b366a0f561a47f032c027eb703a2be45e801788b915ed583e38f617eea23656eb63a77b17fb3a663fe3199b2ec25788f799e751421634e35a64f5258feed9
   languageName: node
   linkType: hard
 

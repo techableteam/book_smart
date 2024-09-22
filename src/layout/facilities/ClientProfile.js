@@ -37,7 +37,7 @@ export default function ClientProfile({ navigation, route }) {
             <StatusBar translucent backgroundColor="transparent" />
             <MHeader navigation={navigation} />
             <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-            <ScrollView style={{ width: '100%', marginTop: 140 }} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{ width: '100%', marginTop: 160 }} showsVerticalScrollIndicator={false} >
                 <View style={styles.profile}>
                     <View style={styles.profileTitleBg}>
                         <Text style={styles.profileTitle}>🖥️CAREGIVER PROFILE</Text>

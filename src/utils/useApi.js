@@ -398,12 +398,12 @@ export const PostJob = async (jobData, endpoint) => {
         Authorization: `Bearer ${existingToken}`
       }
     });
+    console.log(response);
+    console.log(JSON.stringify(response));
     // If the update is successful, you can potentially update the token in AsyncStorage
     if (response.status === 200) {
       // Optionally, if the backend sends a new token for some reason
-      if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
+
     } else if (response.status === 401) {
       console.log('Token is expired')
       // navigation.navigate('Home')
@@ -432,6 +432,42 @@ export const getFacility = async (endpoint, role) => {
       console.log('Token is expired');
     }
     return response.data.jobData;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const getBidIDs = async () => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get(`api/admin/getBidIDs`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`,
+      }
+    });
+
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data.bidList;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const getAllUsersName = async () => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get(`api/admin/getAllUsersName`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`,
+      }
+    });
+
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data.userList;
   } catch (error) {
     return { error: error };
   }

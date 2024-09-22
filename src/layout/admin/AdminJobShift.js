@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
-import { TextInput, useTheme } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
 import { useFocusEffect } from '@react-navigation/native';
@@ -9,23 +9,24 @@ import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { PostJob, getFacility, getDegreeList, addDegreeItem } from '../../utils/useApi';
+import { PostJob, getDegreeList, addDegreeItem, Clinician, getLocationList } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
 
 export default function AdminJobShift({ navigation }) {
-  const [data, setData] = useState([]);
   const [facility, setFacility] = useState([]);
-  const [facilityValue, setFacilityValue] = useState(null);
+  const [facilityValue, setFacilityValue] = useState('');
   const [isFacilityFocus, setIsFacilityFocus] = useState(false);
   const [degreeValue, setDegreeValue] = useState(null);
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
   const [locationValue, setLocationValue] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [showAddDegreeModal, setShowAddDegreeModal] = useState(false);
   const [isLocationFocus, setIsLocationFocus] = useState(false);
   const [shiftFromDay, setShiftFromDay] = useState(new Date());
   const [showCalender, setShowCalendar] = useState(false);
-  const [item, setItem] = useState('');
-  const [title, setTitle] = useState('degree')
+  const [degreeItem, setDegreeItem] = useState('');
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const [degree, setDegree] = useState([]);
+  const [location, setLocation] = useState([]);
   const [ credentials, setCredentials ] = useState({
     facility: '',
     degree: '',
@@ -35,24 +36,8 @@ export default function AdminJobShift({ navigation }) {
     location: '',
     payRate: '',
     bonus: '',
+    facilityId: '',
   });
-  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
-
-  const [degree, setDegree] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'CNA', value: 'CNA'},
-    {label: 'LPN', value: 'LPN'},
-    {label: 'STNA', value: 'STNA'},
-  ]);
-
-  const [location, setLocation] = useState([
-    {label: 'Select...', value: 'Select...'},
-    {label: 'Lancaster, NY', value: 'Lancaster, NY'},
-    {label: 'Skilled Nursing Facility', value: 'Skilled Nursing Facility'},
-    {label: 'Springville, NY', value: 'Springville, NY'},
-    {label: 'Warsaw, NY', value: 'Warsaw, NY'},
-    {label: 'Williansville', value: 'Williansville'},
-  ]);
 
   useEffect(() => {
     const areRequiredFieldsFilled = 
@@ -64,31 +49,46 @@ export default function AdminJobShift({ navigation }) {
     setIsButtonEnabled(areRequiredFieldsFilled);
   }, [credentials]);
 
-  async function getData() {
-    let data = await getFacility('facilities', 'Admin');
-    if(!data) {
-      setData(['No Data'])
+  useEffect(() => {
+    setCredentials({...credentials, ['facility']: facilityValue});
+  }, [credentials.facilityId]);
+
+  const getData = async () => {
+    let data = await Clinician('facilities/getFacilityList', 'Admin');
+    if(!data?.error) {
+      const uniqueValues = new Set();
+      const transformed = [];
+  
+      data.forEach(subarray => {
+        const value = subarray[2];
+        if (!uniqueValues.has(value)) {
+          uniqueValues.add(value);
+          transformed.push({ label: value, value: value, id: subarray[0] });
+        }
+      });
+  
+      transformed.unshift({ label: 'Select...', value: 'Select...', id: '' });
+      setFacility(transformed);
     } else {
-      setData(data)
+      console.log('get list failure');
     }
-    const uniqueValues = new Set();
-    const transformed = [];
-    console.log(data);
-
-    data.forEach(subarray => {
-      const value = subarray[3];
-      if (!uniqueValues.has(value)) {
-        uniqueValues.add(value);
-        transformed.push({ label: value, value: value });
-      }
-    });
-
-    transformed.unshift({ label: 'Select...', value: 'Select...' });
-    console.log(transformed);
-    setFacility(transformed);
   };
 
-  async function getDegree() {
+  const getLocation = async () => {
+    const response = await getLocationList('location');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.locationName, value: item.locationName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setLocation(tempArr);
+    } else {
+      setLocation([]);
+    }
+  };
+
+  const getDegree = async () => {
     const response = await getDegreeList('degree');
     if (!response?.error) {
       let tempArr = [];
@@ -106,6 +106,7 @@ export default function AdminJobShift({ navigation }) {
     React.useCallback(() => {
       getData();
       getDegree();
+      getLocation();
     }, [])
   );
 
@@ -113,19 +114,14 @@ export default function AdminJobShift({ navigation }) {
     if (target === "streetAddress" || target === "streetAddress2" || target === "city" || target === "state" || target === "zip") {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     } else if (target === "timeFrom" || target === "dateFrom" || target === "dateTo" || target === "timeTo") {
-      console.log('success')
       setCredentials({...credentials, shiftsDateAndTimes: {...credentials.shiftsDateAndTimes, [target]: e}})
     } else {
       setCredentials({...credentials, [target]: e});
     }
   };
 
-  const handleItemPress = () => {
-    setShowModal(!showModal);
-  };
-
-  const toggleModal = () => {
-    setShowModal(!showModal);
+  const toggleShowAddDegreeModal = () => {
+    setShowAddDegreeModal(!showAddDegreeModal);
   };
 
   const handleDayChange = (target, day) => {
@@ -174,41 +170,31 @@ export default function AdminJobShift({ navigation }) {
     } else if (credentials.shiftDate === '') {
       showAlerts('Shift Date')
     } else {
+      setIsButtonEnabled(true);
       try {
         const response = await PostJob(credentials, 'jobs');
         navigation.goBack();
       } catch (error) {
+        setIsButtonEnabled(false);
         console.error('Job Shift failed: ', error);
       }
     }
   };
 
-  const handleItemChange = (e) => {
-    setItem(e);
-  };
-
-  const handleModal = async (title, item) => {
-    // if (title === 'degree'){
-    //   setDegree([...degree, {label: item, value: item}])
-    // } else if (title === 'location') {
-    //   setLocation([...location, {label: item, value: item},])
-    // }
-    console.log(item);
+  const handleAddDegree = async (item) => {
     const response = await addDegreeItem({ item }, 'degree');
-    console.log(response);
     if (!response?.error) {
       let tempArr = [];
       response.data.map(item => {
         tempArr.push({ label: item.degreeName, value: item.degreeName });
       });
       tempArr.unshift({ label: 'Select...', value: 'Select...' });
-      console.log(tempArr);
       setDegree(tempArr);
     } else {
       setDegree([]);
     }
-    setShowModal(!showModal)
-    setItem('')
+    setShowAddDegreeModal(!showAddDegreeModal)
+    setDegreeItem('')
   };
 
   return (
@@ -232,19 +218,17 @@ export default function AdminJobShift({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={facility}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={'Select...'}
-                // searchPlaceholder="Search..."
-                value={ facilityValue ? facilityValue : facility[0]?.value }
+                value={facilityValue}
                 onFocus={() => setIsFacilityFocus(true)}
                 onBlur={() => setIsFacilityFocus(false)}
                 onChange={item => {
-                  setFacilityValue(item?.value);
+                  setFacilityValue(item.value);
                   setIsFacilityFocus(false);
-                  handleCredentials('facility', item?.label)
+                  setCredentials({...credentials, ['facilityId']: item.id});
                 }}
                 renderLeftIcon={() => (
                   <View
@@ -270,7 +254,7 @@ export default function AdminJobShift({ navigation }) {
                 labelField="label"
                 valueField="value"
                 placeholder={'Select ...'}
-                value={degreeValue ? degreeValue : degree[0]?.value}
+                value={degreeValue}
                 onFocus={() => setIsDegreeFocus(true)}
                 onBlur={() => setIsDegreeFocus(false)}
                 onChange={item => {
@@ -287,7 +271,7 @@ export default function AdminJobShift({ navigation }) {
                   />
                 )}
               />
-              <TouchableOpacity style={styles.addItems} onPress={() => {handleItemPress(); setTitle('degree')}}>
+              <TouchableOpacity style={styles.addItems} onPress={toggleShowAddDegreeModal}>
                 <Image source={images.plus} style={{width: 15, height: 15}} />
                 <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
               </TouchableOpacity>
@@ -344,13 +328,11 @@ export default function AdminJobShift({ navigation }) {
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
                 data={location}
-                // search
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={'100 per page'}
-                // searchPlaceholder="Search..."
-                value={locationValue ? locationValue : location[0].value}
+                placeholder={''}
+                value={locationValue}
                 onFocus={() => setIsLocationFocus(true)}
                 onBlur={() => setIsLocationFocus(false)}
                 onChange={item => {
@@ -397,19 +379,19 @@ export default function AdminJobShift({ navigation }) {
           </View>
         </View>
       </ScrollView>
-      {showModal && <Modal
+      {showAddDegreeModal && <Modal
         Visible={false}
         transparent= {true}
         animationType="slide"
         onRequestClose={() => {
-          setShowModal(!showModal);
+          setShowAddDegreeModal(!showAddDegreeModal);
         }}
       >
         <View style={styles.modalContainer}>
           <View style={styles.calendarContainer}>
             <View style={styles.header}>
               <Text style={[styles.headerText, { color: 'black' }]}>Add a new option</Text>
-              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleShowAddDegreeModal}>
                 <Image source = {images.close} style={{width: 20, height: 20,}}/>
               </TouchableOpacity>
             </View>
@@ -419,13 +401,10 @@ export default function AdminJobShift({ navigation }) {
                   <TextInput
                     style={[styles.input, {width: '100%'}]}
                     placeholder=""
-                    onChangeText={e => handleItemChange(e)}
-                    value={item || ''}
+                    onChangeText={e => setDegreeItem(e)}
+                    value={degreeItem}
                   />
-                  {/* <TouchableOpacity style={styles.searchBtn}>
-                    <Text>Submit</Text>
-                  </TouchableOpacity> */}
-                  <Button title="Submit" onPress={() => handleModal(title, item) } />
+                  <Button title="Submit" onPress={() => handleAddDegree(degreeItem) } />
                 </View>
               </View>
             </View>
