@@ -14,8 +14,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import Loader from '../Loader';
 
 export default function AllCaregivers({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -46,6 +47,7 @@ export default function AllCaregivers({ navigation }) {
   const [clinicians, setClinicians] = useState([]);
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const widths = [120, 150, 150, 180, 300, 150, 150, 150, 80, 100, 80, 120];
   let colorIndex = 0;
   const [credentials, setCredentials] = useState({
@@ -286,11 +288,14 @@ export default function AllCaregivers({ navigation }) {
   };
 
   const handleSubmitVerification = async () => {
+    setIsSubmitting(true);
     let data = await Update(credentials, 'clinical');
     if (!data?.error) {
+      setIsSubmitting(false);
       getData();
       toggleVerificationModal();
     } else {
+      setIsSubmitting(false);
       Alert.alert(
         'Warning!',
         "Please try again later.",
@@ -563,36 +568,148 @@ export default function AllCaregivers({ navigation }) {
       mediaType: 'photo', // Use 'video' for video capture
       quality: 1, // 1 for high quality, 0 for low quality
     };
-  
-    launchCamera(options, async (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled camera');
-      } else if (response.error) {
-        console.error('Camera error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        const fileUri = response.assets[0].uri;
-        const fileContent = await RNFS.readFile(fileUri, 'base64');
-        
-        handleCredentials(sfileType, {
-          content: fileContent,
-          type: 'image',
-          name: response.assets[0].fileName,
-        });
-        toggleFileTypeSelectModal();
-      }
-    });
+    try {
+      launchCamera(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled camera');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'Camera error: ', response.error,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.error('Camera error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else if (response.errorCode) {
+          Alert.alert(
+            'Alert!',
+            'Camera errorCode: ', response.errorCode,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('Camera error code: ', response.errorCode);
+        } else {
+          const fileUri = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(fileUri, 'base64');
+          
+          handleCredentials(sfileType, {
+            content: fileContent,
+            type: 'image',
+            name: response.assets[0].fileName,
+          });
+          toggleFileTypeSelectModal();
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
-
+  
+  const pickGallery = async () => {
+    const options = {
+      mediaType: 'photo', // you can also use 'mixed' or 'video'
+      quality: 1, // 0 (low) to 1 (high)
+    };
+  
+    try {
+      launchImageLibrary(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response.error),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.assets && response.assets.length > 0) {
+          const pickedImage = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(pickedImage, 'base64');
+          
+          handleCredentials(sfileType, {
+            content: fileContent,
+            type: 'image',
+            name: response.assets[0].fileName,
+          });
+          toggleFileTypeSelectModal();
+        } else {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+  
   const pickFile = async () => {
     try {
-      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf];
       const res = await DocumentPicker.pick({
         type: type,
       });
   
       const fileContent = await RNFS.readFile(res[0].uri, 'base64');
+  
       let fileType;
       if (res[0].type === 'application/pdf') {
         fileType = 'pdf';
@@ -601,9 +718,22 @@ export default function AllCaregivers({ navigation }) {
       } else {
         fileType = 'unknown';
       }
-      handleCredentials(sfileType, {content: `${fileContent}`, type: fileType, name: res[0].name});
+      handleCredentials(sfileType, { content: `${fileContent}`, type: fileType, name: res[0].name });
       toggleFileTypeSelectModal();
     } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'DocumentPicker Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
       } else {
@@ -616,6 +746,12 @@ export default function AllCaregivers({ navigation }) {
     toggleVerificationModal();
     navigation.navigate("FileViewer", { jobId: '', fileData: data });
   };
+
+  if (isSubmitting) {
+    return (
+      <Loader />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -1967,13 +2103,17 @@ export default function AllCaregivers({ navigation }) {
                 <View style={[styles.body, { marginBottom: 0 }]}>
                   <View style={[styles.modalBody, { paddingHorizontal: 20, borderRadius: 15, borderWidth: 2, borderColor: '#c6c5c5', backgroundColor: '#e3f2f1', paddingVertical: 20 }]}>
                     <View style={styles.cameraContain}>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {openCamera();}}>
-                        <Icon name="camera" size={50} color="#ccc" />
+                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {openCamera();}}>
+                        <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickFile();}}>
-                        <Icon name="image" size={50} color="#ccc" />
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickGallery();}}>
+                        <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickFile();}}>
+                        <Image source={images.folder} style={{ width: 50, height: 50 }} />
+                        <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>
                     </View>
                   </View>

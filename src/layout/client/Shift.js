@@ -14,7 +14,7 @@ import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 
@@ -233,53 +233,178 @@ export default function Shift ({ navigation }) {
       mediaType: 'photo', // Use 'video' for video capture
       quality: 1, // 1 for high quality, 0 for low quality
     };
-  
-    launchCamera(options, async (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled camera');
-      } else if (response.error) {
-        console.error('Camera error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        // Handle the response
-        const fileUri = response.assets[0].uri;
-        const fileContent = await RNFS.readFile(fileUri, 'base64');
-        
-        setSubmitData({
-          ...submitData,
-          timeSheet: {
-            content: fileContent,
-            type: 'image',
-            name: response.assets[0].fileName,
+    try {
+      launchCamera(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled camera');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'Camera error: ', response.error,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.error('Camera error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else if (response.errorCode) {
+          Alert.alert(
+            'Alert!',
+            'Camera errorCode: ', response.errorCode,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('Camera error code: ', response.errorCode);
+        } else {
+          const fileUri = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(fileUri, 'base64');
+          
+          setSubmitData({
+            ...submitData,
+            timeSheet: {
+              content: fileContent,
+              type: 'image',
+              name: response.assets[0].fileName,
+            },
+          });
+          toggleFileTypeSelectModal();
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
           },
-        });
-      }
-    });
+        ],
+        { cancelable: false }
+      );
+    }
   };
-
+  
+  const pickGallery = async () => {
+    const options = {
+      mediaType: 'photo', // you can also use 'mixed' or 'video'
+      quality: 1, // 0 (low) to 1 (high)
+    };
+  
+    try {
+      launchImageLibrary(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response.error),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.assets && response.assets.length > 0) {
+          const pickedImage = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(pickedImage, 'base64');
+          
+          setSubmitData({
+            ...submitData,
+            timeSheet: {
+              content: fileContent,
+              type: 'image',
+              name: response.assets[0].fileName,
+            },
+          });
+          toggleFileTypeSelectModal();
+        } else {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+  
   const pickFile = async () => {
     try {
       let type = [DocumentPicker.types.images, DocumentPicker.types.pdf];
       const res = await DocumentPicker.pick({
         type: type,
       });
-
-      let fileUri = res[0].uri;
-      let fileContent;
+  
+      const fileContent = await RNFS.readFile(res[0].uri, 'base64');
+  
       let fileType;
-      fileContent = await RNFS.readFile(fileUri, 'base64');
-
-      if (res[0].type == 'application/pdf') {
+      if (res[0].type === 'application/pdf') {
         fileType = 'pdf';
-      } else if (res[0].type.startsWith('image')) {
+      } else if (res[0].type.startsWith('image/')) {
         fileType = 'image';
       } else {
         fileType = 'unknown';
       }
-      
-      setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}})
+      setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}});
+      toggleFileTypeSelectModal();
     } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'DocumentPicker Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
       } else {
@@ -681,12 +806,16 @@ export default function Shift ({ navigation }) {
                   <View style={[styles.modalBody, { marginBottom: 20 }]}>
                     <View style={styles.cameraContain}>
                       <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
-                        <Icon name="camera" size={50} color="#ccc" />
+                        <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
-                        <Icon name="image" size={50} color="#ccc" />
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('gallery'); pickGallery();}}>
+                        <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                        <Image source={images.folder} style={{ width: 50, height: 50 }} />
+                        <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>
                     </View>
                   </View>

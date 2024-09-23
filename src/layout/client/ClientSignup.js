@@ -115,27 +115,71 @@ export default function ClientSignUp({ navigation }) {
       mediaType: 'photo', // Use 'video' for video capture
       quality: 1, // 1 for high quality, 0 for low quality
     };
-  
-    launchCamera(options, async (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled camera');
-      } else if (response.error) {
-        console.error('Camera error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else if (response.errorCode) {
-        console.log('Camera error code: ', response.errorCode);
-      } else {
-        const fileUri = response.assets[0].uri;
-        const fileContent = await RNFS.readFile(fileUri, 'base64');
-        
-        setPhotoImage({
-          content: fileContent,
-          type: 'image',
-          name: response.assets[0].fileName,
-        });
-      }
-    });
+    try {
+      launchCamera(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled camera');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'Camera error: ', response.error,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  setPassword('');
+                  setConfirmPassword('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.error('Camera error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else if (response.errorCode) {
+          Alert.alert(
+            'Alert!',
+            'Camera errorCode: ', response.errorCode,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  setPassword('');
+                  setConfirmPassword('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('Camera error code: ', response.errorCode);
+        } else {
+          const fileUri = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(fileUri, 'base64');
+          
+          setPhotoImage({
+            content: fileContent,
+            type: 'image',
+            name: response.assets[0].fileName,
+          });
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setPassword('');
+              setConfirmPassword('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   const pickGallery = async () => {
@@ -144,35 +188,76 @@ export default function ClientSignUp({ navigation }) {
       quality: 1, // 0 (low) to 1 (high)
     };
   
-    launchImageLibrary(options, async (response) => {
-      console.log(response);
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.assets && response.assets.length > 0) {
-        const pickedImage = response.assets[0].uri;
-        const fileContent = await RNFS.readFile(pickedImage, 'base64');
-        
-        setPhotoImage({
-          content: fileContent,
-          type: 'image',
-          name: response.assets[0].fileName,
-        });
-      }
-    });
+    try {
+      launchImageLibrary(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response.error),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  setPassword('');
+                  setConfirmPassword('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.assets && response.assets.length > 0) {
+          const pickedImage = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(pickedImage, 'base64');
+          
+          setPhotoImage({
+            content: fileContent,
+            type: 'image',
+            name: response.assets[0].fileName,
+          });
+        } else {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  setPassword('');
+                  setConfirmPassword('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setPassword('');
+              setConfirmPassword('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   const pickFile = async () => {
     try {
-      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
-      console.log('sdocument picker');
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf];
       const res = await DocumentPicker.pick({
         type: type,
-        mode: 'open'
       });
-
-      console.log(res);
   
       const fileContent = await RNFS.readFile(res[0].uri, 'base64');
 
@@ -186,6 +271,20 @@ export default function ClientSignUp({ navigation }) {
       }
       setPhotoImage({content: `${fileContent}`, type: fileType, name: res[0].name});
     } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'DocumentPicker Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setPassword('');
+              setConfirmPassword('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
       } else {
@@ -962,7 +1061,7 @@ const styles = StyleSheet.create({
   },
   container: {
     marginBottom: 0,
-    backgroundColor: 'rgba(155, 155, 155, 0.61))'
+    backgroundColor: 'rgba(155, 155, 155, 0.61)'
   },
   scroll: {
     marginTop: 97,
@@ -1012,7 +1111,6 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',
@@ -1093,8 +1191,6 @@ const styles = StyleSheet.create({
     marginLeft: '15%',
   },
   homepage: {
-    // paddingHorizontal: 30,
-    // paddingVertical: 70,
     width: '45%',
     height: 130,
     marginTop: 10,
@@ -1147,7 +1243,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -1197,7 +1293,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
-    height: '20%,',
+    height: '20%',
     padding: 20,
     borderBottomColor: '#c4c4c4',
     borderBottomWidth: 1,
@@ -1236,3 +1332,4 @@ const styles = StyleSheet.create({
 		marginVertical: 14, padding: 5,
 	},
 });
+
