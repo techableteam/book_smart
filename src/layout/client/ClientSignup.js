@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Alert, Animated, Easing, StyleSheet, Pressable, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button, Image } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import SignatureCapture from 'react-native-signature-capture';
 import DatePicker from 'react-native-date-picker';
 import HButton from '../../components/Hbutton';
@@ -11,7 +10,8 @@ import { Signup } from '../../utils/useApi';
 import images from '../../assets/images';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
-import { launchCamera } from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
 import RNFS from 'react-native-fs'
 
 export default function ClientSignUp({ navigation }) {
@@ -127,6 +127,30 @@ export default function ClientSignUp({ navigation }) {
         // Handle the response
         const fileUri = response.assets[0].uri;
         const fileContent = await RNFS.readFile(fileUri, 'base64');
+        
+        setPhotoImage({
+          content: fileContent,
+          type: 'image',
+          name: response.assets[0].fileName,
+        });
+      }
+    });
+  };
+
+  const pickGallery = async () => {
+    const options = {
+      mediaType: 'photo', // you can also use 'mixed' or 'video'
+      quality: 1, // 0 (low) to 1 (high)
+    };
+  
+    launchImageLibrary(options, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.assets && response.assets.length > 0) {
+        const pickedImage = response.assets[0].uri;
+        const fileContent = await RNFS.readFile(pickedImage, 'base64');
         
         setPhotoImage({
           content: fileContent,
@@ -903,7 +927,7 @@ export default function ClientSignUp({ navigation }) {
                         <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('gallery'); pickGallery();}}>
                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
                       </TouchableOpacity>

@@ -35,6 +35,10 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>camera description.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>photos description.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need your location while you use the app to show relevant content and suggestions.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
