@@ -2094,7 +2094,7 @@ export default function AllCaregivers({ navigation }) {
             <StatusBar translucent backgroundColor='transparent' />
             <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
               <View style={[styles.viewContainer, { marginTop: '50%' }]}>
-                <View style={styles.header}>
+                <View style={[styles.header, { height: 100 }]}>
                   <Text style={styles.headerText}>Choose File</Text>
                   <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
                     <Image source={images.close} style={{ width: 20, height: 20 }} />
