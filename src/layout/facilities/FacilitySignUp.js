@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Image } from 'react-native';
-import { TextInput, useTheme, } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFocusEffect } from '@react-navigation/native';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
@@ -13,6 +14,9 @@ import { launchCamera } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 
 export default function FacilitySignUp({ navigation }) {
+  const [fileType, setFiletype] = useState('');
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
 
   useEffect(() => {
@@ -35,8 +39,11 @@ export default function FacilitySignUp({ navigation }) {
     Animated.loop(sequenceAnimation).start();
   }, [fadeAnim]);
 
-  const [fileType, setFiletype] = useState('');
-  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsSubmitting(false);
+    }, [])
+  );
 
   //--------------------------------------------Credentials-----------------------------
   const [credentials, setCredentials] = useState({
@@ -272,14 +279,22 @@ export default function FacilitySignUp({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    if (!validation()) {
+    if (isSubmitting) {
       return;
     }
+    console.log('clicked');
+
+    if (!validation()) {
+      setIsSubmitting(false);
+      return;
+    }
+    setIsSubmitting(true);
     try {
       const response = await Signup(credentials, "facilities");
       if (!response?.error) {
         navigation.navigate('FacilityFinishSignup');
       } else {
+        setIsSubmitting(false);
         if (response.error.status == 500) {
           Alert.alert(
             'Warning!',
@@ -339,6 +354,7 @@ export default function FacilitySignUp({ navigation }) {
         }
       }
     } catch (error) {
+      setIsSubmitting(false);
       console.error('Signup failed: ', error);
       Alert.alert(
         'Failure!',
@@ -773,8 +789,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: 'white',
     fontSize: 16,
   },
   drinksButton: {
