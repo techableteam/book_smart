@@ -900,12 +900,16 @@ export default function ClientSignUp({ navigation }) {
                   <View style={[styles.modalBody, { marginBottom: 20 }]}>
                     <View style={styles.cameraContain}>
                       <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
-                        <Icon name="camera" size={50} color="#ccc" />
+                        <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
                       <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
-                        <Icon name="image" size={50} color="#ccc" />
+                        <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                        <Image source={images.folder} style={{ width: 50, height: 50 }} />
+                        <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>
                     </View>
                   </View>

@@ -16,7 +16,10 @@ const images = {
     view: require('./images/checklist2.png'),
     approve: require('./images/Present.png'),
     approveTime: require('./images/Stopwatch.png'),
-    plus: require("./images/plus.png")
+    plus: require("./images/plus.png"),
+    folder: require("./images/folder.png"),
+    gallery: require("./images/gallery.png"),
+    camera: require("./images/camera.png")
 };
   
   export default images;
