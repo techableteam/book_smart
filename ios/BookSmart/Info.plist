@@ -35,6 +35,10 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+	<string>fetch</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>camera description.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -42,6 +46,8 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need your location while you use the app to show relevant content and suggestions.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
+	<key>NSDocumentsUsageDescription</key>
+	<string>We need access to documents to allow you to upload files.</string>
 	<string>We need access to your photo library to allow you to select images for your profile or posts.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to provide personalized content and updates based on your location.</string>

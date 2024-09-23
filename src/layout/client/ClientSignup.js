@@ -123,8 +123,9 @@ export default function ClientSignUp({ navigation }) {
         console.error('Camera error: ', response.error);
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
+      } else if (response.errorCode) {
+        console.log('Camera error code: ', response.errorCode);
       } else {
-        // Handle the response
         const fileUri = response.assets[0].uri;
         const fileContent = await RNFS.readFile(fileUri, 'base64');
         
@@ -144,6 +145,7 @@ export default function ClientSignUp({ navigation }) {
     };
   
     launchImageLibrary(options, async (response) => {
+      console.log(response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -164,9 +166,13 @@ export default function ClientSignUp({ navigation }) {
   const pickFile = async () => {
     try {
       let type = [DocumentPicker.types.images, DocumentPicker.types.pdf]; // Specify the types of files to pick (images and PDFs)
+      console.log('sdocument picker');
       const res = await DocumentPicker.pick({
         type: type,
+        mode: 'open'
       });
+
+      console.log(res);
   
       const fileContent = await RNFS.readFile(res[0].uri, 'base64');
 
