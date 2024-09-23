@@ -61,6 +61,9 @@ export default function ShiftListing ({ navigation }) {
         title: 'Job-ID',
         content: item.jobId
       },{
+        title: 'Job #',
+        content: item.jobNum
+      },{
         title: 'Title',
         content: item.degree
       },{
@@ -76,6 +79,7 @@ export default function ShiftListing ({ navigation }) {
         title: 'Status',
         content: item.status
       }]);
+
       const detailedData = Data.map(item => [{
         title: 'Job-ID',
         content: item.jobId
@@ -99,16 +103,13 @@ export default function ShiftListing ({ navigation }) {
         content: item.shift
       },{
         title: 'Date',
-        content: item.shiftDateAndTimes
+        content: item.shiftDate
       },{
         title: 'Location',
         content: item.location
       },{
         title: 'Bonus',
         content: item.bonus
-      },{
-        title: 'Date',
-        content: item.shiftDate
       }]);
       
       setUserInfo(transformedData);
@@ -349,7 +350,7 @@ export default function ShiftListing ({ navigation }) {
           <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.viewContainer}>
               <View style={styles.header}>
-                <Text style={styles.headerText}>View Job/ Shift Details</Text>
+                <Text style={styles.headerText}>View Job / Shift Details</Text>
                 <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
                   <Image source = {images.close} style={{width: 20, height: 20,}}/>
                 </TouchableOpacity>

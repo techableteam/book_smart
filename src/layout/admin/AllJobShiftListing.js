@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Alert, TouchableOpacity } from 'react-native';
+import { Modal, TextInput, View, Image, Animated, TouchableWithoutFeedback, StyleSheet, ScrollView, StatusBar, Alert, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -20,6 +20,7 @@ export default function AllJobShiftListing({ navigation }) {
   const [isJobDetailModal, setIsJobDetailModal] = useState(false);
   const [isAwardJobModal, setIsAwardJobModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJobId, setSelectedJobId] = useState(0);
   const [selectedBidders, setSelectedBidders] = useState([]);
   const [selectedBidder, setSelectedBidder] = useState([]);
   const [awardedStatus, setAwardedStatus] = useState(2);
@@ -42,6 +43,9 @@ export default function AllJobShiftListing({ navigation }) {
   const [selectedAccount, setSelectedAccount] = useState('');
   const [isFocusBidList, setIsFocusBidList] = useState(false);
   const [isFocusAccountList, setIsFocusAccountList] = useState(false);
+  const [isJobStatusModal, setIsJobStatusModal] = useState(false);
+  const [isFocusJobStatus, setIsFocusJobStatus] = useState(false);
+  const [selectedJobStatus, setSelectedJobStatus] = useState('');
   let colorIndex = 0;
 
   useEffect(() => {
@@ -70,7 +74,7 @@ export default function AllJobShiftListing({ navigation }) {
     'Shift',
     'View Shift & Bids',
     'Nurse Type',
-    'Job Status',
+    '✏️ Job Status',
     'Hired',
     'Bids',
     'View Hours',
@@ -193,6 +197,10 @@ export default function AllJobShiftListing({ navigation }) {
     setIsJobEditModal(!isJobEditModal);
   };
 
+  const toggleJobStatusModal = () => {
+    setIsJobStatusModal(!isJobStatusModal);
+  };
+
   const toggleJobDetailModal = () => {
     setIsJobDetailModal(!isJobDetailModal);
   };
@@ -239,24 +247,23 @@ export default function AllJobShiftListing({ navigation }) {
     }
   ]), []);
 
-  //---------------DropDown--------------
   const jobStatus = [
-    {label: 'Available', value: '1'},
-    {label: 'Awarded', value: '2'},
-    {label: 'Pending Verification', value: '3'},
-    {label: 'Cancelled', value: '4'},
-    {label: 'Verified', value: '5'},
-    {label: 'Paid', value: '6'},
+    {label: 'Available', value: 'Available'},
+    {label: 'Awarded', value: 'Awarded'},
+    {label: 'Pending Verification', value: 'Pending Verification'},
+    {label: 'Cancelled', value: 'Cancelled'},
+    {label: 'Verified', value: 'Verified'},
+    {label: 'Paid', value: 'Paid'},
   ];
 
-  const [location, setLocation] = useState([
+  const location = [
     {label: 'Select...', value: 'Select...'},
     {label: 'Lancaster, NY', value: 'Lancaster, NY'},
     {label: 'Skilled Nursing Facility', value: 'Skilled Nursing Facility'},
     {label: 'Springville, NY', value: 'Springville, NY'},
     {label: 'Warsaw, NY', value: 'Warsaw, NY'},
     {label: 'Williansville', value: 'Williansville'},
-  ]);
+  ];
 
   const [isJobFocus, setJobIsFocus] = useState(false);
 
@@ -510,6 +517,51 @@ export default function AllJobShiftListing({ navigation }) {
     getData();
   };
 
+  const handleUpdate = async () => {
+    console.log(selectedJobId);
+    console.log(selectedJobStatus);
+    let results = await PostJob({ jobId: selectedJobId, jobStatus: selectedJobStatus }, 'jobs');
+    if (!results?.error) {
+      toggleJobStatusModal();
+      getData();
+      console.log('success');
+      Alert.alert(
+        'Success!',
+        'Job status has been updated.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      console.log('failure', JSON.stringify(results.error));
+      Alert.alert(
+        'Warning!',
+        'Please retry again later',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
+  const handleCellClick = async (data) => {
+    setSelectedJobId(data[2]);
+    setSelectedJobStatus(data[9]);
+    toggleJobStatusModal();
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -709,6 +761,17 @@ export default function AllJobShiftListing({ navigation }) {
                                   >
                                     {cellData}
                                   </Text>
+                                );
+                              } else if (cellIndex == 9) {
+                                return (
+                                  <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(rowData)}>
+                                    <Text
+                                      key={cellIndex}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
+                                    >
+                                      {cellData}
+                                    </Text>
+                                  </TouchableWithoutFeedback>
                                 );
                               } else {
                                 return (
@@ -1376,6 +1439,61 @@ export default function AllJobShiftListing({ navigation }) {
                       </TouchableOpacity>
                     </View>
                   </ScrollView>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={isJobStatusModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setIsJobStatusModal(!isJobStatusModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={[styles.header, { height: 80 }]}>
+                  <Text style={styles.headerText}>Job Status</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleJobStatusModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.body, { marginBottom: 0 }]}>
+                  <View style={[styles.modalBody, { paddingBottom: 10 }]}>
+                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Job Status</Text>
+                    <Dropdown
+                      style={[styles.dropdown, { width: '90%' }, isFocusJobStatus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      itemTextStyle={styles.itemTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={jobStatus}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={''}
+                      value={selectedJobStatus}
+                      onFocus={() => setIsFocusJobStatus(true)}
+                      onBlur={() => setIsFocusJobStatus(false)}
+                      onChange={item => {
+                        setSelectedJobStatus(item.value);
+                        setIsFocusJobStatus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <View
+                          style={styles.icon}
+                          color={isFocusJobStatus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
+                        />
+                      )}
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleUpdate} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Update</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </View>
