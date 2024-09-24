@@ -40,6 +40,7 @@ export default function Shift ({ navigation }) {
     lunch: '',
     comments: ''
   });
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [info, setInfo] = useState([
     {title: 'Job-ID', content: ""},
     {title: 'Entry Date', content: ''},
@@ -180,9 +181,11 @@ export default function Shift ({ navigation }) {
   };
 
   const handleUploadSubmit = async () => {
+    setIsSubmitted(true);
     const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet};
     if (submitData.timeSheet?.name != '') {
       const response = await updateTimeSheet(data, 'jobs');
+      setIsSubmitted(false);
       if (!response?.error) {
         setUpload(!isUpload);
         getData();
@@ -207,6 +210,7 @@ export default function Shift ({ navigation }) {
         ]);
       }
     } else {
+      setIsSubmitted(false);
       Alert.alert('Failure!', 'Please upload documentation', [
         {
           text: 'OK',
@@ -552,7 +556,7 @@ export default function Shift ({ navigation }) {
 
   const itemsToShow = getItemsForPage(currentPage);
 
-  if (downloading) {
+  if (downloading || isSubmitted) {
     return (
       <Loader />
     );
