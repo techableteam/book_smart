@@ -105,7 +105,7 @@ export default function Shift ({ navigation }) {
         title: 'Pay Rate',
         content: item.payRate
       },{
-        title: 'Shift Status',
+        title: 'Status',
         content: item.shiftStatus
       },
       {
@@ -240,7 +240,7 @@ export default function Shift ({ navigation }) {
   //-----------------------------------------File Upload---------------------
   const handleChangeFileType = (mode) => {
     setFiletype(mode);
-    toggleFileTypeSelectModal();
+    // toggleFileTypeSelectModal();
   };
 
   const openCamera = async () => {
@@ -296,7 +296,6 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             },
           });
-          toggleFileTypeSelectModal();
         }
       });
     } catch (err) {
@@ -353,7 +352,6 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             },
           });
-          toggleFileTypeSelectModal();
         } else {
           Alert.alert(
             'Alert!',
@@ -405,7 +403,6 @@ export default function Shift ({ navigation }) {
         fileType = 'unknown';
       }
       setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}});
-      toggleFileTypeSelectModal();
     } catch (err) {
       Alert.alert(
         'Alert!',
@@ -564,7 +561,7 @@ export default function Shift ({ navigation }) {
             <AnimatedHeader title="AWARDED & COMPLETED SHIFTS" />
             <View style={styles.bottomBar}/>
           </View>
-          <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARD"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"COMPLETE"&nbsp;</Text>.</Text>
+          <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"PENDING VERIFICAITON"&nbsp;</Text>.</Text>
           {downloading ? (
             <Text style={[styles.text, { marginTop: 15 }]}>Downloading...</Text>
           ) : (
@@ -797,7 +794,7 @@ export default function Shift ({ navigation }) {
           </ScrollView>
         </Modal>}
 
-        {fileTypeSelectModal && (
+        {/* {fileTypeSelectModal && ( */}
           <Modal
             visible={fileTypeSelectModal} // Changed from Visible to visible
             transparent={true}
@@ -836,7 +833,7 @@ export default function Shift ({ navigation }) {
               </View>
             </ScrollView>
           </Modal>
-        )}
+        {/* )} */}
 
         <MFooter />
       </View>
@@ -886,13 +883,13 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   text: {
-    fontSize: 14,
+    fontSize: 13,
     color: 'black',
     fontWeight: '300',
     textAlign: 'center',
     marginTop: 30,
-    width: '90%',
-    marginLeft: '5%'
+    width: '96%',
+    marginLeft: '2%'
   },
   imageButton: {
     width: '90%',
@@ -958,7 +955,7 @@ const styles = StyleSheet.create({
   },
   subBar: {
     width: '100%',
-    backgroundColor: "#f0fbfe",
+    backgroundColor: "#dcd6fa",
     padding: 10,
     borderRadius: 20,
     borderWidth: 2,
@@ -1039,7 +1036,7 @@ const styles = StyleSheet.create({
     marginBottom: 100
   },
   modalBody: {
-    backgroundColor: '#e3f2f1',
+    backgroundColor: '#dcd6fa',
     borderRadius: 10,
     borderColor: '#c6c5c5',
     borderWidth: 2,

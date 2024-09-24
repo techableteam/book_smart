@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#A020F0',
+    backgroundColor: '#DF1828FF',
     color: 'white',
     fontSize: 16,
   },
