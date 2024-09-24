@@ -9,6 +9,7 @@ import { UpdateUser, Clinician, updateUserInfo, removeAccount } from '../../util
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import { useFocusEffect } from '@react-navigation/native';
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function AdminAllUser({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -260,9 +261,7 @@ export default function AdminAllUser({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
-          <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>ALL PLATFORM USERS</Text>
-          </Animated.View>
+          <AnimatedHeader title="ALL PLATFORM USERS" />
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}></View>

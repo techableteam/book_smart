@@ -8,6 +8,7 @@ import { Table, Row } from 'react-native-table-component';
 import { getCaregiverTimesheets, Jobs } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function CaregiverTimeSheet({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -72,9 +73,7 @@ export default function CaregiverTimeSheet({ navigation }) {
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView style={{ width: '100%', marginTop: 140 }} showsVerticalScrollIndicator={false}>
         <View style={styles.topView}>
-          <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>Jobs</Text>
-          </Animated.View>
+          <AnimatedHeader title="Jobs" />
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}></View>

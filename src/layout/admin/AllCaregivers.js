@@ -17,6 +17,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function AllCaregivers({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -764,9 +765,7 @@ export default function AllCaregivers({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
-          <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>ALL PLATFORM CAREGIVERS</Text>
-          </Animated.View>
+          <AnimatedHeader title="ALL PLATFORM CAREGIVERS" />
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>

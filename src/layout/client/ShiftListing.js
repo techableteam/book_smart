@@ -12,6 +12,7 @@ import { firstNameAtom, lastNameAtom } from '../../context/ClinicalAuthProvider'
 import { PostBid, Jobs } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
+import AnimatedHeader from '../AnimatedHeader';
 
 const itemsPerPage = 100;
 
@@ -256,9 +257,7 @@ export default function ShiftListing ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <Animated.View style={[styles.backTitle, {backgroundColor}]}>
-              <Text style={styles.title}>JOB / SHIFT LISTINGS</Text>
-            </Animated.View>
+            <AnimatedHeader title="JOB / SHIFT LISTINGS" />
             <View style={styles.bottomBar}/>
           </View>
           <Text style={styles.text}>View and Apply for Shifts below, once applied the Facility will be notified, and if <Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> the shift will appear on your <Text style={{fontWeight: 'bold'}}>&nbsp;"MY SHIFTS TAB"&nbsp;</Text>.</Text>

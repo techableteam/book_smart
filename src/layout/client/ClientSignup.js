@@ -13,6 +13,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 import RNFS from 'react-native-fs'
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function ClientSignUp({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -715,9 +716,7 @@ export default function ClientSignUp({ navigation }) {
       <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.intro}>
-            <View style={styles.backTitle} />
-            <Animated.View style={[styles.backTitle, { opacity: fadeAnim, backgroundColor: '#0f00c4' }]}></Animated.View>
-            <Text style={styles.title}>CAREGIVERS REGISTER HERE!</Text>
+            <AnimatedHeader title="CAREGIVERS REGISTER HERE!" />
             <View style={{flexDirection:'row', justifyContent: 'center', marginVertical: 10}}>
               {/* <View style={styles.marker} /> */}
               <Text style={[styles.text, {flexDirection:'row'}]}>
@@ -1122,7 +1121,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffffa8',
   },
   intro: {
-    marginTop: 30
+    marginTop: 30,
+    paddingHorizontal: 20
   },
   modalContainer: {
     flex: 1,

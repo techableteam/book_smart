@@ -10,6 +10,7 @@ import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom, photoImageAtom } from '../../context/ClinicalAuthProvider';
+import AnimatedHeader from '../AnimatedHeader';
 // import MapView from 'react-native-maps';
 
 export default function MyProfile ({ navigation }) {
@@ -74,9 +75,7 @@ export default function MyProfile ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <Animated.View style={[styles.backTitle, {backgroundColor}]}>
-              <Text style={styles.title}>CAREGIVER PROFILE & DOCS</Text>
-            </Animated.View>
+            <AnimatedHeader title="CAREGIVER PROFILE & DOCS" />
             <View style={styles.bottomBar}/>
           </View>
           <View style={styles.imageButton}>

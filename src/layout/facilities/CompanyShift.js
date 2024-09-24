@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function CompanyShift({ navigation }) {
   const [totalPages, setTotalPages] = useState(1);
@@ -781,9 +782,7 @@ export default function CompanyShift({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
-          <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>COMPANY JOBS / SHIFTS</Text>
-          </Animated.View>
+          <AnimatedHeader title="COMPANY JOBS / SHIFTS" />
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>

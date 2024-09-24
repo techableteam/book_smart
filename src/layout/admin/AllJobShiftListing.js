@@ -13,6 +13,7 @@ import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function AllJobShiftListing({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -573,9 +574,7 @@ export default function AllJobShiftListing({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
-          <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>COMPANY JOBS / SHIFTS</Text>
-          </Animated.View>
+          <AnimatedHeader title="COMPANY JOBS / SHIFTS" />
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>

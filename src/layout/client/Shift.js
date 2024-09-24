@@ -17,9 +17,10 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function Shift ({ navigation }) {
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
+  const [backgroundColor, setBackgroundColor] = useState('#ff0000');
   const [isModal, setModal] = useState(false);
   const [isUpload, setUpload] = useState(false);
   const [value, setValue] = useState(100);
@@ -60,17 +61,31 @@ export default function Shift ({ navigation }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if(colorIndex >= 0.9) {
-        colorIndex = 0;
+      if (colorIndex >= 1) {
+        colorIndex = 0; // Reset the index once it reaches 1 (full cycle)
       } else {
         colorIndex += 0.1;
       }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
+  
+      // Define the color transition logic
+      let randomColor;
+      if (colorIndex <= 0.5) {
+        // From RED to PURPLE (0 to 300 degrees in HSL)
+        const hue = 0 + (colorIndex * 2 * 300);  // Transition from 0 (Red) to 300 (Purple)
+        randomColor = `hsl(${hue}, 100%, 50%)`;  // Full saturation, 50% lightness for vibrant colors
+      } else {
+        // From PURPLE to BLACK by reducing lightness
+        const lightness = 50 - ((colorIndex - 0.5) * 2 * 50);  // Decrease lightness from 50% to 0%
+        randomColor = `hsl(300, 100%, ${lightness}%)`;  // Keep hue at 300 (Purple), reduce lightness
+      }
+  
       setBackgroundColor(randomColor);
     }, 500);
-    return () => clearInterval(interval);
+  
+    return () => clearInterval(interval);  // Clean up the interval on component unmount
   }, []);
+  
+  
 
   const getData = async () => {
     let data = await MyShift('jobs', 'Clinician');
@@ -546,9 +561,7 @@ export default function Shift ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <Animated.View style={[styles.backTitle, {backgroundColor}]}>
-              <Text style={styles.title}>AWARDED & COMPLETED SHIFTS</Text>
-            </Animated.View>
+            <AnimatedHeader title="AWARDED & COMPLETED SHIFTS" />
             <View style={styles.bottomBar}/>
           </View>
           <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARD"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"COMPLETE"&nbsp;</Text>.</Text>

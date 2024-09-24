@@ -12,6 +12,7 @@ import { Signup } from '../../utils/useApi';
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function FacilitySignUp({ navigation }) {
   const [fileType, setFiletype] = useState('');
@@ -502,12 +503,7 @@ export default function FacilitySignUp({ navigation }) {
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.intro}>
-            <View style={styles.backTitle} />
-            <Animated.View
-              style={[styles.backTitle, { opacity: fadeAnim, backgroundColor: '#0f00c4' }]
-              }>
-            </Animated.View>
-            <Text style={styles.title}>FACILITIES REGISTER HERE!</Text>
+            <AnimatedHeader title="FACILITIES REGISTER HERE!" />
           </View>
           <View style={styles.authInfo}>
             <View style={styles.email}>
@@ -849,7 +845,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffffa8',
   },
   intro: {
-    marginTop: 30
+    marginTop: 30,
+    paddingHorizontal: 20,
+    marginBottom: 20
   },
   input: {
     backgroundColor: 'white',

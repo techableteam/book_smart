@@ -6,6 +6,7 @@ import SubNavbar from '../../components/SubNavbar';
 import AHeader from '../../components/Aheader';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, companyNameAtom, phoneAtom, emailAtom, photoImageAtom } from '../../context/AdminAuthProvider'
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function AdminCompany ({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -52,9 +53,7 @@ export default function AdminCompany ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-              <Text style={styles.title}>ADMIN / COMPANY PROFILE</Text>
-            </Animated.View>
+            <AnimatedHeader title="ADMIN / COMPANY PROFILE" />
             <View style={styles.bottomBar} />
           </View>
           <View style={styles.profile}>

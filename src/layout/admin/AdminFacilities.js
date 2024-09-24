@@ -9,6 +9,7 @@ import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import AHeader from '../../components/Aheader';
 import { Clinician, getFacilityInfo, updatePassword, updateUserInfo } from '../../utils/useApi';
+import AnimatedHeader from '../AnimatedHeader';
 
 export default function AdminFacilities({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -231,9 +232,7 @@ export default function AdminFacilities({ navigation }) {
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView style={{ width: '100%', marginTop: 155 }} showsVerticalScrollIndicator={false}>
         <View style={styles.topView}>
-          <Animated.View style={[styles.backTitle, { backgroundColor }]}>
-            <Text style={styles.title}>ALL PLATFORM FACILITIES</Text>
-          </Animated.View>
+          <AnimatedHeader title="ALL PLATFORM FACILITIES" />
           <View style={styles.bottomBar} />
         </View>
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>

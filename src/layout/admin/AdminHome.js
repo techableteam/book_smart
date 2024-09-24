@@ -11,6 +11,7 @@ import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, userRoleAtom } from '../../context/AdminAuthProvider';
 import AHeader from '../../components/Aheader';
+import AnimatedHeader from '../AnimatedHeader';
 // import MapView from 'react-native-maps';
 
 export default function AdminHome ({ navigation }) {
@@ -56,9 +57,7 @@ export default function AdminHome ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <Animated.View style={[styles.backTitle, {backgroundColor}]}>
-              <Text style={styles.title}>WELCOME TO BOOK SMART!</Text>
-            </Animated.View>
+            <AnimatedHeader title="WELCOME TO BOOK SMART!" />
             <View style={styles.bottomBar}/>
           </View>
             {

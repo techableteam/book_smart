@@ -15,6 +15,7 @@ import * as Progress from 'react-native-progress';
 import { MyShift, UpdateTime, Update } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 import moment from 'moment';
+import AnimatedHeader from '../AnimatedHeader';
 
 
 
@@ -216,9 +217,7 @@ export default function Reporting ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <Animated.View style={[styles.backTitle, {backgroundColor}]}>
-              <Text style={styles.title}>CAREGIVER REPORTING</Text>
-            </Animated.View>
+            <AnimatedHeader title="CAREGIVER REPORTING" />
             <View style={styles.bottomBar}/>
           </View>
           <View style={styles.imageButton}>

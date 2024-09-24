@@ -14,6 +14,7 @@ import { GetDashboardData } from '../../utils/useApi';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, userRoleAtom } from '../../context/AdminAuthProvider';
 import { useFocusEffect } from '@react-navigation/native';
+import AnimatedHeader from '../AnimatedHeader';
 // import MapView from 'react-native-maps';
 
 export default function AdminDashboard ({ navigation }) {
@@ -159,9 +160,7 @@ export default function AdminDashboard ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <Animated.View style={[styles.backTitle, {backgroundColor}]}>
-              <Text style={styles.title}>ADMIN DASHBOARD</Text>
-            </Animated.View>
+            <AnimatedHeader title="ADMIN DASHBOARD" />
             <View style={styles.bottomBar}/>
           </View>
           <View style={{paddingVertical: 40, backgroundColor: '#c6c5c5', marginTop: 20, width: '80%', marginLeft: '10%', borderRadius: 10}}>
