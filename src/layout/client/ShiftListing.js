@@ -8,7 +8,7 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom } from '../../context/ClinicalAuthProvider';
+import { aicAtom, firstNameAtom, lastNameAtom } from '../../context/ClinicalAuthProvider';
 import { PostBid, Jobs } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
@@ -39,6 +39,7 @@ export default function ShiftListing ({ navigation }) {
     return () => clearInterval(interval);
   }, []);
 
+  const [aic, setAIC] = useAtom(aicAtom);
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
   const handleNavigate = (navigateUrl) => {
@@ -149,7 +150,7 @@ export default function ShiftListing ({ navigation }) {
   const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = async (id) => {
-    const bidData = {jobId: id[0].content, message: content, caregiver: `${firstName} ${lastName}`}
+    const bidData = { jobId: id[0].content, message: content, caregiver: `${firstName} ${lastName}`, caregiverId: aic }
     let response = await PostBid(bidData, 'bids');
 
     if (!response?.error) {

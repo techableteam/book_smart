@@ -29,7 +29,8 @@ import {
   signatureAtom,
   passwordAtom,
   blsAtom,
-  clinicalAcknowledgeTerm
+  clinicalAcknowledgeTerm,
+  aicAtom
  } from '../../context/ClinicalAuthProvider';
 import { Signin } from '../../utils/useApi';
 import { deviceNumberAtom } from '../../context/BackProvider';
@@ -37,7 +38,8 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 
-export default function ClientSignIn({ navigation }) {  
+export default function ClientSignIn({ navigation }) {
+  const [aic, setAIC] = useAtom(aicAtom);
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
   const [birthday, setBirthday] = useAtom(birthdayAtom);
@@ -137,6 +139,7 @@ export default function ClientSignIn({ navigation }) {
       const response = await Signin({ email: loginEmail, password: loginPW, device: device, userRole: 'Clinician' }, 'clinical');
 
       if (response?.user) {
+        setAIC(response.user.aic);
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
         setBirthday(response.user.birthday);

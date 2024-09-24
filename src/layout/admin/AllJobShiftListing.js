@@ -404,7 +404,8 @@ export default function AllJobShiftListing({ navigation }) {
                 }}
                 onPress={() => {
                   console.log(item[6]);
-                  navigation.navigate("ClientProfile", {id: item[6]});
+                  toggleJobDetailModal();
+                  navigation.navigate("CaregiverProfile", {id: item[6]});
                 }}
               >
                 <Text style={styles.profileTitle}>View</Text>

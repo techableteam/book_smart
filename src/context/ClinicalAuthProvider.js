@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider, atom } from 'jotai';
 
+export const aicAtom = atom(0);
 export const firstNameAtom = atom('');
 export const lastNameAtom = atom('');
 export const emailAtom = atom('');
