@@ -128,8 +128,7 @@ export default function ClientSignUp({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -146,8 +145,7 @@ export default function ClientSignUp({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -173,8 +171,7 @@ export default function ClientSignUp({ navigation }) {
           {
             text: 'OK',
             onPress: () => {
-              setPassword('');
-              setConfirmPassword('');
+              console.log('');
             },
           },
         ],
@@ -201,8 +198,7 @@ export default function ClientSignUp({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -226,8 +222,7 @@ export default function ClientSignUp({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -243,8 +238,7 @@ export default function ClientSignUp({ navigation }) {
           {
             text: 'OK',
             onPress: () => {
-              setPassword('');
-              setConfirmPassword('');
+              console.log('');
             },
           },
         ],
@@ -279,8 +273,7 @@ export default function ClientSignUp({ navigation }) {
           {
             text: 'OK',
             onPress: () => {
-              setPassword('');
-              setConfirmPassword('');
+              console.log('');
             },
           },
         ],
@@ -302,8 +295,7 @@ export default function ClientSignUp({ navigation }) {
         {
           text: 'OK',
           onPress: () => {
-            setPassword('');
-            setConfirmPassword('');
+            console.log('');
           },
         },
       ],

@@ -133,8 +133,7 @@ export default function EditProfile({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -151,8 +150,7 @@ export default function EditProfile({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -179,8 +177,7 @@ export default function EditProfile({ navigation }) {
           {
             text: 'OK',
             onPress: () => {
-              setPassword('');
-              setConfirmPassword('');
+              console.log('');
             },
           },
         ],
@@ -207,8 +204,7 @@ export default function EditProfile({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -233,8 +229,7 @@ export default function EditProfile({ navigation }) {
               {
                 text: 'OK',
                 onPress: () => {
-                  setPassword('');
-                  setConfirmPassword('');
+                  console.log('');
                 },
               },
             ],
@@ -250,8 +245,7 @@ export default function EditProfile({ navigation }) {
           {
             text: 'OK',
             onPress: () => {
-              setPassword('');
-              setConfirmPassword('');
+              console.log('');
             },
           },
         ],
@@ -287,8 +281,7 @@ export default function EditProfile({ navigation }) {
           {
             text: 'OK',
             onPress: () => {
-              setPassword('');
-              setConfirmPassword('');
+              console.log('');
             },
           },
         ],

@@ -156,10 +156,6 @@ export default function Shift ({ navigation }) {
     }
   }
 
-  const toggleFileTypeSelectModal = () => {
-    setFiletypeSelectModal(!fileTypeSelectModal);
-  };
-
   const handleNavigate = (navigateUrl) => {
     navigation.navigate(navigateUrl);
   };
@@ -179,6 +175,7 @@ export default function Shift ({ navigation }) {
   const handleShowFile = (data) => {
     const jobIdObject = data.find(item => item.title === 'Job-ID');
     const jobId = jobIdObject ? jobIdObject.content : null;
+    setUpload(false);
     navigation.navigate("FileViewer", { jobId: jobId, fileData: '' });
   };
 
@@ -238,9 +235,20 @@ export default function Shift ({ navigation }) {
   };
 
   //-----------------------------------------File Upload---------------------
+
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+
+  const handleShowSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+    toggleUploadModal();
+  };
+
   const handleChangeFileType = (mode) => {
     setFiletype(mode);
-    // toggleFileTypeSelectModal();
+    toggleFileTypeSelectModal();
+    // toggleUploadModal();
   };
 
   const openCamera = async () => {
@@ -296,6 +304,7 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             },
           });
+          toggleUploadModal();
         }
       });
     } catch (err) {
@@ -350,8 +359,9 @@ export default function Shift ({ navigation }) {
               content: fileContent,
               type: 'image',
               name: response.assets[0].fileName,
-            },
+            }
           });
+          toggleUploadModal();
         } else {
           Alert.alert(
             'Alert!',
@@ -403,6 +413,7 @@ export default function Shift ({ navigation }) {
         fileType = 'unknown';
       }
       setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}});
+      toggleUploadModal();
     } catch (err) {
       Alert.alert(
         'Alert!',
@@ -645,6 +656,7 @@ export default function Shift ({ navigation }) {
             }
           </View>
         </ScrollView>
+
         {isModal && <Modal
           Visible={false}
           transparent= {true}
@@ -747,7 +759,7 @@ export default function Shift ({ navigation }) {
           <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.viewContainer}>
               <View style={styles.header}>
-                <Text style={styles.headerText}>Upload TimeSheet</Text>
+                <Text style={styles.headerText}>Upload TimeSheet {fileTypeSelectModal ? "true" : "false"}</Text>
                 <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleUploadModal}>
                   <Image source = {images.close} style={{width: 20, height: 20,}}/>
                 </TouchableOpacity>
@@ -755,24 +767,24 @@ export default function Shift ({ navigation }) {
               <View style={styles.body}>
                 <View style={styles.modalBody}>
                   <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[0].title}</Text>
-                    <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[0].content}</Text>
+                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[0]?.title}</Text>
+                    <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[0]?.content}</Text>
                   </View>
                   <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[1].title}</Text>
-                    <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[1].content}</Text>
+                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[1]?.title}</Text>
+                    <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[1]?.content}</Text>
                   </View>
                   <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[2].title}</Text>
-                    {detailedInfos[2].content && 
+                    <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[2]?.title}</Text>
+                    {detailedInfos[2]?.content && 
                       <View style={{ flexDirection: 'row' }}>
-                        <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(detailedInfos); }}>{detailedInfos[2].content}</Text>
+                        <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(detailedInfos); }}>{detailedInfos[2]?.content}</Text>
                         <Text style={{color: 'blue'}} onPress= {handleDelete}>&nbsp;&nbsp;remove</Text>
                       </View>
                     }
                   </View>
                   <View style={{flexDirection: 'row', width: '100%'}}>
-                    <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
+                    <TouchableOpacity title="Select File" onPress={handleShowSelectModal} style={styles.chooseFile}>
                       <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                     </TouchableOpacity>
                     <TextInput
@@ -780,7 +792,7 @@ export default function Shift ({ navigation }) {
                       placeholder=""
                       autoCorrect={false}
                       autoCapitalize="none"
-                      value={submitData.timeSheet.name || ''}
+                      value={submitData?.timeSheet?.name || ''}
                     />
                   </View>
                 </View>
@@ -794,9 +806,9 @@ export default function Shift ({ navigation }) {
           </ScrollView>
         </Modal>}
 
-        {/* {fileTypeSelectModal && ( */}
+        {fileTypeSelectModal && 
           <Modal
-            visible={fileTypeSelectModal} // Changed from Visible to visible
+            visible={true} // Changed from Visible to visible
             transparent={true}
             animationType="slide"
             onRequestClose={() => {
@@ -805,7 +817,7 @@ export default function Shift ({ navigation }) {
           >
             <StatusBar translucent backgroundColor='transparent' />
             <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
-              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
+              <View style={[styles.viewContainer, { marginTop: '1%' }]}>
                 <View style={[styles.header, { height: 100 }]}>
                   <Text style={styles.headerText}>Choose File</Text>
                   <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
@@ -833,8 +845,7 @@ export default function Shift ({ navigation }) {
               </View>
             </ScrollView>
           </Modal>
-        {/* )} */}
-
+        }
         <MFooter />
       </View>
   )
