@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TextInput, View, Animated, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Modal, TextInput, View, Image, Dimensions, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
 import images from '../../assets/images';
@@ -9,8 +8,10 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Job, Jobs, RemoveJos, setAwarded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
+import { getTimesheet, Job, Jobs, RemoveJos, setAwarded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native';
+import { WebView } from 'react-native-webview';
+import Pdf from 'react-native-pdf';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -38,13 +39,16 @@ export default function CompanyShift({ navigation }) {
   const [tsVerifyStatus, setTSVerifyStatus] = useState(2);
   const [fileType, setFiletype] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isFileViewerModal, setIsFileViewerModal] = useState(false);
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  const [htmlContent, setHtmlContent] = useState('');
+  const [fileInfo, setFileInfo] = useState({ content: '', type: '', name: '' });
+
   const [timeSheetFile, setTimesheetFile] = useState({
     content: '',
     name: '',
     type: ''
   });
-
   const radioButtons = useMemo(() => ([
     {
       id: 1,
@@ -57,7 +61,6 @@ export default function CompanyShift({ navigation }) {
       value: 2
     }
   ]), []);
-
   const TSradioButtons = useMemo(() => ([
     {
       id: 1,
@@ -78,8 +81,7 @@ export default function CompanyShift({ navigation }) {
     {label: '100 per page', value: '100'},
     {label: '500 per page', value: '500'},
     {label: '1000 per page', value: '1000'},
-  ]
-
+  ];
   const tableHead = [
     'Degree/Discipline',
     'Entry Date',
@@ -96,7 +98,6 @@ export default function CompanyShift({ navigation }) {
     'Rating',
     'Delete',
   ];
-
   const bidderTableHeader = [
     "Entry Date",
     "Caregiver",
@@ -178,6 +179,11 @@ export default function CompanyShift({ navigation }) {
     setIsJobTSVerifyModal(!isJobTSVerifyModal);
   };
 
+  const toggleFileViewerModal = () => {
+    setIsFileViewerModal(!isFileViewerModal);
+    setIsJobTSVerifyModal(true);
+  };
+
   const handleChangeRatings = async () => {
     let results = await updateJobRatings({ jobId: curJobId, rating: curRatings }, 'jobs');
     if (!results?.error) {
@@ -212,7 +218,7 @@ export default function CompanyShift({ navigation }) {
   const handleShowJobTSVerifyModal = async (id) => {
     console.log(id);
     let data = await Job({ jobId: id }, 'jobs');
-    console.log(data);
+    console.log(data ? 'true' : 'false');
     if(!data) {
       setCurJobId(id);
     } else {
@@ -531,6 +537,49 @@ export default function CompanyShift({ navigation }) {
 
   const handleShowFile = () => {
     navigation.navigate("FileViewer", { jobId: curJobId, fileData: '' });
+  };
+
+  const handleShowFileModal = async () => {
+    toggleJobTSVerifyModal();
+    setLoading(true);
+    let result = await getTimesheet({ jobId: curJobId });
+    console.log(result.type);
+    if (!result?.error) {
+      const fetchedFileInfo = result;
+      let content = '';
+      if (fetchedFileInfo.type.indexOf('pdf') >= 0) {
+        setFileInfo(fetchedFileInfo);
+      } else if (fetchedFileInfo.type.indexOf('image') >= 0) {
+        content = `
+          <html>
+          <body style="margin: 0; padding: 0;">
+              <img src="data:image/jpeg;base64,${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
+          </body>
+          </html>
+        `;
+        setHtmlContent(content);
+        setFileInfo(fetchedFileInfo);
+      } else {
+        content = `
+          <html>
+            <body style="margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100%;">
+              <p>No valid file type found.</p>
+            </body>
+          </html>
+        `;
+        setHtmlContent(content);
+      }
+    } else {
+      setHtmlContent(`
+        <html>
+          <body>
+            <p>Error fetching the file.</p>
+          </body>
+        </html>
+      `);
+    }
+    setLoading(false);
+    setIsFileViewerModal(true);
   };
 
   const itemsToShow = getItemsForPage(currentPage);
@@ -1157,7 +1206,7 @@ export default function CompanyShift({ navigation }) {
                     </View>
                     {selectedJob?.timeSheet?.name && 
                       <View style={{ flexDirection: 'row' }}>
-                        <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile(); }}>{selectedJob?.timeSheet?.name}</Text>
+                        <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFileModal(); }}>{selectedJob?.timeSheet?.name}</Text>
                         <Text style={{color: 'blue'}}>&nbsp;&nbsp;remove</Text>
                       </View>
                     }
@@ -1182,6 +1231,43 @@ export default function CompanyShift({ navigation }) {
                     >
                       <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
                     </TouchableOpacity>
+                  </View>
+                </ScrollView>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          visible={isFileViewerModal}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setIsFileViewerModal(!isFileViewerModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.calendarContainer, { height: '80%' }]}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>File Viewer</Text>
+                <TouchableOpacity style={{width: 20, height: 20}} onPress={toggleFileViewerModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <ScrollView>
+                  <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
+                  {fileInfo.type.indexOf('pdf') >= 0 ? (
+                    <Pdf
+                      source={{ uri: `data:application/pdf;base64,${fileInfo.content}` }}
+                      style={styles.pdf}
+                    />
+                  ) : (
+                    <WebView
+                        originWhitelist={['*']}
+                        source={{ html: htmlContent }}
+                        style={styles.webView}
+                    />
+                  )}
                   </View>
                 </ScrollView>
               </View>
@@ -1519,11 +1605,11 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   tableItemStyle: { 
-    borderColor: '#AAAAAA', 
+    borderColor: '#AAAAAA',
     borderWidth: 1, 
     textAlign: 'center',
     textAlignVertical: 'center',
-    height: 40
+    minHeight: 50
   },
   dropdown: {
     height: 40,
@@ -1550,6 +1636,18 @@ const styles = StyleSheet.create({
   placeholderStyle: {
     color: 'black',
     fontSize: 16,
+  },
+  webView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 300,
+    height: 700,
+  },
+  pdf: {
+    flex: 1,
+    width: 300,
+    height: 700,
   },
   selectedTextStyle: {
     color: 'black',
