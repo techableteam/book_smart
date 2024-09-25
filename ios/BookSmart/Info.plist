@@ -44,7 +44,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>We need access to save images to your photo library.</string>
 	<key>NSDocumentsUsageDescription</key>
-	<string>We need access to your documents to upload files.</string>
+	<string>We need access to documents to allow you to upload files.</string>
 	<key>NSFileProviderDomainUsageDescription</key>
 	<string>We need access to files from your document provider.</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -52,11 +52,9 @@
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>camera description.</string>
+	<string>We need access to your camera for capturing photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need your location while you use the app to show relevant content and suggestions.</string>
-	<key>NSDocumentsUsageDescription</key>
-	<string>We need access to documents to allow you to upload files.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to provide personalized content and updates based on your location.</string>
 	<key>UILaunchStoryboardName</key>
