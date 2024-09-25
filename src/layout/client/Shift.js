@@ -182,12 +182,12 @@ export default function Shift ({ navigation }) {
 
   const handleUploadSubmit = async () => {
     setIsSubmitted(true);
+    setUpload(!isUpload);
     const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet};
     if (submitData.timeSheet?.name != '') {
       const response = await updateTimeSheet(data, 'jobs');
       setIsSubmitted(false);
       if (!response?.error) {
-        setUpload(!isUpload);
         getData();
         Alert.alert('Success!', 'Your timesheet has been submitted', [
           {
@@ -199,6 +199,7 @@ export default function Shift ({ navigation }) {
           { text: 'Cancel', style: 'cancel' },
         ]);
       } else {
+        setUpload(!isUpload);
         Alert.alert('Failure!', 'Pleae try later', [
           {
             text: 'OK',
@@ -211,6 +212,7 @@ export default function Shift ({ navigation }) {
       }
     } else {
       setIsSubmitted(false);
+      setUpload(!isUpload);
       Alert.alert('Failure!', 'Please upload documentation', [
         {
           text: 'OK',
@@ -556,22 +558,18 @@ export default function Shift ({ navigation }) {
 
   const itemsToShow = getItemsForPage(currentPage);
 
-  if (downloading || isSubmitted) {
-    return (
-      <Loader />
-    );
-  }
+  // if (downloading || isSubmitted) {
+  //   return (
+  //     <Loader />
+  //   );
+  // }
 
   return (
       <View style={styles.container}>
-        <StatusBar 
-            translucent backgroundColor="transparent"
-        />
+        <StatusBar translucent backgroundColor="transparent" />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: 160}}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={{width: '100%', marginTop: 160}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <AnimatedHeader title="AWARDED & COMPLETED SHIFTS" />
             <View style={styles.bottomBar}/>
@@ -850,6 +848,7 @@ export default function Shift ({ navigation }) {
             </ScrollView>
           </Modal>
         }
+        {(downloading || isSubmitted) && <Loader />}
         <MFooter />
       </View>
   )
