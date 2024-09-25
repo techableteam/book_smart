@@ -447,7 +447,7 @@ export default function Shift ({ navigation }) {
     let dir = RNFS.DownloadDirectoryPath;
   
     if (Platform.OS === 'ios') {
-      dir = RNFS.LibraryDirectoryPath;
+      dir = RNFS.DocumentDirectoryPath;
     }
   
     const filePath = `${dir}/${fileName}`;
