@@ -59,7 +59,7 @@ export default function EditProfile({ navigation }) {
   const [bls, setBls] = useAtom(blsAtom); 
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [ credentials, setCredentials ] = useState({
     firstName: firstName,
@@ -358,7 +358,7 @@ export default function EditProfile({ navigation }) {
       credentials.address.zip ==='') {
         showAlerts('all gaps')
     } else {
-      setIsSubmitting(true);
+      setLoading(true);
       try {
         const response = await Update(credentials, 'clinical');
         setFirstName(response.user.firstName);
@@ -379,10 +379,10 @@ export default function EditProfile({ navigation }) {
         setCovidCard(response.user.covidCard);
         setBls(response.user.bls);
         console.log('successfully Updated')
-        setIsSubmitting(false);
+        setLoading(false);
         navigation.navigate("MyHome")
       } catch (error) {
-        setIsSubmitting(false);
+        setLoading(false);
         console.error('Update failed: ', error)
       }
     }
@@ -395,10 +395,6 @@ export default function EditProfile({ navigation }) {
       type: ''
     });
   };
-
-  if (isSubmitting == true) {
-    return <Loader />;
-  }
 
   return (
     <View style={styles.container}>
@@ -891,6 +887,7 @@ export default function EditProfile({ navigation }) {
           </Modal>
         )}
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   );

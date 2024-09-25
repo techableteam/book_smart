@@ -87,6 +87,7 @@ export default function AddJobShift({ navigation }) {
   }
 
   const toggleAddDegreeModal = () => {
+    console.log('star');
     setShowAddDegreeModal(!showAddDegreeModal);
   };
 
@@ -220,7 +221,7 @@ export default function AddJobShift({ navigation }) {
                   />
                 )}
               />
-              <TouchableOpacity style={styles.addItems} onPress={() => {toggleAddDegreeModal}}>
+              <TouchableOpacity style={styles.addItems} onPress={toggleAddDegreeModal}>
                 <Image source={images.plus} style={{width: 15, height: 15}} />
                 <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
               </TouchableOpacity>

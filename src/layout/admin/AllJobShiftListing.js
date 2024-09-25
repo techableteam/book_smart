@@ -7,13 +7,19 @@ import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import { Table } from 'react-native-table-component';
-import { Jobs, Update, Clinician, removeJob, Job, setAwarded, updateHoursStatus, getAllUsersName, getBidIDs, PostJob } from '../../utils/useApi';
+import { Jobs, Update, Clinician, removeJob, Job, setAwarded, updateHoursStatus, getAllUsersName, getBidIDs, PostJob, updateDocuments } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
+
+// Choose file
+import DocumentPicker from 'react-native-document-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import RNFS from 'react-native-fs'
+import Loader from '../Loader';
 
 export default function AllJobShiftListing({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -47,6 +53,16 @@ export default function AllJobShiftListing({ navigation }) {
   const [isJobStatusModal, setIsJobStatusModal] = useState(false);
   const [isFocusJobStatus, setIsFocusJobStatus] = useState(false);
   const [selectedJobStatus, setSelectedJobStatus] = useState('');
+  const [uploadFileType, setUploadFileType] = useState('');
+  const [isFileUploadModa, setIsFileUploadModal] = useState(false);
+  const [tmpFile, setTmpFile] = useState({
+    content: '',
+    type: '',
+    name: ''
+  });
+  const [tmpFileName, setTmpFileName] = useState('');
+  const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   let colorIndex = 0;
 
   useEffect(() => {
@@ -88,12 +104,14 @@ export default function AllJobShiftListing({ navigation }) {
   ];
 
   const getData = async () => {
+    setLoading(true);
     let data = await Jobs('jobs', 'Admin');
     if(!data) {
       setData(['No Data'])
     } else {
       setData(data)
     }
+    setLoading(false);
     const uniqueValues = new Set();
     const transformed = [];
     
@@ -194,6 +212,10 @@ export default function AllJobShiftListing({ navigation }) {
     setIsHoursDetailModal(!isHoursDetailModal);
   };
 
+  const toggleFileTypeSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+
   const toggleJobEditModal = () => {
     setIsJobEditModal(!isJobEditModal);
   };
@@ -202,12 +224,195 @@ export default function AllJobShiftListing({ navigation }) {
     setIsJobStatusModal(!isJobStatusModal);
   };
 
+  const toggleTiemSheetUploadModal = () => {
+    setIsFileUploadModal(!isFileUploadModa);
+  };
+
   const toggleJobDetailModal = () => {
     setIsJobDetailModal(!isJobDetailModal);
   };
 
   const toggleJobAwardModal = () => {
     setIsAwardJobModal(!isAwardJobModal);
+  };
+
+  const openCamera = async () => {
+    const options = {
+      mediaType: 'photo', // Use 'video' for video capture
+      quality: 1, // 1 for high quality, 0 for low quality
+    };
+    try {
+      launchCamera(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled camera');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'Camera error: ', response.error,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.error('Camera error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else if (response.errorCode) {
+          Alert.alert(
+            'Alert!',
+            'Camera errorCode: ', response.errorCode,
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('Camera error code: ', response.errorCode);
+        } else {
+          const fileUri = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(fileUri, 'base64');
+          
+          setTmpFile({
+            content: fileContent,
+            type: 'image',
+            name: response.assets[0].fileName,
+          });
+          handleShowSelectModal();
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+  
+  const pickGallery = async () => {
+    const options = {
+      mediaType: 'photo', // you can also use 'mixed' or 'video'
+      quality: 1, // 0 (low) to 1 (high)
+    };
+  
+    try {
+      launchImageLibrary(options, async (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response.error),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.assets && response.assets.length > 0) {
+          const pickedImage = response.assets[0].uri;
+          const fileContent = await RNFS.readFile(pickedImage, 'base64');
+          
+          setTmpFile({
+            content: fileContent,
+            type: 'image',
+            name: response.assets[0].fileName,
+          });
+          handleShowSelectModal();
+        } else {
+          Alert.alert(
+            'Alert!',
+            'ImagePicker Issue: ' + JSON.stringify(response),
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      });
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'Camera Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+  
+  const pickFile = async () => {
+    try {
+      let type = [DocumentPicker.types.images, DocumentPicker.types.pdf];
+      const res = await DocumentPicker.pick({
+        type: type,
+      });
+  
+      const fileContent = await RNFS.readFile(res[0].uri, 'base64');
+  
+      let fileType;
+      if (res[0].type === 'application/pdf') {
+        fileType = 'pdf';
+      } else if (res[0].type.startsWith('image/')) {
+        fileType = 'image';
+      } else {
+        fileType = 'unknown';
+      }
+      setTmpFile({ content: `${fileContent}`, type: fileType, name: res[0].name });
+      handleShowSelectModal();
+    } catch (err) {
+      Alert.alert(
+        'Alert!',
+        'DocumentPicker Issue: ' + JSON.stringify(err),
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker
+      } else {
+        // Handle other errors
+      }
+    }
   };
 
   const handleChangeAwardStatus = async (bidderId, jobId) => {
@@ -564,6 +769,42 @@ export default function AllJobShiftListing({ navigation }) {
     toggleJobStatusModal();
   };
 
+  const handleUploadModal = (data, type, filename) => {
+    setUploadFileType(type);
+    setSelectedJobId(data[2]);
+    setTmpFileName(filename);
+    setTmpFile({
+      content: '',
+      name: '',
+      type: ''
+    });
+    toggleTiemSheetUploadModal();
+  };
+
+  const handleShowSelectModal = () => {
+    setFiletypeSelectModal(!fileTypeSelectModal);
+    toggleTiemSheetUploadModal();
+  };
+
+  const handleFileUpload = async () => {
+    setLoading(true);
+    toggleTiemSheetUploadModal();
+    let response = await updateDocuments({ jobId: selectedJobId, file: tmpFile, prevFile: tmpFileName, type: uploadFileType }, 'jobs');
+    if (!response?.error) {
+      getData();
+    } else {
+      Alert.alert('Failure!', 'Pleae try later', [
+        {
+          text: 'OK',
+          onPress: () => {
+            console.log('');
+          },
+        },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -754,13 +995,25 @@ export default function AllJobShiftListing({ navigation }) {
                             } else {
                               if (cellIndex == 15) {
                                 return (
-                                  <Text
-                                    key={cellIndex}
-                                    style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
-                                    onPress={() => { handleShowFile(rowData[2]) }}
-                                  >
-                                    {cellData}
-                                  </Text>
+                                  <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUploadModal(rowData, 'timesheet', cellData)}>
+                                    <Text
+                                      key={cellIndex}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                    >
+                                      {cellData}
+                                    </Text>
+                                  </TouchableWithoutFeedback>
+                                );
+                              } else if (cellIndex == 16) {
+                                return (
+                                  <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUploadModal(rowData, 'verification', cellData)}>
+                                    <Text
+                                      key={cellIndex}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                    >
+                                      {cellData}
+                                    </Text>
+                                  </TouchableWithoutFeedback>
                                 );
                               } else if (cellIndex == 9) {
                                 return (
@@ -1498,8 +1751,93 @@ export default function AllJobShiftListing({ navigation }) {
               </View>
             </View>
           </Modal>
+          <Modal
+            visible={isFileUploadModa}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setIsFileUploadModal(!isFileUploadModa);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={[styles.header, { height: 80 }]}>
+                  <Text style={styles.headerText}>File Upload</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleTiemSheetUploadModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.body, { marginBottom: 0 }]}>
+                  <View style={[styles.modalBody, { paddingVertical: 10 }]}>
+                    <View style={{flexDirection: 'column', width: '70%', gap: 10}}>
+                      {tmpFileName && 
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { console.log('openfile'); }}>{tmpFileName}</Text>
+                          <Text style={{color: 'blue'}} onPress= {() => setTmpFileName('')}>&nbsp;&nbsp;remove</Text>
+                        </View>
+                      }
+                    </View>
+                    <View style={{flexDirection: 'row', width: '95%'}}>
+                      <TouchableOpacity title="Select File" onPress={handleShowSelectModal} style={styles.chooseFile}>
+                        <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        style={[styles.chooseFileinput, { width: '70%', color: 'black' }]}
+                        placeholder=""
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        value={tmpFile.name || ''}
+                      />
+                    </View>
+                    <TouchableOpacity style={styles.button} onPress={handleFileUpload} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Update</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          <Modal
+            visible={fileTypeSelectModal} // Changed from Visible to visible
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => {
+              setFiletypeSelectModal(false); // Close the modal
+            }}
+          >
+            <StatusBar translucent backgroundColor='transparent' />
+            <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
+              <View style={[styles.viewContainer, { marginTop: '30%' }]}>
+                <View style={[styles.header, { height: 100 }]}>
+                  <Text style={styles.headerText}>Choose File</Text>
+                  <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
+                    <Image source={images.close} style={{ width: 20, height: 20 }} />
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.body, { marginBottom: 0 }]}>
+                  <View style={[styles.modalBody, { marginBottom: 0, width: '100%' }]}>
+                    <View style={styles.cameraContain}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {openCamera();}}>
+                        <Image source={images.camera} style={{ width: 50, height: 50 }} />
+                        <Text style={styles.textStyle}>Camera</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickGallery();}}>
+                        <Image source={images.gallery} style={{ width: 50, height: 50 }} />
+                        <Text style={styles.textStyle}>Gallery</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickFile();}}>
+                        <Image source={images.folder} style={{ width: 50, height: 50 }} />
+                        <Text style={styles.textStyle}>Folder</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
         </View>
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   )
@@ -1513,10 +1851,43 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     width: '100%'
   },
+  cameraContain: {
+		flex: 1,
+    width: '100%',
+		alignItems: 'flex-start',
+		justifyContent: 'space-around',
+		flexDirection: 'row',
+    paddingVertical: 20
+	},
   topView: {
     marginTop: 30,
     marginLeft: '10%',
     width: '80%',
+  },
+  modalsContainer: {
+    paddingTop: 30,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  viewContainer: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    elevation: 5,
+    width: '90%',
+    marginLeft: '5%',
+    flexDirection: 'flex-start',
+    borderWidth: 3,
+    borderColor: '#7bf4f4',
+    marginBottom: 100
+  },
+  chooseFile: {
+    width: '30%', 
+    height: 30, 
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: 'black',
   },
   tableItemStyle: { 
     borderColor: '#AAAAAA', 
@@ -1803,5 +2174,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1,
     borderColor: '#DBDBDB',
+  },
+  chooseFileinput: {
+    backgroundColor: 'white', 
+    height: 30, 
+    marginBottom: 10, 
+    borderWidth: 1, 
+    borderColor: 'hsl(0, 0%, 86%)',
+    paddingVertical: 5
   },
 });

@@ -16,6 +16,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import AnimatedHeader from '../AnimatedHeader';
+import Loader from '../Loader';
 
 export default function CompanyShift({ navigation }) {
   const [totalPages, setTotalPages] = useState(1);
@@ -36,6 +37,7 @@ export default function CompanyShift({ navigation }) {
   const [awardedStatus, setAwardedStatus] = useState(2);
   const [tsVerifyStatus, setTSVerifyStatus] = useState(2);
   const [fileType, setFiletype] = useState('');
+  const [loading, setLoading] = useState(false);
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [timeSheetFile, setTimesheetFile] = useState({
     content: '',
@@ -127,6 +129,7 @@ export default function CompanyShift({ navigation }) {
 
   const [data, setData] = useState([]);
   async function getData() {
+    setLoading(true);
     let result = await Jobs('jobs', 'Facilities');
     if(!result) {
       setData(['No Data'])
@@ -136,6 +139,7 @@ export default function CompanyShift({ navigation }) {
     }
     result.unshift(tableHead);
     setTableData(result);
+    setLoading(false);
   }
 
   useFocusEffect(
@@ -788,7 +792,7 @@ export default function CompanyShift({ navigation }) {
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
           <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => navigation.navigate('AddJobShift')}>
             <View style={{ backgroundColor: 'white', borderRadius: 10, width: 16, height: 16, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-              <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', marginTop: 0 }}>+</Text>
+              <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', marginTop: 0, lineHeight: 16 }}>+</Text>
             </View>
             <Text style={styles.profileTitle}>Add A New Job / Shift
             </Text>
@@ -1259,6 +1263,7 @@ export default function CompanyShift({ navigation }) {
           </Modal>
         )}
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   )

@@ -48,7 +48,7 @@ export default function AllCaregivers({ navigation }) {
   const [clinicians, setClinicians] = useState([]);
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
   const widths = [120, 150, 150, 180, 300, 150, 150, 150, 80, 100, 80, 120];
   let colorIndex = 0;
   const [credentials, setCredentials] = useState({
@@ -238,6 +238,7 @@ export default function AllCaregivers({ navigation }) {
   };
 
   const getData = async () => {
+    setLoading(true);
     let data = await Clinician('clinical/clinician', 'Admin');
     if(!data) {
       setData(['No Data'])
@@ -245,6 +246,7 @@ export default function AllCaregivers({ navigation }) {
       const modifiedData = formatData(data);
       setData(modifiedData)
     }
+    setLoading(false);
     const uniqueValues = new Set();
     const transformed = [];
 
@@ -289,14 +291,14 @@ export default function AllCaregivers({ navigation }) {
   };
 
   const handleSubmitVerification = async () => {
-    setIsSubmitting(true);
+    setLoading(true);
     let data = await Update(credentials, 'clinical');
     if (!data?.error) {
-      setIsSubmitting(false);
+      setLoading(false);
       getData();
       toggleVerificationModal();
     } else {
-      setIsSubmitting(false);
+      setLoading(false);
       Alert.alert(
         'Warning!',
         "Please try again later.",
@@ -747,12 +749,6 @@ export default function AllCaregivers({ navigation }) {
     toggleVerificationModal();
     navigation.navigate("FileViewer", { jobId: '', fileData: data });
   };
-
-  if (isSubmitting) {
-    return (
-      <Loader />
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -2123,6 +2119,7 @@ export default function AllCaregivers({ navigation }) {
         )}
         </View>
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   )
