@@ -574,6 +574,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> Pic. (Optional)</Text>
               {credentials.photoImage.name !== "" && <View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                  onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.photoImage })}
                 >{credentials.photoImage.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('photoImage')}

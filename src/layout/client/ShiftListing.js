@@ -53,6 +53,7 @@ export default function ShiftListing ({ navigation }) {
   const [filteredDetailData, setFilteredDetailData] = useState(detailedInfos);
   const [totalPages, setTotalPages] = useState(1);
   const [pageItems, setPageItems] = useState([]);
+  const [bidsubmit, setBidsubmit] = useState(false); 
 
   async function getData() {
     setGettingData(true);
@@ -154,10 +155,12 @@ export default function ShiftListing ({ navigation }) {
   const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = async (id) => {
+    setBidsubmit(true);
     const bidData = { jobId: id[0].content, message: content, caregiver: `${firstName} ${lastName}`, caregiverId: aic }
     let response = await PostBid(bidData, 'bids');
 
     if (!response?.error) {
+      setBidsubmit(false);
       Alert.alert(
         'Success!',
         response?.message,
@@ -174,6 +177,7 @@ export default function ShiftListing ({ navigation }) {
       setContent('');
       handleBack();
     } else {
+      setBidsubmit(false);
       Alert.alert(
         'Failed!',
         "",
@@ -350,6 +354,7 @@ export default function ShiftListing ({ navigation }) {
             setShowModal(!showModal);
           }}
         >
+          <Loader visible={bidsubmit}/>
           <StatusBar translucent backgroundColor='transparent' />
           <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.viewContainer}>
@@ -393,9 +398,10 @@ export default function ShiftListing ({ navigation }) {
                 </View>
               </View>
             </View>
+            {/* <Loader visible={}/> */}
           </ScrollView>
         </Modal>}
-        {gettingData && <Loader />}
+        <Loader visible={gettingData}/>
         <MFooter />
       </View>
   )

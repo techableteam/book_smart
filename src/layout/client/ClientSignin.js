@@ -172,7 +172,6 @@ export default function ClientSignIn({ navigation }) {
     }
 
     try {
-      console.log("sdfasdfsd")
       setRequest(true);
       const response = await Signin({ email: loginEmail, password: loginPW, device: device, userRole: 'Clinician' }, 'clinical');
       if (response?.user) {
@@ -380,7 +379,7 @@ export default function ClientSignIn({ navigation }) {
           </HButton>
         </View>
       </ScrollView>
-      {request && <Loader />}
+      <Loader visible={request}/>
       <MFooter />
     </View>
   );
