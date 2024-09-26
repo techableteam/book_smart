@@ -64,6 +64,8 @@ export default function AllJobShiftListing({ navigation }) {
   const [isFieldFocus, setIsFieldFocus] = useState(false);
   const [isConditionFocus, setIsConditionFocus] = useState(false);
   const [isValueOptionFocus, setIsValueOptionFocus] = useState(false);
+  const [updateExplanationModal, setUpdateExplanationModal] = useState(false);
+  const [explanation, setExplanation] = useState('');
   const [tmpFile, setTmpFile] = useState({
     content: '',
     type: '',
@@ -267,7 +269,7 @@ export default function AllJobShiftListing({ navigation }) {
     'Hours Approved?',
     'Timesheet',
     'Verfication',
-    'No Status Explanation',
+    '✏️ No Status Explanation',
     'Delete'
   ];
 
@@ -393,6 +395,10 @@ export default function AllJobShiftListing({ navigation }) {
 
   const toggleTiemSheetUploadModal = () => {
     setIsFileUploadModal(!isFileUploadModa);
+  };
+
+  const toggleUpdateExplanationModal = () => {
+    setUpdateExplanationModal(!updateExplanationModal)
   };
 
   const toggleJobDetailModal = () => {
@@ -878,6 +884,43 @@ export default function AllJobShiftListing({ navigation }) {
     getData();
   };
 
+  const handleUpdateExplanation = async () => {
+    let results = await PostJob({ jobId: selectedJobId, noStatusExplanation: explanation }, 'jobs');
+    if (!results?.error) {
+      toggleUpdateExplanationModal();
+      getData();
+      console.log('success');
+      // Alert.alert(
+      //   'Success!',
+      //   'Updated',
+      //   [
+      //     {
+      //       text: 'OK',
+      //       onPress: () => {
+      //         console.log('OK pressed')
+      //       },
+      //     },
+      //   ],
+      //   { cancelable: false }
+      // );
+    } else {
+      console.log('failure', JSON.stringify(results.error));
+      Alert.alert(
+        'Warning!',
+        'Please retry again later',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
   const handleUpdate = async () => {
     console.log(selectedJobId);
     console.log(selectedJobStatus);
@@ -944,6 +987,11 @@ export default function AllJobShiftListing({ navigation }) {
       type: ''
     });
     toggleTiemSheetUploadModal();
+  };
+
+  const handleUpdateExplanationModal = (data) => {
+    setSelectedJobId(data[2]);
+    toggleUpdateExplanationModal();
   };
 
   const handleShowSelectModal = () => {
@@ -1274,6 +1322,17 @@ export default function AllJobShiftListing({ navigation }) {
                               } else if (cellIndex == 16) {
                                 return (
                                   <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUploadModal(rowData, 'verification', cellData)}>
+                                    <Text
+                                      key={cellIndex}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                    >
+                                      {cellData}
+                                    </Text>
+                                  </TouchableWithoutFeedback>
+                                );
+                              } else if (cellIndex == 17) {
+                                return (
+                                  <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUpdateExplanationModal(rowData)}>
                                     <Text
                                       key={cellIndex}
                                       style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
@@ -2101,6 +2160,42 @@ export default function AllJobShiftListing({ navigation }) {
                 </View>
               </View>
             </ScrollView>
+          </Modal>
+          <Modal
+            visible={updateExplanationModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setUpdateExplanationModal(!updateExplanationModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={[styles.header, { height: 80 }]}>
+                  <Text style={styles.headerText}>Update Explanation</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleUpdateExplanationModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.body, { marginBottom: 0 }]}>
+                  <View style={[styles.modalBody, { paddingVertical: 10 }]}>
+                    <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
+                      <TextInput
+                        style={[styles.inputs, { width: '95%', color: 'black'}]}
+                        onChangeText={setExplanation}
+                        value={explanation}
+                        multiline={true}
+                        textAlignVertical="top"
+                        placeholder=""
+                      />
+                    </View>
+                    <TouchableOpacity style={styles.button} onPress={handleUpdateExplanation} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Update</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
           </Modal>
         </View>
         <Modal
