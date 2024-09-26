@@ -37,6 +37,7 @@ import { deviceNumberAtom } from '../../context/BackProvider';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
+import Loader from '../Loader';
 
 export default function ClientSignIn({ navigation }) {
   const [aic, setAIC] = useAtom(aicAtom);
@@ -74,6 +75,7 @@ export default function ClientSignIn({ navigation }) {
     userRole: 'Clinician',
     device: '',
   });
+  const [request, setRequest] = useState(false);
 
   const fetchDeviceInfo = async () => {
     try {
@@ -135,10 +137,46 @@ export default function ClientSignIn({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    try {
-      const response = await Signin({ email: loginEmail, password: loginPW, device: device, userRole: 'Clinician' }, 'clinical');
+    if (loginEmail == "") {
+      Alert.alert(
+        'Warning!',
+        "Please enter your email",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      return;
+    }
 
+    if (loginPW == "") {
+      Alert.alert(
+        'Warning!',
+        "Please enter password",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      return;
+    }
+
+    try {
+      console.log("sdfasdfsd")
+      setRequest(true);
+      const response = await Signin({ email: loginEmail, password: loginPW, device: device, userRole: 'Clinician' }, 'clinical');
       if (response?.user) {
+        setRequest(false);
         setAIC(response.user.aic);
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
@@ -182,6 +220,7 @@ export default function ClientSignIn({ navigation }) {
           handleSignInNavigate("ClientPermission");
         }
       } else {
+        setRequest(false);
         if (response.error.status == 401) {
           Alert.alert(
             'Failed!',
@@ -227,7 +266,8 @@ export default function ClientSignIn({ navigation }) {
         }
       }
     } catch (error) {
-      console.log('SignIn failed: ', error)
+      setRequest(false);
+      console.log('SignIn failed: ', JSON.stringify(error))
       Alert.alert(
         'Failed!',
         "Network Error",
@@ -339,8 +379,8 @@ export default function ClientSignIn({ navigation }) {
             Facilities Home
           </HButton>
         </View>
-
       </ScrollView>
+      {request && <Loader />}
       <MFooter />
     </View>
   );

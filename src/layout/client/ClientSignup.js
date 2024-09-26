@@ -8,6 +8,7 @@ import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
 import images from '../../assets/images';
+import Loader from '../Loader';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -46,7 +47,7 @@ export default function ClientSignUp({ navigation }) {
   const [showCalender, setShowCalendar] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
-
+  const [sending, setSending] = useState(false);
   useEffect(() => {
     const isBirthdayValid = birthday instanceof Date && !isNaN(birthday.getTime());
     const areRequiredFieldsFilled =
@@ -601,6 +602,7 @@ export default function ClientSignUp({ navigation }) {
       return;
     }
     try {
+      setSending(true);
       const credentials = {
         firstName,
         lastName,
@@ -620,9 +622,11 @@ export default function ClientSignUp({ navigation }) {
       const response = await Signup(credentials, 'clinical');
 
       if (!response?.error) {
+        setSending(false);
         successAlerts();
         setIsSubmitting(false);
       } else {
+        setSending(false);
         setIsSubmitting(false);
         if (response.error.status == 500) {
           Alert.alert(
@@ -683,6 +687,7 @@ export default function ClientSignUp({ navigation }) {
         }
       }
     } catch (error) {
+      setSending(false);
       setIsSubmitting(false);
       console.error('Signup failed: ', error);
       Alert.alert(
@@ -1039,6 +1044,7 @@ export default function ClientSignUp({ navigation }) {
           </Modal>
         )}
       </ScrollView>
+      {sending && <Loader />}
       <MFooter />
     </View>
   );

@@ -9,6 +9,7 @@ import { useAtom } from 'jotai';
 import { facilityIdAtom, firstNameAtom, lastNameAtom, facilityAcknowledgementAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, entryDateAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom, passwordAtom } from '../../context/FacilityAuthProvider'
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../Loader';
 
 export default function FacilityLogin({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -30,6 +31,7 @@ export default function FacilityLogin({ navigation }) {
     userRole: 'Facilities',
   })
   const [checked, setChecked] = useState(false);
+  const [request, setRequest] = useState(false);
 
   useEffect(() => {
     const getCredentials = async() => {
@@ -79,10 +81,46 @@ export default function FacilityLogin({ navigation }) {
   };
 
   const handleSubmit = async () => {
+    if(credentials.contactEmail == ""){
+      Alert.alert(
+        'Warning!',
+        "Please enter your email address.",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      return;
+    }
+
+    if(credentials.password == ""){
+      Alert.alert(
+        'Warning!',
+        "Please enter your password.",
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      return;
+    }
+
     try {
+      setRequest(true);
       const response = await Signin(credentials, 'facilities');
 
       if (!response.error) {
+        setRequest(false);
         setFacilityID(response.user.aic);
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
@@ -108,6 +146,7 @@ export default function FacilityLogin({ navigation }) {
           handleSignInNavigate("FacilityPermission");
         }
       } else {
+        setRequest(false);
         if (response.error.status == 401) {
           Alert.alert(
             'Failed!',
@@ -287,8 +326,8 @@ export default function FacilityLogin({ navigation }) {
             Main Home
           </HButton>
         </View>
-
       </ScrollView>
+      {request && <Loader />}
       <MFooter />
     </View>
   );

@@ -60,6 +60,7 @@ export default function EditProfile({ navigation }) {
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [ credentials, setCredentials ] = useState({
     firstName: firstName,
@@ -345,6 +346,7 @@ export default function EditProfile({ navigation }) {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (credentials.email === '' || 
       credentials.firstName === '' || 
       credentials.lastName ==='' || 
@@ -357,6 +359,7 @@ export default function EditProfile({ navigation }) {
       credentials.address.state ==='' || 
       credentials.address.zip ==='') {
         showAlerts('all gaps')
+        setLoading(false);
     } else {
       setIsSubmitting(true);
       try {
@@ -380,9 +383,11 @@ export default function EditProfile({ navigation }) {
         setBls(response.user.bls);
         console.log('successfully Updated')
         setIsSubmitting(false);
+        setLoading(false);
         navigation.navigate("MyHome")
       } catch (error) {
         setIsSubmitting(false);
+        setLoading(false);
         console.error('Update failed: ', error)
       }
     }
@@ -396,9 +401,9 @@ export default function EditProfile({ navigation }) {
     });
   };
 
-  if (isSubmitting == true) {
-    return <Loader />;
-  }
+  // if (isSubmitting == true) {
+  //   return <Loader />;
+  // }
 
   return (
     <View style={styles.container}>
@@ -891,6 +896,7 @@ export default function EditProfile({ navigation }) {
           </Modal>
         )}
       </ScrollView>
+      {loading && <Loader />}
       <MFooter />
     </View>
   );
