@@ -467,25 +467,12 @@ export default function CompanyShift({ navigation }) {
       }
       
       setTimesheetFile({
-        content: `data:${res[0].type};base64,${fileContent}`,
-        type: res[0].type,
+        content: fileContent,
+        type: fileType,
         name: res[0].name,
       });
       toggleFileTypeSelectModal();
     } catch (err) {
-      Alert.alert(
-        'Alert!',
-        'DocumentPicker Issue: ' + JSON.stringify(err),
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              console.log('');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
       } else {
@@ -543,7 +530,7 @@ export default function CompanyShift({ navigation }) {
     toggleJobTSVerifyModal();
     setLoading(true);
     let result = await getTimesheet({ jobId: curJobId });
-    console.log(result.type);
+    console.log(result.type, result.name);
     if (!result?.error) {
       const fetchedFileInfo = result;
       let content = '';
