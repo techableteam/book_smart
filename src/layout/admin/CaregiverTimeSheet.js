@@ -222,9 +222,11 @@ export default function CaregiverTimeSheet({ navigation }) {
     } else {
       setData([]);
     }
+    setLoading(false);
   };
 
   const getNurseList = async () => {
+    setLoading(true);
     let result = await Clinician('clinical/getAllList', 'Clinical');
     if (!result.error) {
       let nurses = [];
@@ -254,6 +256,11 @@ export default function CaregiverTimeSheet({ navigation }) {
   
     setSearch(''); 
     getData({ search: '', page: curPage });
+  };
+  
+  const handleSearch = (event) => {
+    event.persist();
+    getData();
   };
 
   const toggleAddFilterModal = () => {
@@ -359,7 +366,7 @@ export default function CaregiverTimeSheet({ navigation }) {
                   onChangeText={e => setSearch(e)}
                   value={search}
                 />
-                <TouchableOpacity style={styles.searchBtn} onPress={getData}>
+                <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
                   <Text>Search</Text>
                 </TouchableOpacity>
                 {search && <TouchableOpacity style={styles.searchBtn} onPress={handleReset}>
@@ -372,7 +379,7 @@ export default function CaregiverTimeSheet({ navigation }) {
                 </TouchableOpacity>
                 <View>
                   {filters.map((item, index) => (
-                    <View>
+                    <View key={index}>
 
                     </View>
                   ))}
@@ -556,7 +563,7 @@ export default function CaregiverTimeSheet({ navigation }) {
                     <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={addFilter}>
                       <Text style={styles.buttonText}>Add filter</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={() => console.log('')} underlayColor="#0056b3">
+                    <TouchableOpacity style={styles.button} onPress={toggleAddFilterModal} underlayColor="#0056b3">
                       <Text style={styles.buttonText}>Submit</Text>
                     </TouchableOpacity>
                   </ScrollView>
