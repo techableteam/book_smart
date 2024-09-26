@@ -40,7 +40,7 @@ export default function Shift ({ navigation }) {
     lunch: '',
     comments: ''
   });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false); // loading
   const [info, setInfo] = useState([
     {title: 'Job-ID', content: ""},
     {title: 'Entry Date', content: ''},
@@ -181,12 +181,12 @@ export default function Shift ({ navigation }) {
   };
 
   const handleUploadSubmit = async () => {
-    setIsSubmitted(true);
+    setLoading(true);
     setUpload(!isUpload);
     const data = {jobId: submitData.jobId, timeSheet: submitData.timeSheet};
     if (submitData.timeSheet?.name != '') {
       const response = await updateTimeSheet(data, 'jobs');
-      setIsSubmitted(false);
+      setLoading(false);
       if (!response?.error) {
         getData();
         Alert.alert('Success!', 'Your timesheet has been submitted', [
@@ -211,7 +211,7 @@ export default function Shift ({ navigation }) {
         ]);
       }
     } else {
-      setIsSubmitted(false);
+      setLoading(false);
       setUpload(!isUpload);
       Alert.alert('Failure!', 'Please upload documentation', [
         {
@@ -447,7 +447,7 @@ export default function Shift ({ navigation }) {
     let dir = RNFS.DownloadDirectoryPath;
   
     if (Platform.OS === 'ios') {
-      dir = RNFS.LibraryDirectoryPath;
+      dir = RNFS.DocumentDirectoryPath;
     }
   
     const filePath = `${dir}/${fileName}`;
@@ -482,6 +482,7 @@ export default function Shift ({ navigation }) {
       progress: (res) => {
         const progress = (res.bytesWritten / res.contentLength) * 100;
         setDownloading(true);
+        setLoading(true);
         console.log(`Download progress: ${progress.toFixed(2)}%`);
       }
     };
@@ -492,6 +493,7 @@ export default function Shift ({ navigation }) {
       const result = await RNFS.downloadFile(options).promise;
       console.log('Download result:', result);
       setDownloading(false);
+      setLoading(false);
   
       Alert.alert(
         'Alert',
@@ -848,7 +850,7 @@ export default function Shift ({ navigation }) {
             </ScrollView>
           </Modal>
         }
-        {(downloading || isSubmitted) && <Loader />}
+        <Loader visible={loading}/>
         <MFooter />
       </View>
   )

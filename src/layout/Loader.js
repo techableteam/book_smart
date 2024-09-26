@@ -1,14 +1,22 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 
-const Loader = () => (
-  <View style={styles.loaderContainer}>
-    <View style={styles.loaderContent}>
-      <Text style={styles.loaderText}>Processing</Text>
-      <ActivityIndicator size="large" color={"#A020F0"} />
-    </View>
-  </View>
-);
+const Loader = ({ visible }) => {
+    {
+        if (visible) {
+            return (
+                <View style={styles.loaderContainer}>
+                    <View style={styles.loaderContent}>
+                    <Text style={styles.loaderText}>Processing</Text>
+                    <ActivityIndicator size="large" color={"#A020F0"} />
+                    </View>
+                </View>
+            );
+        } else {
+            return (<></>);
+        }
+    }
+};
 
 const styles = StyleSheet.create({
   loaderContainer: {

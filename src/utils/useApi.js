@@ -390,6 +390,26 @@ export const updateUserInfo = async (updateData, endpoint) => {
   }
 }
 
+export const updateDocuments = async (updateData, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/updateDocuments`, updateData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.status === 200) {
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+      }
+    }
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+}
+
 export const PostJob = async (jobData, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');

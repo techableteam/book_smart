@@ -57,7 +57,7 @@ export default function AdminHome ({ navigation }) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
-            <AnimatedHeader title="WELCOME TO BOOK SMART!" />
+            <AnimatedHeader title="WELCOME TO BookSmart™!" />
             <View style={styles.bottomBar}/>
           </View>
             {

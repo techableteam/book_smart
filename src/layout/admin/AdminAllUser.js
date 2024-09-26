@@ -10,6 +10,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
+import Loader from '../Loader';
 
 export default function AdminAllUser({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -27,6 +28,7 @@ export default function AdminAllUser({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState('');
+  const [loading, setLoading] = useState(false);
   const widths = [120, 250, 150, 150, 80];
   const tableHead = [
     'Name',
@@ -71,6 +73,7 @@ export default function AdminAllUser({ navigation }) {
   };
 
   const getData = async () => {
+    setLoading(true);
     let clinicalData = await Clinician('clinical/getAllList', 'Admin');
     let adminData = await Clinician('admin/admin', "Admin")
     let facilityData = await Clinician('facilities/facility', 'Admin')
@@ -84,6 +87,7 @@ export default function AdminAllUser({ navigation }) {
       const modifiedArray = [...modifiedData1, ...modifiedData2, ...modifiedData3];
       setData(modifiedArray);
     }
+    setLoading(false);
   };
 
   useFocusEffect(
@@ -467,6 +471,7 @@ export default function AdminAllUser({ navigation }) {
           </Modal>
         </View>
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   )

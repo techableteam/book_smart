@@ -27,6 +27,7 @@ export default function AdminFacilities({ navigation }) {
   const [facility, setFacility] = useState(null);
   const [shifts, setShifts] = useState([]);
   const [userProfileModal, setUserProfileModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   let colorIndex = 0;
   const widths = [100, 150, 250, 150, 150, 100, 100, 100];
   const tableHead = [
@@ -67,12 +68,14 @@ export default function AdminFacilities({ navigation }) {
   }, []);
 
   async function getData() {
+    setLoading(false);
     let data = await Clinician('facilities/getFacilityList', 'Admin');
     if(!data) {
       setData(['No Data'])
     } else {
       setData(data)
     }
+    setLoading(false);
   };
 
   useFocusEffect(
