@@ -9,6 +9,7 @@ import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, phoneAtom, emailAtom, photoImageAtom, userRoleAtom, companyNameAtom, addressAtom, passInfAtom } from '../../context/AdminAuthProvider'
 import { Signin } from '../../utils/useApi';
+import Loader from '../Loader';
 
 export default function AdminLogin({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -20,6 +21,7 @@ export default function AdminLogin({ navigation }) {
   const [companyName, setCompanyName] = useAtom(companyNameAtom);
   const [address, setAddress]= useAtom(addressAtom);
   const [password, setPassword] = useAtom(passInfAtom)
+  const [request, setRequest]= useState(false);
   const [ credentials, setCredentials ] = useState({
     email: '',
     password: '',
@@ -73,6 +75,7 @@ export default function AdminLogin({ navigation }) {
   }
 
   const handleSubmit = async () => {
+    setRequest(true);
     try {
       const response = await Signin(credentials, 'Admin');
       if (!response.error) {
@@ -89,8 +92,10 @@ export default function AdminLogin({ navigation }) {
           await AsyncStorage.setItem('AdminEmail', credentials.email);
           await AsyncStorage.setItem('AdminPassword', credentials.password);
         }
+        setRequest(false);
         handleSignInNavigate();
       } else {
+        setRequest(false);
         if (response.error.status == 401) {
           Alert.alert(
             'Failed!',
@@ -164,6 +169,7 @@ export default function AdminLogin({ navigation }) {
         }
       }
     } catch (error) {
+      setRequest(false);
       console.log('SignIn failed: ', error);
       Alert.alert(
         'Failed!',
@@ -268,8 +274,8 @@ export default function AdminLogin({ navigation }) {
             <Text style={styles.homeText}>Home</Text>
           </TouchableOpacity>
         </View>
-
       </ScrollView>
+      <Loader visible={request}/>
       <MFooter />
     </View>
   );
