@@ -394,19 +394,6 @@ export default function AllJobShiftListing({ navigation }) {
       setTmpFile({ content: `${fileContent}`, type: fileType, name: res[0].name });
       handleShowSelectModal();
     } catch (err) {
-      Alert.alert(
-        'Alert!',
-        'DocumentPicker Issue: ' + JSON.stringify(err),
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              console.log('');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
       } else {

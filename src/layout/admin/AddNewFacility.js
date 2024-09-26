@@ -238,19 +238,6 @@ export default function AddNewFacility({ navigation }) {
       }
       handleCredentials('avatar', { content: `${fileContent}`, type: fileType, name: res[0].name });
     } catch (err) {
-      Alert.alert(
-        'Alert!',
-        'DocumentPicker Issue: ' + JSON.stringify(err),
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              console.log('');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
       } else {

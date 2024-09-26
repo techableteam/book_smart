@@ -90,8 +90,6 @@ export default function Shift ({ navigation }) {
 
   const getData = async () => {
     let data = await MyShift('jobs', 'Clinician');
-    console.log(data);
-
     if(!data) {
       setData(['No Data'])
     } else {
@@ -421,19 +419,6 @@ export default function Shift ({ navigation }) {
       setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}});
       toggleUploadModal();
     } catch (err) {
-      Alert.alert(
-        'Alert!',
-        'DocumentPicker Issue: ' + JSON.stringify(err),
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              console.log('');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
       } else {
@@ -763,7 +748,7 @@ export default function Shift ({ navigation }) {
           <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.viewContainer}>
               <View style={styles.header}>
-                <Text style={styles.headerText}>Upload TimeSheet {fileTypeSelectModal ? "true" : "false"}</Text>
+                <Text style={styles.headerText}>Upload TimeSheet</Text>
                 <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleUploadModal}>
                   <Image source = {images.close} style={{width: 20, height: 20,}}/>
                 </TouchableOpacity>

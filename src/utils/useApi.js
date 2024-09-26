@@ -493,20 +493,19 @@ export const getAllUsersName = async () => {
   }
 };
 
-export const getCaregiverTimesheets = async (endpoint, role) => {
+export const getCaregiverTimesheets = async (data, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.get(`api/${endpoint}/getCaregiverTimesheets`, {
+    const response = await axios.post(`api/${endpoint}/getCaregiverTimesheets`, data, {
       headers: {
-        Authorization: `Bearer ${existingToken}`,
-        Role: role
+        Authorization: `Bearer ${existingToken}`
       }
     });
 
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
-    return response.data.timesheet;
+    return response.data;
   } catch (error) {
     return { error: error };
   }
