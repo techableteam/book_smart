@@ -13,12 +13,14 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import AnimatedHeader from '../AnimatedHeader';
+import Loader from '../Loader';
 
 export default function FacilitySignUp({ navigation }) {
   const [fileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const increaseAnimation = Animated.timing(fadeAnim, {
@@ -69,7 +71,7 @@ export default function FacilitySignUp({ navigation }) {
     confirmPassword: '',
     signature: '',
     userRole: 'Facilities'
-  })
+  });
 
   const handleCredentials = (target, e) => {
     if (target !== "street" && target !== "street2" && target !== "city" && target !== "state" && target !== "zip") {
@@ -402,11 +404,14 @@ export default function FacilitySignUp({ navigation }) {
     }
     setIsSubmitting(true);
     try {
+      setSending(true);
       const response = await Signup(credentials, "facilities");
       if (!response?.error) {
+        setSending(false);
         navigation.navigate('FacilityFinishSignup');
       } else {
         setIsSubmitting(false);
+        setSending(false);
         if (response.error.status == 500) {
           Alert.alert(
             'Warning!',
@@ -467,6 +472,7 @@ export default function FacilitySignUp({ navigation }) {
       }
     } catch (error) {
       setIsSubmitting(false);
+      setSending(false);
       console.error('Signup failed: ', error);
       Alert.alert(
         'Failure!',
@@ -733,6 +739,7 @@ export default function FacilitySignUp({ navigation }) {
           </Modal>
         )}
       </ScrollView>
+      {sending && <Loader />}
       <MFooter />
     </View>
   );

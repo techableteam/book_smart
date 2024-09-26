@@ -133,10 +133,12 @@ export default function CompanyShift({ navigation }) {
     setLoading(true);
     let result = await Jobs('jobs', 'Facilities');
     if(!result) {
+      setLoading(false);
       setData(['No Data'])
     } else {
       setData(result)
       setFilteredData(result);
+      setLoading(false);
     }
     result.unshift(tableHead);
     setTableData(result);
@@ -202,8 +204,10 @@ export default function CompanyShift({ navigation }) {
   };
 
   const handleShowJobDetailModal = async (id) => {
+    setLoading(true);
     let data = await Job({ jobId: id }, 'jobs');
     if(!data) {
+      setLoading(false);
       setSelectedJob(null);
       setSelectedBidders([]);
     } else {
@@ -212,20 +216,24 @@ export default function CompanyShift({ navigation }) {
       setSelectedJob(data.jobData);
       setSelectedBidders(biddersList);
       setIsJobDetailModal(true);
+      setLoading(false);
     }
   };
 
   const handleShowJobTSVerifyModal = async (id) => {
+    setLoading(true);
     console.log(id);
     let data = await Job({ jobId: id }, 'jobs');
     console.log(data ? 'true' : 'false');
     if(!data) {
+      setLoading(false);
       setCurJobId(id);
     } else {
       setCurJobId(id);
       setSelectedJob(data.jobData);
       setTSVerifyStatus(data.jobData.timeSheetVerified ? 1 : 2);
       setIsJobTSVerifyModal(true);
+      setLoading(false);
     }
   };
 
@@ -269,9 +277,10 @@ export default function CompanyShift({ navigation }) {
   };
 
   const handleChangeJobTSVerify = async () => {
+    setLoading(true);
     const response = await updateJobTSVerify({ jobId: curJobId, status: tsVerifyStatus, file: timeSheetFile }, 'jobs');
-    
     if (!response?.error) {
+      setLoading(false);
       getData();
       Alert.alert('Success!', 'Verified!', [
         {
@@ -284,6 +293,7 @@ export default function CompanyShift({ navigation }) {
       ]);
       setIsJobTSVerifyModal(false);
     } else {
+      setLoading(false);
       console.log('failure', response.error);
       Alert.alert('Failure!', 'Please retry again later', [
         {
@@ -1304,7 +1314,7 @@ export default function CompanyShift({ navigation }) {
               setFiletypeSelectModal(false); // Close the modal
             }}
           >
-            <StatusBar translucent backgroundColor='transparent' />
+            <StatusBar translucent backgroundColor='transparent' / >
             <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
               <View style={[styles.viewContainer, { marginTop: '50%' }]}>
                 <View style={[styles.header, { height: 100 }]}>

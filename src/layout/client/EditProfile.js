@@ -332,6 +332,7 @@ export default function EditProfile({ navigation }) {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (credentials.email === '' || 
       credentials.firstName === '' || 
       credentials.lastName ==='' || 
@@ -344,6 +345,7 @@ export default function EditProfile({ navigation }) {
       credentials.address.state ==='' || 
       credentials.address.zip ==='') {
         showAlerts('all gaps')
+        setLoading(false);
     } else {
       setLoading(true);
       try {

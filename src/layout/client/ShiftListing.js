@@ -13,6 +13,7 @@ import { PostBid, Jobs } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
+import Loader from '../Loader';
 
 const itemsPerPage = 100;
 
@@ -22,7 +23,7 @@ export default function ShiftListing ({ navigation }) {
   let colorIndex = 0;
   const [isModal, setModal] = useState(false);
   const [content, setContent] = useState('');
-
+  const [gettingData, setGettingData] = useState(false);
   useEffect(() => {
     const interval = setInterval(() => {
       // Generate a random color
@@ -54,8 +55,10 @@ export default function ShiftListing ({ navigation }) {
   const [pageItems, setPageItems] = useState([]);
 
   async function getData() {
+    setGettingData(true);
     let Data = await Jobs('jobs', 'Clinician');
     if(!Data) {
+      setGettingData(false);
       setData(['No Data'])
     } else {
       setData(Data);
@@ -126,6 +129,7 @@ export default function ShiftListing ({ navigation }) {
         value: index + 1
       }));
       setPageItems(generatedPageArray);
+      setGettingData(false);
     }
   };
 
@@ -391,6 +395,7 @@ export default function ShiftListing ({ navigation }) {
             </View>
           </ScrollView>
         </Modal>}
+        {gettingData && <Loader />}
         <MFooter />
       </View>
   )
