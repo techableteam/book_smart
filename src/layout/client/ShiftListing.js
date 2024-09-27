@@ -96,7 +96,7 @@ export default function ShiftListing ({ navigation }) {
         title: 'Caregiver',
         content: item.degree
       },{
-        title: 'Pay Rate',
+        title: 'Hourly Rate',
         content: item.payRate
       },{
         title: 'Job',

@@ -41,6 +41,8 @@ export default function CompanyShift({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [isFileViewerModal, setIsFileViewerModal] = useState(false);
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
+  const [isaward, setIsaward] = useState(false);
+  const [isopenaward, setIsopenaward] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
   const [fileInfo, setFileInfo] = useState({ content: '', type: '', name: '' });
 
@@ -238,6 +240,7 @@ export default function CompanyShift({ navigation }) {
   };
 
   const handleShowJobAwardModal = async (id) => {
+    setIsopenaward(true);
     let bidder = [];
     selectedBidders.map((item, idx) => {
       if (item[6] === id) {
@@ -250,19 +253,24 @@ export default function CompanyShift({ navigation }) {
       setSelectedBidder(bidder);
       setAwardedStatus(bidder[4] === 'Awarded' ? 1 : 2);
       setIsAwardJobModal(true);
+      setIsopenaward(false);
     } else {
       setSelectedBidder([]);
+      setIsopenaward(false);
     }
   };
 
   const handleChangeAwardStatus = async (bidderId, jobId) => {
+    setIsaward(true);
     const response = await setAwarded({ jobId: jobId, bidderId: bidderId, status: awardedStatus }, 'jobs');
     console.log(JSON.stringify(response));
     if (!response?.error) {
+      setIsaward(false);
       console.log('success');
       getData();
       setIsAwardJobModal(false);
     } else {
+      setIsaward(false);
       console.log('failure', response.error);
       Alert.alert('Failure!', 'Please retry again later', [
         {
@@ -280,8 +288,8 @@ export default function CompanyShift({ navigation }) {
     setLoading(true);
     const response = await updateJobTSVerify({ jobId: curJobId, status: tsVerifyStatus, file: timeSheetFile }, 'jobs');
     if (!response?.error) {
-      setLoading(false);
       getData();
+      setLoading(false);
       Alert.alert('Success!', 'Verified!', [
         {
           text: 'OK',
@@ -1159,6 +1167,7 @@ export default function CompanyShift({ navigation }) {
               </View>
             </View>
           </View>
+          {<Loader visible={isaward}/>}
         </Modal>
         <Modal
           visible={isJobTSVerifyModal}
@@ -1233,6 +1242,7 @@ export default function CompanyShift({ navigation }) {
               </View>
             </View>
           </View>
+          {<Loader visible={loading}/>}
         </Modal>
         <Modal
           visible={isFileViewerModal}

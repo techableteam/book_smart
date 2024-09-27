@@ -19,6 +19,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
+import { blue800 } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 export default function AllJobShiftListing({ navigation }) {
   const [backgroundColor, setBackgroundColor] = useState('#0000ff');
@@ -56,6 +57,7 @@ export default function AllJobShiftListing({ navigation }) {
   const [isFileUploadModa, setIsFileUploadModal] = useState(false);
   const [search, setSearch] = useState('');
   const [addfilterModal, setAddFilterModal] = useState(false);
+  const [isexport, setIsexport] = useState(false);
   const [showDate, setShowDate] = useState(false);
   const [valueOption, setValueOption] = useState([]);
   const [nurseList, setNurseList] = useState([]);
@@ -971,6 +973,10 @@ export default function AllJobShiftListing({ navigation }) {
     setAddFilterModal(!addfilterModal)
   };
 
+  const toggleExportModal = () => {
+    setIsexport(!isexport)
+  };
+
   const handleCellClick = async (data) => {
     setSelectedJobId(data[2]);
     setSelectedJobStatus(data[9]);
@@ -1162,9 +1168,15 @@ export default function AllJobShiftListing({ navigation }) {
                 </TouchableOpacity>}
               </View>
               <View style={{ marginBottom: 10 }}>
-                <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0 }]} onPress={toggleAddFilterModal}>
-                  <Text>Add Filter</Text>
-                </TouchableOpacity>
+                <View style = {styles.filterbar}>
+                  <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0 }]} onPress={toggleAddFilterModal}>
+                    <Text style={{color: "#2a53c1"}}>Add Filter</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={[styles.filterBtn, { marginLeft: 10 }]} onPress={toggleExportModal}>
+                    <Text style={{color: "#2a53c1"}}>Export</Text>
+                  </TouchableOpacity>
+                </View>
                 <View>
                   {filters.map((item, index) => (
                     <View>
@@ -2198,6 +2210,14 @@ export default function AllJobShiftListing({ navigation }) {
             </View>
           </Modal>
         </View>
+        <Modal visible={isexport}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setIsexport(!isexport);
+          }}>
+
+        </Modal>
         <Modal
           visible={addfilterModal}
           transparent= {true}
@@ -2532,6 +2552,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingLeft: '5%'
   },
+  filterbar:{
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   searchBar: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -2564,7 +2589,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 5,
-    gap: 5
+    gap: 5,
+    color: "#2a53c1"
   },
   filterText: {
     color: '#2a53c1',

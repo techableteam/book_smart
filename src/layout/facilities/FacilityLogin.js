@@ -327,7 +327,7 @@ export default function FacilityLogin({ navigation }) {
           </HButton>
         </View>
       </ScrollView>
-      {request && <Loader />}
+      {<Loader visible={request}/>}
       <MFooter />
     </View>
   );

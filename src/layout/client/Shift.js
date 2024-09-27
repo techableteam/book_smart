@@ -101,7 +101,7 @@ export default function Shift ({ navigation }) {
         title: 'Location',
         content: item.location
       },{
-        title: 'Pay Rate',
+        title: 'Hourly Rate',
         content: item.payRate
       },{
         title: 'Status',
@@ -429,10 +429,12 @@ export default function Shift ({ navigation }) {
 
   const fileDownload = async () => {
     const fileName = 'BookSmart_Timesheet.pdf';
-    let dir = RNFS.DownloadDirectoryPath;
+    
   
     if (Platform.OS === 'ios') {
       dir = RNFS.DocumentDirectoryPath;
+    } else {
+      dir = RNFS.ExternalStorageDirectoryPath;
     }
   
     const filePath = `${dir}/${fileName}`;
