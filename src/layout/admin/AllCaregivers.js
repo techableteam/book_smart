@@ -5,7 +5,7 @@ import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { useFocusEffect } from '@react-navigation/native';
 import { Table } from 'react-native-table-component';
 import RadioGroup from 'react-native-radio-buttons-group';
-import { Update, Clinician, updatePassword, getUserProfile, getUserInfo, updateUserStatus, allCaregivers } from '../../utils/useApi';
+import { Update, updatePassword, getUserProfile, getUserInfo, updateUserStatus, allCaregivers } from '../../utils/useApi';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -39,6 +39,14 @@ export default function AllCaregivers({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [curPage, setCurPage] = useState(1);
+  const [isLogicFocus, setIsLogicFocus] = useState(false);
+  const [isFieldFocus, setIsFieldFocus] = useState(false);
+  const [isConditionFocus, setIsConditionFocus] = useState(false);
+  const [isValueOptionFocus, setIsValueOptionFocus] = useState(false);
+  const [addfilterModal, setAddFilterModal] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [valueOption, setValueOption] = useState([]);
+  const [degrees, setDegress] = useState([]);
   const [pageList, setPageList] = useState([
     {label: 'Page 1', value: 1}
   ]);
@@ -181,19 +189,198 @@ export default function AllCaregivers({ navigation }) {
     'Ratio',
     'P.W.'
   ];
-  const pageItems = [
-    {label: '10 per page', value: '1'},
-    {label: '25 per page', value: '2'},
-    {label: '50 per page', value: '3'},
-    {label: '100 per page', value: '4'},
-    {label: '500 per page', value: '5'},
-    {label: '1000 per page', value: '6'},
-  ];
   const statusList = [
     {label: 'activate', value: 'activate'},
     {label: 'inactivate', value: 'inactivate'},
     {label: 'pending approval', value: 'pending approval'},
   ];
+  const paymentList = [
+    { label: 'Zelle', value: 'Zelle' },
+    { label: 'ACH', value: 'ACH' },
+  ];
+  const logicItems = [
+    {label: 'and', value: 'and'},
+    {label: 'or', value: 'or'}
+  ];
+  const fieldsItems = [
+    { label: 'Entry Date', value: 'Entry Date'},
+    { label: 'Name', value: 'Name'},
+    { label: 'Phone', value: 'Phone'},
+    { label: 'Degree/Discipline', value: 'Degree/Discipline'},
+    { label: 'Email', value: 'Email'},
+    { label: 'User Status', value: 'User Status'},
+    { label: 'Total Awarded', value: 'Total Awarded'},
+    { label: 'Total Bids / Offers', value: 'Total Bids / Offers'},
+    { label: 'Bid to Award Ratio', value: 'Bid to Award Ratio'},
+    { label: 'Payment', value: 'Payment'},
+  ];
+  const fieldConditions = {
+    'Entry Date': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'is during the current', value: 'is during the current' },
+      { label: 'is during the previous', value: 'is during the previous' },
+      { label: 'is during the next', value: 'is during the next' },
+      { label: 'is before the previous', value: 'is before the previous' },
+      { label: 'is after the next', value: 'is after the next' },
+      { label: 'is before', value: 'is before' },
+      { label: 'is after', value: 'is after' },
+      { label: 'is today', value: 'is today' },
+      { label: 'is today or before', value: 'is today or before' },
+      { label: 'is today or after', value: 'is today or after' },
+      { label: 'is before today', value: 'is before today' },
+      { label: 'is after today', value: 'is after today' },
+      { label: 'is before current time', value: 'is before current time' },
+      { label: 'is after current time', value: 'is after current time' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Name': [
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'starts with', value: 'starts with' },
+      { label: 'ends with', value: 'ends with' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Phone': [
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'starts with', value: 'starts with' },
+      { label: 'ends with', value: 'ends with' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Degree/Discipline': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is any', value: 'is any' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Email': [
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'starts with', value: 'starts with' },
+      { label: 'ends with', value: 'ends with' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'User Status': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is any', value: 'is any' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Total Awarded': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'higher than', value: 'higher than' },
+      { label: 'lower than', value: 'lower than' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Total Bids / Offers': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'higher than', value: 'higher than' },
+      { label: 'lower than', value: 'lower than' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Bid to Award Ratio': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'higher than', value: 'higher than' },
+      { label: 'lower than', value: 'lower than' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Payment': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is any', value: 'is any' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+  };
+  const [conditionItems, setConditionItems] = useState(fieldConditions['Name']);
+  const [filters, setFilters] = useState([
+    { logic: '', field: 'Name', condition: 'contains', value: '', valueType: 'text' },
+  ]);
+
+  const removeFilter = (index) => {
+    const newFilters = [...filters];
+    newFilters.splice(index, 1);
+    setFilters(newFilters);
+  };
+
+  const handleRemoveFilter = (index) => {
+    const newFilters = [...filters];
+    newFilters.splice(index, 1);
+    getData({ search: search, page: curPage, filters: newFilters });
+    setFilters(newFilters);
+  };
+
+  const handleFilterChange = (index, key, value) => {
+    const newFilters = [...filters];
+
+    if (key === 'logic') {
+      const updatedFilters = newFilters.map((filter) => ({
+        ...filter,
+        logic: value,
+      }));
+      setFilters(updatedFilters);
+      return;
+    } else if (key === 'field') {
+      setConditionItems(fieldConditions[value]);
+
+      if (value === 'Degree/Discipline' || value === 'User Status' || value === 'Payment') {
+        newFilters[index]['valueType'] = 'select';
+        if (value === 'Degree/Discipline') {
+          setValueOption(degrees);
+        } else if (value === 'User Status') {
+          setValueOption(userStatus);
+        } else if (value === 'Payment') {
+          setValueOption(paymentList);
+        }
+        newFilters[index]['condition'] = 'is';
+      } else {
+        newFilters[index]['valueType'] = 'text';
+      }
+      newFilters[index][key] = value;
+    } else if (key == 'condition') {
+      if (value == 'is any' || value == 'is blank' || value == 'is not blank') {
+        newFilters[index]['valueType'] = '';
+      } else {
+        if (newFilters[index]['field'] === 'Degree/Discipline' || newFilters[index]['field'] === 'User Status' || newFilters[index]['field'] === 'Payment') {
+          newFilters[index]['valueType'] = 'select';
+        } else {
+          newFilters[index]['valueType'] = 'text';
+        }
+      }
+    } else {
+      newFilters[index][key] = value;
+    }
+    setFilters(newFilters);
+  };
+
+  const addFilter = () => {
+    setFilters([...filters, { logic: 'and', field: 'Name', condition: 'contains', value: '', valueType: 'text' }]);
+  };
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e});
@@ -232,6 +419,20 @@ export default function AllCaregivers({ navigation }) {
     setLoading(false);
   };
 
+  const getDegree = async () => {
+    const response = await getDegreeList('degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
+    }
+  };
+
   useEffect(() => {
     getData();
   }, [curPage]);
@@ -247,11 +448,22 @@ export default function AllCaregivers({ navigation }) {
     getData();
   };
 
+  const toggleAddFilterModal = () => {
+    setAddFilterModal(!addfilterModal)
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       getData();
+      getDegree();
     }, [])
   );
+
+  const handleSubmit = () => {
+    setIsSubmitted(true);
+    toggleAddFilterModal();
+    getData();
+  };
 
   const handleResetPW = async () => {
     if (password != confirmPassword) {
@@ -656,6 +868,55 @@ export default function AllCaregivers({ navigation }) {
     navigation.navigate("FileViewer", { jobId: '', fileData: data });
   };
 
+  const renderInputField = (filter, index) => {
+    const { valueType, value } = filter;
+
+    if (valueType === 'text') {
+      return (
+        <TextInput
+          style={[styles.input, { color: 'black', paddingVertical: 5 }]}
+          placeholder=""
+          value={value}
+          onChangeText={(text) => handleFilterChange(index, 'value', text)}
+        />
+      );
+    }
+
+    if (valueType === 'select') {
+      return (
+        <Dropdown
+          style={[styles.dropdown, {width: '100%'}, isValueOptionFocus && { borderColor: 'blue' }]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          itemTextStyle={styles.itemTextStyle}
+          iconStyle={styles.iconStyle}
+          data={valueOption}
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder={''}
+          value={filter.value}
+          onFocus={() => setIsValueOptionFocus(true)}
+          onBlur={() => setIsValueOptionFocus(false)}
+          onChange={item => {
+            handleFilterChange(index, 'value', item.value);
+            setIsValueOptionFocus(false);
+          }}
+          renderLeftIcon={() => (
+            <View
+              style={styles.icon}
+              color={isValueOptionFocus ? 'blue' : 'black'}
+              name="Safety"
+              size={20}
+            />
+          )}
+        />
+      );
+    }
+    return (<></>);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -699,7 +960,7 @@ export default function AllCaregivers({ navigation }) {
               <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
                 <Text style={styles.profileTitle}>ALL CAREGIVERS</Text>
               </View>
-              <View style={styles.searchBar}>
+              {/* <View style={styles.searchBar}>
                 <TextInput
                   style={styles.searchText}
                   placeholder=""
@@ -712,7 +973,8 @@ export default function AllCaregivers({ navigation }) {
                 {search && <TouchableOpacity style={styles.searchBtn} onPress={handleReset}>
                   <Text>Reset</Text>
                 </TouchableOpacity>}
-              </View>
+              </View> */}
+              
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
