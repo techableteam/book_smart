@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Alert, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Alert, Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Text } from 'react-native-paper';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { useFocusEffect } from '@react-navigation/native';
 import { Table } from 'react-native-table-component';
 import RadioGroup from 'react-native-radio-buttons-group';
-import { Update, Clinician, updatePassword, getUserProfile, getUserInfo, updateUserStatus } from '../../utils/useApi';
+import { Update, Clinician, updatePassword, getUserProfile, getUserInfo, updateUserStatus, allCaregivers } from '../../utils/useApi';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -32,25 +31,18 @@ export default function AllCaregivers({ navigation }) {
   const [resetPWModal, setResetPWModal] = useState(false);
   const [updateStatusModal, setUpdateStatusModal] = useState(false);
   const [data, setData] = useState([]);
-  const [value, setValue] = useState(null);
-  const [isFocus, setIsFocus] = useState(false); 
-  const [modal, setModal] = useState(false)
-  const [cellData, setCellData] = useState(null);
-  const [rowData, setRowData] = useState(null);
-  const [modalItem, setModalItem] = useState(0);
-  const [label, setLabel] = useState(null);
-  const [jobValue, setJobValue] = useState(null);
-  const [isJobFocus, setJobIsFocus] = useState(false);
+  const [isFocus, setIsFocus] = useState(false);
   const [isStatusFocus, setStatusIsFocus] = useState(false);
-  const [suc, setSuc] = useState(0);
   const [userStatus, setUserStatus] = useState('inactivate');
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
-  const [clinicians, setClinicians] = useState([]);
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const [curPage, setCurPage] = useState(1);
+  const [pageList, setPageList] = useState([
+    {label: 'Page 1', value: 1}
+  ]);
   const widths = [120, 150, 150, 180, 300, 150, 150, 150, 80, 100, 80, 120];
-  let colorIndex = 0;
   const [credentials, setCredentials] = useState({
     email: '',
     driverLicense: {
@@ -162,21 +154,7 @@ export default function AllCaregivers({ navigation }) {
     },
     copyOfTBStatus: 0,
     userStatus: 'pending approval'
-  });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
-
+  })
   const radioButtons = useMemo(() => ([
     {
       id: 1,
@@ -189,7 +167,6 @@ export default function AllCaregivers({ navigation }) {
       value: false
     }
   ]), []);
-
   const tableHead = [
     'Entry Date',
     'Name',
@@ -237,27 +214,37 @@ export default function AllCaregivers({ navigation }) {
     return formattedDate;
   };
 
-  const getData = async () => {
+  const getData = async (requestData = { search: search, page: curPage }) => {
     setLoading(true);
-    let data = await Clinician('clinical/clinician', 'Admin');
-    if(!data) {
+    let result = await allCaregivers(requestData, 'clinical');
+    if(!result) {
       setData(['No Data'])
     } else {
-      const modifiedData = formatData(data);
+      console.log(result);
+      const modifiedData = formatData(result.dataArray);
+      let pageContent = [];
+      for (let i = 1; i <= result.totalPageCnt; i++) {
+        pageContent.push({ label: 'Page ' + i, value: i });
+      }
+      setPageList(pageContent);
       setData(modifiedData)
     }
     setLoading(false);
-    const uniqueValues = new Set();
-    const transformed = [];
+  };
 
-    data.forEach(subarray => {
-      const value = subarray[1];
-      if (!uniqueValues.has(value)) {
-        uniqueValues.add(value); 
-        transformed.push({ label: value, value: value });
-      }
-    });
-    setClinicians(transformed);
+  useEffect(() => {
+    getData();
+  }, [curPage]);
+
+  const handleReset = (event) => {
+    event.persist();
+    setSearch(''); 
+    getData({ search: '', page: curPage});
+  };
+  
+  const handleSearch = (event) => {
+    event.persist();
+    getData();
   };
 
   useFocusEffect(
@@ -365,10 +352,6 @@ export default function AllCaregivers({ navigation }) {
 
   const toggleUpdateStatusModal = () => {
     setUpdateStatusModal(!updateStatusModal);
-  };
-
-  const toggleModal = () => {
-    setModal(!modal);
   };
 
   const handleShowUserInfoModal = async () => {
@@ -480,72 +463,8 @@ export default function AllCaregivers({ navigation }) {
   );
 
   const handleCellClick = (userData) => {
-    console.log(userData);
     setUserStatus(userData[7]);
     setUpdateStatusModal(true);
-    // setCellData(cellData);
-    // const rowD = data[rowIndex][3];
-    // setModalItem(cellIndex);
-    // if(cellIndex==1) {
-    //   const name = cellData.split(' ');
-    //   setLabel({firstName: name[0], lastName: name[1]});
-    // } else {
-    //   setLabel(cellData.toString());
-    // }
-    // setRowData(rowD);
-    // if (cellIndex !== 0 ) {
-    //   toggleModal();
-    // }
-  };
-
-  const formatPhoneNumber = (input) => {
-    const cleaned = input.replace(/\D/g, '');
-
-    let formattedNumber = '';
-    if (cleaned.length >= 3) {
-      formattedNumber = `(${cleaned.slice(0, 3)})`;
-    }
-    if (cleaned.length > 3) {
-      formattedNumber += ` ${cleaned.slice(3, 6)}`;
-    }
-    if (cleaned.length > 6) {
-      formattedNumber += `-${cleaned.slice(6, 10)}`;
-    }
-    return formattedNumber;
-  };
-
-  const handlePress = async() => {
-    let sendData = label;
-    let sendingData = {}
-    if (modalItem === 1) {
-      const emailData = {email: rowData}
-      sendingData = {
-        ...emailData, // Ensure rowData is defined and contains the appropriate value
-        ...sendData // Use sendData for jobNum
-      };
-    } else if (modalItem === 2) {
-      sendingData = {
-        email: rowData,
-        phoneNumber: sendData // Use sendData for location
-      };
-    } else if (modalItem === 3)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        email: rowData,
-        updateEmail: sendData // Use sendData for location
-      };
-    } else if (modalItem === 4)  {
-      // Handle other modalItems as needed
-      sendingData = {
-        email: rowData,
-        userStatus: sendData // Use sendData for location
-      };
-    }
-    let Data = await Update(sendingData, 'clinical');
-    if(Data) setSuc(suc+1);
-    else setSuc(suc);
-    toggleModal();
-    getData();
   };
 
   const handleRemove = (name) => {
@@ -781,10 +700,18 @@ export default function AllCaregivers({ navigation }) {
                 <Text style={styles.profileTitle}>ALL CAREGIVERS</Text>
               </View>
               <View style={styles.searchBar}>
-                {/* <TextInput style={styles.searchText} /> */}
-                {/* <TouchableOpacity style={styles.searchBtn}>
-                  <Text>Add filters</Text>
-                </TouchableOpacity> */}
+                <TextInput
+                  style={styles.searchText}
+                  placeholder=""
+                  onChangeText={e => setSearch(e)}
+                  value={search}
+                />
+                <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
+                  <Text>Search</Text>
+                </TouchableOpacity>
+                {search && <TouchableOpacity style={styles.searchBtn} onPress={handleReset}>
+                  <Text>Reset</Text>
+                </TouchableOpacity>}
               </View>
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
@@ -793,16 +720,16 @@ export default function AllCaregivers({ navigation }) {
                 inputSearchStyle={styles.inputSearchStyle}
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
-                data={pageItems}
+                data={pageList}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
                 placeholder={'100 per page'}
-                value={value ? value : pageItems[3].value}
+                value={curPage ? curPage : 1}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={item => {
-                  setValue(item.value);
+                  setCurPage(item.value);
                   setIsFocus(false);
                 }}
                 renderLeftIcon={() => (
@@ -927,99 +854,6 @@ export default function AllCaregivers({ navigation }) {
               </ScrollView>
             </View>
           </View>
-          
-          <Modal
-            visible={modal}
-            transparent= {true}
-            animationType="slide"
-            onRequestClose={() => {
-              setModal(!modal);
-            }}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.calendarContainer}>
-                <View style={styles.header}>
-                  <Text style={styles.headerText}>{tableHead[modalItem]}</Text>
-                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
-                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.body}>
-                  <View style={styles.modalBody}>
-                    {
-                      (modalItem === 4) ?
-                        <Dropdown
-                          style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          inputSearchStyle={styles.inputSearchStyle}
-                          itemTextStyle={styles.itemTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={location}
-                          // search
-                          maxHeight={300}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={cellData}
-                          // searchPlaceholder="Search..."
-                          value={jobValue}
-                          onFocus={() => setJobIsFocus(true)}
-                          onBlur={() => setJobIsFocus(false)}
-                          onChange={item => {
-                            setJobValue(item.value);
-                            setLabel(item.label);
-                            setJobIsFocus(false);
-                          }}
-                          renderLeftIcon={() => (
-                            <View
-                              style={styles.icon}
-                              color={isJobFocus ? 'blue' : 'black'}
-                              name="Safety"
-                              size={20}
-                            />
-                          )}
-                        />
-                      :
-                      (modalItem === 2) || (modalItem === 3) ?
-                        (<TextInput
-                          style={[styles.searchText, {width: '100%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
-                          placeholder=""
-                          onChangeText={e => {
-                            const formattedNumber = formatPhoneNumber(e);
-                            if (modalItem === 2) {setLabel(formattedNumber)}
-                            else {setLabel(e)}
-                          }}
-                          value={label || ''}
-                          keyboardType={modalItem && "phone-pad"}
-                        />)
-                      :
-                      (modalItem === 1) ?
-                        (<View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: 20}}>
-                          <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
-                            placeholder=""
-                            onChangeText={e => setLabel({...label, firstName: e})}
-                            value={label.firstName || ''}
-                          />
-                          <TextInput
-                            style={[styles.searchText, {width: '40%', paddingTop: 0, height: 30, textAlignVertical: 'center'}]}
-                            placeholder=""
-                            onChangeText={e => setLabel({...label, lastName: e})}
-                            value={label.lastName || ''}
-                          />
-                        </View>
-                        )
-                      :
-                      <></>
-                    }
-                    <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
-                      <Text style={styles.buttonText}>Update</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </Modal>
           <Modal
             visible={updateStatusModal}
             transparent= {true}
@@ -2235,6 +2069,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black',
   },
+  searchBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: '60%',
+    borderRadius: 10,
+    marginBottom: 10
+  },
+  searchText: {
+    width: 150,
+    backgroundColor: 'white',
+    paddingVertical: 5,
+    color: 'black',
+    height: 30,
+  },
+  searchBtn: {
+    width: 80,
+    height: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    marginLeft: 5
+  },
   row: {
     padding: 10,
     borderBottomWidth: 1,
@@ -2295,28 +2154,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'flex-start',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    width: '60%',
-    borderRadius: 10,
-    marginBottom: 10
-  },
-  searchText: {
-    width: '70%',
-    backgroundColor: 'white',
-    paddingBottom: 0,
-  },
-  searchBtn: {
-    width: '50%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-    color: '#2a53c1',
-    height: 30
   },
   filter: {
     width: '90%',

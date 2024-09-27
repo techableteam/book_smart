@@ -207,8 +207,8 @@ export default function CaregiverTimeSheet({ navigation }) {
     setFilters(newFilters);  // Set the updated filters state
   };
 
-  const getData = async (requestData = { search, page: curPage }) => {
-    
+  const getData = async (requestData = { search: search, page: curPage, filters: filters }) => {
+    console.log(search, filters, curPage);
     setLoading(true);
     let result = await getCaregiverTimesheets(requestData, 'jobs');
   
@@ -255,11 +255,12 @@ export default function CaregiverTimeSheet({ navigation }) {
     event.persist();
   
     setSearch(''); 
-    getData({ search: '', page: curPage });
+    getData({ search: '', page: curPage, filters: filters });
   };
   
   const handleSearch = (event) => {
     event.persist();
+    setAddFilterModal(false);
     getData();
   };
 
@@ -373,17 +374,26 @@ export default function CaregiverTimeSheet({ navigation }) {
                   <Text>Reset</Text>
                 </TouchableOpacity>}
               </View>
-              <View style={{ marginBottom: 10 }}>
+              <View>
                 <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0 }]} onPress={toggleAddFilterModal}>
                   <Text>Add Filter</Text>
                 </TouchableOpacity>
-                <View>
-                  {filters.map((item, index) => (
-                    <View key={index}>
-
+              </View>
+              <View style={{ flexDirection: 'row', marginVertical: 5, flexWrap: 'wrap' }}>
+                {filters.map((item, index) => (
+                  <View key={index} style={styles.filterItem}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={styles.filterItemTxt}> {item.field}</Text>
+                      <Text style={styles.filterItemTxt}> {item.condition}</Text>
+                      <Text style={styles.filterItemTxt}> {item.value}</Text>
                     </View>
-                  ))}
-                </View>
+                    <View style={{ marginLeft: 5 }}>
+                      <TouchableOpacity style={{width: 20, height: 20, }} onPress={() => removeFilter(index)}>
+                        <Image source = {images.close} style={{width: 20, height: 20}}/>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
               </View>
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
@@ -448,129 +458,129 @@ export default function CaregiverTimeSheet({ navigation }) {
           </View>
         </View>
         <Modal
-            visible={addfilterModal}
-            transparent= {true}
-            animationType="slide"
-            onRequestClose={() => {
-              setAddFilterModal(!addfilterModal);
-            }}
-          >
-            <View style={styles.modalContainer}>
-              <View style={[styles.calendarContainer, { height: '80%' }]}>
-                <View style={styles.header}>
-                  <Text style={styles.headerText}>Filter</Text>
-                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddFilterModal}>
-                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.body}>
-                  <ScrollView>
-                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Where</Text>
-                    {filters.map((filter, index) => (
-                      <View key={index} style={styles.filterRow}>
-                        {index !== 0 && (
-                          <Dropdown
-                            style={[styles.dropdown, {width: '100%'}, isLogicFocus && { borderColor: 'blue' }]}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            itemTextStyle={styles.itemTextStyle}
-                            iconStyle={styles.iconStyle}
-                            data={logicItems}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="value"
-                            placeholder={''}
-                            value={filter.logic}
-                            onFocus={() => setIsLogicFocus(true)}
-                            onBlur={() => setIsLogicFocus(false)}
-                            onChange={item => {
-                              handleFilterChange(index, 'logic', item.value);
-                              setIsLogicFocus(false);
-                            }}
-                            renderLeftIcon={() => (
-                              <View
-                                style={styles.icon}
-                                color={isLogicFocus ? 'blue' : 'black'}
-                                name="Safety"
-                                size={20}
-                              />
-                            )}
+          visible={addfilterModal}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setAddFilterModal(!addfilterModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={[styles.calendarContainer, { height: '80%' }]}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Filter</Text>
+                <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddFilterModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <ScrollView>
+                  <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Where</Text>
+                  {filters.map((filter, index) => (
+                    <View key={index} style={styles.filterRow}>
+                      {index !== 0 && (
+                        <Dropdown
+                          style={[styles.dropdown, {width: '100%'}, isLogicFocus && { borderColor: 'blue' }]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          itemTextStyle={styles.itemTextStyle}
+                          iconStyle={styles.iconStyle}
+                          data={logicItems}
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={''}
+                          value={filter.logic}
+                          onFocus={() => setIsLogicFocus(true)}
+                          onBlur={() => setIsLogicFocus(false)}
+                          onChange={item => {
+                            handleFilterChange(index, 'logic', item.value);
+                            setIsLogicFocus(false);
+                          }}
+                          renderLeftIcon={() => (
+                            <View
+                              style={styles.icon}
+                              color={isLogicFocus ? 'blue' : 'black'}
+                              name="Safety"
+                              size={20}
+                            />
+                          )}
+                        />
+                      )}
+                      <Dropdown
+                        style={[styles.dropdown, {width: '100%'}, isFieldFocus && { borderColor: 'blue' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        itemTextStyle={styles.itemTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={fieldsItems}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={''}
+                        value={filter.field}
+                        onFocus={() => setIsFieldFocus(true)}
+                        onBlur={() => setIsFieldFocus(false)}
+                        onChange={item => {
+                          handleFilterChange(index, 'field', item.value);
+                          setIsFieldFocus(false);
+                        }}
+                        renderLeftIcon={() => (
+                          <View
+                            style={styles.icon}
+                            color={isFieldFocus ? 'blue' : 'black'}
+                            name="Safety"
+                            size={20}
                           />
                         )}
-                        <Dropdown
-                          style={[styles.dropdown, {width: '100%'}, isFieldFocus && { borderColor: 'blue' }]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          inputSearchStyle={styles.inputSearchStyle}
-                          itemTextStyle={styles.itemTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={fieldsItems}
-                          maxHeight={300}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={''}
-                          value={filter.field}
-                          onFocus={() => setIsFieldFocus(true)}
-                          onBlur={() => setIsFieldFocus(false)}
-                          onChange={item => {
-                            handleFilterChange(index, 'field', item.value);
-                            setIsFieldFocus(false);
-                          }}
-                          renderLeftIcon={() => (
-                            <View
-                              style={styles.icon}
-                              color={isFieldFocus ? 'blue' : 'black'}
-                              name="Safety"
-                              size={20}
-                            />
-                          )}
-                        />
-                        <Dropdown
-                          style={[styles.dropdown, {width: '100%'}, isConditionFocus && { borderColor: 'blue' }]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          inputSearchStyle={styles.inputSearchStyle}
-                          itemTextStyle={styles.itemTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={conditionItems}
-                          maxHeight={300}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={''}
-                          value={filter.condition}
-                          onFocus={() => setIsConditionFocus(true)}
-                          onBlur={() => setIsConditionFocus(false)}
-                          onChange={item => {
-                            handleFilterChange(index, 'condition', item.value);
-                            setIsConditionFocus(false);
-                          }}
-                          renderLeftIcon={() => (
-                            <View
-                              style={styles.icon}
-                              color={isConditionFocus ? 'blue' : 'black'}
-                              name="Safety"
-                              size={20}
-                            />
-                          )}
-                        />
-                        {renderInputField(filter, index)}
-                        <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={() => removeFilter(index)}>
-                          <Text style={styles.removeButton}>Remove</Text>
-                        </TouchableOpacity>
-                      </View>
-                    ))}
-                    <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={addFilter}>
-                      <Text style={styles.buttonText}>Add filter</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={toggleAddFilterModal} underlayColor="#0056b3">
-                      <Text style={styles.buttonText}>Submit</Text>
-                    </TouchableOpacity>
-                  </ScrollView>
-                </View>
+                      />
+                      <Dropdown
+                        style={[styles.dropdown, {width: '100%'}, isConditionFocus && { borderColor: 'blue' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        itemTextStyle={styles.itemTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={conditionItems}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={''}
+                        value={filter.condition}
+                        onFocus={() => setIsConditionFocus(true)}
+                        onBlur={() => setIsConditionFocus(false)}
+                        onChange={item => {
+                          handleFilterChange(index, 'condition', item.value);
+                          setIsConditionFocus(false);
+                        }}
+                        renderLeftIcon={() => (
+                          <View
+                            style={styles.icon}
+                            color={isConditionFocus ? 'blue' : 'black'}
+                            name="Safety"
+                            size={20}
+                          />
+                        )}
+                      />
+                      {renderInputField(filter, index)}
+                      <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={() => removeFilter(index)}>
+                        <Text style={styles.removeButton}>Remove</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                  <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={addFilter}>
+                    <Text style={styles.buttonText}>Add filter</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={handleSearch} underlayColor="#0056b3">
+                    <Text style={styles.buttonText}>Submit</Text>
+                  </TouchableOpacity>
+                </ScrollView>
               </View>
             </View>
-          </Modal>
+          </View>
+        </Modal>
       </ScrollView>
       <Loader visible={loading} />
       <MFooter />
@@ -764,6 +774,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
     color: '#2a53c1',
     marginLeft: 5
+  },
+  filterItem: {
+    paddingHorizontal: 10,
+    height: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    marginRight: 5,
+    marginBottom: 3,
+    borderRadius: 50,
+  },
+  filterItemTxt: {
+    color: 'blue',
+    textDecorationLine: 'underline'
   },
   filter: {
     width: '90%',

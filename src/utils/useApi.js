@@ -511,6 +511,42 @@ export const getCaregiverTimesheets = async (data, endpoint) => {
   }
 };
 
+export const getAllUsersList = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/getAllUsersList`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const allCaregivers = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/allCaregivers`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
 export const Jobs = async (endpoint, role) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');

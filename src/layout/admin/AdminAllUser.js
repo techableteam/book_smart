@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableWithoutFeedback, Alert, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { TouchableWithoutFeedback, Alert, Modal, View, TextInput, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
-import { Table, Row } from 'react-native-table-component';
-import { UpdateUser, Clinician, updateUserInfo, removeAccount } from '../../utils/useApi';
+import { Table } from 'react-native-table-component';
+import { updateUserInfo, removeAccount, getAllUsersList } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
 import { useFocusEffect } from '@react-navigation/native';
@@ -13,22 +13,25 @@ import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 
 export default function AdminAllUser({ navigation }) {
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
   const [data, setData] = useState([]);
   const [cellData, setCellData] = useState(null);
-  const [rowData, setRowData] = useState(null);
-  const [useRole, setUserRole] = useState(0)
-  const [modalItem, setModalItem] = useState(100);
-  const [label, setLabel] = useState(null);
-  const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [modal, setModal] = useState(false)  
   const [isJobFocus, setJobIsFocus] = useState(false);
-  const [suc, setSuc] = useState(0);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLogicFocus, setIsLogicFocus] = useState(false);
+  const [isFieldFocus, setIsFieldFocus] = useState(false);
+  const [isConditionFocus, setIsConditionFocus] = useState(false);
+  const [isValueOptionFocus, setIsValueOptionFocus] = useState(false);
+  const [addfilterModal, setAddFilterModal] = useState(false);
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+  const [curPage, setCurPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [valueOption, setValueOption] = useState([]);
+  const [pageList, setPageList] = useState([
+    {label: 'Page 1', value: 1}
+  ]);
   const widths = [120, 250, 150, 150, 80];
   const tableHead = [
     'Name',
@@ -37,58 +40,149 @@ export default function AdminAllUser({ navigation }) {
     '✏️ User Status',
     'Delete'
   ];
-  const pageItems = [
-    {label: '10 per page', value: '1'},
-    {label: '25 per page', value: '2'},
-    {label: '50 per page', value: '3'},
-    {label: '100 per page', value: '4'},
-    {label: '500 per page', value: '5'},
-    {label: '1000 per page', value: '6'},
-  ];
   const userStatus = [
     {label: 'activate', value: 'activate'},
     {label: 'inactivate', value: 'inactivate'},
     {label: 'pending approval', value: 'pending approval'}
   ];
-  let colorIndex = 0;
+  const rolesList = [
+    {label: 'Clinician', value: 'Clinician'},
+    {label: 'Administrator', value: 'Administrator'},
+    {label: 'Facility', value: 'Facility'},
+  ];
+  const logicItems = [
+    {label: 'and', value: 'and'},
+    {label: 'or', value: 'or'}
+  ];
+  const fieldsItems = [
+    { label: 'Name', value: 'Name'},
+    { label: 'Email', value: 'Email'},
+    { label: 'User Roles', value: 'User Roles'},
+    { label: 'User Status', value: 'User Status'},
+  ];
+  const fieldConditions = {
+    'Name': [
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'starts with', value: 'starts with' },
+      { label: 'ends with', value: 'ends with' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'Email': [
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'starts with', value: 'starts with' },
+      { label: 'ends with', value: 'ends with' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'User Roles': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is any', value: 'is any' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+    'User Status': [
+      { label: 'is', value: 'is' },
+      { label: 'is not', value: 'is not' },
+      { label: 'contains', value: 'contains' },
+      { label: 'does not contain', value: 'does not contain' },
+      { label: 'is any', value: 'is any' },
+      { label: 'is blank', value: 'is blank' },
+      { label: 'is not blank', value: 'is not blank' },
+    ],
+  };
+  const [conditionItems, setConditionItems] = useState(fieldConditions['Name']);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
+  const [filters, setFilters] = useState([
+    { logic: '', field: 'Name', condition: 'contains', value: '', valueType: 'text' },
+  ]);
 
-  function formatData(data) {
-    return data.map(item => {
-      const fullName = `${item[1]} ${item[2]}`;
-      return [fullName, item[4], item[6], item[5], ""];
-    });
+  const addFilter = () => {
+    setFilters([...filters, { logic: 'and', field: 'Name', condition: 'contains', value: '', valueType: 'text' }]);
   };
 
-  const getData = async () => {
+  const removeFilter = (index) => {
+    const newFilters = [...filters];
+    newFilters.splice(index, 1);
+    setFilters(newFilters);
+  };
+
+  const handleRemoveFilter = (index) => {
+    const newFilters = [...filters];
+    newFilters.splice(index, 1);
+    getData({ search: search, page: curPage, filters: newFilters });
+    setFilters(newFilters);
+  };
+
+  const handleFilterChange = (index, key, value) => {
+    const newFilters = [...filters];
+
+    if (key === 'logic') {
+      const updatedFilters = newFilters.map((filter) => ({
+        ...filter,
+        logic: value,
+      }));
+      setFilters(updatedFilters);
+      return;
+    } else if (key === 'field') {
+      setConditionItems(fieldConditions[value]);
+
+      if (value === 'User Roles' || value === 'User Status') {
+        newFilters[index]['valueType'] = 'select';
+        if (value === 'User Roles') {
+          setValueOption(rolesList);
+        } else if (value === 'User Status') {
+          setValueOption(userStatus);
+        }
+        newFilters[index]['condition'] = 'is';
+      } else {
+        newFilters[index]['valueType'] = 'text';
+      }
+      newFilters[index][key] = value;
+    } else if (key == 'condition') {
+      if (value == 'is any' || value == 'is blank' || value == 'is not blank') {
+        newFilters[index]['valueType'] = '';
+      } else {
+        if (newFilters[index]['field'] === 'User Roles' || newFilters[index]['field'] === 'User Status') {
+          newFilters[index]['valueType'] = 'select';
+        } else {
+          newFilters[index]['valueType'] = 'text';
+        }
+      }
+    } else {
+      newFilters[index][key] = value;
+    }
+    setFilters(newFilters);
+  };
+
+  const getData = async (requestData = { search: search, page: curPage, filters: filters }) => {
     setLoading(true);
-    let clinicalData = await Clinician('clinical/getAllList', 'Admin');
-    let adminData = await Clinician('admin/admin', "Admin")
-    let facilityData = await Clinician('facilities/facility', 'Admin')
-    
-    if(!clinicalData) {
+    let result = await getAllUsersList(requestData, 'Admin');
+    if(!result) {
       setData(['No Data'])
     } else {
-      const modifiedData1 = clinicalData;
-      const modifiedData2 = formatData(adminData);
-      const modifiedData3 = formatData(facilityData);
-      const modifiedArray = [...modifiedData1, ...modifiedData2, ...modifiedData3];
-      setData(modifiedArray);
+      setData(result.userList);
+      let pageContent = [];
+      for (let i = 1; i <= result.totalPageCnt; i++) {
+        pageContent.push({ label: 'Page ' + i, value: i });
+      }
+      setPageList(pageContent);
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    getData();
+  }, [curPage]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -100,8 +194,13 @@ export default function AdminAllUser({ navigation }) {
     setModal(!modal);
   };
 
+  const handleSubmit = () => {
+    setIsSubmitted(true);
+    toggleAddFilterModal();
+    getData();
+  };
+
   const handleCellClick = (data) => {
-    console.log(data);
     setCellData(data);
     setStatus(data[3]);
     toggleModal();
@@ -145,29 +244,8 @@ export default function AdminAllUser({ navigation }) {
   };
 
   const handleUpdate = async () => {
-    // if (password != '') {
-    //   if (password != confirmPassword) {
-    //     Alert.alert(
-    //       'Warning!',
-    //       "The Password doesn't matched. Please try again.",
-    //       [
-    //         {
-    //           text: 'OK',
-    //           onPress: () => {
-    //             setPassword('');
-    //             setConfirmPassword('');
-    //             console.log('OK pressed')
-    //           },
-    //         },
-    //       ],
-    //       { cancelable: false }
-    //     );
-    //     return;
-    //   }
-    // }
-
     try {
-      const response = await updateUserInfo({userEmail: cellData[1], userRole: cellData[2], status: status, password: password}, 'admin');
+      const response = await updateUserInfo({userEmail: cellData[1], userRole: cellData[2], status: status, password: ''}, 'admin');
 
       if (!response?.error) {
         getData();
@@ -204,55 +282,69 @@ export default function AdminAllUser({ navigation }) {
     }
   };
 
-  const handlePress = async() => {
-    let totalData = {};
-    let sendingData = {};
-
-    if (modalItem === 2) {
-      const name = rowData[0].split(" ");
-
-      if (label === 'Clinician' || label === 'Admin') {
-        sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: label, userStatus: rowData[3]}
-      } else {
-        sendingData = {firstName: name[0], lastName: name[1], contactEmail: rowData[1], userRole: label, userStatus: rowData[3]}
-      }
-    } else if (modalItem === 0) {
-      if ( useRole === 'Clinician' || useRole === 'Admin') {
-        sendingData = {firstName: label.firstName, lastName: label.lastName, email: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
-      } else {
-        sendingData = {firstName: label.firstName, lastName: label.lastName, contactEmail: rowData[1], userRole: rowData[2], userStatus: rowData[3]}
-      }
-    } else if (modalItem === 1) {
-      const name = rowData[0].split(" ");
-      sendingData = {
-        firstName: name[0],
-        lastName: name[1],
-        userRole: rowData[2],
-        userStatus: rowData[3],
-      };
-      
-      if (useRole === 'Clinician' || useRole === 'Admin') {
-        sendingData.email = rowData[1];
-        if (modalItem === 1) {
-          sendingData.updateEmail = label;
-        }
-      } else {
-        sendingData.contactEmail = rowData[1];
-      }
-    } else {
-      const name = rowData[0].split(" ");
-      if ( useRole === 'Clinician' || useRole === 'Admin') {
-        sendingData = {firstName: name[0], lastName: name[1], email: rowData[1], userRole: rowData[2], userStatus: label}
-      } else {
-        sendingData = {firstName: name[0], lastName: name[1], contactEmail: rowData[1], userRole: rowData[2], userStatus: label}
-      }
-    }
-    totalData = {updateData: sendingData, userRole: useRole}
-    let data = await UpdateUser(totalData, 'admin');
-    if(data) setSuc(suc+1);
-    else setSuc(suc);
-    toggleModal();
+  const handleSearch = (event) => {
+    event.persist();
     getData();
+  };
+
+  const handleReset = (event) => {
+    event.persist();
+  
+    setSearch(''); 
+    getData({ search: '', page: curPage, filters: filters });
+  };
+
+  const toggleAddFilterModal = () => {
+    setAddFilterModal(!addfilterModal)
+  };
+
+  const renderInputField = (filter, index) => {
+    const { valueType, value } = filter;
+
+    if (valueType === 'text') {
+      return (
+        <TextInput
+          style={[styles.input, { color: 'black', paddingVertical: 5 }]}
+          placeholder=""
+          value={value}
+          onChangeText={(text) => handleFilterChange(index, 'value', text)}
+        />
+      );
+    }
+
+    if (valueType === 'select') {
+      return (
+        <Dropdown
+          style={[styles.dropdown, {width: '100%'}, isValueOptionFocus && { borderColor: 'blue' }]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          itemTextStyle={styles.itemTextStyle}
+          iconStyle={styles.iconStyle}
+          data={valueOption}
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder={''}
+          value={filter.value}
+          onFocus={() => setIsValueOptionFocus(true)}
+          onBlur={() => setIsValueOptionFocus(false)}
+          onChange={item => {
+            handleFilterChange(index, 'value', item.value);
+            setIsValueOptionFocus(false);
+          }}
+          renderLeftIcon={() => (
+            <View
+              style={styles.icon}
+              color={isValueOptionFocus ? 'blue' : 'black'}
+              name="Safety"
+              size={20}
+            />
+          )}
+        />
+      );
+    }
+    return (<></>);
   };
 
   return (
@@ -293,11 +385,40 @@ export default function AdminAllUser({ navigation }) {
                 <Text style={styles.profileTitle}>🖥️ ALL PLATFORM USERS</Text>
               </View>
               <View style={styles.searchBar}>
-                {/* <TextInput style={styles.searchText} /> */}
-                {/* <TouchableOpacity style={styles.searchBtn}>
-                  <Text>Add filters</Text>
-                </TouchableOpacity> */}
+                <TextInput
+                  style={styles.searchText}
+                  placeholder=""
+                  onChangeText={e => setSearch(e)}
+                  value={search}
+                />
+                <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
+                  <Text>Search</Text>
+                </TouchableOpacity>
+                {search && <TouchableOpacity style={styles.searchBtn} onPress={handleReset}>
+                  <Text>Reset</Text>
+                </TouchableOpacity>}
               </View>
+              <View>
+                <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0, marginBottom: 5 }]} onPress={toggleAddFilterModal}>
+                  <Text>Add Filter</Text>
+                </TouchableOpacity>
+              </View>
+              {isSubmitted && <View style={{ flexDirection: 'row', marginBottom: 5, flexWrap: 'wrap' }}>
+                {filters.map((item, index) => (
+                  <View key={index} style={styles.filterItem}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={styles.filterItemTxt}> {item.field}</Text>
+                      <Text style={styles.filterItemTxt}> {item.condition}</Text>
+                      <Text style={styles.filterItemTxt}> {item.value}</Text>
+                    </View>
+                    <View style={{ marginLeft: 5 }}>
+                      <TouchableOpacity style={{width: 20, height: 20, }} onPress={() => handleRemoveFilter(index)}>
+                        <Image source = {images.close} style={{width: 20, height: 20}}/>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>}
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
@@ -305,16 +426,16 @@ export default function AdminAllUser({ navigation }) {
                 inputSearchStyle={styles.inputSearchStyle}
                 itemTextStyle={styles.itemTextStyle}
                 iconStyle={styles.iconStyle}
-                data={pageItems}
+                data={pageList}
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={'100 per page'}
-                value={value ? value : pageItems[3].value}
+                placeholder={'Page 1'}
+                value={curPage ? curPage : 1}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={item => {
-                  setValue(item.value);
+                  setCurPage(item.value);
                   setIsFocus(false);
                 }}
                 renderLeftIcon={() => (
@@ -391,7 +512,130 @@ export default function AdminAllUser({ navigation }) {
               </ScrollView>
             </View>
           </View>
-          
+          <Modal
+            visible={addfilterModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setAddFilterModal(!addfilterModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={[styles.calendarContainer, { height: '80%' }]}>
+                <View style={styles.header}>
+                  <Text style={styles.headerText}>Filter</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddFilterModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.body, { marginBottom: 100 }]}>
+                  <ScrollView>
+                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Where</Text>
+                    {filters.map((filter, index) => (
+                      <View key={index} style={styles.filterRow}>
+                        {index !== 0 && (
+                          <Dropdown
+                            style={[styles.dropdown, {width: '100%'}, isLogicFocus && { borderColor: 'blue' }]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            itemTextStyle={styles.itemTextStyle}
+                            iconStyle={styles.iconStyle}
+                            data={logicItems}
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={''}
+                            value={filter.logic}
+                            onFocus={() => setIsLogicFocus(true)}
+                            onBlur={() => setIsLogicFocus(false)}
+                            onChange={item => {
+                              handleFilterChange(index, 'logic', item.value);
+                              setIsLogicFocus(false);
+                            }}
+                            renderLeftIcon={() => (
+                              <View
+                                style={styles.icon}
+                                color={isLogicFocus ? 'blue' : 'black'}
+                                name="Safety"
+                                size={20}
+                              />
+                            )}
+                          />
+                        )}
+                        <Dropdown
+                          style={[styles.dropdown, {width: '100%'}, isFieldFocus && { borderColor: 'blue' }]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          itemTextStyle={styles.itemTextStyle}
+                          iconStyle={styles.iconStyle}
+                          data={fieldsItems}
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={''}
+                          value={filter.field}
+                          onFocus={() => setIsFieldFocus(true)}
+                          onBlur={() => setIsFieldFocus(false)}
+                          onChange={item => {
+                            handleFilterChange(index, 'field', item.value);
+                            setIsFieldFocus(false);
+                          }}
+                          renderLeftIcon={() => (
+                            <View
+                              style={styles.icon}
+                              color={isFieldFocus ? 'blue' : 'black'}
+                              name="Safety"
+                              size={20}
+                            />
+                          )}
+                        />
+                        <Dropdown
+                          style={[styles.dropdown, {width: '100%'}, isConditionFocus && { borderColor: 'blue' }]}
+                          placeholderStyle={styles.placeholderStyle}
+                          selectedTextStyle={styles.selectedTextStyle}
+                          inputSearchStyle={styles.inputSearchStyle}
+                          itemTextStyle={styles.itemTextStyle}
+                          iconStyle={styles.iconStyle}
+                          data={conditionItems}
+                          maxHeight={300}
+                          labelField="label"
+                          valueField="value"
+                          placeholder={''}
+                          value={filter.condition}
+                          onFocus={() => setIsConditionFocus(true)}
+                          onBlur={() => setIsConditionFocus(false)}
+                          onChange={item => {
+                            handleFilterChange(index, 'condition', item.value);
+                            setIsConditionFocus(false);
+                          }}
+                          renderLeftIcon={() => (
+                            <View
+                              style={styles.icon}
+                              color={isConditionFocus ? 'blue' : 'black'}
+                              name="Safety"
+                              size={20}
+                            />
+                          )}
+                        />
+                        {renderInputField(filter, index)}
+                        <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={() => removeFilter(index)}>
+                          <Text style={styles.removeButton}>Remove</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                    <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={addFilter}>
+                      <Text style={styles.buttonText}>Add filter</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={handleSubmit} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Submit</Text>
+                    </TouchableOpacity>
+                  </ScrollView>
+                </View>
+              </View>
+            </View>
+          </Modal>
           <Modal
             visible={modal}
             transparent= {true}
@@ -403,7 +647,7 @@ export default function AdminAllUser({ navigation }) {
             <View style={styles.modalContainer}>
               <View style={styles.calendarContainer}>
                 <View style={styles.header}>
-                  <Text style={styles.headerText}>{tableHead[modalItem]}</Text>
+                  <Text style={styles.headerText}>Update</Text>
                   <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
                     <Image source = {images.close} style={{width: 20, height: 20,}}/>
                   </TouchableOpacity>
@@ -439,28 +683,6 @@ export default function AdminAllUser({ navigation }) {
                         />
                       )}
                     />
-
-                    {/* <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Change Password</Text>
-
-                    <TextInput
-                      autoCorrect={false}
-                      autoCapitalize="none"
-                      secureTextEntry={true}
-                      style={[styles.input, {width: '100%', color: 'black'}]}
-                      placeholder="Please enter new password"
-                      onChangeText={e => setPassword(e)}
-                      value={password}
-                    />
-                    <TextInput
-                      autoCorrect={false}
-                      autoCapitalize="none"
-                      secureTextEntry={true}
-                      style={[styles.input, {width: '100%', color: 'black'}]}
-                      placeholder="Please enter confirm password"
-                      onChangeText={e => setConfirmPassword(e)}
-                      value={confirmPassword}
-                    /> */}
-                    
                     <TouchableOpacity style={styles.button} onPress={handleUpdate} underlayColor="#0056b3">
                       <Text style={styles.buttonText}>Update</Text>
                     </TouchableOpacity>
@@ -485,6 +707,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     position: 'relative',
     width: '100%'
+  },
+  removeButton: {
+    color: 'white',
+    textAlign: 'center'
+  },
+  filterRow: {
+    width: '100%',
+    marginBottom: 30
   },
   topView: {
     marginTop: 30,
@@ -573,6 +803,23 @@ const styles = StyleSheet.create({
     color: '#22138e',
     fontWeight: 'bold',
   },
+  filterItem: {
+    paddingHorizontal: 10,
+    height: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    marginRight: 5,
+    marginBottom: 3,
+    borderRadius: 50,
+  },
+  filterItemTxt: {
+    color: 'blue',
+    textDecorationLine: 'underline'
+  },
   row: {
     padding: 10,
     borderBottomWidth: 1,
@@ -645,18 +892,21 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   searchText: {
-    width: '70%',
+    width: 150,
     backgroundColor: 'white',
-    paddingBottom: 0,
+    paddingVertical: 5,
+    color: 'black',
+    height: 30,
   },
   searchBtn: {
-    width: '50%',
+    width: 80,
+    height: 30,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
     color: '#2a53c1',
-    height: 30
+    marginLeft: 5
   },
   filter: {
     width: '90%',
@@ -753,6 +1003,7 @@ const styles = StyleSheet.create({
     
   },
   buttonText: {
+    textAlign: 'center',
     color: 'white',            // Text color
     fontSize: 16,              // Text size
   },
