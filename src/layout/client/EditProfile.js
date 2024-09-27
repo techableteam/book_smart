@@ -1,5 +1,7 @@
 import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import React, { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useAtom } from 'jotai';
 import images from '../../assets/images';
 import { TextInput } from 'react-native-paper';
 import HButton from '../../components/Hbutton';
@@ -7,30 +9,8 @@ import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import DatePicker from 'react-native-date-picker';
 import MSubNavbar from '../../components/MSubNavbar';
-import { useAtom } from 'jotai';
-import { 
-  firstNameAtom, 
-  lastNameAtom, 
-  emailAtom, 
-  titleAtom, 
-  userRoleAtom, 
-  birthdayAtom, 
-  entryDateAtom, 
-  phoneNumberAtom, 
-  addressAtom, 
-  socialSecurityNumberAtom, 
-  photoImageAtom, 
-  driverLicenseAtom,
-  socialCardAtom,
-  physicalExamAtom,
-  ppdAtom,
-  mmrAtom,
-  healthcareLicenseAtom,
-  resumeAtom,
-  covidCardAtom,
-  blsAtom
- } from '../../context/ClinicalAuthProvider';
-import { Update } from '../../utils/useApi';
+import { getUserInfo, Update } from '../../utils/useApi';
+import { aicAtom } from '../../context/ClinicalAuthProvider';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -38,25 +18,62 @@ import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 
 export default function EditProfile({ navigation }) {
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [userRole, setUserRole] = useAtom(userRoleAtom);
-  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [address, setAddress] = useAtom(addressAtom);
-  const [photoImage, setPhotoImage] = useAtom(photoImageAtom);
-  const [title, setTitle] = useAtom(titleAtom);
-  const [birthdays, setBirthdays] = useAtom(birthdayAtom);
-  const [socialSecurityNumber, setSocialSecurityNumber] = useAtom(socialSecurityNumberAtom);
-  const [driverLicense, setDriverLicense] = useAtom(driverLicenseAtom); 
-  const [socialCard, setSocialCard] = useAtom(socialCardAtom);
-  const [physicalExam, setPhysicalExam] = useAtom(physicalExamAtom); 
-  const [ppd, setPPD] = useAtom(ppdAtom);
-  const [mmr, setMMR] = useAtom(mmrAtom); 
-  const [healthcareLicense, setHealthcareLicense] = useAtom(healthcareLicenseAtom);
-  const [resume, setResume] = useAtom(resumeAtom); 
-  const [covidCard, setCovidCard] = useAtom(covidCardAtom);
-  const [bls, setBls] = useAtom(blsAtom); 
+  const [aic, setAIC] = useAtom(aicAtom);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [userRole, setUserRole] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [photoImage, setPhotoImage] = useState('');
+  const [title, setTitle] = useState('');
+  const [birthdays, setBirthdays] = useState('');
+  const [socialSecurityNumber, setSocialSecurityNumber] = useState('');
+  const [driverLicense, setDriverLicense] = useState({
+    content: '',
+    type: '',
+    name: ''
+  }); 
+  const [socialCard, setSocialCard] = useState({
+    content: '',
+    type: '',
+    name: ''
+  });
+  const [physicalExam, setPhysicalExam] = useState({
+    content: '',
+    type: '',
+    name: ''
+  }); 
+  const [ppd, setPPD] = useState({
+    content: '',
+    type: '',
+    name: ''
+  });
+  const [mmr, setMMR] = useState({
+    content: '',
+    type: '',
+    name: ''
+  }); 
+  const [healthcareLicense, setHealthcareLicense] = useState({
+    content: '',
+    type: '',
+    name: ''
+  });
+  const [resume, setResume] = useState({
+    content: '',
+    type: '',
+    name: ''
+  }); 
+  const [covidCard, setCovidCard] = useState({
+    content: '',
+    type: '',
+    name: ''
+  });
+  const [bls, setBls] = useState({
+    content: '',
+    type: '',
+    name: ''
+  }); 
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,7 +98,49 @@ export default function EditProfile({ navigation }) {
     resume: resume, 
     covidCard: covidCard, 
     bls: bls
-  })
+  });
+
+  const getData = async () => {
+    setLoading(true);
+    let result = await getUserInfo({ userId: aic }, 'clinical');
+    if (!result?.error) {
+      const updatedCredentials = { ...credentials };
+      Object.keys(updatedCredentials).forEach((key) => {
+        if (result.userData[key]) {
+          if (typeof updatedCredentials[key] === 'object') {
+            updatedCredentials[key] = { ...updatedCredentials[key], ...result.userData[key] };
+          } else if (result.userData[key] == true) {
+            updatedCredentials[key] = result.userData[key] == true ? 1 : 0;
+          } else {
+            updatedCredentials[key] = result.userData[key];
+          }
+        }
+      });
+      setCredentials(updatedCredentials);
+      setLoading(false);
+    } else {
+      setLoading(false);
+      Alert.alert(
+        'Warning!',
+        'Please try again later',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('');
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, [])
+  );
 
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
@@ -89,14 +148,13 @@ export default function EditProfile({ navigation }) {
     } else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }
-  }
-
+  };
 
   const [showModal, setShowModal] = useState(false);
   const handleItemPress = (text) => {
     handleCredentials('title', text);
     setShowModal(false);
-  }
+  };
 
   //-------------------------------------------Date Picker---------------------------------------
   const [birthday, setBirthday] = useState(new Date());
@@ -282,17 +340,13 @@ export default function EditProfile({ navigation }) {
     }
   };
 
-  //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
-    // Remove all non-numeric characters from the input
     const cleaned = input.replace(/\D/g, '');
 
-    // If the cleaned input has 1 or 2 characters, return it as is
     if (cleaned.length === 1 || cleaned.length === 2) {
         return cleaned;
     }
 
-    // Apply the desired phone number format
     let formattedNumber = '';
     if (cleaned.length >= 3) {
         formattedNumber = `(${cleaned.slice(0, 3)})`;
@@ -305,6 +359,7 @@ export default function EditProfile({ navigation }) {
     }
     return formattedNumber;
   };
+
   const handlePhoneNumberChange = (text) => {
     const formattedNumber = formatPhoneNumber(text);
     handleCredentials('phoneNumber', formattedNumber);
@@ -312,9 +367,8 @@ export default function EditProfile({ navigation }) {
 
   const handleBack = () => {
     navigation.navigate('MyHome');
-  }
+  };
 
-    //Alert
   const showAlerts = (name) => {
     Alert.alert(
       'Warning!',
@@ -350,23 +404,23 @@ export default function EditProfile({ navigation }) {
       setLoading(true);
       try {
         const response = await Update(credentials, 'clinical');
-        setFirstName(response.user.firstName);
-        setLastName(response.user.lastName);
-        setBirthdays(response.user.birthday);
-        setPhoneNumber(response.user.phoneNumber);
-        setEmail(response.user.email);
-        setTitle(response.user.title);
-        setPhotoImage(response.user.photoImage);
-        setUserRole(response.user.userRole);
-        setDriverLicense(response.user.driverLicense);
-        setSocialCard(response.user.socialCard);
-        setPhysicalExam(response.user.physicalExam);
-        setPPD(response.user.ppd);
-        setMMR(response.user.mmr);
-        setHealthcareLicense(response.user.healthcareLicense);
-        setResume(response.user.resume);
-        setCovidCard(response.user.covidCard);
-        setBls(response.user.bls);
+        // setFirstName(response.user.firstName);
+        // setLastName(response.user.lastName);
+        // setBirthdays(response.user.birthday);
+        // setPhoneNumber(response.user.phoneNumber);
+        // setEmail(response.user.email);
+        // setTitle(response.user.title);
+        // setPhotoImage(response.user.photoImage);
+        // setUserRole(response.user.userRole);
+        // setDriverLicense(response.user.driverLicense);
+        // setSocialCard(response.user.socialCard);
+        // setPhysicalExam(response.user.physicalExam);
+        // setPPD(response.user.ppd);
+        // setMMR(response.user.mmr);
+        // setHealthcareLicense(response.user.healthcareLicense);
+        // setResume(response.user.resume);
+        // setCovidCard(response.user.covidCard);
+        // setBls(response.user.bls);
         console.log('successfully Updated')
         setLoading(false);
         navigation.navigate("MyHome")
@@ -387,14 +441,10 @@ export default function EditProfile({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation}/>
       <MSubNavbar navigation={navigation} name={"Caregiver"}/>
-      <ScrollView style = {styles.scroll}    
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.authInfo}>
             <View style={styles.email}>
