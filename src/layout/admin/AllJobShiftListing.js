@@ -2214,7 +2214,7 @@ export default function AllJobShiftListing({ navigation }) {
           transparent= {true}
           animationType="slide"
           onRequestClose={() => {
-            setIsexport(!isexport);
+            setIsexport(!isex);
           }}>
 
         </Modal>

@@ -179,28 +179,29 @@ export default function ClientSignIn({ navigation }) {
         setAIC(response.user.aic);
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
-        setBirthday(response.user.birthday);
-        setPhoneNumber(response.user.phoneNumber);
-        setSignature(response.user.signature);
         setEmail(response.user.email);
         setTitle(response.user.title);
-        setPhotoImage(response.user.photoImage);
+        setPhoneNumber(response.user.phoneNumber);
         setUserRole(response.user.userRole);
-        setEntryDate(response.user.entryDate);
-        setSocialSecurityNumber(response.user.socialSecurityNumber);
         setClinicalAcknowledgement(response.user.clinicalAcknowledgeTerm);
-        setAddress(response.user.address);
         setPassword(response.user.password);
-        setDriverLicense(response.user.driverLicense);
-        setSocialCard(response.user.socialCard);
-        setPhysicalExam(response.user.physicalExam);
-        setPPD(response.user.ppd);
-        setMMR(response.user.mmr);
-        setHealthcareLicense(response.user.healthcareLicense);
-        setResume(response.user.resume);
-        setCovidCard(response.user.covidCard);
-        setBls(response.user.bls);
-        setDeviceNum(response.device);
+        // setDeviceNum(response.device);
+        // setBirthday(response.user.birthday);
+        // setSignature(response.user.signature);
+        // setPhotoImage(response.user.photoImage);
+        // setEntryDate(response.user.entryDate);
+        // setSocialSecurityNumber(response.user.socialSecurityNumber);
+        // setAddress(response.user.address);
+        // setDriverLicense(response.user.driverLicense);
+        // setSocialCard(response.user.socialCard);
+        // setPhysicalExam(response.user.physicalExam);
+        // setPPD(response.user.ppd);
+        // setMMR(response.user.mmr);
+        // setHealthcareLicense(response.user.healthcareLicense);
+        // setResume(response.user.resume);
+        // setCovidCard(response.user.covidCard);
+        // setBls(response.user.bls);
+        
 
         await AsyncStorage.setItem('clinicalPhoneNumber', response.user.phoneNumber);
 

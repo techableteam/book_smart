@@ -429,14 +429,12 @@ export default function Shift ({ navigation }) {
 
   const fileDownload = async () => {
     const fileName = 'BookSmart_Timesheet.pdf';
-    
+    dir = RNFS.ExternalStorageDirectoryPath;
   
     if (Platform.OS === 'ios') {
       dir = RNFS.DocumentDirectoryPath;
-    } else {
-      dir = RNFS.ExternalStorageDirectoryPath;
-    }
-  
+    } 
+      
     const filePath = `${dir}/${fileName}`;
   
     try {

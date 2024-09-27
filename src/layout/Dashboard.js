@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet, StatusBar } from 'react-native';
+import { View, Image, StyleSheet, StatusBar, SafeAreaView,  } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../assets/images';
 import HButton from '../components/Hbutton'
@@ -16,7 +16,7 @@ export default function Dashboard ({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView  style={styles.container}>
       <StatusBar  translucent backgroundColor="transparent" />
       <MHeader navigation={navigation} />
       <Text style={styles.text}>
@@ -24,24 +24,23 @@ export default function Dashboard ({ navigation }) {
       </Text>
       <Image
         source={images.homepage}
-        resizeMode="cover"
         style={styles.homepage}
       />
       <Text style={styles.text}>Are you looking to work or to hire?</Text>
       <View style={styles.buttonWrapper}>
         <HButton
           onPress={ handleClient }
-          style={styles.drinksButton}>
+          style={styles.button}>
           CLINICIAN
         </HButton>
         <HButton
           onPress={ handleFacility }
-          style={styles.drinksButton}>
+          style={styles.button}>
           FACILITY
         </HButton>
       </View>
       <MFooter />
-    </View>
+    </SafeAreaView >
   )
 };
 
@@ -57,6 +56,7 @@ const styles = StyleSheet.create({
     width: 350,
     height: 300,
     marginTop: 30,
+    resizeMode: 'cover'
   },
   text: {
     fontSize: 20,
@@ -68,7 +68,10 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
-  }
+    marginTop: 20,
+  },
+  button: {
+    marginHorizontal: 10, // Replace gap with marginHorizontal
+  },
 });
   
