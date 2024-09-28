@@ -133,7 +133,7 @@ export default function CompanyShift({ navigation }) {
   const [data, setData] = useState([]);
   async function getData() {
     setLoading(true);
-    let result = await Jobs('jobs', 'Facilities');
+    let result = await Jobs({}, 'jobs', 'Facilities');
     if(!result) {
       setLoading(false);
       setData(['No Data'])

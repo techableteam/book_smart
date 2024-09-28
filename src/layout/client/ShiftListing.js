@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
-import { Text, useTheme, } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Text } from 'react-native-paper';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
@@ -18,28 +18,9 @@ import Loader from '../Loader';
 const itemsPerPage = 100;
 
 export default function ShiftListing ({ navigation }) {
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
   const [isModal, setModal] = useState(false);
   const [content, setContent] = useState('');
   const [gettingData, setGettingData] = useState(false);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a random color
-      if(colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
-
   const [aic, setAIC] = useAtom(aicAtom);
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
@@ -57,13 +38,13 @@ export default function ShiftListing ({ navigation }) {
 
   async function getData() {
     setGettingData(true);
-    let Data = await Jobs('jobs', 'Clinician');
-    if(!Data) {
+    let data = await Jobs({}, 'jobs', 'Clinician');
+    if(!data) {
       setGettingData(false);
       setData(['No Data'])
     } else {
-      setData(Data);
-      const transformedData = Data.map(item => [{
+      setData(data);
+      const transformedData = data.map(item => [{
         title: 'Job-ID',
         content: item.jobId
       },{
@@ -86,7 +67,7 @@ export default function ShiftListing ({ navigation }) {
         content: item.status
       }]);
 
-      const detailedData = Data.map(item => [{
+      const detailedData = data.map(item => [{
         title: 'Job-ID',
         content: item.jobId
       },{

@@ -26,6 +26,7 @@ export default function CaregiverTimeSheet({ navigation }) {
   const [showDate, setShowDate] = useState(false);
   const [addfilterModal, setAddFilterModal] = useState(false);
   const [valueOption, setValueOption] = useState([]);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [nurseList, setNurseList] = useState([]);
   const [pageList, setPageList] = useState([
     {label: 'Page 1', value: 1}
@@ -63,7 +64,7 @@ export default function CaregiverTimeSheet({ navigation }) {
     { label: 'Pre Time', value: 'Pre Time'},
     { label: 'Lunch', value: 'Lunch'},
     { label: 'Lunch Equation', value: 'Lunch Equation'},
-    { label: 'Final Hours Equatioin', value: 'Final Hours Equatioin'},
+    { label: 'Final Hours Equation', value: 'Final Hours Equation'},
   ];
   const fieldConditions = {
     'Job-ID': [
@@ -264,6 +265,12 @@ export default function CaregiverTimeSheet({ navigation }) {
     getData();
   };
 
+  const handleSubmit = () => {
+    setIsSubmitted(true);
+    toggleAddFilterModal();
+    getData();
+  };
+
   const toggleAddFilterModal = () => {
     setAddFilterModal(!addfilterModal)
   };
@@ -379,7 +386,7 @@ export default function CaregiverTimeSheet({ navigation }) {
                   <Text>Add Filter</Text>
                 </TouchableOpacity>
               </View>
-              <View style={{ flexDirection: 'row', marginVertical: 5, flexWrap: 'wrap' }}>
+              {isSubmitted && <View style={{ flexDirection: 'row', marginBottom: 5, flexWrap: 'wrap' }}>
                 {filters.map((item, index) => (
                   <View key={index} style={styles.filterItem}>
                     <View style={{ flexDirection: 'row' }}>
@@ -388,13 +395,13 @@ export default function CaregiverTimeSheet({ navigation }) {
                       <Text style={styles.filterItemTxt}> {item.value}</Text>
                     </View>
                     <View style={{ marginLeft: 5 }}>
-                      <TouchableOpacity style={{width: 20, height: 20, }} onPress={() => removeFilter(index)}>
+                      <TouchableOpacity style={{width: 20, height: 20, }} onPress={() => handleRemoveFilter(index)}>
                         <Image source = {images.close} style={{width: 20, height: 20}}/>
                       </TouchableOpacity>
                     </View>
                   </View>
                 ))}
-              </View>
+              </View>}
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
@@ -573,7 +580,7 @@ export default function CaregiverTimeSheet({ navigation }) {
                   <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={addFilter}>
                     <Text style={styles.buttonText}>Add filter</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button} onPress={handleSearch} underlayColor="#0056b3">
+                  <TouchableOpacity style={styles.button} onPress={handleSubmit} underlayColor="#0056b3">
                     <Text style={styles.buttonText}>Submit</Text>
                   </TouchableOpacity>
                 </ScrollView>

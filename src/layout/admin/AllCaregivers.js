@@ -5,7 +5,7 @@ import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { useFocusEffect } from '@react-navigation/native';
 import { Table } from 'react-native-table-component';
 import RadioGroup from 'react-native-radio-buttons-group';
-import { Update, updatePassword, getUserProfile, getUserInfo, updateUserStatus, allCaregivers } from '../../utils/useApi';
+import { Update, updatePassword, getUserProfile, getUserInfo, updateUserStatus, allCaregivers, getDegreeList } from '../../utils/useApi';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -353,7 +353,7 @@ export default function AllCaregivers({ navigation }) {
         if (value === 'Degree/Discipline') {
           setValueOption(degrees);
         } else if (value === 'User Status') {
-          setValueOption(userStatus);
+          setValueOption(statusList);
         } else if (value === 'Payment') {
           setValueOption(paymentList);
         }
@@ -401,7 +401,7 @@ export default function AllCaregivers({ navigation }) {
     return formattedDate;
   };
 
-  const getData = async (requestData = { search: search, page: curPage }) => {
+  const getData = async (requestData = { search: search, page: curPage, filters: filters }) => {
     setLoading(true);
     let result = await allCaregivers(requestData, 'clinical');
     if(!result) {
@@ -427,9 +427,9 @@ export default function AllCaregivers({ navigation }) {
         tempArr.push({ label: item.degreeName, value: item.degreeName });
       });
       tempArr.unshift({ label: 'Select...', value: 'Select...' });
-      setDegree(tempArr);
+      setDegress(tempArr);
     } else {
-      setDegree([]);
+      setDegress([]);
     }
   };
 
@@ -440,7 +440,7 @@ export default function AllCaregivers({ navigation }) {
   const handleReset = (event) => {
     event.persist();
     setSearch(''); 
-    getData({ search: '', page: curPage});
+    getData({ search: '', page: curPage, filters: filters});
   };
   
   const handleSearch = (event) => {
@@ -974,7 +974,27 @@ export default function AllCaregivers({ navigation }) {
                   <Text>Reset</Text>
                 </TouchableOpacity>}
               </View> */}
-              
+              <View>
+                <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0, marginBottom: 5 }]} onPress={toggleAddFilterModal}>
+                  <Text>Add Filter</Text>
+                </TouchableOpacity>
+              </View>
+              {isSubmitted && <View style={{ flexDirection: 'row', marginBottom: 5, flexWrap: 'wrap' }}>
+                {filters.map((item, index) => (
+                  <View key={index} style={styles.filterItem}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={styles.filterItemTxt}> {item.field}</Text>
+                      <Text style={styles.filterItemTxt}> {item.condition}</Text>
+                      <Text style={styles.filterItemTxt}> {item.value}</Text>
+                    </View>
+                    <View style={{ marginLeft: 5 }}>
+                      <TouchableOpacity style={{width: 20, height: 20, }} onPress={() => handleRemoveFilter(index)}>
+                        <Image source = {images.close} style={{width: 20, height: 20}}/>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>}
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
@@ -986,7 +1006,7 @@ export default function AllCaregivers({ navigation }) {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={'100 per page'}
+                placeholder={'Page 1'}
                 value={curPage ? curPage : 1}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
@@ -2202,6 +2222,130 @@ export default function AllCaregivers({ navigation }) {
         )}
         </View>
       </ScrollView>
+      <Modal
+        visible={addfilterModal}
+        transparent= {true}
+        animationType="slide"
+        onRequestClose={() => {
+          setAddFilterModal(!addfilterModal);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={[styles.calendarContainer, { height: '80%' }]}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Filter</Text>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddFilterModal}>
+                <Image source = {images.close} style={{width: 20, height: 20,}}/>
+              </TouchableOpacity>
+            </View>
+            <View style={[styles.body, { marginBottom: 100 }]}>
+              <ScrollView>
+                <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Where</Text>
+                {filters.map((filter, index) => (
+                  <View key={index} style={styles.filterRow}>
+                    {index !== 0 && (
+                      <Dropdown
+                        style={[styles.dropdown, {width: '100%'}, isLogicFocus && { borderColor: 'blue' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        itemTextStyle={styles.itemTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={logicItems}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={''}
+                        value={filter.logic}
+                        onFocus={() => setIsLogicFocus(true)}
+                        onBlur={() => setIsLogicFocus(false)}
+                        onChange={item => {
+                          handleFilterChange(index, 'logic', item.value);
+                          setIsLogicFocus(false);
+                        }}
+                        renderLeftIcon={() => (
+                          <View
+                            style={styles.icon}
+                            color={isLogicFocus ? 'blue' : 'black'}
+                            name="Safety"
+                            size={20}
+                          />
+                        )}
+                      />
+                    )}
+                    <Dropdown
+                      style={[styles.dropdown, {width: '100%'}, isFieldFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      itemTextStyle={styles.itemTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={fieldsItems}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={''}
+                      value={filter.field}
+                      onFocus={() => setIsFieldFocus(true)}
+                      onBlur={() => setIsFieldFocus(false)}
+                      onChange={item => {
+                        handleFilterChange(index, 'field', item.value);
+                        setIsFieldFocus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <View
+                          style={styles.icon}
+                          color={isFieldFocus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
+                        />
+                      )}
+                    />
+                    <Dropdown
+                      style={[styles.dropdown, {width: '100%'}, isConditionFocus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      itemTextStyle={styles.itemTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={conditionItems}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={''}
+                      value={filter.condition}
+                      onFocus={() => setIsConditionFocus(true)}
+                      onBlur={() => setIsConditionFocus(false)}
+                      onChange={item => {
+                        handleFilterChange(index, 'condition', item.value);
+                        setIsConditionFocus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <View
+                          style={styles.icon}
+                          color={isConditionFocus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
+                        />
+                      )}
+                    />
+                    {renderInputField(filter, index)}
+                    <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={() => removeFilter(index)}>
+                      <Text style={{ color: 'white', textAlign: 'center' }}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={addFilter}>
+                  <Text style={styles.buttonText}>Add filter</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { marginLeft: 0 }]} onPress={handleSubmit} underlayColor="#0056b3">
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          </View>
+        </View>
+      </Modal>
       <Loader visible={loading} />
       <MFooter />
     </View>
@@ -2216,6 +2360,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     position: 'relative',
     width: '100%'
+  },
+  filterRow: {
+    width: '100%',
+    marginBottom: 30
   },
   topView: {
     marginTop: 30,
@@ -2553,6 +2701,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
+    textAlign: 'center',
     color: 'white',
     fontSize: 16,
   },
@@ -2562,5 +2711,22 @@ const styles = StyleSheet.create({
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
+  },
+  filterItem: {
+    paddingHorizontal: 10,
+    height: 30,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    marginRight: 5,
+    marginBottom: 3,
+    borderRadius: 50,
+  },
+  filterItemTxt: {
+    color: 'blue',
+    textDecorationLine: 'underline'
   },
 });
