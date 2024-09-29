@@ -1,44 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
-import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
-import MHeader from '../../components/Mheader';
 import AHeader from '../../components/Aheader';
 import SubNavbar from '../../components/SubNavbar';
-import ImageButton from '../../components/ImageButton';
 import { Table, Row, Rows } from 'react-native-table-component';
 import { GetDashboardData } from '../../utils/useApi';
-import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, userRoleAtom } from '../../context/AdminAuthProvider';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
-// import MapView from 'react-native-maps';
+import Loader from '../Loader';
 
 export default function AdminDashboard ({ navigation }) {
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a random color
-      if(colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
-
   const [jobInfo, setJobInfo] = useState([
     {title: 'TOT. - JOBS / SHIFTS', content: 0},
     {title: 'TOT. - AVAILABLE', content: 0},
@@ -53,8 +25,10 @@ export default function AdminDashboard ({ navigation }) {
   const [sum1,setSum1] = useState(0);
   const [sum2, setSum2] = useState(0);
   const [sum3,setSum3] = useState(0);
+  const [loading, setLoading] = useState(false);
   
-  async function getData() {
+  const getData = async () => {
+    setLoading(true);
     let data = await GetDashboardData('jobs', 'Admin');
     if(data) {
       const newTableData1 = data.job.map(item => [item._id, item.count]);
@@ -111,13 +85,13 @@ export default function AdminDashboard ({ navigation }) {
       setSum2(s2)
       setSum3(s3)
     }
+    setLoading(false);
   }
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array means this runs on focus
+    }, [])
   );
-
 
   const tableDatas = [
     {
@@ -207,6 +181,7 @@ export default function AdminDashboard ({ navigation }) {
           )}
           <View style = {{height: 100}}/>
         </ScrollView>
+        <Loader visible={loading} />
         <MFooter />
       </View>
   )

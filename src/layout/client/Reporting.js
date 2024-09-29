@@ -1,59 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FlatList, Modal, TextInput, View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
+import React, { useState } from 'react';
+import { FlatList, Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
-import { useAtom } from 'jotai';
-import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom } from '../../context/ClinicalAuthProvider';
-// import MapView from 'react-native-maps';
-import * as Progress from 'react-native-progress';
-import { MyShift, UpdateTime, Update } from '../../utils/useApi';
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { MyShift, UpdateTime } from '../../utils/useApi';
+import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
 import AnimatedHeader from '../AnimatedHeader';
-
-
+import Loader from '../Loader';
 
 export default function Reporting ({ navigation }) {
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a random color
-      if(colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
-
-  const theme = useTheme();
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [email, setEmail] = useAtom(emailAtom);
-  const [userRole, setUserRole] = useAtom(userRoleAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
-  const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [address, setAddress] = useAtom(addressAtom);
-  const handleNavigate = (navigateUrl) => {
-    navigation.navigate(navigateUrl);
-  }
-
-  //--------------------Gathering Data from Backend--------------
-  
   const [data, setData] = useState({reportData: [],dailyPay: 0, weeklyPay: 0});
   const [userInfos, setUserInfo] = useState([]);
   const [detailedInfos, setDetailedInfos] = useState([]);
@@ -61,64 +20,63 @@ export default function Reporting ({ navigation }) {
   const [dailyPay, setDailyPay] = useState({date: '', pay: 0});
   const [weeklyPay, setWeeklyPay] = useState({date: '', pay: 0});
   const [times, setTimes] = useState([]);
+  const [loading, setLoading] = useState(false);
   
-  async function getData() {
-    let Data = await MyShift('jobs', 'Clinician');
-    console.log("date------------------------", Data);
-    if (!Data) {
+  const getData = async () => {
+    setLoading(true);
+    let data = await MyShift('jobs', 'Clinician');
+    if (!data) {
       setData(['No Data']);
     } else {
-      setData(Data);
+      setData(data);
       let transformedData = [];
       const monthGroups = {};
-      const extractVerifiedJobs = Data.reportData.filter(job => job.shiftStatus === "Verified");
+      const extractVerifiedJobs = data.reportData.filter(job => job.shiftStatus === "Verified");
       console.log(extractVerifiedJobs);
       setClocks(extractVerifiedJobs)
       
-      transformedData = Data.reportData.map(({ entryDate, jobId, shiftStatus, unit, shiftDateAndTimes }, index) => ({ key: index, entryDate, jobId, jobStatus: shiftStatus, unit, shiftDateAndTimes }));
-      // console.log("date------------------------", transformedData);
+      transformedData = data.reportData.map(({ entryDate, jobId, shiftStatus, unit, shiftDateAndTimes }, index) => ({ key: index, entryDate, jobId, jobStatus: shiftStatus, unit, shiftDateAndTimes }));
       transformedData.forEach(item => {
-        const month = item.entryDate.split('/')[0] + "/24"; // Get the MM part
+        const month = item.entryDate.split('/')[0] + "/24";
         if (!monthGroups[month]) {
-          monthGroups[month] = []; // Initialize an array for the month
+          monthGroups[month] = [];
         }
         monthGroups[month].push(item);
       });
-      // console.log("mm", data);
-      // Get keys and sort them based on date
       const sortedKeys = Object.keys(monthGroups).sort((a, b) => {
-        const dateA = new Date(a.split('/')[1], a.split('/')[0] - 1); // Month is 0-indexed
+        const dateA = new Date(a.split('/')[1], a.split('/')[0] - 1);
         const dateB = new Date(b.split('/')[1], b.split('/')[0] - 1);
-        return dateB - dateA; // Sort in ascending order
+        return dateB - dateA;
       });
-      // Create a sorted object based on sorted keys
       const sortedMonthGroups = {};
       sortedKeys.forEach(key => {
         sortedMonthGroups[key] = monthGroups[key];
       });
-      // console.log(sortedMonthGroups, "sort");
       const mothData = Object.keys(sortedMonthGroups).map(month => ({
         month: month,
-        number: String(sortedMonthGroups[month].length) // Count of entries for that month
+        number: String(sortedMonthGroups[month].length)
       }));
       mothData.unshift({ "month": "Month", "number": "Count" });
-      mothData.push({ "month": "Sum", "number": String(Data.reportData.length) });
-      // console.log(mothData);
-      const totalPayString = Data.dailyPay;
-      const weeklyPayString = Data.weeklyPay;
-      // console.log(Data.dailyPay, Data.weeklyPay);
+      mothData.push({ "month": "Sum", "number": String(data.reportData.length) });
+      const totalPayString = data.dailyPay;
+      const weeklyPayString = data.weeklyPay;
       setDailyPay(totalPayString);
       setWeeklyPay(weeklyPayString);
       setUserInfo(mothData);
       setDetailedInfos(sortedMonthGroups);
     }
+    setLoading(false);
   }
 
   useFocusEffect(
     React.useCallback(() => {
       getData();
-    }, []) // Empty dependency array to only run on focus
+    }, [])
   );
+
+  const handleNavigate = (navigateUrl) => {
+    navigation.navigate(navigateUrl);
+  };
 
   const [myShiftDate, setMyShiftDate] = useState([]);
 
@@ -138,14 +96,11 @@ export default function Reporting ({ navigation }) {
     );
   };
 
-  //--------------------------------------------------detailed Info-------------------------------------------------------------
-  
-  //------------------------------------------Search Function----------------
-  const [searchTerm, setSearchTem] = useState(''); // Search term
+  const [searchTerm, setSearchTem] = useState('');
   const [filteredData, setFilteredData] = useState([]);
+
   const handleSearch = (e) => {
     setSearchTem(e);
-    // console.log(e, '------------');
     if (e !== '') {
       const filtered = myShiftDate.filter(item => 
         Object.values(item).some(value => 
@@ -155,67 +110,58 @@ export default function Reporting ({ navigation }) {
       filtered.unshift({text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'});
       console.log("detailedData", filtered);
       setFilteredData(filtered);
-    }
-    else {
+    } else {
       let detailedData = myShiftDate;
       detailedData.unshift({text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'});
       console.log("detailedData", detailedData);
       setFilteredData(detailedData);
     }
-  }
+  };
 
   const handleClick = (id) => {
     if (id !== 'Month' && id !== 'Sum'){
       const detailedData = detailedInfos[id].map(({jobId, jobStatus, unit, shiftDateAndTimes})=> ({"text1": jobId, "text2": jobStatus, "text3": unit, "text4": shiftDateAndTimes}))      
       setMyShiftDate(detailedData);
       detailedData.unshift({text1: 'Job-ID', text2: 'Job Status', text3: 'Unit', text4: 'Shift'});
-      // console.log("detailedData", id, detailedData);
       setFilteredData(detailedData);
       toggleModal();
     }
-  }
+  };
   
   const toggleModal = () => {
     setShowModal(!showModal);
-  }
+  };
 
   const handleButtonClick = async(jobId, laborSate) => {
-    const timeNow = moment(new Date()).format("MM/DD/YYYY hh:mm") // Get current time as a string
+    const timeNow = moment(new Date()).format("MM/DD/YYYY hh:mm");
     const existingJobIndex = times.findIndex(time => time.jobId === jobId)
     let deliverArray = {};
     let index = 0;
     if (laborSate == 0) {
-        // If the jobId does not exist, add a new object
-        index = times.length-1;
-        console.log(index, times);
-        deliverArray = { jobId, laborState: 1, shiftStartTime: timeNow, shiftEndTime: '' };
-        setTimes([...times, { jobId, laborState: 1, shiftStartTime: timeNow, shiftEndTime: '' }]);
+      index = times.length-1;
+      console.log(index, times);
+      deliverArray = { jobId, laborState: 1, shiftStartTime: timeNow, shiftEndTime: '' };
+      setTimes([...times, { jobId, laborState: 1, shiftStartTime: timeNow, shiftEndTime: '' }]);
     } else {
-        // If the jobId exists, update the existing object's shiftEndTime and laborState
-        const updatedTimes = [...times];
-        updatedTimes[existingJobIndex].shiftEndTime = timeNow; // Update shiftEndTime
-        updatedTimes[existingJobIndex].laborState = 2; // Update laborState to false
-        setTimes(updatedTimes); // Set the updated array back to state
-        index = existingJobIndex;
-        deliverArray = updatedTimes[index]
+      const updatedTimes = [...times];
+      updatedTimes[existingJobIndex].shiftEndTime = timeNow;
+      updatedTimes[existingJobIndex].laborState = 2;
+      setTimes(updatedTimes);
+      index = existingJobIndex;
+      deliverArray = updatedTimes[index]
     }
-    console.log(times[index]);
     const update = await UpdateTime(deliverArray, 'jobs')
     if(update) {
       getData();
     }
-};
+  };
 
   return (
       <View style={styles.container}>
-        <StatusBar 
-            translucent backgroundColor="transparent"
-        />
+        <StatusBar translucent backgroundColor="transparent" />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: 155}}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={{width: '100%', marginTop: 160}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <AnimatedHeader title="CAREGIVER REPORTING" />
             <View style={styles.bottomBar}/>
@@ -271,11 +217,6 @@ export default function Reporting ({ navigation }) {
               <Text style={styles.name}>{`Day:     ${dailyPay.date}                        $${dailyPay.pay}`}</Text>
               <Text style={styles.name}>{`Week:  ${weeklyPay.date}  $${weeklyPay.pay}`}</Text>
             </View>
-            {/* <FlatList
-              data={data}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-            /> */}
           </View>
         </ScrollView>
           {showModal && <Modal
@@ -319,6 +260,7 @@ export default function Reporting ({ navigation }) {
               </View>
             </View>
           </Modal>}
+          <Loader visible={loading} />
         <MFooter />
       </View>
   )

@@ -8,14 +8,13 @@ import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import AHeader from '../../components/Aheader';
-import { Clinician, getAllFacility, getFacilityInfo, updatePassword, updateUserInfo } from '../../utils/useApi';
+import { getAllFacility, getFacilityInfo, updatePassword, updateUserInfo } from '../../utils/useApi';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 
 export default function AdminFacilities({ navigation }) {
   const [data, setData] = useState([]);
   const [cellData, setCellData] = useState(null);
-  const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [statusModal, setStatusModal] = useState(false);
   const [status, setStatus] = useState('');
@@ -50,14 +49,6 @@ export default function AdminFacilities({ navigation }) {
     'User Roles',
     'View Shifts',
     'P.W.'
-  ];
-  const pageItems = [
-    {label: '10 per page', value: '1'},
-    {label: '25 per page', value: '2'},
-    {label: '50 per page', value: '3'},
-    {label: '100 per page', value: '4'},
-    {label: '500 per page', value: '5'},
-    {label: '1000 per page', value: '6'},
   ];
   const statusList = [
     {label: 'activate', value: 'activate'},
@@ -163,9 +154,17 @@ export default function AdminFacilities({ navigation }) {
   const handleRemoveFilter = (index) => {
     const newFilters = [...filters];
     newFilters.splice(index, 1);
-    getData({ search: search, page: curPage, filters: newFilters });
+    getData({ search: search, page: curPage, filters: newFilters }, true);
     setFilters(newFilters);
   };
+
+  const handleSubmit = () => {
+    setIsSubmitted(true);
+    toggleAddFilterModal();
+    const requestData = { search: search, page: curPage, filters: filters };
+    getData(requestData, true);
+  };
+
 
   const addFilter = () => {
     setFilters([...filters, { logic: 'and', field: 'AIC-ID', condition: 'is', value: '', valueType: 'text' }]);
@@ -212,7 +211,11 @@ export default function AdminFacilities({ navigation }) {
     setFilters(newFilters);
   };
 
-  const getData = async (requestData = { search: search, page: curPage, filters: filters }) => {
+  const getData = async (requestData = { search: search, page: curPage, filters: filters }, isFilter = isSubmitted ) => {
+    if (!isFilter) {
+      requestData.filters = [];
+    }
+    console.log(requestData);
     setLoading(true);
     let data = await getAllFacility(requestData, 'facilities');
     if(!data) {
@@ -251,12 +254,6 @@ export default function AdminFacilities({ navigation }) {
 
   const toggleAddFilterModal = () => {
     setAddFilterModal(!addfilterModal)
-  };
-
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-    toggleAddFilterModal();
-    getData();
   };
 
   const renderInputField = (filter, index) => {
@@ -1143,18 +1140,21 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   searchText: {
-    width: '70%',
+    width: 150,
     backgroundColor: 'white',
+    paddingVertical: 5,
+    color: 'black',
     height: 30,
   },
   searchBtn: {
-    width: '50%',
+    width: 80,
+    height: 30,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
     color: '#2a53c1',
-    height: 30
+    marginLeft: 5
   },
   filter: {
     width: '90%',

@@ -318,9 +318,17 @@ export default function AllJobShiftListing({ navigation }) {
   const handleRemoveFilter = (index) => {
     const newFilters = [...filters];
     newFilters.splice(index, 1);
-    getData({ search: search, page: curPage, filters: newFilters });
+    getData({ search: search, page: curPage, filters: newFilters }, true);
     setFilters(newFilters);
   };
+
+  const handleSubmit = () => {
+    setIsSubmitted(true);
+    toggleAddFilterModal();
+    const requestData = { search: search, page: curPage, filters: filters };
+    getData(requestData, true);
+  };
+
 
   const handleFilterChange = (index, key, value) => {
     const newFilters = [...filters];
@@ -391,7 +399,10 @@ export default function AllJobShiftListing({ navigation }) {
     'Delete'
   ];
 
-  const getData = async (requestData = { search: search, page: curPage, filters: filters }) => {
+  const getData = async (requestData = { search: search, page: curPage, filters: filters }, isFilter = isSubmitted ) => {
+    if (!isFilter) {
+      requestData.filters = [];
+    }
     setLoading(true);
     console.log(requestData);
     let result = await Jobs(requestData, 'jobs', 'Admin');
@@ -819,12 +830,6 @@ export default function AllJobShiftListing({ navigation }) {
     } else {
       console.log('failure', results.error);
     }
-  };
-
-  const handleSubmit = () => {
-    setIsSubmitted(true);
-    toggleAddFilterModal();
-    getData();
   };
 
   const bidderTableHeader = [

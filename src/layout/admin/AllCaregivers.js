@@ -328,13 +328,6 @@ export default function AllCaregivers({ navigation }) {
     setFilters(newFilters);
   };
 
-  const handleRemoveFilter = (index) => {
-    const newFilters = [...filters];
-    newFilters.splice(index, 1);
-    getData({ search: search, page: curPage, filters: newFilters });
-    setFilters(newFilters);
-  };
-
   const handleFilterChange = (index, key, value) => {
     const newFilters = [...filters];
 
@@ -401,7 +394,10 @@ export default function AllCaregivers({ navigation }) {
     return formattedDate;
   };
 
-  const getData = async (requestData = { search: search, page: curPage, filters: filters }) => {
+  const getData = async (requestData = { search: search, page: curPage, filters: filters }, isFilter = isSubmitted ) => {
+    if (!isFilter) {
+      requestData.filters = [];
+    }
     setLoading(true);
     let result = await allCaregivers(requestData, 'clinical');
     if(!result) {
@@ -459,10 +455,18 @@ export default function AllCaregivers({ navigation }) {
     }, [])
   );
 
+  const handleRemoveFilter = (index) => {
+    const newFilters = [...filters];
+    newFilters.splice(index, 1);
+    getData({ search: search, page: curPage, filters: newFilters }, true);
+    setFilters(newFilters);
+  };
+
   const handleSubmit = () => {
     setIsSubmitted(true);
     toggleAddFilterModal();
-    getData();
+    const requestData = { search: search, page: curPage, filters: filters };
+    getData(requestData, true);
   };
 
   const handleResetPW = async () => {

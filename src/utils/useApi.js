@@ -25,16 +25,20 @@ export const Signin = async (credentials, endpoint) => {
   }
 }
 
-export const getAllFacility = async (data, endpoint) => {
+export const getAllFacility = async (userData, endpoint) => {
   try {
-    console.log(`api/${endpoint}/getAllFacility`);
-    const response = await axios.post(`api/${endpoint}/getAllFacility`, data);
-
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/getAllFacilities`, userData, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
     return response.data;
   } catch (error) {
+    console.log(error);
     return {error: error};
   }
 }
@@ -791,33 +795,27 @@ export const getTimesheet = async (data) => {
 
 export const MyShift = async (endpoint, role) => {
   try {
-    // console.log("jobs");
-    // Existing token (obtained from AsyncStorage or login)
     const existingToken = await AsyncStorage.getItem('token');
-    console.log(existingToken)
-    // Include token in Authorization header
     const response = await axios.get(`api/${endpoint}/myShift`, {
       headers: {
         Authorization: `Bearer ${existingToken}`,
         Role: role
       }
     });
-    // If the update is successful, you can potentially update the token in AsyncStorage
+
     if (response.status === 200) {
-      // Optionally, if the backend sends a new token for some reason
       if (response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
       }
     } else if (response.status === 401) {
       console.log('Token is expired')
-      // navigation.navigate('Home')
     }
     return response.data.jobData;
   } catch (error) {
     console.log(error);
-    throw error;
+    return { error: error };
   }
-}
+};
 
 export const UpdateTime = async (data, endpoint) => {
   try {

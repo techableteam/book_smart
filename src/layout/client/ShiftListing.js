@@ -43,8 +43,8 @@ export default function ShiftListing ({ navigation }) {
       setGettingData(false);
       setData(['No Data'])
     } else {
-      setData(data);
-      const transformedData = data.map(item => [{
+      setData(data.dataArray);
+      const transformedData = data.dataArray.map(item => [{
         title: 'Job-ID',
         content: item.jobId
       },{
@@ -67,7 +67,7 @@ export default function ShiftListing ({ navigation }) {
         content: item.status
       }]);
 
-      const detailedData = data.map(item => [{
+      const detailedData = data.dataArray.map(item => [{
         title: 'Job-ID',
         content: item.jobId
       },{

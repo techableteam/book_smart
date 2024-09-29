@@ -138,12 +138,12 @@ export default function CompanyShift({ navigation }) {
       setLoading(false);
       setData(['No Data'])
     } else {
-      setData(result)
-      setFilteredData(result);
+      setData(result.dataArray)
+      setFilteredData(result.dataArray);
       setLoading(false);
     }
-    result.unshift(tableHead);
-    setTableData(result);
+    result.dataArray.unshift(tableHead);
+    setTableData(result.dataArray);
     setLoading(false);
   }
 

@@ -208,8 +208,11 @@ export default function CaregiverTimeSheet({ navigation }) {
     setFilters(newFilters);  // Set the updated filters state
   };
 
-  const getData = async (requestData = { search: search, page: curPage, filters: filters }) => {
-    console.log(search, filters, curPage);
+  const getData = async (requestData = { search: search, page: curPage, filters: filters }, isFilter = isSubmitted ) => {
+    if (!isFilter) {
+      requestData.filters = [];
+    }
+    
     setLoading(true);
     let result = await getCaregiverTimesheets(requestData, 'jobs');
   
@@ -265,10 +268,18 @@ export default function CaregiverTimeSheet({ navigation }) {
     getData();
   };
 
+  const handleRemoveFilter = (index) => {
+    const newFilters = [...filters];
+    newFilters.splice(index, 1);
+    getData({ search: search, page: curPage, filters: newFilters }, true);
+    setFilters(newFilters);
+  };
+
   const handleSubmit = () => {
     setIsSubmitted(true);
     toggleAddFilterModal();
-    getData();
+    const requestData = { search: search, page: curPage, filters: filters };
+    getData(requestData, true);
   };
 
   const toggleAddFilterModal = () => {
@@ -382,7 +393,7 @@ export default function CaregiverTimeSheet({ navigation }) {
                 </TouchableOpacity>}
               </View>
               <View>
-                <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0 }]} onPress={toggleAddFilterModal}>
+                <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0, marginBottom: 5 }]} onPress={toggleAddFilterModal}>
                   <Text>Add Filter</Text>
                 </TouchableOpacity>
               </View>
