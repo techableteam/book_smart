@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, Button } from 'react-native-paper';
 import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
+import DatePicker from 'react-native-date-picker';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { Dropdown } from 'react-native-element-dropdown';
-import { getTimesheet, Job, Jobs, RemoveJos, setAwarded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
+import { addDegreeItem, addLocationItem, getDegreeList, getLocationList, getTimesheet, Job, Jobs, PostJob, RemoveJos, setAwarded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import Pdf from 'react-native-pdf';
@@ -25,6 +26,21 @@ export default function CompanyShift({ navigation }) {
   const [filteredData, setFilteredData] = useState([]);
   const [value, setValue] = useState(100);
   const [isFocus, setIsFocus] = useState(false);
+  const [showShiftDate, setShowShiftDate] = useState(false);
+  const [shiftDate, setShiftDate] = useState(new Date());
+  const [shiftTime, setShiftTime] = useState('');
+  const [jobNum, setJobNum] = useState('');
+  const [degree, setDegree] = useState('');
+  const [location, setLocation] = useState('');
+  const [locationItem, setLocationItem] = useState('');
+  const [degreeItem, setDegreeItem] = useState('');
+  const [isDegreeFocus, setIsDegreeFocus] = useState(false);
+  const [isLocationFocus, setIsLocationFocus] = useState(false);
+  const [payRate, setPayRate] = useState('');
+  const [showAddDegreeModal, setShowAddDegreeModal] = useState(false);
+  const [showAddLocationModal, setShowAddLocationModal] = useState(false);
+  const [bonus, setBonus] = useState('');
+  const [jobRating, setJobRating] = useState(0);
   const [isJobDetailModal, setIsJobDetailModal] = useState(false);
   const [isRatingModal, setIsRatingModal] = useState(false);
   const [isAwardJobModal, setIsAwardJobModal] = useState(false);
@@ -45,6 +61,8 @@ export default function CompanyShift({ navigation }) {
   const [isopenaward, setIsopenaward] = useState(false);
   const [htmlContent, setHtmlContent] = useState('');
   const [fileInfo, setFileInfo] = useState({ content: '', type: '', name: '' });
+  const [degreeList, setDegreeList] = useState([]);
+  const [locationList, setLocationList] = useState([]);
 
   const [timeSheetFile, setTimesheetFile] = useState({
     content: '',
@@ -116,23 +134,61 @@ export default function CompanyShift({ navigation }) {
   const getData = async () => {
     setLoading(true);
     let result = await Jobs({}, 'jobs', 'Facilities');
-    if(!result) {
-      setData(['No Data'])
+    if(result.error) {
+      setData(['No Data']);
+      setTableData([]);
     } else {
       setData(result.dataArray)
       setFilteredData(result.dataArray);
-      setLoading(false);
+      result.dataArray.unshift(tableHead);
+      setTableData(result.dataArray);
     }
-    result.dataArray.unshift(tableHead);
-    setTableData(result.dataArray);
     setLoading(false);
-  }
+  };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, [])
-  );
+  const getDegree = async () => {
+    setLoading(true);
+    const response = await getDegreeList('degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setDegreeList(tempArr);
+    } else {
+      setDegreeList([]);
+    }
+    setLoading(false);
+  };
+
+  const getLocation = async () => {
+    setLoading(true);
+    const response = await getLocationList('location');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.locationName, value: item.locationName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setLocationList(tempArr);
+    } else {
+      setLocationList([]);
+    }
+    setLoading(false);
+  };
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     getData();
+  //   }, [])
+  // );
+  
+  useEffect(() => {
+    getData();
+    getDegree();
+    getLocation();
+  }, []);
 
   const handleRemove = async (id) => {
     let results = await RemoveJos({ jobId: id }, 'jobs');
@@ -180,6 +236,38 @@ export default function CompanyShift({ navigation }) {
     }
   };
 
+  const handleAddDegree = async () => {
+    let response = await addDegreeItem({ item: degreeItem }, 'degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
+    }
+    setDegreeItem('');
+    toggleAddDegreeModal();
+  };
+
+  const handleAddLocation = async () => {
+    let response = await addLocationItem({ item: locationItem }, 'location');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.locationName, value: item.locationName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setLocation(tempArr);
+    } else {
+      setLocation([]);
+    }
+    setLocationItem('');
+    toggleAddLocationModal();
+  };
+
   const handleShowRatingModal = async (id, rating) => {
     setIsRatingModal(true);
     setCurRatings(rating);
@@ -189,15 +277,18 @@ export default function CompanyShift({ navigation }) {
   const handleShowJobDetailModal = async (id) => {
     setLoading(true);
     let data = await Job({ jobId: id }, 'jobs');
-    if(!data) {
-      setLoading(false);
+    console.log(data);
+    if(data?.error) {
       setSelectedJob(null);
       setSelectedBidders([]);
+      setLoading(false);
     } else {
       let biddersList = data.bidders;
       biddersList.unshift(bidderTableHeader);
+      setCurJobId(id);
       setSelectedJob(data.jobData);
       setSelectedBidders(biddersList);
+      console.log(biddersList);
       setIsJobDetailModal(true);
       setLoading(false);
     }
@@ -230,6 +321,7 @@ export default function CompanyShift({ navigation }) {
     });
 
     if (bidder) {
+      console.log(bidder);
       setIsJobDetailModal(false);
       setSelectedBidder(bidder);
       setAwardedStatus(bidder[4] === 'Awarded' ? 1 : 2);
@@ -296,12 +388,38 @@ export default function CompanyShift({ navigation }) {
     }
   };
 
-  const handleShowJobEditModal = async () => {
-    console.log(selectedJob);
+  const handleJobEditSubmit = async () => {
+    const formattedDate = `${String(shiftDate.getMonth() + 1).padStart(2, '0')}/${String(shiftDate.getDate()).padStart(2, '0')}/${shiftDate.getFullYear()}`;
+    let response = await PostJob({ jobId: selectedJob?.jobId, shiftDate: formattedDate, shiftTime: shiftTime, jobNum: jobNum, degree: degree, location: location, payRate: payRate, bonus: bonus, jobRating: jobRating }, 'jobs');
+    toggleJobEditModal();
+    getData();
+  };
+
+  const handleShowJobEditModal = () => {
+    const dateParts = selectedJob.shiftDate.split('/');
+    const formattedDate = new Date(`${dateParts[2]}-${dateParts[0]}-${dateParts[1]}`);
+    setShiftDate(formattedDate);
+    setShiftTime(selectedJob.shiftTime);
+    setJobNum(selectedJob.jobNum);
+    setDegree(selectedJob.degree);
+    setLocation(selectedJob.location);
+    setPayRate(selectedJob.payRate);
+    setBonus(selectedJob.bonus);
+    setJobRating(selectedJob.jobRating);
+    toggleJobDetailModal();
+    toggleJobEditModal();
   };
 
   const toggleFileTypeSelectModal = () => {
     setFiletypeSelectModal(!fileTypeSelectModal);
+  };
+
+  const toggleAddDegreeModal = () => {
+    setShowAddDegreeModal(!showAddDegreeModal);
+  };
+
+  const toggleAddLocationModal = () => {
+    setShowAddLocationModal(!showAddLocationModal);
   };
   
   const handleChangeFileType = (mode) => {
@@ -570,7 +688,6 @@ export default function CompanyShift({ navigation }) {
 
   const itemsToShow = getItemsForPage(currentPage);
 
-  //------------------------------table Component---------------------------
   const widths = [150, 100, 80, 100, 150, 150, 150, 150, 80, 150, 150, 100, 150, 100];
   const RenderItem = ({ item, index }) => (
     <View
@@ -742,8 +859,8 @@ export default function CompanyShift({ navigation }) {
                   borderRadius: 20,
                 }}
                 onPress={() => {
-                  console.log(item[6]);
-                  navigation.navigate("ClientProfile", {id: item[6]});
+                  toggleJobDetailModal();
+                  navigation.navigate("ClientProfile", { id: item[6] });
                 }}
               >
                 <Text style={styles.profileTitle}>View</Text>
@@ -1019,7 +1136,7 @@ export default function CompanyShift({ navigation }) {
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Timesheet Upload</Text>
-                      <Text style={[styles.content, { color: 'blue' }]} onPress={() => { handleShowFile(); }}>{selectedJob?.timeSheet?.name}</Text>
+                      <Text style={[styles.content, { color: 'blue' }]} onPress={() => { toggleJobDetailModal(); handleShowFile(); }}>{selectedJob?.timeSheet?.name}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Job Rating</Text>
@@ -1281,12 +1398,161 @@ export default function CompanyShift({ navigation }) {
               <View style={styles.body}>
                 <ScrollView>
                   <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
-                    
+                    <View>
+                      <Text style={styles.subtitle}>Shift Date</Text>
+                      <View style={{ flexDirection: 'column', width: '80%', gap: 5, position: 'relative' }}>
+                        <TouchableOpacity onPress={() => setShowShiftDate((prev) => !prev)} style={{ width: 300, height: 40, zIndex: 2 }}>
+                          <View>
+                            <TextInput
+                              style={[styles.input, { width: '90%', position: 'absolute', zIndex: 1, color: 'black' }]}
+                              placeholder=""
+                              value={shiftDate.toDateString()}
+                              editable={false}
+                            />
+                          </View>
+                        </TouchableOpacity>
+                        {showShiftDate && (
+                          <>
+                            <DatePicker
+                              date={shiftDate}
+                              onDateChange={(day) => setShiftDate(day)}
+                              mode="date"
+                              theme='light'
+                              androidVariant="native"
+                            />
+                            <Button style={{ width: 300 }} buttonColor='rgb(26,115,232)' textColor='#fff' onPress={() =>setShowShiftDate((prev) => !prev)}>Confirm</Button>
+                          </>
+                        )}
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={styles.subtitle}>Shift Time</Text>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                        <TextInput
+                          style={[styles.input, { width: '90%', color: 'black' }]}
+                          placeholder=""
+                          onChangeText={e => setShiftTime(e)}
+                          value={shiftTime}
+                        />
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={styles.subtitle}>Job Num #</Text>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                        <TextInput
+                          style={[styles.input, { width: '90%', color: 'black' }]}
+                          placeholder=""
+                          onChangeText={e => setJobNum(e)}
+                          value={jobNum}
+                        />
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={styles.subtitle}>Degree/Discipline</Text>
+                      <Dropdown
+                        style={[styles.dropdown1, isDegreeFocus && { borderColor: 'blue' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        itemTextStyle={styles.itemTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={degreeList}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={''}
+                        value={degree}
+                        onFocus={() => setIsDegreeFocus(true)}
+                        onBlur={() => setIsDegreeFocus(false)}
+                        onChange={item => {
+                          setDegree(item.value);
+                          setIsDegreeFocus(false);
+                        }}
+                        renderLeftIcon={() => (
+                          <View
+                            style={styles.icon}
+                            color={isDegreeFocus ? 'blue' : 'black'}
+                            name="Safety"
+                            size={20}
+                          />
+                        )}
+                      />
+                      <TouchableOpacity style={styles.addItems} onPress={toggleAddDegreeModal}>
+                        <Image source={images.plus} style={{width: 15, height: 15}} />
+                        <Text style={[styles.text, {color: '#2a53c1', marginTop: 0, marginLeft: 5, textAlign: 'left'}]}>Add a new options</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View>
+                      <Text style={styles.subtitle}>Location</Text>
+                      <Dropdown
+                        style={[styles.dropdown1, isLocationFocus && { borderColor: 'blue' }]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        itemTextStyle={styles.itemTextStyle}
+                        iconStyle={styles.iconStyle}
+                        data={locationList}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={''}
+                        value={location}
+                        onFocus={() => setIsLocationFocus(true)}
+                        onBlur={() => setIsLocationFocus(false)}
+                        onChange={item => {
+                          setLocation(item.value);
+                          setIsLocationFocus(false);
+                        }}
+                        renderLeftIcon={() => (
+                          <View
+                            style={styles.icon}
+                            color={isLocationFocus ? 'blue' : 'black'}
+                            name="Safety"
+                            size={20}
+                          />
+                        )}
+                      />
+                      <TouchableOpacity style={styles.addItems} onPress={toggleAddLocationModal}>
+                        <Image source={images.plus} style={{width: 15, height: 15}} />
+                        <Text style={[styles.text, {color: '#2a53c1', marginTop: 0, marginLeft: 5, textAlign: 'left'}]}>Add a new options</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View>
+                      <Text style={styles.subtitle}>Pay Rate</Text>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                        <TextInput
+                          style={[styles.input, { width: '90%', color: 'black' }]}
+                          placeholder=""
+                          onChangeText={e => setPayRate(e)}
+                          value={payRate}
+                        />
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={styles.subtitle}>Bonus</Text>
+                      <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+                        <TextInput
+                          style={[styles.input, { width: '90%', color: 'black' }]}
+                          placeholder=""
+                          onChangeText={e => setBonus(e)}
+                          value={bonus}
+                        />
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={styles.subtitle}>Job Rating</Text>
+                      <StarRating
+                        rating={jobRating}
+                        onChange={setJobRating}
+                        maxStars={5}
+                        enableHalfStar={false}
+                      />
+                    </View>
                   </View>
                   <View style={{flexDirection: 'row', width: '100%'}}>
                     <TouchableOpacity
                       style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
-                      onPress={() => handleChangeAwardStatus(selectedBidder[6], selectedJob?.jobId)} underlayColor="#0056b3"
+                      onPress={handleJobEditSubmit} underlayColor="#0056b3"
                     >
                       <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
                     </TouchableOpacity>
@@ -1296,6 +1562,84 @@ export default function CompanyShift({ navigation }) {
             </View>
           </View>
         </Modal>
+        {showAddDegreeModal && <Modal
+          Visible={false}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setShowAddDegreeModal(!showAddDegreeModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.calendarContainer}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Add a new option</Text>
+                <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddDegreeModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <View style={styles.modalBody}>
+                  <View style={styles.searchBar}>
+                    <TextInput
+                      style={[styles.input, { width: '90%', marginTop: 20, color:"black" }]}
+                      placeholder=""
+                      onChangeText={e => setDegreeItem(e)}
+                      value={degreeItem}
+                    />
+                  </View>
+                  <View style={{flexDirection: 'row', width: '100%'}}>
+                    <TouchableOpacity
+                      style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                      onPress={handleAddDegree} underlayColor="#0056b3"
+                    >
+                      <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>}
+        {showAddLocationModal && <Modal
+          Visible={false}
+          transparent= {true}
+          animationType="slide"
+          onRequestClose={() => {
+            setShowAddLocationModal(!showAddLocationModal);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.calendarContainer}>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>Add a new location</Text>
+                <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddLocationModal}>
+                  <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.body}>
+                <View style={styles.modalBody}>
+                  <View style={styles.searchBar}>
+                    <TextInput
+                      style={[styles.input, { width: '90%', marginTop: 20, color:"black" }]}
+                      placeholder=""
+                      onChangeText={e => setLocationItem(e)}
+                      value={locationItem}
+                    />
+                  </View>
+                  <View style={{flexDirection: 'row', width: '100%'}}>
+                    <TouchableOpacity
+                      style={[styles.button, { marginTop: 10, paddingHorizontal: 20 }]}
+                      onPress={handleAddLocation} underlayColor="#0056b3"
+                    >
+                      <Text style={[styles.buttonText, { fontSize: 12 }]}>Submit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </Modal>}
         {fileTypeSelectModal && (
           <Modal
             visible={fileTypeSelectModal} // Changed from Visible to visible
@@ -1305,7 +1649,6 @@ export default function CompanyShift({ navigation }) {
               setFiletypeSelectModal(false); // Close the modal
             }}
           >
-            <StatusBar translucent backgroundColor='transparent' / >
             <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
               <View style={[styles.viewContainer, { marginTop: '50%' }]}>
                 <View style={[styles.header, { height: 100 }]}>
@@ -1461,6 +1804,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  addItems: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   name: {
     fontSize: 14,
     marginBottom: 10,
@@ -1599,6 +1947,17 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     minHeight: 50
   },
+  dropdown1: {
+    height: 30,
+    width: 200,
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 10,
+    color: 'black'
+  },
   dropdown: {
     height: 40,
     width: '60%',
@@ -1607,7 +1966,8 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginBottom: 10
+    marginBottom: 10,
+    color: 'black'
   },
   icon: {
     marginRight: 5,
@@ -1670,6 +2030,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
     color: '#2a53c1',
     height: 30
+  },
+  subtitle: {
+    fontSize: 16,
+    color: 'black',
+    textAlign: 'left',
+    paddingTop: 10,
+    paddingBottom: 10,
+    fontWeight: 'bold'
   },
   button: {
     backgroundColor: '#A020F0',

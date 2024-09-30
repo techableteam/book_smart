@@ -3,13 +3,16 @@ import { StyleSheet, View, Dimensions, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
 import Pdf from 'react-native-pdf';
 import { getTimesheet } from '../utils/useApi';
+import Loader from './Loader';
 
 export default function FileViewer({ navigation, route }) {
     const { jobId, fileData } = route.params;
+    const [loading, setLoading] = useState(false);
     const [htmlContent, setHtmlContent] = useState('');
     const [fileInfo, setFileInfo] = useState({ content: '', type: '', name: '' });
 
     const getData = async () => {
+        setLoading(true);
         let result = await getTimesheet({ jobId });
 
         if (!result?.error) {
@@ -48,9 +51,11 @@ export default function FileViewer({ navigation, route }) {
                 </html>
             `);
         }
+        setLoading(false);
     };
 
     const setData = async () => {
+        setLoading(true);
         const fetchedFileInfo = fileData;
         let content = '';
 
@@ -77,9 +82,11 @@ export default function FileViewer({ navigation, route }) {
             `;
             setHtmlContent(content);
         }
+        setLoading(false);
     };
 
     useEffect(() => {
+        console.log(jobId);
         if (jobId) {
             getData();
         } else {
@@ -106,14 +113,14 @@ export default function FileViewer({ navigation, route }) {
                     style={styles.webView}
                 />
             )}
+            <Loader visible={loading} />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        paddingTop: 100
+        flex: 1
     },
     webView: {
         flex: 1,
@@ -132,7 +139,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 5
+        paddingHorizontal: 5,
+        paddingTop: 100
     },
     headerTitle: {
         fontSize: 16,

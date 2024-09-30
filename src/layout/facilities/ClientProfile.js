@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
@@ -6,31 +6,36 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { getClientInfoWithJobId } from '../../utils/useApi';
+import Loader from '../Loader';
 
 export default function ClientProfile({ navigation, route }) {
     const { id } = route.params;
     const [userInfo, setUserInfo] = useState({});
+    const [loading, setLoading] = useState(false);
     const default_image = 'https://s3.amazonaws.com/assets.knackhq.com/assets/6605fd227f7c6e0027a2c623/66df2fef02a9740307513f2d/thumb_6/nurse.png';
 
-    async function getData() {
+    const getData = async () => {
+        setLoading(true);
         let data = await getClientInfoWithJobId({ bidId: id }, 'clinical');
         console.log('client infomation -> ', data);
         if (data?.error) {
             setUserInfo({});
         } else {
+            console.log(data);
             setUserInfo(data);
         }
+        setLoading(false);
     };
 
-    useFocusEffect(
-        React.useCallback(() => {
-            getData();
-        }, [])
-    );
+    // useFocusEffect(
+    //     React.useCallback(() => {
+    //         getData();
+    //     }, [])
+    // );
 
-    const renderTextContent = (content) => {
-        return content && typeof content === 'object' ? content?.type || '' : content;
-    };
+    useEffect(() => {
+        getData();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -42,12 +47,24 @@ export default function ClientProfile({ navigation, route }) {
                     <View style={styles.profileTitleBg}>
                         <Text style={styles.profileTitle}>🖥️CAREGIVER PROFILE</Text>
                     </View>
-                    <Image
-                        resizeMode="cover"
-                        style={styles.nurse}
-                        source={{ uri: `${userInfo?.photoImage?.content || default_image}` }}
-                    />
-                    <Text style={styles.name}>{userInfo?.photoImage?.name}</Text>
+                    {/* {userInfo?.photoImage?.name != "" ? (
+                        <Image
+                            resizeMode="cover"
+                            style={styles.nurse}
+                            source={ `${userInfo?.photoImage?.content}` }
+                        />
+                    ) : (
+                        <Image
+                            resizeMode="cover"
+                            style={styles.nurse}
+                            source={{ uri: `${default_image}` }}
+                        />
+                    )} */}
+                        <Image
+                            resizeMode="cover"
+                            style={styles.nurse}
+                            source={{ uri: `${default_image}` }}
+                        />
                     <Text style={styles.name}>{userInfo?.firstName || ""}{" "}{userInfo?.lastName || ""}</Text>
 
                     <View style={{ flexDirection: 'row', width: '100%' }}>
@@ -75,73 +92,59 @@ export default function ClientProfile({ navigation, route }) {
 
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>Driver's License</Text>
-                        <Text style={styles.content}>{renderTextContent(userInfo?.driverLicense?.content)}</Text>
-                        {userInfo?.driverLicense?.content && <Image
-                            resizeMode="cover"
-                            style={styles.nurse}
-                            source={{ uri: `${userInfo?.driverLicense?.content}` }}
-                        />}
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'driverLicense' })}>{userInfo?.driverLicense?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>Social Security Card</Text>
-                        <Text style={styles.content}>{renderTextContent(userInfo?.socialCard)}</Text>
-                        {userInfo?.socialCard?.content && <Image
-                            resizeMode="cover"
-                            style={styles.nurse}
-                            source={{ uri: `${userInfo?.socialCard?.content}` }}
-                        />}
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'ssc' })}>{userInfo?.ssc?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>COVID Card</Text>
-                        <Text style={styles.content}>{renderTextContent(userInfo?.covidCard)}</Text>
-                        {userInfo?.covidCard?.content && <Image
-                            resizeMode="cover"
-                            style={styles.nurse}
-                            source={{ uri: `${userInfo?.covidCard?.content}` }}
-                        />}
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'covidCard' })}>{userInfo?.covidCard?.name}</Text>
                     </View>
 
                     <View style={styles.line}></View>
 
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>Physical Exam</Text>
-                        <Text style={styles.content}>{renderTextContent(userInfo?.physicalExam?.content)}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'physicalExam' })}>{userInfo?.physicalExam?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>PPD (TB Test)</Text>
-                        <Text style={styles.content}>{renderTextContent(userInfo?.ppd?.content)}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'ppd' })}>{userInfo?.ppd?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>Certificate/License</Text>
-                        <Text style={styles.content}>{userInfo?.asdf}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'cna' })}>{userInfo?.cna?.name}</Text>
                     </View>
 
                     <View style={styles.line}></View>
 
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>Hep B (shot or declination)</Text>
-                        <Text style={styles.content}>{userInfo?.asdf}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'hepB' })}>{userInfo?.hepB?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>Flu (shot or declination)</Text>
-                        <Text style={styles.content}>{userInfo?.asdf}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'flu' })}>{userInfo?.flu?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>MMR (Immunizations)</Text>
-                        <Text style={styles.content}>{renderTextContent(userInfo?.mmr?.content)}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'mmr' })}>{userInfo?.mmr?.name}</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '100%' }}>
                         <Text style={styles.titles}>BLS (CPR card)</Text>
-                        <Text style={styles.content}>{renderTextContent(userInfo?.bls?.content)}</Text>
+                        <Text style={[styles.content, { color: 'blue' }]} onPress={() => navigation.navigate("UserFileViewer", { userId: userInfo?.aic, filename: 'bls' })}>{userInfo?.bls?.name}</Text>
                     </View>
                 </View>
                 <Text
                     style={{ color: '#2a53c1', textDecorationLine: 'underline', width: '100%', marginBottom: 100, paddingLeft: '7%', marginTop: 10 }}
-                    onPress={() => navigation.navigate("CompanyShift")}
+                    onPress={ () => navigation.navigate("CompanyShift") }
                 >
                     Back to Facility View Job Details
                 </Text>
             </ScrollView>
+            <Loader visible={loading} />
             <MFooter />
         </View>
     )

@@ -616,6 +616,7 @@ const styles = StyleSheet.create({
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
+    paddingVertical: 5
   },
   subject: {
     padding: 5,
