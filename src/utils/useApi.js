@@ -565,8 +565,17 @@ export const allCaregivers = async (data, endpoint) => {
 
 export const getUserImage = async (data, endpoint) => {
   try {
+    const response = await axios.post(`api/${endpoint}/getUserImage`, data);
+    return response.data.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+export const getAdminInfo = async (data) => {
+  try {
     const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/getUserImage`, data, {
+    const response = await axios.post(`api/admin/getAdminInfo`, data, {
       headers: {
         Authorization: `Bearer ${existingToken}`
       }
@@ -575,12 +584,12 @@ export const getUserImage = async (data, endpoint) => {
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
-    return response.data.data;
+    return response.data;
   } catch (error) {
+    console.log(JSON.stringify(error));
     return { error: error };
   }
 };
-
 
 export const Jobs = async (data, endpoint, role) => {
   try {

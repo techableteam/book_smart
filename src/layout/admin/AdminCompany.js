@@ -1,46 +1,60 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, Animated, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
+import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import AHeader from '../../components/Aheader';
-import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, companyNameAtom, phoneAtom, emailAtom, photoImageAtom } from '../../context/AdminAuthProvider'
 import AnimatedHeader from '../AnimatedHeader';
+import { useAtom } from 'jotai';
+import { emailAtom } from '../../context/AdminAuthProvider'
+import { getAdminInfo } from '../../utils/useApi';
+import Loader from '../Loader';
 
 export default function AdminCompany ({ navigation }) {
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [companyName, setCompanyName] = useAtom(companyNameAtom);
-  const [phone, setPhone] = useAtom(phoneAtom);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useAtom(emailAtom);
-  const [avatar, setAvatar] = useAtom(photoImageAtom);
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff');
-  let colorIndex = 0;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if(colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-    }, 500);
-    return () => clearInterval(interval);
-  }, []);
+  const [avatar, setAvatar] = useState({ name: '', type: '', content: '' });
+  const [loading, setLoading] = useState(false);
 
   const userInfo = [
     {title: 'Company', content: companyName},
     {title: 'Email', content: email},
     {title: 'Phone', content: phone},
-  ]
+  ];
 
   const handleEdit = () => {
     console.log('handleEdit')
     navigation.navigate('AdminEditProfile')
-  }
+  };
+
+  const getData = async () => {
+    setLoading(true);
+    let response = await getAdminInfo({ email: email });
+    if (response?.error) {
+      setFirstName('');
+      setLastName('');
+      setCompanyName('');
+      setPhone('');
+      setAvatar({  name: '', type: '', content: '' });
+    } else {
+      setFirstName(response.user.firstName);
+      setLastName(response.user.lastName);
+      setCompanyName(response.user.companyName);
+      setPhone(response.user.phone);
+      setAvatar(response.user.photoImage);
+    }
+    setLoading(false);
+  };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, [])
+  );
 
   return (
       <View style={styles.container}>
@@ -90,6 +104,7 @@ export default function AdminCompany ({ navigation }) {
             /> */}
           </View>
         </ScrollView>
+        <Loader visible={loading} />
         <MFooter />
       </View>
   )

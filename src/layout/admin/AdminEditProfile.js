@@ -1,51 +1,82 @@
 import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
-import React, { useState } from 'react';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, { useState, useEffect } from 'react';
 import images from '../../assets/images';
 import { TextInput } from 'react-native-paper';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { Update } from '../../utils/useApi';
+import { getAdminInfo, Update } from '../../utils/useApi';
 import MSubNavbar from '../../components/MSubNavbar';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, companyNameAtom, phoneAtom, addressAtom,  emailAtom, photoImageAtom } from '../../context/AdminAuthProvider'
+import { emailAtom, firstNameAtom, lastNameAtom } from '../../context/AdminAuthProvider'
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import Loader from '../Loader';
 
 export default function AdminEditProfile({ navigation }) {
-  const [firstName, setFirstName] = useAtom(firstNameAtom);
-  const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [companyName, setCompanyName] = useAtom(companyNameAtom);
-  const [phone, setPhone] = useAtom(phoneAtom);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useAtom(emailAtom);
-  const [avatar, setAvatar] = useAtom(photoImageAtom);
-  const [address, setAddress]= useAtom(addressAtom);
+  const [tfirstName, settfirstNmae] = useAtom(firstNameAtom);
+  const [tlastName, settlastNmae] = useAtom(lastNameAtom);
+  const [temail, setTemail] = useState('');
+  const [avatar, setAvatar] = useState({ name: '', type: '', content: '' });
+  const [address, setAddress]= useState({ street: '', street2: '', city: '', state: '', zip: '' });
   const [fileType, setFiletype] = useState('');
+  const [loading, setLoading] = useState(false);
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
 
-  //--------------------------------------------Credentials-----------------------------
-  const [ credentials, setCredentials ] = useState({
-    firstName: firstName,
-    lastName: lastName,
-    email: email,
-    phone: phone,
-    companyName: companyName,
-    birthday: Date("07/24/2024"),
-    socialSecurityNumber: '123123123',
-    address: address,
-    photoImage: avatar,
-  });
+  // //--------------------------------------------Credentials-----------------------------
+  // const [ credentials, setCredentials ] = useState({
+  //   firstName: firstName,
+  //   lastName: lastName,
+  //   email: email,
+  //   phone: phone,
+  //   companyName: companyName,
+  //   birthday: Date("07/24/2024"),
+  //   socialSecurityNumber: '123123123',
+  //   address: address,
+  //   photoImage: avatar,
+  // });
 
-  const handleCredentials = (target, e) => {
-    if (target !== "street" && target !== "street2" && target !== "city" && target !== "state" && target !== "zip") {
-      setCredentials({...credentials, [target]: e});
+  const getData = async () => {
+    setLoading(true);
+    let response = await getAdminInfo({ email: email });
+    console.log(response);
+    if (response?.error) {
+      setFirstName('');
+      setLastName('');
+      setCompanyName('');
+      setPhone('');
+      setAvatar({  name: '', type: '', content: '' });
+      setTemail('');
+      setAddress({ street: '', street2: '', city: '', state: '', zip: '' });
     } else {
-      setCredentials({...credentials, address: {...credentials.address, [target]: e}})
+      setFirstName(response.user.firstName);
+      setLastName(response.user.lastName);
+      setCompanyName(response.user.companyName);
+      setPhone(response.user.phone);
+      setAvatar(response.user.photoImage);
+      setTemail(response.user.email);
+      setAddress(response.user.address);
     }
-  }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const handleChangeAddress = (target, e) => {
+    setAddress((prevAddress) => ({
+      ...prevAddress,
+      [target]: e, // Access the value from the event target
+    }));
+  };
 
   //-------------------------------------------File Upload----------------------------
 
@@ -103,7 +134,7 @@ export default function AdminEditProfile({ navigation }) {
           const fileUri = response.assets[0].uri;
           const fileContent = await RNFS.readFile(fileUri, 'base64');
           
-          handleCredentials('photoImage', {
+          setAvatar({
             content: fileContent,
             type: 'image',
             name: response.assets[0].fileName,
@@ -156,7 +187,7 @@ export default function AdminEditProfile({ navigation }) {
           const pickedImage = response.assets[0].uri;
           const fileContent = await RNFS.readFile(pickedImage, 'base64');
           
-          handleCredentials('photoImage', {
+          setAvatar({
             content: fileContent,
             type: 'image',
             name: response.assets[0].fileName,
@@ -211,7 +242,7 @@ export default function AdminEditProfile({ navigation }) {
       } else {
         fileType = 'unknown';
       }
-      handleCredentials('photoImage', { content: `${fileContent}`, type: fileType, name: res[0].name });
+      setAvatar({ content: `${fileContent}`, type: fileType, name: res[0].name });
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -246,7 +277,7 @@ export default function AdminEditProfile({ navigation }) {
   };
   const handlePhoneNumberChange = (text) => {
     const formattedNumber = formatPhoneNumber(text);
-    handleCredentials('phone', formattedNumber);
+    setPhone(formattedNumber);
   };
 
   const showAlerts = (name) => {
@@ -266,31 +297,36 @@ export default function AdminEditProfile({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    if (credentials.email === '' || 
-      credentials.firstName === '' || 
-      credentials.lastName ==='') {
+    if (email === '' || firstName === '' || lastName ==='') {
         showAlerts('all gaps')
     } else {
+      setLoading(true);
       try {
-        console.log('credentials: ', credentials);
+        const credentials = {
+          firstName,
+          lastName,
+          email: temail,
+          phone,
+          photoImage: avatar,
+          address,
+          companyName
+        };
         const response = await Update(credentials, "Admin");
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
         setEmail(response.user.email);
-        setPhone(response.user.phone);
-        setCompanyName(response.user.companyName);
-        setAddress(response.user.address);
-        setAvatar(response.user.photoImage);
-        console.log('Signup successful: ', response)
+        settfirstNmae(response.user.firstName);
+        settlastNmae(response.user.lastName);
         navigation.goBack();
       } catch (error) {
-        console.error('Signup failed: ', error)
+        console.error('Signup failed: ', error);
       }
+      setLoading(false);
     }
   }
 
   const handleRemove = (name) => {
-    handleCredentials(name, {type: "", content: "", name: ""});
+    setAvatar({type: "", content: "", name: ""});
   }
 
   const handleShowFile = (data) => {
@@ -314,8 +350,8 @@ export default function AdminEditProfile({ navigation }) {
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
                   placeholder=""
-                  onChangeText={e => handleCredentials('lastName', e)}
-                  value={credentials.companyName || ''}
+                  onChangeText={e => setCompanyName(e)}
+                  value={companyName}
                 />
             </View>
             <View style={styles.email}>
@@ -324,14 +360,14 @@ export default function AdminEditProfile({ navigation }) {
                 <TextInput
                   style={[styles.input, {width: '50%'}]}
                   placeholder="First"
-                  onChangeText={e => handleCredentials('firstName', e)}
-                  value={credentials.firstName || ''}
+                  onChangeText={e => setFirstName(e)}
+                  value={firstName}
                 />
                 <TextInput
                   style={[styles.input, {width: '50%'}]}
                   placeholder="Last"
-                  onChangeText={e => handleCredentials('lastName', e)}
-                  value={credentials.lastName || ''}
+                  onChangeText={e => setLastName(e)}
+                  value={lastName}
                 />
               </View>
             </View>
@@ -344,8 +380,8 @@ export default function AdminEditProfile({ navigation }) {
                   autoCorrect={false}
                   autoCapitalize="none"
                   keyboardType="email-address"
-                  onChangeText={e => handleCredentials('email', e)}
-                  value={credentials.email || ''}
+                  onChangeText={e => setTemail(e)}
+                  value={temail}
                 />
               </View>
             </View>
@@ -353,19 +389,19 @@ export default function AdminEditProfile({ navigation }) {
               <Text style={styles.subtitle}>  Phone <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
-                  value={credentials.phone}
+                  value={phone}
                   style={[styles.input, {width: '100%'}]}
                   onChangeText={handlePhoneNumberChange}
                   keyboardType="phone-pad"
-                  placeholder={credentials.phone}
+                  placeholder={''}
                 />
               </View>
             </View>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Logo </Text>
-              {credentials.photoImage.name &&
+              {avatar.name &&
               <View style={{marginBottom: 10}}>
-                <Text style={{ color: 'blue' }} onPress={() => handleShowFile(credentials.photoImage)}>{credentials.photoImage.name}</Text>
+                <Text style={{ color: 'blue' }} onPress={() => handleShowFile(avatar)}>{avatar.name}</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('photoImage')}
                 >remove</Text>
@@ -376,11 +412,11 @@ export default function AdminEditProfile({ navigation }) {
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color:"black"}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[styles.input, { width: '70%', color: 'black', height: 30 }]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.photoImage.name || ''}
+                  value={avatar.name || ''}
                 />
               </View>
             </View>
@@ -393,8 +429,8 @@ export default function AdminEditProfile({ navigation }) {
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
-                    onChangeText={e => handleCredentials('street', e)}
-                    value={credentials.address.streetAddress || ''}
+                    onChangeText={e => handleChangeAddress('street', e)}
+                    value={address.street || ''}
                   />
                   <Text style = {{color:"black", marginLeft:5}}>Street Address</Text>
                 </View>
@@ -404,8 +440,8 @@ export default function AdminEditProfile({ navigation }) {
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
-                    onChangeText={e => handleCredentials('street2', e)}
-                    value={credentials.address.streetAddress2 || ''}
+                    onChangeText={e => handleChangeAddress('street2', e)}
+                    value={address.street2 || ''}
                   />
                   <Text style = {{color:"black", marginLeft:5}}>Street Address2</Text>
                 </View>
@@ -414,8 +450,8 @@ export default function AdminEditProfile({ navigation }) {
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
-                      onChangeText={e => handleCredentials('city', e)}
-                      value={credentials.address.city || ''}
+                      onChangeText={e => handleChangeAddress('city', e)}
+                      value={address.city || ''}
                     />
                     <Text style = {{color:"black", marginLeft:5}}>City</Text>
                   </View>
@@ -423,8 +459,8 @@ export default function AdminEditProfile({ navigation }) {
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
-                      onChangeText={e => handleCredentials('state', e)}
-                      value={credentials.address.state || ''}
+                      onChangeText={e => handleChangeAddress('state', e)}
+                      value={address.state || ''}
                     />
                     <Text style = {{color:"black", marginLeft:5}}>State</Text>
                   </View>
@@ -433,8 +469,8 @@ export default function AdminEditProfile({ navigation }) {
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
                       // keyboardType="numeric" // Set the keyboardType to "numeric" for zip input
-                      onChangeText={e => handleCredentials('zip', e)}
-                      value={credentials.address.zip || ''}
+                      onChangeText={e => handleChangeAddress('zip', e)}
+                      value={address.zip || ''}
                     />
                     <Text style = {{color:"black", marginLeft:5}}>Zip</Text>
                   </View>
@@ -489,6 +525,7 @@ export default function AdminEditProfile({ navigation }) {
           </Modal>
         )}
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   );
@@ -706,7 +743,7 @@ const styles = StyleSheet.create({
   },
   chooseFile: {
     width: '30%', 
-    height: 30, 
+    height: 40, 
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'center',

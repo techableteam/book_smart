@@ -81,13 +81,14 @@ export default function AdminLogin({ navigation }) {
       if (!response.error) {
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
-        setAddress(response.user.address);
-        setCompanyName(response.user.companyName);
-        setUserRole(response.user.userRole);
         setEmail(response.user.email);
-        setPhone(response.user.phone);
-        setPassword(response.user.password); 
-        setPhotoImage(response.user.photoImage);
+        // setAddress(response.user.address);
+        // setCompanyName(response.user.companyName);
+        setUserRole(response.user.userRole);
+        // setEmail(response.user.email);
+        // setPhone(response.user.phone);
+        // setPassword(response.user.password); 
+        // setPhotoImage(response.user.photoImage);
         if (checked) {
           await AsyncStorage.setItem('AdminEmail', credentials.email);
           await AsyncStorage.setItem('AdminPassword', credentials.password);
