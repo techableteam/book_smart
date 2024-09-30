@@ -215,7 +215,6 @@ export default function AdminFacilities({ navigation }) {
     if (!isFilter) {
       requestData.filters = [];
     }
-    console.log(requestData);
     setLoading(true);
     let data = await getAllFacility(requestData, 'facilities');
     if(!data) {
@@ -392,15 +391,19 @@ export default function AdminFacilities({ navigation }) {
   };
 
   const handleShowFacilityInfoModal = async (data) => {
+    setLoading(true);
     let response = await getFacilityInfo({ userId: data[0] }, 'facilities');
     if (!response.error) {
       let shiftsData = response.jobData;
       shiftsData.unshift(shiftsTableHeader);
-
+      console.log(response.userData);
+      console.log(response.jobData);
       setFacility(response.userData);
       setShifts(shiftsData);
       toggleUserProfileModal();
+      setLoading(false);
     } else {
+      setLoading(false);
       Alert.alert(
         'Warning!',
         "Can't get facility, Please try again later",
@@ -801,7 +804,7 @@ export default function AdminFacilities({ navigation }) {
                           <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ ALL FACILITY SHIFT LISTINGS</Text>
                         </View>
                       </View>
-                      <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
+                      <View style={{maxHeight: 200, flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
                         <ScrollView horizontal={true} style={{width: '100%'}}>
                           <ShiftListTable />
                         </ScrollView>

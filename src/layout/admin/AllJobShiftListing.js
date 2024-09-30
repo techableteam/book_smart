@@ -404,9 +404,9 @@ export default function AllJobShiftListing({ navigation }) {
     //   requestData.filters = [];
     // }
     setLoading(true);
-    console.log(requestData);
     let result = await Jobs(requestData, 'jobs', 'Admin');
     if(!result) {
+      setLoading(false);
       setData(['No Data'])
     } else {
       let pageContent = [];
@@ -415,6 +415,8 @@ export default function AllJobShiftListing({ navigation }) {
       }
       setPageList(pageContent);
       setData(result.dataArray);
+      console.log(result.dataArray);
+      setLoading(false);
     }
     const uniqueValues = new Set();
     const transformed = [];
@@ -437,7 +439,6 @@ export default function AllJobShiftListing({ navigation }) {
     });
 
     setClinicians(transformed);
-    setLoading(false);
   }
 
   const getAccounts = async () => {
@@ -846,8 +847,10 @@ export default function AllJobShiftListing({ navigation }) {
 
   const handleShowHoursModal = async (id) => {
     console.log(id);
+    setLoading(true);
     let data = await Job({ jobId: id }, 'jobs');
     if(!data) {
+      setLoading(false);
       setSelectedJob(null);
     } else {
       setSelectedJob(data.jobData);
@@ -857,23 +860,29 @@ export default function AllJobShiftListing({ navigation }) {
       setPreTime();
       setToDate(new Date());
       setFromDate(new Date());
+      console.log('--------------------------------', data.jobData);
       setIsHoursDetailModal(true);
+      setLoading(false);
     }
   };
 
   const handleShowJobDetailModal = async (id) => {
     console.log(id);
+    setLoading(true);
     let data = await Job({ jobId: id }, 'jobs');
-    console.log('--------------------------------', data);
     if(data?.error) {
       setSelectedJob(null);
       setSelectedBidders([]);
+      setLoading(false);
     } else {
       let biddersList = data.bidders;
       biddersList.unshift(bidderTableHeader);
       setSelectedJob(data.jobData);
       setSelectedBidders(biddersList);
+      console.log('--------------------------------', data.jobData);
+      console.log('--------------------------------', biddersList);
       setIsJobDetailModal(true);
+      setLoading(false);
     }
   };
 

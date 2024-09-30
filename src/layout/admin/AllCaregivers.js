@@ -571,6 +571,7 @@ export default function AllCaregivers({ navigation }) {
   };
 
   const handleShowUserInfoModal = async () => {
+    setLoading(true);
     let response = await getUserInfo({ userId: selectedUserId }, 'clinical');
 
     if (!response?.error) {
@@ -588,13 +589,17 @@ export default function AllCaregivers({ navigation }) {
       updatedCredentials.userStatus = response.userData.userStatus;
       updatedCredentials.email = response.userData.email;
       setCredentials(updatedCredentials);
+      console.log(updatedCredentials);
       toggleVerificationModal();
+      setLoading(false);
     } else {
+      setLoading(false);
       setSelectedUser(null);
     }
   };
 
   const handleShowProfileModal = async () => {
+    setLoading(true);
     let response = await getUserProfile({ userId: selectedUserId }, 'clinical');
 
     if (!response?.error) {
@@ -607,12 +612,16 @@ export default function AllCaregivers({ navigation }) {
       setSelectedUser(response.userData);
       setAppliedList(appliedData);
       setAwardedList(awardedData);
-
+      console.log(response.userData);
+      console.log(appliedData);
+      console.log(awardedData);
       toggleUserProfileModal();
+      setLoading(false);
     } else {
       setSelectedUser(null);
       setAppliedList([]);
       setAwardedList([]);
+      setLoading(false);
     }
   };
 
