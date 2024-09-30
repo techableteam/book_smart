@@ -89,6 +89,7 @@ export default function Shift ({ navigation }) {
   
 
   const getData = async () => {
+    setLoading(true);
     let data = await MyShift('jobs', 'Clinician');
     if(!data) {
       setData(['No Data'])
@@ -128,6 +129,7 @@ export default function Shift ({ navigation }) {
       const page = Math.ceil(len / value);
       setTotalPages(page);
     }
+    setLoading(false);
   };
 
   useFocusEffect(

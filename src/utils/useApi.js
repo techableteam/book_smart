@@ -565,6 +565,25 @@ export const allCaregivers = async (data, endpoint) => {
   }
 };
 
+export const getUserImage = async (data, endpoint) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(`api/${endpoint}/getUserImage`, data, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data.data;
+  } catch (error) {
+    return { error: error };
+  }
+};
+
+
 export const Jobs = async (data, endpoint, role) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
@@ -574,15 +593,11 @@ export const Jobs = async (data, endpoint, role) => {
         Role: role
       }
     });
-    // If the update is successful, you can potentially update the token in AsyncStorage
+
     if (response.status === 200) {
-      // Optionally, if the backend sends a new token for some reason
       if (response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
       }
-    } else if (response.status === 401) {
-      console.log('Token is expired')
-      // navigation.navigate('Home')
     }
     return response.data;
   } catch (error) {

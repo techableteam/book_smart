@@ -39,6 +39,7 @@ export default function ShiftListing ({ navigation }) {
   async function getData() {
     setGettingData(true);
     let data = await Jobs({}, 'jobs', 'Clinician');
+    console.log(data);
     if(!data) {
       setGettingData(false);
       setData(['No Data'])
@@ -113,6 +114,7 @@ export default function ShiftListing ({ navigation }) {
       setPageItems(generatedPageArray);
       setGettingData(false);
     }
+    setGettingData(false);
   };
 
   useFocusEffect(

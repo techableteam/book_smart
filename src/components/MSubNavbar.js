@@ -31,7 +31,7 @@ export default function MSubNavbar({name, navigation}) {
             if (name === "Admin") {
               handleNavigate("AdminHome")
             } else if (name === "Caregiver") {
-              handleNavigate('MyProfile')
+              handleNavigate('MyHome')
             } else if (name === "Facilities") {
               handleNavigate('FacilityProfile')
             }

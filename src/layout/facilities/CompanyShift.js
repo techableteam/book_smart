@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TextInput, View, Image, Dimensions, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -75,7 +75,6 @@ export default function CompanyShift({ navigation }) {
       value: 2
     }
   ]), []);
-
   const pageItems = [
     {label: '10 per page', value: '10'},
     {label: '25 per page', value: '25'},
@@ -112,30 +111,12 @@ export default function CompanyShift({ navigation }) {
     ""
   ];
 
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-    }, 500);
-    return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
-
   const [data, setData] = useState([]);
-  async function getData() {
+
+  const getData = async () => {
     setLoading(true);
     let result = await Jobs({}, 'jobs', 'Facilities');
     if(!result) {
-      setLoading(false);
       setData(['No Data'])
     } else {
       setData(result.dataArray)

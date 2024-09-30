@@ -1,5 +1,5 @@
 import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAtom } from 'jotai';
 import images from '../../assets/images';
@@ -136,11 +136,14 @@ export default function EditProfile({ navigation }) {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     getData();
+  //   }, [])
+  // );
+  useEffect(() => {
+    getData();
+  }, []);
 
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
@@ -654,7 +657,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> Driver's License</Text>
               {credentials.driverLicense.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                  onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.driverLicense })}
+                  onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'driverLicense' })}
                 >{credentials.driverLicense.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('driverLicense')}
@@ -678,7 +681,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> Social Security Card</Text>
               {credentials.socialCard.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.socialCard })}
+                  onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'socialCard' })}
                 >{credentials.socialCard.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('socialCard')}
@@ -702,7 +705,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> Physical Exam</Text>
               {credentials.physicalExam.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.physicalExam })}
+                onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'physicalExam' })}
                 >{credentials.physicalExam.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('physicalExam')}
@@ -726,7 +729,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> PPD (TB Test)</Text>
               {credentials.ppd.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.ppd })}
+                onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'ppd' })}
                 >{credentials.ppd.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('ppd')}
@@ -750,7 +753,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> MMR (Immunizations)</Text>
               {credentials.mmr.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.mmr })}
+                onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'mmr' })}
                 >{credentials.mmr.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('mmr')}
@@ -774,7 +777,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> Healthcare License</Text>
               {credentials.healthcareLicense.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.healthcareLicense })}
+                onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'healthcareLicense' })}
                 >{credentials.healthcareLicense.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('healthcareLicense')}
@@ -798,7 +801,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> Resume</Text>
               {credentials.resume.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.resume })}
+                onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'resume' })}
                 >{credentials.resume.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('resume')}
@@ -822,7 +825,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> COVID Card</Text>
               {credentials.covidCard.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.covidCard })}
+                onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'covidCard' })}
                 >{credentials.covidCard.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('covidCard')}
@@ -846,7 +849,7 @@ export default function EditProfile({ navigation }) {
               <Text style={styles.subtitle}> BLS(CPR card)</Text>
               {credentials.bls.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
-                onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.bls })}
+                onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'bls' })}
                 >{credentials.bls.name} &nbsp;&nbsp;</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
                   onPress = {() => handleRemove('bls')}

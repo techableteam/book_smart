@@ -60,6 +60,7 @@ import ClientPermission from './client/ClientPermission.js';
 import FileViewer from './FileViewer.js';
 import AddNewFacility from './admin/AddNewFacility.js';
 import CaregiverProfile from './admin/CaregiverProfile.js';
+import UserFileViewer from './UserFileViewer.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -89,6 +90,11 @@ function Layout() {
       <Stack.Screen 
         name= 'MyHome'
         component = {MyHome}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'UserFileViewer'
+        component = {UserFileViewer}
         options={{headerShown: false}}
       />
       <Stack.Screen 

@@ -1,8 +1,7 @@
 import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
 import React, { useState } from 'react';
 import images from '../../assets/images';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { TextInput, useTheme } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
@@ -14,6 +13,7 @@ import { firstNameAtom, lastNameAtom, companyNameAtom, contactPhoneAtom, contact
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import Loader from '../Loader';
 
 export default function FacilityEditProfile({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -23,11 +23,10 @@ export default function FacilityEditProfile({ navigation }) {
   const [contactPassword, setContactPassword] = useAtom(contactPasswordAtom);
   const [contactEmail, setContactEmail] = useAtom(contactEmailAtom);
   const [avatar, setAvatar] = useAtom(avatarAtom);
-  const [userRole, setUserRole]= useAtom(userRoleAtom);
   const [address, setAddress]= useAtom(addressAtom);
   const [fileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   //--------------------------------------------Credentials-----------------------------
   const [ credentials, setCredentials ] = useState({
     firstName: firstName,
@@ -279,6 +278,7 @@ export default function FacilityEditProfile({ navigation }) {
         showAlerts('all gaps')
     } else {
       try {
+        setLoading(true);
         console.log('credentials: ', credentials);
         const response = await Update(credentials, "facilities");
         setFirstName(response.user.firstName);
@@ -289,8 +289,10 @@ export default function FacilityEditProfile({ navigation }) {
         setAddress(response.user.address);
         setAvatar(response.user.avatar);
         console.log('Signup successful: ', response)
+        setLoading(false);
         navigation.navigate('FacilityProfile');
       } catch (error) {
+        setLoading(false);
         console.error('Signup failed: ', error)
       }
     }
@@ -492,6 +494,7 @@ export default function FacilityEditProfile({ navigation }) {
           </Modal>
         )}
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   );
@@ -680,7 +683,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     padding: 10,
     backgroundColor: '#A020F0',
-    color: 'black',
+    color: 'white',
     fontSize: 16,
   },
   drinksButton: {
