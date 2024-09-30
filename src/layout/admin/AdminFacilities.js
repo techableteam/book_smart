@@ -504,12 +504,12 @@ export default function AdminFacilities({ navigation }) {
                   <Text>Reset</Text>
                 </TouchableOpacity>}
               </View>
-              <View>
+              {/* <View>
                 <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0, marginBottom: 5 }]} onPress={toggleAddFilterModal}>
                   <Text>Add Filter</Text>
                 </TouchableOpacity>
-              </View>
-              {isSubmitted && <View style={{ flexDirection: 'row', marginBottom: 5, flexWrap: 'wrap' }}>
+              </View> */}
+              {/* {isSubmitted && <View style={{ flexDirection: 'row', marginBottom: 5, flexWrap: 'wrap' }}>
                 {filters.map((item, index) => (
                   <View key={index} style={styles.filterItem}>
                     <View style={{ flexDirection: 'row' }}>
@@ -524,7 +524,7 @@ export default function AdminFacilities({ navigation }) {
                     </View>
                   </View>
                 ))}
-              </View>}
+              </View>} */}
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}

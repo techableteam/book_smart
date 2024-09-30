@@ -398,7 +398,7 @@ export default function AdminAllUser({ navigation }) {
                   <Text>Reset</Text>
                 </TouchableOpacity>}
               </View>
-              <View>
+              {/* <View>
                 <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0, marginBottom: 5 }]} onPress={toggleAddFilterModal}>
                   <Text>Add Filter</Text>
                 </TouchableOpacity>
@@ -418,7 +418,7 @@ export default function AdminAllUser({ navigation }) {
                     </View>
                   </View>
                 ))}
-              </View>}
+              </View>} */}
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}

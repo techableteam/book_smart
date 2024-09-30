@@ -395,9 +395,9 @@ export default function AllCaregivers({ navigation }) {
   };
 
   const getData = async (requestData = { search: search, page: curPage, filters: filters }, isFilter = isSubmitted ) => {
-    if (!isFilter) {
-      requestData.filters = [];
-    }
+    // if (!isFilter) {
+    //   requestData.filters = [];
+    // }
     setLoading(true);
     let result = await allCaregivers(requestData, 'clinical');
     if(!result) {
@@ -451,7 +451,7 @@ export default function AllCaregivers({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       getData();
-      getDegree();
+      // getDegree();
     }, [])
   );
 
@@ -978,7 +978,7 @@ export default function AllCaregivers({ navigation }) {
                   <Text>Reset</Text>
                 </TouchableOpacity>}
               </View> */}
-              <View>
+              {/* <View>
                 <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0, marginBottom: 5 }]} onPress={toggleAddFilterModal}>
                   <Text>Add Filter</Text>
                 </TouchableOpacity>
@@ -998,7 +998,7 @@ export default function AllCaregivers({ navigation }) {
                     </View>
                   </View>
                 ))}
-              </View>}
+              </View>} */}
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}

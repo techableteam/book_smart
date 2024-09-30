@@ -400,9 +400,9 @@ export default function AllJobShiftListing({ navigation }) {
   ];
 
   const getData = async (requestData = { search: search, page: curPage, filters: filters }, isFilter = isSubmitted ) => {
-    if (!isFilter) {
-      requestData.filters = [];
-    }
+    // if (!isFilter) {
+    //   requestData.filters = [];
+    // }
     setLoading(true);
     console.log(requestData);
     let result = await Jobs(requestData, 'jobs', 'Admin');
@@ -517,9 +517,9 @@ export default function AllJobShiftListing({ navigation }) {
       setLoading(true);
       getAccounts();
       getBidderList();
-      getLocation();
-      getDegree();
-      getNurseList();
+      // getLocation();
+      // getDegree();
+      // getNurseList();
       getData();
       setLoading(false);
     }, [])
@@ -1345,7 +1345,7 @@ export default function AllJobShiftListing({ navigation }) {
                   <Text>Reset</Text>
                 </TouchableOpacity>}
               </View>
-              <View style={{ marginBottom: 10 }}>
+              {/* <View style={{ marginBottom: 10 }}>
                 <View style = {styles.filterbar}>
                   <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0 }]} onPress={toggleAddFilterModal}>
                     <Text style={{color: "#2a53c1"}}>Add Filter</Text>
@@ -1371,7 +1371,7 @@ export default function AllJobShiftListing({ navigation }) {
                     </View>
                   </View>
                 ))}
-              </View>}
+              </View>} */}
               <Dropdown
                 style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
                 placeholderStyle={styles.placeholderStyle}
