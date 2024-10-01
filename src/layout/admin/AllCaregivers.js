@@ -610,7 +610,7 @@ export default function AllCaregivers({ navigation }) {
         appliedData.unshift(appliedTableHeader);
         setAppliedList(appliedData);
       } else {
-        setAwardedList([]);
+        setAppliedList([]);
       }
 
       if (awardedData.length > 0) {
@@ -2672,7 +2672,6 @@ const styles = StyleSheet.create({
 	},
   head: {
     backgroundColor: '#7be6ff4f',
-    // width: 2000,
     height: 40,
   },
   tableText: {
