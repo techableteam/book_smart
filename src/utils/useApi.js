@@ -722,16 +722,7 @@ export const updateTimeSheet = async (data, endpoint) => {
 
 export const getClientInfoWithJobId = async (data, endpoint) => {
   try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/getClientInfo`, data, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
+    const response = await axios.post(`api/${endpoint}/getClientInfo`, data);
     return response.data.userData;
   } catch (error) {
     return { error: error };

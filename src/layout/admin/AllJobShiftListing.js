@@ -1065,25 +1065,14 @@ export default function AllJobShiftListing({ navigation }) {
   };
 
   const handleUpdateExplanation = async () => {
+    setLoading(true);
     let results = await PostJob({ jobId: selectedJobId, noStatusExplanation: explanation }, 'jobs');
+    toggleUpdateExplanationModal();
     if (!results?.error) {
-      toggleUpdateExplanationModal();
       getData();
-      console.log('success');
-      // Alert.alert(
-      //   'Success!',
-      //   'Updated',
-      //   [
-      //     {
-      //       text: 'OK',
-      //       onPress: () => {
-      //         console.log('OK pressed')
-      //       },
-      //     },
-      //   ],
-      //   { cancelable: false }
-      // );
+      setLoading(false);
     } else {
+      setLoading(false);
       console.log('failure', JSON.stringify(results.error));
       Alert.alert(
         'Warning!',
@@ -1099,6 +1088,7 @@ export default function AllJobShiftListing({ navigation }) {
         { cancelable: false }
       );
     }
+    setLoading(false);
   };
 
   const handleUpdate = async () => {
@@ -1183,6 +1173,7 @@ export default function AllJobShiftListing({ navigation }) {
 
   const handleUpdateExplanationModal = (data) => {
     setSelectedJobId(data[2]);
+    setExplanation(data[17]);
     toggleUpdateExplanationModal();
   };
 

@@ -41,7 +41,7 @@ export default function CaregiverProfile({ navigation, route }) {
                     <Image
                         resizeMode="cover"
                         style={styles.nurse}
-                        source={{ uri: `${userInfo?.photoImage?.content || default_image}` }}
+                        source={{ uri: `${default_image}` }}
                     />
                     <Text style={styles.name}>{userInfo?.photoImage?.name}</Text>
                     <Text style={styles.name}>{userInfo?.firstName || ""}{" "}{userInfo?.lastName || ""}</Text>
