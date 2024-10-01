@@ -428,22 +428,7 @@ export const updateDocuments = async (updateData, endpoint) => {
 
 export const PostJob = async (jobData, endpoint) => {
   try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/postJob`, jobData, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    console.log(response);
-    console.log(JSON.stringify(response));
-    // If the update is successful, you can potentially update the token in AsyncStorage
-    if (response.status === 200) {
-      // Optionally, if the backend sends a new token for some reason
-
-    } else if (response.status === 401) {
-      console.log('Token is expired')
-      // navigation.navigate('Home')
-    }
+    const response = await axios.post(`api/${endpoint}/postJob`, jobData);
     return response.data;
   } catch (error) {
     return { error: error };
@@ -613,17 +598,7 @@ export const Jobs = async (data, endpoint, role) => {
 
 export const Job = async (jobData, endpoint) => {
   try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/getJob`, jobData, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    if (response.status === 200) {
-      if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
-    }
+    const response = await axios.post(`api/${endpoint}/getJob`, jobData);
     return response.data;
   } catch (error) {
     console.log(JSON.stringify(error));
@@ -633,22 +608,7 @@ export const Job = async (jobData, endpoint) => {
 
 export const removeJob = async (jobData, endpoint) => {
   try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/removeJob`, jobData, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    // If the update is successful, you can potentially update the token in AsyncStorage
-    if (response.status === 200) {
-      // Optionally, if the backend sends a new token for some reason
-      if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
-    } else if (response.status === 401) {
-      console.log('Token is expired')
-      // navigation.navigate('Home')
-    }
+    const response = await axios.post(`api/${endpoint}/removeJob`, jobData);
     return response.data;
   } catch (error) {
     return { error: error };
@@ -681,19 +641,7 @@ export const updateHoursStatus = async (jobData, endpoint) => {
 
 export const setAwarded = async (jobData, endpoint) => {
   try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(`api/${endpoint}/setAwarded`, jobData, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    if (response.status === 200) {
-      if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
-    } else if (response.status === 401) {
-      console.log('Token is expired')
-    }
+    const response = await axios.post(`api/${endpoint}/setAwarded`, jobData);
     return response.data;
   } catch (error) {
     return { error: error };

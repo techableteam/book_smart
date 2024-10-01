@@ -415,7 +415,6 @@ export default function AllJobShiftListing({ navigation }) {
       }
       setPageList(pageContent);
       setData(result.dataArray);
-      console.log(result.dataArray);
       setLoading(false);
     }
     const uniqueValues = new Set();
@@ -936,7 +935,7 @@ export default function AllJobShiftListing({ navigation }) {
               key={idx}
               style={[
                 styles.tableItemStyle,
-                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width, backgroundColor: 'white' },
               ]}
             >
               <TouchableOpacity
@@ -964,7 +963,7 @@ export default function AllJobShiftListing({ navigation }) {
               key={idx}
               style={[
                 styles.tableItemStyle,
-                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
+                { flex: 1, justifyContent: 'center', alignItems: 'center', width, backgroundColor: 'white' },
               ]}
             >
               <TouchableOpacity
@@ -988,7 +987,7 @@ export default function AllJobShiftListing({ navigation }) {
           return (
             <Text
               key={idx}
-              style={[styles.tableItemStyle, { width }]}
+              style={[styles.tableItemStyle, index > 0 ? { backgroundColor: 'white', width } : { width }]}
             >
               {item[idx]}
             </Text>
@@ -1000,9 +999,9 @@ export default function AllJobShiftListing({ navigation }) {
 
   const BidderTableComponent = () => (
     <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
-      {selectedBidders.map((item, index) => (
-        <RenderItem1 key={index} item={item} index={index} />
-      ))}
+      {selectedBidders.map((item, index) => {
+        return (<RenderItem1 key={index} item={item} index={index} />);
+      })}
     </View>
   );
 
@@ -1432,7 +1431,7 @@ export default function AllJobShiftListing({ navigation }) {
                                   key={cellIndex}
                                   style={[
                                     styles.tableItemStyle,
-                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: 200 },
+                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: 200, backgroundColor: 'white' },
                                   ]}
                                 >
                                   <TouchableOpacity
@@ -1459,7 +1458,7 @@ export default function AllJobShiftListing({ navigation }) {
                                   key={cellIndex}
                                   style={[
                                     styles.tableItemStyle,
-                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: 150 },
+                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: 150, backgroundColor: 'white' },
                                   ]}
                                 >
                                   <TouchableOpacity
@@ -1486,7 +1485,7 @@ export default function AllJobShiftListing({ navigation }) {
                                   key={cellIndex}
                                   style={[
                                     styles.tableItemStyle,
-                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: widths[cellIndex] },
+                                    { flex: 1, justifyContent: 'center', alignItems: 'center', width: widths[cellIndex], backgroundColor: 'white' },
                                   ]}
                                 >
                                   <TouchableOpacity
@@ -1521,7 +1520,7 @@ export default function AllJobShiftListing({ navigation }) {
                                   <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUploadModal(rowData, 'timesheet', cellData)}>
                                     <Text
                                       key={cellIndex}
-                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue', backgroundColor: 'white' }]}
                                     >
                                       {cellData}
                                     </Text>
@@ -1532,7 +1531,7 @@ export default function AllJobShiftListing({ navigation }) {
                                   <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUploadModal(rowData, 'verification', cellData)}>
                                     <Text
                                       key={cellIndex}
-                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue', backgroundColor: 'white'  }]}
                                     >
                                       {cellData}
                                     </Text>
@@ -1543,7 +1542,7 @@ export default function AllJobShiftListing({ navigation }) {
                                   <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUpdateExplanationModal(rowData)}>
                                     <Text
                                       key={cellIndex}
-                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue' }]}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue', backgroundColor: 'white'  }]}
                                     >
                                       {cellData}
                                     </Text>
@@ -1554,7 +1553,7 @@ export default function AllJobShiftListing({ navigation }) {
                                   <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(rowData)}>
                                     <Text
                                       key={cellIndex}
-                                      style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
+                                      style={[styles.tableItemStyle, { width: widths[cellIndex], backgroundColor: 'white'  }]}
                                     >
                                       {cellData}
                                     </Text>
@@ -1564,7 +1563,7 @@ export default function AllJobShiftListing({ navigation }) {
                                 return (
                                   <Text
                                     key={cellIndex}
-                                    style={[styles.tableItemStyle, { width: widths[cellIndex] }]}
+                                    style={[styles.tableItemStyle, { width: widths[cellIndex], backgroundColor: 'white'  }]}
                                   >
                                     {cellData}
                                   </Text>
@@ -2609,8 +2608,7 @@ const styles = StyleSheet.create({
     borderColor: 'black',
   },
   tableItemStyle: { 
-    borderColor: '#AAAAAA', 
-    backgroundColor: '#ffffff',
+    borderColor: '#AAAAAA',
     borderWidth: 1, 
     textAlign: 'center',
     textAlignVertical: 'center',

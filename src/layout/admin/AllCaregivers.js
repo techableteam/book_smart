@@ -598,31 +598,37 @@ export default function AllCaregivers({ navigation }) {
     }
   };
 
-  const handleShowProfileModal = async () => {
+  const handleShowProfileModal = async ( userId ) => {
     setLoading(true);
-    let response = await getUserProfile({ userId: selectedUserId }, 'clinical');
-
+    let response = await getUserProfile({ userId: userId }, 'clinical');
+    console.log(response);
     if (!response?.error) {
       let appliedData = response.appliedList;
-      appliedData.unshift(appliedTableHeader);
-
       let awardedData = response.awardedList;
-      awardedData.unshift(awardedTableHeader);
 
+      if (appliedData.length > 0) {
+        appliedData.unshift(appliedTableHeader);
+        setAppliedList(appliedData);
+      } else {
+        setAwardedList([]);
+      }
+
+      if (awardedData.length > 0) {
+        awardedData.unshift(awardedTableHeader);
+        setAwardedList(awardedData);
+      } else {
+        setAwardedList([]);
+      }
       setSelectedUser(response.userData);
-      setAppliedList(appliedData);
-      setAwardedList(awardedData);
-      console.log(response.userData);
-      console.log(appliedData);
-      console.log(awardedData);
-      toggleUserProfileModal();
+
       setLoading(false);
+      toggleUserProfileModal();
     } else {
       setSelectedUser(null);
       setAppliedList([]);
       setAwardedList([]);
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const appliedTableHeaderWidth = [150, 150, 140, 400];
@@ -673,17 +679,25 @@ export default function AllCaregivers({ navigation }) {
   
   const AppliedListTable = () => (
     <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
-      {appliedList.map((item, index) => (
-        <RenderItem key={index} item={item} index={index} />
-      ))}
+      {appliedList.map((item, index) => {
+        if (appliedList.length > 0) {
+          return (<RenderItem key={index} item={item} index={index} />);
+        } else {
+          return (<></>);
+        }
+      })}
     </View>
   );
 
   const AwardedListTable = () => (
     <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
-      {awardedList.map((item, index) => (
-        <RenderItem1 key={index} item={item} index={index} />
-      ))}
+      {awardedList.map((item, index) => {
+        if (awardedList.length > 0) {
+          return (<RenderItem1 key={index} item={item} index={index} />);
+        } else {
+          return (<></>);
+        }
+      })}
     </View>
   );
 
@@ -1066,7 +1080,7 @@ export default function AllCaregivers({ navigation }) {
                                 onPress={() => {
                                   console.log('user => ', rowData[12]);
                                   setSelectedUserId(rowData[12]);
-                                  handleShowProfileModal();
+                                  handleShowProfileModal(rowData[12]);
                                 }}
                               >
                                 <Text style={styles.profileTitle}>View Here</Text>
@@ -1360,7 +1374,7 @@ export default function AllCaregivers({ navigation }) {
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
                         <ScrollView horizontal={true} style={{width: '100%'}}>
-                          <AppliedListTable />
+                          {appliedList.length > 0 ? <AppliedListTable /> : <Text>No applied items available</Text>}
                         </ScrollView>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%'}}>
@@ -1370,7 +1384,7 @@ export default function AllCaregivers({ navigation }) {
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
                         <ScrollView horizontal={true} style={{width: '100%'}}>
-                          <AwardedListTable />
+                        {awardedList.length > 0 ? <AwardedListTable /> : <Text>No awarded items available</Text>}
                         </ScrollView>
                       </View>
                     </View>
