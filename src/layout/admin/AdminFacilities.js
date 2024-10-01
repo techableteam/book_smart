@@ -763,25 +763,16 @@ export default function AdminFacilities({ navigation }) {
                     <Image source = {images.close} style={{width: 20, height: 20}}/>
                   </TouchableOpacity>
                 </View>
-                <View style={{ paddingHorizontal: 10 }}>
+                <View style={[styles.body, { marginBottom: 100, paddingHorizontal: 10 }]}>
                   <ScrollView>
                     <View style={[styles.modalBody, { padding: 0, paddingVertical: 10, margin: 0 }]}>
-                      <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                        {facility?.avatar.name != "" ? (<Image
-                          resizeMode="cover"
-                          style={styles.nurse}
-                          source={{uri: 'data:image/jpeg;base64,' + facility?.avatar.content}}
-                        />) : (
-                          <></>
-                        )}
-                      </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Date Added</Text>
                         <Text style={styles.content}>{formatDate(facility?.entryDate)}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>ID</Text>
-                        <Text style={styles.content}>{facility?.firstName} {facility?.aic}</Text>
+                        <Text style={styles.content}>{facility?.aic}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Company Name</Text>
@@ -984,7 +975,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     lineHeight: 30,
-    width: '35%'
+    width: '40%'
   },
   title: {
     fontSize: 18,
