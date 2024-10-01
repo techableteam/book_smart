@@ -1297,7 +1297,7 @@ export default function AllCaregivers({ navigation }) {
                         </View>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                        {selectedUser?.photoImage?.name != "" ? (<Image
+                        {/* {selectedUser?.photoImage?.name != "" ? (<Image
                           resizeMode="cover"
                           style={styles.nurse}
                           source={{uri: 'data:image/jpeg;base64,' + selectedUser?.photoImage?.content}}
@@ -1307,7 +1307,12 @@ export default function AllCaregivers({ navigation }) {
                             style={styles.nurse}
                             source={images.profile}
                           />
-                        )}
+                        )} */}
+                        <Image
+                            resizeMode="cover"
+                            style={styles.nurse}
+                            source={images.profile}
+                          />
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Entry Date</Text>
