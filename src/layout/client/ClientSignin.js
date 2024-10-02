@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
 import images from '../../assets/images';
-import { TextInput, useTheme } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import { useAtom } from 'jotai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getUniqueId, getManufacturer } from 'react-native-device-info';
+import { getUniqueId } from 'react-native-device-info';
 import { useFocusEffect } from '@react-navigation/native';
 import { 
   firstNameAtom, 
@@ -12,28 +12,12 @@ import {
   emailAtom, 
   titleAtom, 
   userRoleAtom, 
-  birthdayAtom, 
-  entryDateAtom, 
-  phoneNumberAtom, 
-  addressAtom, 
-  socialSecurityNumberAtom, 
-  photoImageAtom, 
-  driverLicenseAtom,
-  socialCardAtom,
-  physicalExamAtom,
-  ppdAtom,
-  mmrAtom,
-  healthcareLicenseAtom,
-  resumeAtom,
-  covidCardAtom,
-  signatureAtom,
+  phoneNumberAtom,
   passwordAtom,
-  blsAtom,
   clinicalAcknowledgeTerm,
   aicAtom
  } from '../../context/ClinicalAuthProvider';
 import { Signin } from '../../utils/useApi';
-import { deviceNumberAtom } from '../../context/BackProvider';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
@@ -43,38 +27,16 @@ export default function ClientSignIn({ navigation }) {
   const [aic, setAIC] = useAtom(aicAtom);
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [birthday, setBirthday] = useAtom(birthdayAtom);
   const [phoneNumber, setPhoneNumber] = useAtom(phoneNumberAtom);
-  const [signature, setSignature] = useAtom(signatureAtom);
   const [title, setTitle] = useAtom(titleAtom);
   const [email, setEmail] = useAtom(emailAtom);
-  const [photoImage, setPhotoImage] = useAtom(photoImageAtom);
   const [userRole, setUserRole]= useAtom(userRoleAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
-  const [socialSecurityNumber, setSocialSecurityNumber] = useAtom(socialSecurityNumberAtom);
-  const [address, setAddress] = useAtom(addressAtom);
   const [password, setPassword] = useAtom(passwordAtom);
   const [clinicalAcknowledgement, setClinicalAcknowledgement] = useAtom(clinicalAcknowledgeTerm);
-  const [deviceNum, setDeviceNum] = useAtom(deviceNumberAtom);
-  const [driverLicense, setDriverLicense] = useAtom(driverLicenseAtom); 
-  const [socialCard, setSocialCard] = useAtom(socialCardAtom);
-  const [physicalExam, setPhysicalExam] = useAtom(physicalExamAtom); 
-  const [ppd, setPPD] = useAtom(ppdAtom);
-  const [mmr, setMMR] = useAtom(mmrAtom); 
-  const [healthcareLicense, setHealthcareLicense] = useAtom(healthcareLicenseAtom);
-  const [resume, setResume] = useAtom(resumeAtom); 
-  const [covidCard, setCovidCard] = useAtom(covidCardAtom);
-  const [bls, setBls] = useAtom(blsAtom);
   const [device, setDevice] = useState('');
   const [loginEmail, setLoginEmail] =  useState('');
   const [loginPW, setLoginPW] = useState('');
   const [checked, setChecked] = useState(false);
-  const [ credentials, setCredentials ] = useState({
-    email: '',
-    password: '',
-    userRole: 'Clinician',
-    device: '',
-  });
   const [request, setRequest] = useState(false);
 
   const fetchDeviceInfo = async () => {
@@ -91,22 +53,6 @@ export default function ClientSignIn({ navigation }) {
       fetchDeviceInfo();
     }, [])
   );
-
-  const showAlert = (name) => {
-    Alert.alert(
-      'Warning!',
-      `You have to input ${name}!`,
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            console.log('OK pressed')
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
   
   const handleToggle = async () => {
     setChecked(!checked);
@@ -123,13 +69,7 @@ export default function ClientSignIn({ navigation }) {
   }, []);
 
   const handleSignInNavigate = (url) => {
-    if (loginEmail === '') {
-      showAlert('email')
-    } else if (loginPW === '') {
-      showAlert('password')
-    } else {
-      navigation.navigate(url);
-    }
+    navigation.navigate(url);
   };
 
   const handleSignUpNavigate = () => {
@@ -185,23 +125,6 @@ export default function ClientSignIn({ navigation }) {
         setUserRole(response.user.userRole);
         setClinicalAcknowledgement(response.user.clinicalAcknowledgeTerm);
         setPassword(response.user.password);
-        // setDeviceNum(response.device);
-        // setBirthday(response.user.birthday);
-        // setSignature(response.user.signature);
-        // setPhotoImage(response.user.photoImage);
-        // setEntryDate(response.user.entryDate);
-        // setSocialSecurityNumber(response.user.socialSecurityNumber);
-        // setAddress(response.user.address);
-        // setDriverLicense(response.user.driverLicense);
-        // setSocialCard(response.user.socialCard);
-        // setPhysicalExam(response.user.physicalExam);
-        // setPPD(response.user.ppd);
-        // setMMR(response.user.mmr);
-        // setHealthcareLicense(response.user.healthcareLicense);
-        // setResume(response.user.resume);
-        // setCovidCard(response.user.covidCard);
-        // setBls(response.user.bls);
-        
 
         await AsyncStorage.setItem('clinicalPhoneNumber', response.user.phoneNumber);
 
@@ -217,7 +140,7 @@ export default function ClientSignIn({ navigation }) {
             handleSignInNavigate('MyHome');
           }
         } else {
-          handleSignInNavigate("ClientPermission");
+          handleSignInNavigate('ClientPermission');
         }
       } else {
         setRequest(false);
@@ -354,10 +277,7 @@ export default function ClientSignIn({ navigation }) {
               </Pressable>
             </View>
             <View style={styles.btn}>
-              <HButton style={styles.subBtn} onPress={ 
-                handleSubmit 
-                // handleSignInNavigate
-              }>
+              <HButton style={styles.subBtn} onPress={ handleSubmit }>
                 Sign In
               </HButton>
               <Text style={styles.middleText}>Need an account?</Text>
