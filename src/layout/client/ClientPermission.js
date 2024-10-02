@@ -24,7 +24,10 @@ export default function ClientPermission ({ navigation }) {
     let signatureRef = useRef(null);
 
     const onSaveEvent = (result) => {
-        setCredentials({...credentials, ["signature"] :result.encoded})
+        setCredentials(prevCredentials => ({
+          ...prevCredentials, 
+          signature: result.encoded
+        }));
     };
 
     const handleUploadSubmit = async () => {
@@ -195,7 +198,6 @@ export default function ClientPermission ({ navigation }) {
                                 selectedTextStyle={styles.selectedTextStyle}
                                 inputSearchStyle={styles.inputSearchStyle}
                                 itemTextStyle={styles.itemTextStyle}
-                                iconStyle={styles.iconStyle}
                                 data={items}
                                 maxHeight={300}
                                 labelField="label"
@@ -208,19 +210,17 @@ export default function ClientPermission ({ navigation }) {
                                     setValue(item.value);
                                     setIsFocus(false);
                                     if (item.value == 1) {
-                                        setCredentials({...credentials, ["clinicalAcknowledgeTerm"] : true});
+                                        setCredentials(prevCredentials => ({
+                                            ...prevCredentials, 
+                                            clinicalAcknowledgeTerm: true
+                                        }));
                                     } else  {
-                                        setCredentials({...credentials, ["clinicalAcknowledgeTerm"] : false});
+                                        setCredentials(prevCredentials => ({
+                                            ...prevCredentials, 
+                                            clinicalAcknowledgeTerm: false
+                                        }));
                                     }
                                 }}
-                                renderLeftIcon={() => (
-                                    <View
-                                        style={styles.icon}
-                                        color={isFocus ? 'blue' : 'black'}
-                                        name="Safety"
-                                        size={20}
-                                    />
-                                )}
                             />
                         </View>
                         {value == 1 && <View style={styles.titleBar}>

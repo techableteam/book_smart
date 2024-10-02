@@ -7,13 +7,12 @@ import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import { emailAtom } from '../../context/ClinicalAuthProvider';
-import { verifyPhoneAtom, deviceNumberAtom } from '../../context/BackProvider';
+import { verifyPhoneAtom } from '../../context/BackProvider';
 import { PhoneSms } from '../../utils/useApi';
 
 
 export default function ClientPhone ({ navigation }) {
   const [verifyPhone, setVerifyPhone] = useAtom(verifyPhoneAtom);
-  const [device, setDevice] = useAtom(deviceNumberAtom);
   const [email, setEmail] = useAtom(emailAtom);
   const [isAlreadyHas, setIsAlreadyHas] = useState(false);
   const [credentials, setCredentials] = useState({
@@ -22,7 +21,7 @@ export default function ClientPhone ({ navigation }) {
 
   useEffect(() => {
     const getCredentials = async() => {
-      const phoneNumber = (await AsyncStorage.getItem('clinicalPhoneNumber')) || '';
+      const phoneNumber = await AsyncStorage.getItem('clinicalPhoneNumber') || '';
       if (phoneNumber !== '') {
         setIsAlreadyHas(true);
       } else {
