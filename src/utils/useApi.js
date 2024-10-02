@@ -164,17 +164,16 @@ export const ResetPassword = async (credentials, endpoint) => {
 export const Update = async (updateData, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
+    console.log(existingToken);
     const response = await axios.post(`api/${endpoint}/update`, updateData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
       }
     });
 
-    if (response.status === 200) {
-      if (response.data.token) {
-        await AsyncStorage.setItem('token', response.data.token);
-      }
-    } 
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
     return response.data;
   } catch (error) {
     return {error: error}

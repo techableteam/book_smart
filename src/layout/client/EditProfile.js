@@ -88,7 +88,6 @@ export default function EditProfile({ navigation }) {
     socialSecurityNumber: socialSecurityNumber,
     address: address,
     photoImage: photoImage,
-    userRole: userRole,
     driverLicense:driverLicense, 
     socialCard: socialCard,
     physicalExam: physicalExam, 
@@ -103,6 +102,7 @@ export default function EditProfile({ navigation }) {
   const getData = async () => {
     setLoading(true);
     let result = await getUserInfo({ userId: aic }, 'clinical');
+    console.log(result);
     if (!result?.error) {
       const updatedCredentials = { ...credentials };
       Object.keys(updatedCredentials).forEach((key) => {
@@ -663,7 +663,7 @@ export default function EditProfile({ navigation }) {
                   onPress = {() => handleRemove('driverLicense')}
                 >remove</Text>
               </View>}
-              
+
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('driverLicense')} style={styles.chooseFile}>
                   <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>

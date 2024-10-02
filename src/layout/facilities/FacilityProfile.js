@@ -1,70 +1,34 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Image, Animated, StyleSheet, ScrollView, StatusBar, Easing, TouchableOpacity } from 'react-native';
-import { Text, PaperProvider, DataTable, useTheme } from 'react-native-paper';
+import React from 'react';
+import { View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
-import { firstNameAtom, lastNameAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, entryDateAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom, passwordAtom } from '../../context/FacilityAuthProvider'
-// import MapView from 'react-native-maps';
+import { firstNameAtom, lastNameAtom, contactPhoneAtom, contactEmailAtom, avatarAtom } from '../../context/FacilityAuthProvider'
 
 export default function FacilityProfile ({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
-  const [companyName, setCompanyName] = useAtom(companyNameAtom);
   const [contactPhone, setContactPhone] = useAtom(contactPhoneAtom);
-  const [contactPassword, setContactPassword] = useAtom(contactPasswordAtom);
-  const [entryDate, setEntryDate] = useAtom(entryDateAtom);
   const [contactEmail, setContactEmail] = useAtom(contactEmailAtom);
   const [avatar, setAvatar] = useAtom(avatarAtom);
-  const [userRole, setUserRole]= useAtom(userRoleAtom);
-  const [address, setAddress]= useAtom(addressAtom);
-  //---------------------------------------Animation of Background---------------------------------------
-  const [backgroundColor, setBackgroundColor] = useState('#0000ff'); // Initial color
-  let colorIndex = 0;
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a random color
-      if(colorIndex >= 0.9) {
-        colorIndex = 0;
-      } else {
-        colorIndex += 0.1;
-      }
-
-      const randomColor = colorIndex == 0 ? `#00000${Math.floor(colorIndex * 256).toString(16)}` : `#0000${Math.floor(colorIndex * 256).toString(16)}`;
-      setBackgroundColor(randomColor);
-      // console.log(randomColor)
-    }, 500); // Change color every 5 seconds
-
-    return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
-
-  const theme = useTheme();
   const handleNavigate = (navigateUrl) => {
-      navigation.navigate(navigateUrl);
-  }
+    navigation.navigate(navigateUrl);
+  };
 
   const userInfo = [
     {title: 'Contact Name', content: firstName + " " + lastName},
     {title: 'email', content: contactEmail},
     {title: 'Phone', content: contactPhone},
-  ]
-
-  // const userInfo = [
-  //   {title: 'Contact Name', content: "Dale Wong"},
-  //   {title: 'Email', content: "dalewong008@gmail.com"},
-  //   {title: 'Phone', content: '1231231234'},
-  // ]
+  ];
 
   const handleEdit = () => {
-    console.log('handleEdit')
-    navigation.navigate('FacilityEditProfile')
-  }
+    navigation.navigate('FacilityEditProfile');
+  };
 
   return (
       <View style={styles.container}>

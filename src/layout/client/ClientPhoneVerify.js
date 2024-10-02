@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, View, TextInput, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
-import { Text, PaperProvider, DataTable } from 'react-native-paper';
-import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { Alert, View, StyleSheet, StatusBar } from 'react-native';
+import { Text } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
-import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
 import { emailAtom } from '../../context/ClinicalAuthProvider';
 import { verifyPhoneAtom, deviceNumberAtom } from '../../context/BackProvider';
@@ -24,31 +21,22 @@ export default function ClientPhoneVerify ({ navigation }) {
   const [verifyPhone, setVerifyPhone] = useAtom(verifyPhoneAtom);
   const [device, setDevice] = useAtom(deviceNumberAtom);
   const [email, setEmail] = useAtom(emailAtom);
-  const handleNavigate = (navigateUrl) => {
-      navigation.navigate(navigateUrl);
-  }
 
-  const [credentials, setCredentials] = useState(
-    {
-      verifyCode: 0,
-    }
-  );
+  const [credentials, setCredentials] = useState({
+    verifyCode: 0,
+  });
 
   const handleCredentials = (target, e) => {
-    setCredentials({...credentials, [target]: e})
-    console.log(credentials)
-  }
+    setCredentials({...credentials, [target]: e});
+  };
 
-  
   const [value, setValue] = useState('');
-  // const [enableMask, setEnableMask] = useState(true);
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
     value,
     setValue,
   });
-  
-  // const toggleMask = () => setEnableMask((f) => !f);
+
   const renderCell = ({index, symbol, isFocused}) => {
     let textChild = null;
     const borderColor = isFocused ? '#53FAFB' : '#151515';
@@ -58,7 +46,7 @@ export default function ClientPhoneVerify ({ navigation }) {
     } else if (isFocused) {
       textChild = <Cursor />;
     }
-  //   console.log('symbol', symbol, 'textChild', textChild);
+
     return (
       <Text
         key={index}
