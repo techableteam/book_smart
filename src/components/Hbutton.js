@@ -9,7 +9,16 @@ export default function HButton({
   ...props
 }) {
   return (
-    <TouchableOpacity {...props} accessible={true} accessibilityLabel={children}>
+    // <TouchableOpacity {...props} accessible={true} accessibilityLabel={children}>
+    //   <Text style={[styles.text, style]}>
+    //     {children}
+    //   </Text>
+    // </TouchableOpacity>
+    <TouchableOpacity 
+      {...props} 
+      accessible={true} 
+      accessibilityLabel={typeof children === 'string' ? children : 'Button'}
+    >
       <Text style={[styles.text, style]}>
         {children}
       </Text>
