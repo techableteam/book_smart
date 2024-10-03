@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../../assets/images';
@@ -36,11 +36,10 @@ export default function ShiftListing ({ navigation }) {
   const [pageItems, setPageItems] = useState([]);
   const [bidsubmit, setBidsubmit] = useState(false); 
 
-  async function getData() {
+  const getData = async () => {
     setGettingData(true);
     let data = await Jobs({}, 'jobs', 'Clinician');
-    console.log(data);
-    if(!data) {
+    if(data?.error) {
       setGettingData(false);
       setData(['No Data'])
     } else {

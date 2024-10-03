@@ -113,6 +113,7 @@ export default function ClientSignIn({ navigation }) {
 
     try {
       setRequest(true);
+      console.log(device)
       const response = await Signin({ email: loginEmail, password: loginPW, device: device, userRole: 'Clinician' }, 'clinical');
       if (response?.user) {
         setRequest(false);

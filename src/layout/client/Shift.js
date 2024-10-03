@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, TextInput, View, Image, Platform, Animated, Alert, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { Modal, TextInput, View, Image, Platform, Alert, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { PermissionsAndroid } from 'react-native';
@@ -20,7 +19,6 @@ import Loader from '../Loader';
 import AnimatedHeader from '../AnimatedHeader';
 
 export default function Shift ({ navigation }) {
-  const [backgroundColor, setBackgroundColor] = useState('#ff0000');
   const [isModal, setModal] = useState(false);
   const [isUpload, setUpload] = useState(false);
   const [value, setValue] = useState(100);
@@ -58,36 +56,7 @@ export default function Shift ({ navigation }) {
     {label: '500 per page', value: '500'},
     {label: '1000 per page', value: '1000'},
   ];
-  let colorIndex = 0;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (colorIndex >= 1) {
-        colorIndex = 0; // Reset the index once it reaches 1 (full cycle)
-      } else {
-        colorIndex += 0.1;
-      }
   
-      // Define the color transition logic
-      let randomColor;
-      if (colorIndex <= 0.5) {
-        // From RED to PURPLE (0 to 300 degrees in HSL)
-        const hue = 0 + (colorIndex * 2 * 300);  // Transition from 0 (Red) to 300 (Purple)
-        randomColor = `hsl(${hue}, 100%, 50%)`;  // Full saturation, 50% lightness for vibrant colors
-      } else {
-        // From PURPLE to BLACK by reducing lightness
-        const lightness = 50 - ((colorIndex - 0.5) * 2 * 50);  // Decrease lightness from 50% to 0%
-        randomColor = `hsl(300, 100%, ${lightness}%)`;  // Keep hue at 300 (Purple), reduce lightness
-      }
-  
-      setBackgroundColor(randomColor);
-    }, 500);
-  
-    return () => clearInterval(interval);  // Clean up the interval on component unmount
-  }, []);
-  
-  
-
   const getData = async () => {
     setLoading(true);
     let data = await MyShift('jobs', 'Clinician');
@@ -132,11 +101,15 @@ export default function Shift ({ navigation }) {
     setLoading(false);
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     getData();
+  //   }, [])
+  // );
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   async function requestStoragePermission() {
     try {
@@ -189,15 +162,19 @@ export default function Shift ({ navigation }) {
       setLoading(false);
       if (!response?.error) {
         getData();
-        Alert.alert('Success!', 'Your timesheet has been submitted', [
-          {
-            text: 'OK',
-            onPress: () => {
-              console.log('');
-            },
-          },
-          { text: 'Cancel', style: 'cancel' },
-        ]);
+        Alert.alert(
+          'Success!',
+          'Your timesheet has been submitted',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('');
+              },
+            }
+          ],
+          { cancelable: false }
+        );
       } else {
         setUpload(!isUpload);
         Alert.alert('Failure!', 'Pleae try later', [
@@ -310,7 +287,7 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             },
           });
-          toggleUploadModal();
+          // toggleUploadModal();
         }
       });
     } catch (err) {
@@ -367,7 +344,7 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             }
           });
-          toggleUploadModal();
+          // toggleUploadModal();
         } else {
           Alert.alert(
             'Alert!',
@@ -419,7 +396,7 @@ export default function Shift ({ navigation }) {
         fileType = 'unknown';
       }
       setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}});
-      toggleUploadModal();
+      // toggleUploadModal();
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -775,7 +752,7 @@ export default function Shift ({ navigation }) {
                     }
                   </View>
                   <View style={{flexDirection: 'row', width: '100%'}}>
-                    <TouchableOpacity title="Select File" onPress={handleShowSelectModal} style={styles.chooseFile}>
+                    <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
                       <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                     </TouchableOpacity>
                     <TextInput

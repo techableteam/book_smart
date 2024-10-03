@@ -32,11 +32,12 @@ export default function AdminAllUser({ navigation }) {
   const [pageList, setPageList] = useState([
     {label: 'Page 1', value: 1}
   ]);
-  const widths = [120, 250, 150, 150, 80];
+  const widths = [120, 250, 150, 150, 150, 80];
   const tableHead = [
     'Name',
     'Email',
     'userRole',
+    'Facility',
     '✏️ User Status',
     'Delete'
   ];
@@ -202,7 +203,7 @@ export default function AdminAllUser({ navigation }) {
 
   const handleCellClick = (data) => {
     setCellData(data);
-    setStatus(data[3]);
+    setStatus(data[4]);
     toggleModal();
   };
 
@@ -462,7 +463,7 @@ export default function AdminAllUser({ navigation }) {
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
                       {rowData.map((cellData, cellIndex) => {
-                        if (cellIndex == 3) {
+                        if (cellIndex == 4) {
                           return (
                             <TouchableWithoutFeedback key={cellIndex} onPress={() => handleCellClick(rowData)}>
                               <View style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
@@ -470,7 +471,7 @@ export default function AdminAllUser({ navigation }) {
                               </View>
                             </TouchableWithoutFeedback>
                           );
-                        } else if (cellIndex == 4) {
+                        } else if (cellIndex == 5) {
                           return (
                             <View key={cellIndex} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[cellIndex] }}>
                               <TouchableOpacity
