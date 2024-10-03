@@ -101,15 +101,15 @@ export default function Shift ({ navigation }) {
     setLoading(false);
   };
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     getData();
-  //   }, [])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, [])
+  );
 
-  useEffect(() => {
-    getData();
-  }, []);
+  // useEffect(() => {
+  //   getData();
+  // }, []);
 
   async function requestStoragePermission() {
     try {
