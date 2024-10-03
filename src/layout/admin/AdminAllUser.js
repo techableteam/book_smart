@@ -36,7 +36,7 @@ export default function AdminAllUser({ navigation }) {
   const tableHead = [
     'Name',
     'Email',
-    'userRole',
+    'UserRole',
     'Facility',
     '✏️ User Status',
     'Delete'
