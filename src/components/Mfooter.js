@@ -39,7 +39,7 @@ export default function MFooter(props) {
 const styles = StyleSheet.create({
   shadow: {
     borderRadius: 0,
-    backgroundColor: '#13032f',
+    backgroundColor: '#290135',
     bottom: 0,
     width: '100%',
     position: 'absolute',

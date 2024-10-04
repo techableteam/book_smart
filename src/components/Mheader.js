@@ -14,7 +14,7 @@ export default function MHeader({props, navigation}) {
 const styles = StyleSheet.create({
   shadow: {
     borderRadius: 0,
-    backgroundColor: '#13032f',
+    backgroundColor: '#290135',
     width: '100%',
     top: 0,
     position:'absolute',
