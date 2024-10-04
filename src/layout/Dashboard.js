@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    marginHorizontal: 10, // Replace gap with marginHorizontal
+    marginHorizontal: 5, // Replace gap with marginHorizontal
   },
 });
   

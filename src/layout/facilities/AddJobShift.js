@@ -13,6 +13,7 @@ import images from '../../assets/images';
 import { addDegreeItem, addLocationItem, getDegreeList, getLocationList, PostJob } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
 import { companyNameAtom, facilityIdAtom } from '../../context/FacilityAuthProvider'
+import Loader from '../Loader';
 
 export default function AddJobShift({ navigation }) {
   const [facility, setFacility] = useAtom(companyNameAtom);
@@ -27,6 +28,7 @@ export default function AddJobShift({ navigation }) {
   const [shiftFromDay, setShiftFromDay] = useState(new Date());
   const [showCalender, setShowCalendar] = useState(false);
   const [showAddLocationModal, setShowAddLocationModal] = useState(false);
+  const [loading, setloading] = useState(false);
   const [locationItem, setLocationItem] = useState('');
   const [location, setLocation] = useState([]);
   const [ credentials, setCredentials ] = useState({
@@ -116,17 +118,23 @@ export default function AddJobShift({ navigation }) {
   };
 
   const handleSubmit = async () => {
+    setloading(true);
     if (credentials.degree === '') {
+      setloading(false);
       showAlerts('Degree');
     } else if (credentials.shift === '') {
+      setloading(false);
       showAlerts('Shift');
     } else if (credentials.shiftDate === '') {
+      setloading(false);
       showAlerts('Shift Date');
     } else {
       try {
         const response = await PostJob(credentials, 'jobs');
+        setloading(false);
         navigation.navigate('CompanyShift');
       } catch (error) {
+        setloading(false);
         console.error('Job Shift failed: ', error)
       }
     }
@@ -297,7 +305,7 @@ export default function AddJobShift({ navigation }) {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.subtitle}> Pay Rate </Text>
+              <Text style={styles.subtitle}> Hourly Rate </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""
@@ -321,6 +329,7 @@ export default function AddJobShift({ navigation }) {
             </View>
           </View>
         </View>
+        <Loader visible={loading}/>
       </ScrollView>
       {showAddDegreeModal && <Modal
         Visible={false}

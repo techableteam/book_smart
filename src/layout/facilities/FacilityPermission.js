@@ -23,7 +23,7 @@ export default function FacilityPermission ({ navigation }) {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [credentials, setCredentials] = useState({
-    signature: signature,
+    signature: '',
     facilityAcknowledgeTerm: facilityAcknowledgement
   });
   const [key, setKey] = useState(0);
@@ -31,7 +31,10 @@ export default function FacilityPermission ({ navigation }) {
 
   const onSaveEvent = (result) => {
     console.log(result)
-    setCredentials({...credentials, ["signature"] :result.encoded})
+    setCredentials(prevCredentials => ({
+      ...prevCredentials, 
+      signature: result.encoded
+    }));
   }
 
   const getSignature = () => {
@@ -218,19 +221,14 @@ export default function FacilityPermission ({ navigation }) {
               
                 {value == 1 && <View style={styles.titleBar}>
                   <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Signature <Text style={{color: '#f00'}}>*</Text></Text>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <SignatureCapture
+                  <SignatureCapture
                       style={styles.signature}
                       ref={signatureRef}
                       onSaveEvent={onSaveEvent}
                       saveImageFileInExtStorage={false}
-                      showNativeButtons={false}
-                    />
-                    <TouchableOpacity onPress={resetSignature} style={{ backgroundColor: '#ccc', padding: 5, width: 'auto', height: 'auto', marginLeft: 5 }}>
-                      <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Reset</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>}
+                      showNativeButtons={true}
+                  />
+                  </View>}
               </View>
               <View style={[styles.btn, {marginTop: 20, width: '90%'}]}>
                 <HButton style={styles.subBtn} onPress={ handlePreSubmit }>

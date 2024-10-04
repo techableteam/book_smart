@@ -137,13 +137,14 @@ export default function CompanyShift({ navigation }) {
     if(result.error) {
       setData(['No Data']);
       setTableData([]);
+      setLoading(false);
     } else {
       setData(result.dataArray)
       setFilteredData(result.dataArray);
       result.dataArray.unshift(tableHead);
       setTableData(result.dataArray);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const getDegree = async () => {
@@ -178,14 +179,14 @@ export default function CompanyShift({ navigation }) {
     setLoading(false);
   };
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     getData();
-  //   }, [])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, [])
+  );
   
   useEffect(() => {
-    getData();
+    // getData();
     getDegree();
     getLocation();
   }, []);
