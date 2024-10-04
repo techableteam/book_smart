@@ -287,7 +287,7 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             },
           });
-          // toggleUploadModal();
+          toggleUploadModal();
         }
       });
     } catch (err) {
@@ -344,7 +344,7 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             }
           });
-          // toggleUploadModal();
+          toggleUploadModal();
         } else {
           Alert.alert(
             'Alert!',
@@ -396,7 +396,7 @@ export default function Shift ({ navigation }) {
         fileType = 'unknown';
       }
       setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}});
-      // toggleUploadModal();
+      toggleUploadModal();
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -752,7 +752,7 @@ export default function Shift ({ navigation }) {
                     }
                   </View>
                   <View style={{flexDirection: 'row', width: '100%'}}>
-                    <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
+                    <TouchableOpacity title="Select File" onPress={handleShowSelectModal} style={styles.chooseFile}>
                       <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                     </TouchableOpacity>
                     <TextInput
