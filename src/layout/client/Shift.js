@@ -248,7 +248,7 @@ export default function Shift ({ navigation }) {
         } else if (response.error) {
           Alert.alert(
             'Alert!',
-            'Camera error: ', response.error,
+            'Camera error: ' + response.error,
             [
               {
                 text: 'OK',
@@ -265,7 +265,7 @@ export default function Shift ({ navigation }) {
         } else if (response.errorCode) {
           Alert.alert(
             'Alert!',
-            'Camera errorCode: ', response.errorCode,
+            'Camera errorCode: ' + response.errorCode,
             [
               {
                 text: 'OK',
@@ -278,6 +278,19 @@ export default function Shift ({ navigation }) {
           );
           console.log('Camera error code: ', response.errorCode);
         } else {
+          Alert.alert(
+            'Alert!',
+            'Camera Opened',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
           const fileUri = response.assets[0].uri;
           const fileContent = await RNFS.readFile(fileUri, 'base64');
           
@@ -289,7 +302,10 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             },
           });
-          toggleUploadModal();
+          
+          setTimeout(() => {
+            toggleUploadModal();
+          }, 1000);
         }
       });
     } catch (err) {
@@ -346,7 +362,9 @@ export default function Shift ({ navigation }) {
               name: response.assets[0].fileName,
             }
           });
-          toggleUploadModal();
+          setTimeout(() => {
+            toggleUploadModal();
+          }, 1000);
         } else {
           Alert.alert(
             'Alert!',
