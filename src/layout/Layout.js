@@ -61,6 +61,7 @@ import FileViewer from './FileViewer.js';
 import AddNewFacility from './admin/AddNewFacility.js';
 import CaregiverProfile from './admin/CaregiverProfile.js';
 import UserFileViewer from './UserFileViewer.js';
+import UploadTimesheet from './client/UploadTimesheet.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -85,6 +86,11 @@ function Layout() {
       <Stack.Screen 
         name= 'ClientSignUp'
         component = {ClientSignUp}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'UploadTimesheet'
+        component = {UploadTimesheet}
         options={{headerShown: false}}
       />
       <Stack.Screen 

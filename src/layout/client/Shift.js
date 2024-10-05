@@ -208,13 +208,15 @@ export default function Shift ({ navigation }) {
 
   const handleUploadEdit = (id) => {
     let infoData = data.reportData.find(item => item.jobId === id)
-    setSubmitData(infoData);
-    setDetailedInfos([
+    let detailInfo = [
       { title: 'Job-ID', content: infoData.jobId },
       { title: 'Caregiver', content: infoData.caregiver },
       { title: 'TimeSheet', content: infoData.timeSheet.name },
-    ]);
-    toggleUploadModal();
+    ];
+    setSubmitData(infoData);
+    setDetailedInfos(detailInfo);
+    // toggleUploadModal();
+    navigation.navigate('UploadTimesheet', { detailInfo: detailInfo, fileData: infoData });
   };
 
   //-----------------------------------------File Upload---------------------
