@@ -298,7 +298,7 @@ export default function UploadTimesheet ({ navigation, route }) {
                                 <Text style={{color: 'blue'}} onPress= {handleDelete}>&nbsp;&nbsp;remove</Text>
                             </View>}
                         </View>
-                        <View style={{flexDirection: 'row', width: '100%'}}>
+                        <View style={{flexDirection: 'row', width: '100%', marginTop: 20}}>
                             <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
                                 <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
                             </TouchableOpacity>
