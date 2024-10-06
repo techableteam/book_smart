@@ -162,6 +162,7 @@ export default function ClientSignUp({ navigation }) {
             type: 'image',
             name: response.assets[0].fileName,
           });
+          toggleFileTypeSelectModal();
         }
       });
     } catch (err) {
@@ -215,6 +216,7 @@ export default function ClientSignUp({ navigation }) {
             type: 'image',
             name: response.assets[0].fileName,
           });
+          toggleFileTypeSelectModal();
         } else {
           Alert.alert(
             'Alert!',
@@ -266,6 +268,7 @@ export default function ClientSignUp({ navigation }) {
         fileType = 'unknown';
       }
       setPhotoImage({content: `${fileContent}`, type: fileType, name: res[0].name});
+      toggleFileTypeSelectModal();
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -871,15 +874,15 @@ export default function ClientSignUp({ navigation }) {
                 <View style={styles.body}>
                   <View style={[styles.modalBody, { marginBottom: 20 }]}>
                     <View style={styles.cameraContain}>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
                         <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('gallery'); pickGallery();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
                         <Image source={images.folder} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>

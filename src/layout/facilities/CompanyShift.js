@@ -1661,15 +1661,15 @@ export default function CompanyShift({ navigation }) {
                 <View style={{  marginTop: 10, paddingHorizontal: 20, marginBottom: 20 }}>
                   <View style={{ backgroundColor: '#e3f2f1', borderRadius: 10, borderColor: '#c6c5c5', borderWidth: 2, paddingHorizontal: 20, paddingVertical: 20 }}>
                     <View style={styles.cameraContain}>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('photo'); openCamera();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
                         <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('gallery'); pickGallery();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {handleChangeFileType('library'); pickFile();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
                         <Image source={images.folder} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>

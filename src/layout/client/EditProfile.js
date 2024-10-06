@@ -910,15 +910,15 @@ export default function EditProfile({ navigation }) {
                 <View style={styles.body}>
                   <View style={[styles.modalBody, { marginBottom: 20 }]}>
                     <View style={styles.cameraContain}>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {openCamera();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
                         <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickGallery();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickFile();}}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
                         <Image source={images.folder} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>

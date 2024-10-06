@@ -356,7 +356,7 @@ export default function UploadTimesheet ({ navigation, route }) {
                                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                                         <Text style={styles.textStyle}>Gallery</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickFile();}}>
+                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
                                         <Image source={images.folder} style={{ width: 50, height: 50 }} />
                                         <Text style={styles.textStyle}>Folder</Text>
                                     </TouchableOpacity>
