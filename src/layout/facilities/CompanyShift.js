@@ -415,6 +415,11 @@ export default function CompanyShift({ navigation }) {
     setFiletypeSelectModal(!fileTypeSelectModal);
   };
 
+  const handleChooseFile = () => {
+    toggleJobTSVerifyModal();
+    toggleFileTypeSelectModal();
+  };
+
   const toggleAddDegreeModal = () => {
     setShowAddDegreeModal(!showAddDegreeModal);
   };
@@ -479,6 +484,7 @@ export default function CompanyShift({ navigation }) {
             name: response.assets[0].fileName,
           });
           toggleFileTypeSelectModal();
+          toggleJobTSVerifyModal();
         }
       });
     } catch (err) {
@@ -533,6 +539,7 @@ export default function CompanyShift({ navigation }) {
             name: response.assets[0].fileName,
           });
           toggleFileTypeSelectModal();
+          toggleJobTSVerifyModal();
         } else {
           Alert.alert(
             'Alert!',
@@ -590,6 +597,7 @@ export default function CompanyShift({ navigation }) {
         name: res[0].name,
       });
       toggleFileTypeSelectModal();
+      toggleJobTSVerifyModal();
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
@@ -1316,7 +1324,7 @@ export default function CompanyShift({ navigation }) {
                       </View>
                     }
                     <View style={{flexDirection: 'row', width: '100%'}}>
-                      <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
+                      <TouchableOpacity title="Select File" onPress={handleChooseFile} style={styles.chooseFile}>
                         <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
                       </TouchableOpacity>
                       <TextInput

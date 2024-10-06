@@ -726,6 +726,7 @@ export default function AllCaregivers({ navigation }) {
   const handleChangeFileType = (name) => {
     setFiletype(name);
     toggleFileTypeSelectModal();
+    toggleVerificationModal();
   };
 
   const openCamera = async () => {
@@ -779,6 +780,7 @@ export default function AllCaregivers({ navigation }) {
             name: response.assets[0].fileName,
           });
           toggleFileTypeSelectModal();
+          toggleVerificationModal();
         }
       });
     } catch (err) {
@@ -833,6 +835,7 @@ export default function AllCaregivers({ navigation }) {
             name: response.assets[0].fileName,
           });
           toggleFileTypeSelectModal();
+          toggleVerificationModal();
         } else {
           Alert.alert(
             'Alert!',
@@ -885,6 +888,7 @@ export default function AllCaregivers({ navigation }) {
       }
       handleCredentials(sfileType, { content: `${fileContent}`, type: fileType, name: res[0].name });
       toggleFileTypeSelectModal();
+      toggleVerificationModal();
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
