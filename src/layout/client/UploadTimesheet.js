@@ -155,6 +155,7 @@ export default function UploadTimesheet ({ navigation, route }) {
                             name: response.assets[0].fileName,
                         }
                     });
+                    toggleFileTypeSelectModal();
                 }
             });
         } catch (err) {
@@ -211,6 +212,7 @@ export default function UploadTimesheet ({ navigation, route }) {
                             name: response.assets[0].fileName,
                         }
                     });
+                    toggleFileTypeSelectModal();
                 } else {
                     Alert.alert(
                         'Alert!',
@@ -262,6 +264,7 @@ export default function UploadTimesheet ({ navigation, route }) {
             }
 
             setSubmitData({...submitData, timeSheet: {content: fileContent, type: fileType, name: res[0].name}});
+            toggleFileTypeSelectModal();
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 console.log('document picker cancelled');
@@ -345,15 +348,15 @@ export default function UploadTimesheet ({ navigation, route }) {
                             <View style={styles.body}>
                                 <View style={[styles.modalBody, { marginBottom: 20 }]}>
                                     <View style={styles.cameraContain}>
-                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {toggleFileTypeSelectModal(); openCamera();}}>
+                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
                                         <Image source={images.camera} style={{ width: 50, height: 50 }} />
                                         <Text style={styles.textStyle}>Camera</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {toggleFileTypeSelectModal(); pickGallery();}}>
+                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
                                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                                         <Text style={styles.textStyle}>Gallery</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {toggleFileTypeSelectModal(); pickFile();}}>
+                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={() => {pickFile();}}>
                                         <Image source={images.folder} style={{ width: 50, height: 50 }} />
                                         <Text style={styles.textStyle}>Folder</Text>
                                     </TouchableOpacity>
