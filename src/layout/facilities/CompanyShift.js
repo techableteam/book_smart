@@ -34,13 +34,17 @@ export default function CompanyShift({ navigation }) {
   const [location, setLocation] = useState('');
   const [locationItem, setLocationItem] = useState('');
   const [degreeItem, setDegreeItem] = useState('');
+  const [selectedJobId, setSelectedJobId] = useState('');
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
   const [isLocationFocus, setIsLocationFocus] = useState(false);
+  const [isFocusJobStatus, setIsFocusJobStatus] = useState(false);
   const [payRate, setPayRate] = useState('');
   const [showAddDegreeModal, setShowAddDegreeModal] = useState(false);
   const [showAddLocationModal, setShowAddLocationModal] = useState(false);
   const [bonus, setBonus] = useState('');
   const [jobRating, setJobRating] = useState(0);
+  const [isJobStatusModal, setIsJobStatusModal] = useState(false);
+  const [selectedJobStatus, setSelectedJobStatus] = useState('');
   const [isJobDetailModal, setIsJobDetailModal] = useState(false);
   const [isRatingModal, setIsRatingModal] = useState(false);
   const [isAwardJobModal, setIsAwardJobModal] = useState(false);
@@ -101,6 +105,14 @@ export default function CompanyShift({ navigation }) {
     {label: '500 per page', value: '500'},
     {label: '1000 per page', value: '1000'},
   ];
+  const jobStatus = [
+    {label: 'Available', value: 'Available'},
+    {label: 'Awarded', value: 'Awarded'},
+    {label: 'Pending Verification', value: 'Pending Verification'},
+    {label: 'Cancelled', value: 'Cancelled'},
+    {label: 'Verified', value: 'Verified'},
+    {label: 'Paid', value: 'Paid'},
+  ];
   const tableHead = [
     'Degree/Discipline',
     'Entry Date',
@@ -111,7 +123,7 @@ export default function CompanyShift({ navigation }) {
     'Shift',
     'View Shift/Bids',
     'Bids',
-    'Job Status',
+    '✏️ Job Status',
     'Hired',
     'Verify TS',
     'Rating',
@@ -187,6 +199,53 @@ export default function CompanyShift({ navigation }) {
     getLocation();
   }, []);
 
+  const handleCellClick = async (data) => {
+    console.log(data);
+    setSelectedJobId(data[2]);
+    setSelectedJobStatus(data[9]);
+    toggleJobStatusModal();
+  };
+
+  const handleUpdate = async () => {
+    toggleJobStatusModal();
+    setLoading(true);
+    let results = await PostJob({ jobId: selectedJobId, jobStatus: selectedJobStatus }, 'jobs');
+    if (!results?.error) {
+      console.log('success');
+      Alert.alert(
+        'Success!',
+        'Job status has been updated.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      setLoading(false);
+      getData();
+    } else {
+      console.log('failure', JSON.stringify(results.error));
+      Alert.alert(
+        'Warning!',
+        'Please retry again later',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+      setLoading(false);
+    }
+  };
+
   const handleRemove = async (id) => {
     let results = await RemoveJos({ jobId: id }, 'jobs');
     if (!results?.error) {
@@ -203,6 +262,10 @@ export default function CompanyShift({ navigation }) {
 
   const toggleJobDetailModal = () => {
     setIsJobDetailModal(!isJobDetailModal);
+  };
+
+  const toggleJobStatusModal = () => {
+    setIsJobStatusModal(!isJobStatusModal);
   };
 
   const toggleJobAwardModal = () => {
@@ -727,6 +790,16 @@ export default function CompanyShift({ navigation }) {
                 <Text style={styles.profileTitle}>View</Text>
               </TouchableOpacity>
             </View>
+          );
+        } else if (idx === 9 && index > 0) {
+          return (
+            <TouchableOpacity key={idx} onPress={() => handleCellClick(item)}>
+              <Text
+                style={[styles.tableItemStyle, { width }]}
+              >
+                {item[idx]}
+              </Text>
+            </TouchableOpacity>
           );
         } else if (idx === 11 && index > 0) {
           return (
@@ -1644,6 +1717,61 @@ export default function CompanyShift({ navigation }) {
             </View>
           </View>
         </Modal>}
+        <Modal
+            visible={isJobStatusModal}
+            transparent= {true}
+            animationType="slide"
+            onRequestClose={() => {
+              setIsJobStatusModal(!isJobStatusModal);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <View style={styles.calendarContainer}>
+                <View style={[styles.header, { height: 80 }]}>
+                  <Text style={styles.headerText}>Job Status</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleJobStatusModal}>
+                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.body, { marginBottom: 0 }]}>
+                  <View style={[styles.modalBody, { paddingBottom: 10 }]}>
+                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Job Status</Text>
+                    <Dropdown
+                      style={[styles.dropdown, { width: '90%' }, isFocusJobStatus && { borderColor: 'blue' }]}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      inputSearchStyle={styles.inputSearchStyle}
+                      itemTextStyle={styles.itemTextStyle}
+                      iconStyle={styles.iconStyle}
+                      data={jobStatus}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      placeholder={''}
+                      value={selectedJobStatus}
+                      onFocus={() => setIsFocusJobStatus(true)}
+                      onBlur={() => setIsFocusJobStatus(false)}
+                      onChange={item => {
+                        setSelectedJobStatus(item.value);
+                        setIsFocusJobStatus(false);
+                      }}
+                      renderLeftIcon={() => (
+                        <View
+                          style={styles.icon}
+                          color={isFocusJobStatus ? 'blue' : 'black'}
+                          name="Safety"
+                          size={20}
+                        />
+                      )}
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleUpdate} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Update</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
         {fileTypeSelectModal && (
           <Modal
             visible={fileTypeSelectModal} // Changed from Visible to visible
