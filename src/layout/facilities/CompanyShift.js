@@ -145,10 +145,10 @@ export default function CompanyShift({ navigation }) {
       setTableData(result.dataArray);
       setLoading(false);
     }
+    setLoading(false);
   };
 
   const getDegree = async () => {
-    setLoading(true);
     const response = await getDegreeList('degree');
     if (!response?.error) {
       let tempArr = [];
@@ -160,11 +160,9 @@ export default function CompanyShift({ navigation }) {
     } else {
       setDegreeList([]);
     }
-    setLoading(false);
   };
 
   const getLocation = async () => {
-    setLoading(true);
     const response = await getLocationList('location');
     if (!response?.error) {
       let tempArr = [];
@@ -176,7 +174,6 @@ export default function CompanyShift({ navigation }) {
     } else {
       setLocationList([]);
     }
-    setLoading(false);
   };
 
   useFocusEffect(
@@ -186,7 +183,6 @@ export default function CompanyShift({ navigation }) {
   );
   
   useEffect(() => {
-    // getData();
     getDegree();
     getLocation();
   }, []);
@@ -322,7 +318,6 @@ export default function CompanyShift({ navigation }) {
     });
 
     if (bidder) {
-      console.log(bidder);
       setIsJobDetailModal(false);
       setSelectedBidder(bidder);
       setAwardedStatus(bidder[4] === 'Awarded' ? 1 : 2);
@@ -1219,11 +1214,11 @@ export default function CompanyShift({ navigation }) {
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Phone</Text>
-                      <Text style={styles.content}>{selectedBidder[8] || ''}</Text>
+                      <Text style={[styles.content, { color: 'blue' }]}>{selectedBidder[8] || ''}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Email</Text>
-                      <Text style={styles.content}>{selectedBidder[7] || ''}</Text>
+                      <Text style={[styles.content, { color: 'blue' }]}>{selectedBidder[7] || ''}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                       <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Date</Text>
