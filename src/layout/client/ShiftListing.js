@@ -74,14 +74,11 @@ export default function ShiftListing ({ navigation }) {
         title: 'Job #',
         content: item.jobNum
       },{
-        title: 'Caregiver',
+        title: 'Title',
         content: item.degree
       },{
         title: 'Hourly Rate',
         content: item.payRate
-      },{
-        title: 'Job',
-        content: item.jobInfo
       },{
         title: 'Status',
         content: item.status

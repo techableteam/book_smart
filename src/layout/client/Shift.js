@@ -71,7 +71,7 @@ export default function Shift ({ navigation }) {
         title: 'Location',
         content: item.location
       },{
-        title: 'Hourly Rate',
+        title: 'Rate',
         content: item.payRate
       },{
         title: 'Status',
