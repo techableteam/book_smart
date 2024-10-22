@@ -52,7 +52,7 @@
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>We need access to your camera for capturing photos.</string>
+	<string>Access to camera is required to capture photos needed for your profile and shift's timesheet.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need your location while you use the app to show relevant content and suggestions.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
