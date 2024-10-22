@@ -4,6 +4,8 @@ import { Text } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
+import { useFocusEffect } from '@react-navigation/native';
+import { getUniqueId } from 'react-native-device-info';
 import { useAtom } from 'jotai';
 import { emailAtom } from '../../context/ClinicalAuthProvider';
 import { verifyPhoneAtom, deviceNumberAtom } from '../../context/BackProvider';
@@ -25,6 +27,21 @@ export default function ClientPhoneVerify ({ navigation }) {
   const [credentials, setCredentials] = useState({
     verifyCode: 0,
   });
+
+  const fetchDeviceInfo = async () => {
+    try {
+      const id = await getUniqueId();
+      setDevice(id);
+    } catch (error) {
+      console.error('Error fetching device info:', error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDeviceInfo();
+    }, [])
+  );
 
   const handleCredentials = (target, e) => {
     setCredentials({...credentials, [target]: e});
