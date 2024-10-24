@@ -9,12 +9,14 @@ import MFooter from '../../components/Mfooter';
 import { Signup } from '../../utils/useApi';
 import images from '../../assets/images';
 import Loader from '../Loader';
-// Choose file
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-
 import RNFS from 'react-native-fs'
 import AnimatedHeader from '../AnimatedHeader';
+import { Dimensions } from 'react-native';
+import { RFValue } from "react-native-responsive-fontsize";
+
+const { width, height } = Dimensions.get('window');
 
 export default function ClientSignUp({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -564,10 +566,9 @@ export default function ClientSignUp({ navigation }) {
         <View style={styles.modal}>
           <View style={styles.intro}>
             <AnimatedHeader title="CAREGIVERS REGISTER HERE!" />
-            <View style={{flexDirection:'row', justifyContent: 'center', marginVertical: 10}}>
-              {/* <View style={styles.marker} /> */}
+            <View style={{flexDirection:'row', justifyContent: 'center', marginVertical: RFValue(20)}}>
               <Text style={[styles.text, {flexDirection:'row'}]}>
-                NOTE: Your Registration will be in <Text style={[styles.text, {color:'#0000ff'}]}>"PENDING"</Text> {"\n"}
+                NOTE: Your Registration will be in <Text style={[styles.text, {color:'#0000ff'}]}>"PENDING"</Text>
                 &nbsp;Status until your information is verified. Once
                 <Text style={[styles.text, {color:'#008000'}]}> "APPROVED" </Text>you will be notified by email.
               </Text>
@@ -808,7 +809,6 @@ export default function ClientSignUp({ navigation }) {
             
             <View style={styles.password}>
               <Text style={styles.subtitle}>Signature<Text style={{color: 'red'}}>*</Text> </Text>  
-              
               <SignatureCapture
                 style={styles.signature}
                 ref={signatureRef}
@@ -816,20 +816,6 @@ export default function ClientSignUp({ navigation }) {
                 saveImageFileInExtStorage={false}
                 showNativeButtons={true}
               />
-
-              {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <SignatureCapture
-                  style={styles.signature}
-                  ref={signatureRef}
-                  onSaveEvent={onSaveEvent}
-                  saveImageFileInExtStorage={false}
-                  showNativeButtons={false}
-                />
-                <TouchableOpacity onPress={resetSignature} style={{ backgroundColor: '#ccc', padding: 5, width: 'auto', height: 'auto', marginLeft: 5 }}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Reset</Text>
-                </TouchableOpacity>
-              </View> */}
-
             </View>
             
             <View style={[styles.email, {marginTop: 20}]}>
@@ -911,7 +897,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(155, 155, 155, 0.61)'
   },
   scroll: {
-    marginTop: 97,
+    marginTop: height * 0.157,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -947,12 +933,12 @@ const styles = StyleSheet.create({
     marginTop: 17
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'hsl(0, 0%, 29%)',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 10,
-    lineHeight: 24
+    marginTop: RFValue(10),
+    lineHeight: RFValue(24)
   },
   modal: {
     width: '90%',
@@ -1024,12 +1010,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#77f9ff9c',
     borderRadius: 2,
     borderColor: 'black',
-    width: '80%',
+    width: width * 0.7,
     color: 'black',
     fontWeight: 'bold',
-    marginTop: 30,
-    marginLeft: '10%',
-    fontSize: 18,
+    marginTop: RFValue(20),
+    fontSize: RFValue(16),
     borderRadius: 5,
     textAlign: 'center'
   },
@@ -1045,7 +1030,7 @@ const styles = StyleSheet.create({
     marginLeft: '25%',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,

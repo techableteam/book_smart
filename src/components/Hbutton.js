@@ -1,7 +1,10 @@
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
 import { Text } from 'react-native-paper';
+import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions } from 'react-native';
 
+const { width, height } = Dimensions.get('window');
 export default function HButton({
   children,
   mode = 'contained',
@@ -28,14 +31,14 @@ export default function HButton({
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: 20,
+    fontSize: RFValue(18),
     fontWeight: '800',
     color: 'white',
     textAlign: 'center',
     borderRadius: 10,
     backgroundColor: '#A020F0',
-    padding: 20,
-    marginTop: 20,
-    width: 170,
+    padding: RFValue(15),
+    marginTop: RFValue(10),
+    width: width * 0.45,
   }
 });

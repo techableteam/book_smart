@@ -22,6 +22,10 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import Loader from '../Loader';
+import { Dimensions } from 'react-native';
+import { RFValue } from "react-native-responsive-fontsize";
+
+const { width, height } = Dimensions.get('window');
 
 export default function ClientSignIn({ navigation }) {
   const [aic, setAIC] = useAtom(aicAtom);
@@ -317,7 +321,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   scroll: {
-    marginTop: 97,
+    marginTop: height * 0.157,
   },
   modal: {
     width: '90%',
@@ -340,37 +344,36 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   intro: {
+    flex: 1,
+    alignItems: 'center',
     marginTop: 30
   },
   mark: {
-    width: '70%',
-    height: 75,
+    width: width * 0.65,
+    height: height * 0.1,
     marginLeft: '15%',
   },
   homepage: {
-    // paddingHorizontal: 30,
-    // paddingVertical: 70,
-    width: '45%',
-    height: 130,
+    width: width * 0.5,
+    height: height * 0.25,
     marginTop: 10,
-    marginLeft: '25%',
   },
   text: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: RFValue(22),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 10,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: RFValue(17),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'left',
@@ -378,7 +381,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   middleText: {
-    fontSize: 16,
+    fontSize: RFValue(15),
     margin: 0,
     lineHeight: 16,
     color: 'black'
@@ -391,36 +394,35 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
-    marginBottom: 130
+    gap: RFValue(10),
+    marginBottom: RFValue(130)
   },
   btn: {flexDirection: 'column',
-    gap: 20,
-    marginBottom: 30,
+    gap: RFValue(20),
+    marginBottom: RFValue(30),
   },
   subBtn: {
-    marginTop: 0,
-    padding: 10,
+    padding: RFValue(10),
     backgroundColor: '#DF1828FF',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(15),
   },
   drinksButton: {
-    fontSize: 16,
-    padding: 15,
+    fontSize: RFValue(14),
+    padding: RFValue(15),
     borderWidth: 3,
     borderColor: 'white',
     borderRadius: 0
 
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
+    width: RFValue(20),
+    height: RFValue(20),
+    borderWidth: RFValue(1),
     borderColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: RFValue(10),
   },
   checkmark: {
     color: '#000',

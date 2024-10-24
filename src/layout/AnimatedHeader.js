@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Animated, Text } from 'react-native';
+import { Dimensions } from 'react-native';
+import { RFValue } from "react-native-responsive-fontsize";
+
+const { width, height } = Dimensions.get('window');
 
 export default AnimatedHeader = ({ title }) => {
   const [colorIndex, setColorIndex] = useState(0); // Initial color index
@@ -40,21 +44,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     width: '100%',
     height: '55',
-    marginTop: 10,
-    borderRadius: 10,
+    marginTop: RFValue(10),
+    borderRadius: RFValue(10),
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 500,
     color: 'black',
-    top: 10
+    top: RFValue(10)
   },
   title: {
-    fontSize: 18,
+    fontSize: RFValue(19),
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'left',
     backgroundColor: 'transparent',
-    paddingVertical: 10
+    paddingVertical: RFValue(10)
   },
 });
