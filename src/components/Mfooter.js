@@ -1,33 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-import { View, Image, StyleSheet, StatusBar, Text, KeyboardAvoidingView } from 'react-native';
-import images from '../assets/images';
-import { Card, IconButton, useTheme } from 'react-native-paper';
-import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { AuthState } from '../context/ClinicalAuthProvider';
-// import { getRatingDataByUserID } from '../utils/api';
+import { View, StyleSheet, Text } from 'react-native';
+import { useTheme } from 'react-native-paper';
+import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default function MFooter(props) {
   const theme = useTheme();
-  // const { auth } = AuthState();
-  // const { isAuthenticated } = auth || {};
-  // const [filterData, setFilterData] = useState([]);
-  // const [suggestionRating, setSuggestionRating] = useState({});
-  // const [loadingState, setLoadingState] = useState(true);
-
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     getRatingDataByUserID().then(response => {
-  //       setSuggestionRating(response.suggestionRating);
-  //       setFilterData(response.locations);
-  //       setLoadingState(false);
-  //     });
-  //   }
-  // }, [isAuthenticated]);
-
   return (
     <View style={styles.shadow}>
-      {/* <StatusBar hidden={true} /> */}
       <View style={styles.bottomStyle}></View>
       <Text style={styles.text}>Support by Email: support@whybookdumb.com{'\n'}
         Support by Text: 716.997.9990
@@ -52,13 +35,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 10,
     color: 'white',
-    fontSize: 14,
+    // fontSize: 14,
+    fontSize: RFValue(13),
     textAlign: 'center',
     fontWeight: '700',
   },
   bottomStyle: {
     width: '100%',
-    height: 5,
+    height: height * 0.007,
     backgroundColor: "#BC222F"
   },
   logo: {

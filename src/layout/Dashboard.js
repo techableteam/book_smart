@@ -5,8 +5,13 @@ import images from '../assets/images';
 import HButton from '../components/Hbutton'
 import MFooter from '../components/Mfooter';
 import MHeader from '../components/Mheader';
+import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default function Dashboard ({ navigation }) {
+
   const handleClient = () => {
     navigation.navigate('ClientSignIn');
   };
@@ -53,13 +58,13 @@ const styles = StyleSheet.create({
     position: 'relative'
   },
   homepage: {
-    width: 350,
-    height: 300,
+    width: width * 0.7,
+    height: height * 0.3,
     marginTop: 30,
     resizeMode: 'cover'
   },
   text: {
-    fontSize: 20,
+    fontSize: RFValue(18),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
