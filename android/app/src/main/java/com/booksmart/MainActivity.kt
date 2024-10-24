@@ -1,4 +1,4 @@
-package com.booksmart
+package com.booksmartllc
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
