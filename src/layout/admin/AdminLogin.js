@@ -10,6 +10,10 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, phoneAtom, emailAtom, photoImageAtom, userRoleAtom, companyNameAtom, addressAtom, passInfAtom } from '../../context/AdminAuthProvider'
 import { Signin } from '../../utils/useApi';
 import Loader from '../Loader';
+import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions } from 'react-native';
+import constStyles from '../../assets/styles';
+const { width, height } = Dimensions.get('window');
 
 export default function AdminLogin({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -82,13 +86,7 @@ export default function AdminLogin({ navigation }) {
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
         setEmail(response.user.email);
-        // setAddress(response.user.address);
-        // setCompanyName(response.user.companyName);
         setUserRole(response.user.userRole);
-        // setEmail(response.user.email);
-        // setPhone(response.user.phone);
-        // setPassword(response.user.password); 
-        // setPhotoImage(response.user.photoImage);
         if (checked) {
           await AsyncStorage.setItem('AdminEmail', credentials.email);
           await AsyncStorage.setItem('AdminPassword', credentials.password);
@@ -190,9 +188,7 @@ export default function AdminLogin({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-          translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation}/>
       <ScrollView style = {styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -205,19 +201,19 @@ export default function AdminLogin({ navigation }) {
               resizeMode="contain"
               style={styles.mark}
             />
-            <Text style={styles.title}>WHERE CARE MEETS CONNECTION</Text>
+            <Text style={constStyles.loginMainTitle1}>WHERE CARE MEETS CONNECTION</Text>
             <HButton
               // onPress={() => navigation.navigate('ClientSignIn')}
-              style={styles.drinksButton}>
+              style={constStyles.loginMainButton}>
               Admin Login
             </HButton>
-            <Text style={[styles.subtitle, { color: '#2a53c1', width: '90%', textAlign: 'center'}]}>Enter your email address and password to login.</Text>
+            <Text style={[constStyles.loginSubTitle, { color: '#2a53c1', width: '90%', textAlign: 'center', fontSize: RFValue(14)}]}>Enter your email address and password to login.</Text>
           </View>
           <View style={styles.authInfo}>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Email Address </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Email Address </Text>
               <TextInput
-                style={{ backgroundColor: 'white', height: 40, marginBottom: 10, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
+                style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => handleCredentials('email', e)}
                 value={credentials.email || ''}
@@ -225,18 +221,18 @@ export default function AdminLogin({ navigation }) {
             </View>
             <View style={styles.password}>
               <View style={{flexDirection: 'row', alignItems: 'bottom'}}>
-                <Text style={styles.subtitle}> Password </Text>
+                <Text style={constStyles.loginSubTitle}> Password </Text>
                 <TouchableOpacity
                   onPress={() => console.log('Navigate to forget password')}>
                   <Text
-                    style={[styles.subtitle, { color: '#2a53c1'}]}
+                    style={[constStyles.loginSubTitle, { color: '#2a53c1'}]}
                     onPress={() => navigation.navigate('AdminForgotPwd')}>
                     {'('}forgot?{')'}
                   </Text>
                 </TouchableOpacity>
               </View>
               <TextInput
-                style={{ backgroundColor: 'white', height: 40, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
+                style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => handleCredentials('password', e)}
                 secureTextEntry={true}
@@ -251,15 +247,14 @@ export default function AdminLogin({ navigation }) {
                   marginTop: 10
                 }}>
                 <View style={styles.checkbox}>
-                  {checked && <Text style={styles.checkmark}>✓</Text>}
+                  {checked && <Text style={constStyles.logincheckmark}>✓</Text>}
                 </View>
-                <Text style={styles.middleText}>Remember me</Text>
+                <Text style={constStyles.loginMiddleText}>Remember me</Text>
               </Pressable>
             </View>
             <View style={styles.btn}>
-              <HButton style={styles.subBtn} onPress={ 
+              <HButton style={constStyles.loginSubBtn} onPress={ 
                 handleSubmit 
-                // handleSignInNavigate
               }>
                 Sign In
               </HButton>
@@ -293,7 +288,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#777777'
   },
   scroll: {
-    marginTop: 99,
+    marginTop: height * 0.157,
   },
   modal: {
     width: '90%',
@@ -324,12 +319,10 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   mark: {
-    width: 150,
-    height: 150,
+    width: width * 0.5,
+    height: height * 0.28,
   },
   homepage: {
-    // paddingHorizontal: 30,
-    // paddingVertical: 70,
     width: '45%',
     height: 130,
     marginTop: 10,
@@ -342,13 +335,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  title: {
-    fontSize: 24,
-    color: 'black',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-  },
+
   subtitle: {
     fontSize: 18,
     color: 'black',
@@ -378,21 +365,6 @@ const styles = StyleSheet.create({
     gap: 20,
     marginBottom: 30,
   },
-  subBtn: {
-    marginTop: 0,
-    padding: 10,
-    backgroundColor: '#DF1828FF',
-    color: 'white',
-    fontSize: 16,
-  },
-  drinksButton: {
-    fontSize: 18,
-    padding: 15,
-    paddingVertical: 10,
-    borderWidth: 3,
-    borderColor: 'white',
-    borderRadius: 10
-  },
   checkbox: {
     width: 20,
     height: 20,
@@ -420,6 +392,6 @@ const styles = StyleSheet.create({
   },
   homeText: {
     color: 'white',
-    fontSize: 18
+    fontSize: RFValue(18)
   }
 });

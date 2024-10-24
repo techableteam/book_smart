@@ -7,6 +7,8 @@ import MHeader from '../../components/Mheader';
 import { useAtom } from 'jotai';
 import { emailAtom } from '../../context/AdminAuthProvider';
 import { ForgotPassword } from '../../utils/useApi';
+import constStyles from '../../assets/styles';
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function AdminForgotPwd ({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
@@ -57,13 +59,13 @@ export default function AdminForgotPwd ({ navigation }) {
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
-            <Text style={styles.subject}> Forgot Password? </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your email address below and we will send you a link to reset your password. </Text>
+            <Text style={constStyles.loginMainTitle}> Forgot Password? </Text>
+            <Text style={[constStyles.loginSubTitle,{textAlign: 'left', width: '90%', fontWeight: '400', fontSize: RFValue(14)}]}>Enter your email address below and we will send you a link to reset your password. </Text>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Email Address </Text>
-              <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
+              <Text style={constStyles.loginSubTitle}> Email Address </Text>
+              <View style={{flexDirection: 'row', width: '90%', gap: 5}}>
                 <TextInput
-                  style={[styles.input, {width: '100%', color: 'black'}]}
+                  style={[constStyles.forgotInputText, {width: '100%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -74,7 +76,7 @@ export default function AdminForgotPwd ({ navigation }) {
               </View>
             </View>
             <View style={[styles.btn, {marginTop: 20}]}>
-              <HButton style={styles.subBtn} onPress={ handleSubmit }>
+              <HButton style={constStyles.loginSubBtn} onPress={ handleSubmit }>
                 Submit
               </HButton>
             </View>

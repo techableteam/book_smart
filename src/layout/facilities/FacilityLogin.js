@@ -10,6 +10,11 @@ import { facilityIdAtom, firstNameAtom, lastNameAtom, facilityAcknowledgementAto
 import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../Loader';
+import constStyles from '../../assets/styles';
+import { Dimensions } from 'react-native';
+import { RFValue } from "react-native-responsive-fontsize";
+
+const { width, height } = Dimensions.get('window');
 
 export default function FacilityLogin({ navigation }) {  
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -239,9 +244,7 @@ export default function FacilityLogin({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-          translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation}/>
       <ScrollView style = {styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -254,19 +257,18 @@ export default function FacilityLogin({ navigation }) {
               resizeMode="contain"
               style={styles.mark}
             />
-            <Text style={styles.title}>WHERE CARE MEETS CONNECTION</Text>
+            <Text style={constStyles.loginMainTitle1}>WHERE CARE MEETS CONNECTION</Text>
             <HButton
-              // onPress={() => navigation.navigate('ClientSignIn')}
-              style={styles.drinksButton}>
+              style={constStyles.loginMainButton}>
               FACILITIES
             </HButton>
-            <Text style={[styles.subtitle, { color: '#2a53c1', width: '90%', textAlign: 'center'}]}>Register or Enter your email address and password to login.</Text>
+            <Text style={[constStyles.loginSubTitle, { color: '#2a53c1', width: '90%', textAlign: 'center', fontSize: RFValue(14)}]}>Register or Enter your email address and password to login.</Text>
           </View>
           <View style={styles.authInfo}>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Email Address </Text>
+              <Text style={constStyles.loginSubTitle}> Email Address </Text>
               <TextInput
-                style={{ backgroundColor: 'white', height: 40, marginBottom: 10, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
+                style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => handleCredentials('contactEmail', e)}
                 value={credentials.contactEmail || ''}
@@ -274,18 +276,18 @@ export default function FacilityLogin({ navigation }) {
             </View>
             <View style={styles.password}>
               <View style={{flexDirection: 'row', alignItems: 'bottom'}}>
-                <Text style={styles.subtitle}> Password </Text>
+                <Text style={constStyles.loginSubTitle}> Password </Text>
                 <TouchableOpacity
                   onPress={() => console.log('Navigate to forget password')}>
                   <Text
-                    style={[styles.subtitle, { color: '#2a53c1'}]}
+                    style={[constStyles.loginSubTitle, { color: '#2a53c1'}]}
                     onPress={() => navigation.navigate('FacilityForgotPwd')}>
                     {'('}forgot?{')'}
                   </Text>
                 </TouchableOpacity>
               </View>
               <TextInput
-                style={{ backgroundColor: 'white', height: 40, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
+                style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => handleCredentials('password', e)}
                 secureTextEntry={true}
@@ -293,27 +295,25 @@ export default function FacilityLogin({ navigation }) {
               />
               <Pressable 
                 onPress={handleToggle}
-                style={{
-                  flexDirection: 'row',
+                style={{flexDirection: 'row',
                   alignItems: 'center',
-                  marginBottom: 10,
-                  marginTop: 10
-                }}>
+                  marginBottom: RFValue(10),
+                  marginTop: RFValue(10)}}>
                 <View style={styles.checkbox}>
                   {checked && <Text style={styles.checkmark}>✓</Text>}
                 </View>
-                <Text style={styles.middleText}>Remember me</Text>
+                <Text style={constStyles.loginMiddleText}>Remember me</Text>
               </Pressable>
             </View>
             <View style={styles.btn}>
-              <HButton style={styles.subBtn} onPress={ 
-                handleSubmit 
-                // handleSignInNavigate
-              }>
+              <HButton style={constStyles.loginSubBtn} onPress={ 
+                handleSubmit}>
                 Sign In
               </HButton>
-              <Text style={styles.middleText}>Need an account?</Text>
-              <HButton style={styles.subBtn} onPress={ handleSignUpNavigate }>
+              <View style = {{marginTop : RFValue(20)}}/>
+              <Text style={constStyles.loginMiddleText}>Need an account?</Text>
+              <View style = {{marginTop : RFValue(5)}}/>
+              <HButton style={constStyles.loginSubBtn} onPress={ handleSignUpNavigate }>
                 Sign Up
               </HButton>
             </View>
@@ -322,7 +322,7 @@ export default function FacilityLogin({ navigation }) {
         <View style={styles.buttonWrapper}>
           <HButton
             onPress={() => navigation.navigate('Home')}
-            style={styles.drinksButton}>
+            style={constStyles.loginMainButton}>
             Main Home
           </HButton>
         </View>
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   scroll: {
-    marginTop: 99,
+    marginTop: height * 0.157,
   },
   modal: {
     width: '90%',
@@ -374,8 +374,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   mark: {
-    width: 150,
-    height: 150,
+    width: width * 0.5,
+    height: height * 0.28,
   },
   homepage: {
     // paddingHorizontal: 30,
@@ -393,14 +393,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: RFValue(18),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: RFValue(10),
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'left',
@@ -425,23 +425,7 @@ const styles = StyleSheet.create({
     marginBottom: 130
   },
   btn: {flexDirection: 'column',
-    gap: 20,
     marginBottom: 30,
-  },
-  subBtn: {
-    marginTop: 0,
-    padding: 10,
-    backgroundColor: '#DF1828FF',
-    color: 'white',
-    fontSize: 16,
-  },
-  drinksButton: {
-    fontSize: 18,
-    padding: 15,
-    paddingVertical: 10,
-    borderWidth: 3,
-    borderColor: 'white',
-    borderRadius: 10
   },
   checkbox: {
     width: 20,
@@ -453,6 +437,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   checkmark: {
+    fontSize: 13,
     color: '#000',
   },
   homeBtn: {

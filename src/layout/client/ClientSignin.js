@@ -22,6 +22,7 @@ import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import Loader from '../Loader';
+import constStyles from '../../assets/styles';
 import { Dimensions } from 'react-native';
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -227,22 +228,23 @@ export default function ClientSignIn({ navigation }) {
               resizeMode="contain"
               style={styles.mark}
             />
-            <Text style={styles.title}>WHY BOOK DUMB?</Text>
+            <Text style={constStyles.loginMainTitle}>WHY BOOK DUMB?</Text>
             <Image
               source={images.homepage}
               resizeMode="contain"
               style={styles.homepage}
             />
-            <Text style={styles.text}>Let your licensure and certifications pay off. {'\n'}
+            <Text style={constStyles.loginSmallText}>Let your licensure and certifications pay off. {'\n'}
               Get the money you deserve by signing up {'\n'}
               and becoming a freelance clinician today!
             </Text>
+
           </View>
           <View style={styles.authInfo}>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Email Address </Text>
+              <Text style={constStyles.loginSubTitle}> Email Address </Text>
               <TextInput
-                style={{ backgroundColor: 'white', height: 40, marginBottom: 10, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
+                style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => setLoginEmail(e)}
                 value={loginEmail || ''}
@@ -250,18 +252,18 @@ export default function ClientSignIn({ navigation }) {
             </View>
             <View style={styles.password}>
               <View style={{flexDirection: 'row', alignItems: 'bottom'}}>
-                <Text style={styles.subtitle}> Password </Text>
+                <Text style={constStyles.loginSubTitle}> Password </Text>
                 <TouchableOpacity
                   onPress={() => console.log('Navigate to forget password')}>
                   <Text
-                    style={[styles.subtitle, { color: '#2a53c1'}]}
+                    style={[constStyles.loginSubTitle, { color: '#2a53c1'}]}
                     onPress={() => navigation.navigate('ClientForgotPwd')}>
                     {'('}forgot?{')'}
                   </Text>
                 </TouchableOpacity>
               </View>
               <TextInput
-                style={{ backgroundColor: 'white', height: 40, borderWidth: 1, borderColor: 'hsl(0, 0%, 86%)'}}
+                style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => setLoginPW(e)}
                 secureTextEntry={true}
@@ -269,24 +271,21 @@ export default function ClientSignIn({ navigation }) {
               />
               <Pressable 
                 onPress={handleToggle}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 10,
-                  marginTop: 10
-                }}>
+                style={constStyles.loginCheckBox}>
                 <View style={styles.checkbox}>
-                  {checked && <Text style={styles.checkmark}>✓</Text>}
+                  {checked && <Text style={constStyles.logincheckmark}>✓</Text>}
                 </View>
-                <Text style={styles.middleText}>Remember me</Text>
+                <Text style={constStyles.loginMiddleText}>Remember me</Text>
               </Pressable>
             </View>
             <View style={styles.btn}>
-              <HButton style={styles.subBtn} onPress={ handleSubmit }>
+              <HButton style={constStyles.loginSubBtn} onPress={ handleSubmit }>
                 Sign In
               </HButton>
-              <Text style={styles.middleText}>Need an account?</Text>
-              <HButton style={styles.subBtn} onPress={ handleSignUpNavigate }>
+              <View style = {{marginTop : RFValue(20)}}/>
+              <Text style={constStyles.loginMiddleText}>Need an account?</Text>
+              <View style = {{marginTop : RFValue(5)}}/>
+              <HButton style={constStyles.loginSubBtn} onPress={ handleSignUpNavigate }>
                 Sign Up
               </HButton>
             </View>
@@ -295,12 +294,12 @@ export default function ClientSignIn({ navigation }) {
         <View style={styles.buttonWrapper}>
           <HButton
             onPress={() => navigation.navigate('AdminLogin')}
-            style={styles.drinksButton}>
+            style={constStyles.loginMainButton}>
             Admin Login
           </HButton>
           <HButton
             onPress={() => navigation.navigate('FacilityLogin')}
-            style={styles.drinksButton}>
+            style={constStyles.loginMainButton}>
             Facilities Home
           </HButton>
         </View>
@@ -358,34 +357,11 @@ const styles = StyleSheet.create({
     height: height * 0.25,
     marginTop: 10,
   },
-  text: {
-    fontSize: RFValue(12),
-    color: 'black',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  title: {
-    fontSize: RFValue(22),
-    color: 'black',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  subtitle: {
-    fontSize: RFValue(17),
-    color: 'black',
-    fontWeight: 'bold',
-    textAlign: 'left',
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-  middleText: {
-    fontSize: RFValue(15),
-    margin: 0,
-    lineHeight: 16,
-    color: 'black'
-  },
+ 
+
+  
+
+  
   authInfo: {
     marginLeft: 20,
     marginRight: 20,
@@ -398,23 +374,9 @@ const styles = StyleSheet.create({
     marginBottom: RFValue(130)
   },
   btn: {flexDirection: 'column',
-    gap: RFValue(20),
     marginBottom: RFValue(30),
   },
-  subBtn: {
-    padding: RFValue(10),
-    backgroundColor: '#DF1828FF',
-    color: 'white',
-    fontSize: RFValue(15),
-  },
-  drinksButton: {
-    fontSize: RFValue(14),
-    padding: RFValue(15),
-    borderWidth: 3,
-    borderColor: 'white',
-    borderRadius: 0
-
-  },
+  
   checkbox: {
     width: RFValue(20),
     height: RFValue(20),
@@ -424,7 +386,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: RFValue(10),
   },
-  checkmark: {
-    color: '#000',
-  },
+  
 });

@@ -10,7 +10,8 @@ import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
 import { emailAtom } from '../../context/AdminAuthProvider';
 import { ResetPassword } from '../../utils/useApi';
-
+import constStyles from '../../assets/styles';
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function AdminResetPassword ({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
@@ -85,13 +86,13 @@ export default function AdminResetPassword ({ navigation }) {
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
-            <Text style={styles.subject}> Reset Passowrd </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your new password and confirm password here. </Text>
+            <Text style={constStyles.loginMainTitle}> Reset Passowrd </Text>
+            <Text style={[constStyles.loginSubTitle,{textAlign: 'left', width: '90%', fontWeight: '400', fontSize: RFValue(14)}]}>Enter your new password and confirm password here. </Text>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Password </Text>
+              <Text style={constStyles.loginSubTitle}> Password </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
                 <TextInput
-                  style={[styles.input, {width: '100%', color: 'black'}]}
+                  style={[constStyles.forgotInputText, {width: '90%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"

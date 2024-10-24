@@ -14,6 +14,11 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
+import constStyles from '../../assets/styles';
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default function FacilitySignUp({ navigation }) {
   const [fileType, setFiletype] = useState('');
@@ -500,10 +505,10 @@ export default function FacilitySignUp({ navigation }) {
           </View>
           <View style={styles.authInfo}>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Company Name <Text style={{ color: 'red' }}>*</Text>  </Text>
-              <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
+              <Text style={constStyles.signUpSubtitle}> Company Name <Text style={{ color: 'red' }}>*</Text> </Text>
+              <View style={{ flexDirection: 'row', width: '100%', gap: RFValue(5) }}>
                 <TextInput
-                  style={[styles.input, { width: '100%' }]}
+                  style={[constStyles.signUpinput, { width: '100%' }]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -513,16 +518,16 @@ export default function FacilitySignUp({ navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Contact Name <Text style={{ color: 'red' }}>*</Text> </Text>
+              <Text style={constStyles.signUpSubtitle}> Contact Name <Text style={{ color: 'red' }}>*</Text> </Text>
               <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
-                  style={[styles.input, { width: '50%' }]}
+                  style={[constStyles.signUpinput, { width: '50%' }]}
                   placeholder="First"
                   onChangeText={e => handleCredentials('firstName', e)}
                   value={credentials.firstName || ''}
                 />
                 <TextInput
-                  style={[styles.input, { width: '50%' }]}
+                  style={[constStyles.signUpinput, { width: '50%' }]}
                   placeholder="Last"
                   onChangeText={e => handleCredentials('lastName', e)}
                   value={credentials.lastName || ''}
@@ -530,10 +535,10 @@ export default function FacilitySignUp({ navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Contact Email <Text style={{ color: 'red' }}>*</Text> </Text>
+              <Text style={constStyles.signUpSubtitle}> Contact Email <Text style={{ color: 'red' }}>*</Text> </Text>
               <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
-                  style={[styles.input, { width: '100%' }]}
+                  style={[constStyles.signUpinput, { width: '100%' }]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -544,11 +549,11 @@ export default function FacilitySignUp({ navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Contact Phone <Text style={{ color: 'red' }}>*</Text> </Text>
+              <Text style={constStyles.signUpSubtitle}> Contact Phone <Text style={{ color: 'red' }}>*</Text> </Text>
               <View style={{ flexDirection: 'row', width: '100%', gap: 5 }}>
                 <TextInput
                   value={credentials.contactPhone}
-                  style={[styles.input, {width: '100%'}]}
+                  style={[constStyles.signUpinput, {width: '100%'}]}
                   onChangeText={e => handlePhoneNumberChange(e)}
                   keyboardType="phone-pad"
                   placeholder=""
@@ -573,7 +578,7 @@ export default function FacilitySignUp({ navigation }) {
                 autoCorrect={false}
                 autoCapitalize="none"
                 secureTextEntry={true}
-                style={[styles.input, { width: '100%' }]}
+                style={[constStyles.signUpinput, { width: '100%' }]}
                 placeholder="Password"
                 onChangeText={e => handleCredentials('password', e)}
                 value={credentials.password || ''}
@@ -582,107 +587,85 @@ export default function FacilitySignUp({ navigation }) {
                 autoCorrect={false}
                 autoCapitalize="none"
                 secureTextEntry={true}
-                style={[styles.input, { width: '100%' }]}
+                style={[constStyles.signUpinput, { width: '100%' }]}
                 placeholder="Confirm Password"
                 onChangeText={e => handleCredentials('confirmPassword', e)}
                 value={credentials.confirmPassword || ''}
               />
-              <Text style={[styles.subtitle, { fontStyle: 'italic', fontSize: 14, color: 'red' }]}>Create your password to access the platform</Text>
+              <Text style={[constStyles.signUpSubtitle, { fontStyle: 'italic', fontSize: RFValue(14), color: 'red' }]}>Create your password to access the platform</Text>
             </View>
-            {/* <View style={styles.password}>
-              <View style={{ flexDirection: 'row' }}>
-                <Text style={{
-                  marginBottom: 10,
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  color: 'black'
-                }}>
-                  Enter Password Again
-                </Text>
-              </View>
-              <TextInput
-                autoCorrect={false}
-                autoCapitalize="none"
-                // secureTextEntry={true}
-                style={[styles.input, { width: '100%' }]}
-                placeholder=""
-                onChangeText={e => handleCredentials('contactPassword', e)}
-                value={credentials.contactPassword || ''}
-              />
-              <Text style={[styles.subtitle, { fontSize: 14, fontWeight: '400' }]}> Send yourself a copy of your login information! ( optional ) </Text>
-            </View> */}
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Address <Text style={{color: 'red'}}>*</Text></Text>
+              <Text style={constStyles.signUpSubtitle}> Address <Text style={{color: 'red'}}>*</Text></Text>
               <View style={{ flexDirection: 'column', width: '100%', gap: 5 }}>
-                <View style={{ width: '100%', marginBottom: 10 }}>
+                <View style={{ width: '100%', marginBottom: RFValue(10) }}>
                   <TextInput
-                    style={[styles.input, { width: '100%', marginBottom: 0 }]}
+                    style={[constStyles.signUpinput, { width: '100%', marginBottom: 0 }]}
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
                     onChangeText={e => handleCredentials('street', e)}
                     value={credentials.address.street || ''}
                   />
-                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address<Text style={{color: 'red'}}> *</Text></Text>
+                  <Text style={constStyles.signUpsmalltitle}>Street Address<Text style={{color: 'red'}}> *</Text></Text>
                 </View>
-                <View style={{ width: '100%', marginBottom: 10 }}>
+                <View style={{ width: '100%', marginBottom: RFValue(10) }}>
                   <TextInput
-                    style={[styles.input, { width: '100%', marginBottom: 0 }]}
+                    style={[constStyles.signUpinput, { width: '100%', marginBottom: 0 }]}
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
                     onChangeText={e => handleCredentials('street2', e)}
                     value={credentials.address.street2 || ''}
                   />
-                  <Text style={{ color: 'black', paddingLeft: 5 }}>Street Address2</Text>
+                  <Text style={constStyles.signUpsmalltitle}>Street Address2</Text>
                 </View>
-                <View style={{ flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30 }}>
-                  <View style={[styles.input, { width: '45%' }]}>
+                <View style={{ flexDirection: 'row', width: '100%', gap: 5, marginBottom: RFValue(30) }}>
+                  <View style={[constStyles.signUpinput, { width: '45%' }]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, { width: '100%', marginBottom: 0 }]}
+                      style={[constStyles.signUpinput, { width: '100%', marginBottom: 0 }]}
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>City<Text style={{color: 'red'}}> *</Text></Text>
+                    <Text style={constStyles.signUpsmalltitle}>City<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
-                  <View style={[styles.input, { width: '20%' }]}>
+                  <View style={[constStyles.signUpinput, { width: '20%' }]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, { width: '100%', marginBottom: 0 }]}
+                      style={[constStyles.signUpinput, { width: '100%', marginBottom: 0 }]}
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>State<Text style={{color: 'red'}}> *</Text></Text>
+                    <Text style={constStyles.signUpsmalltitle}>State<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
-                  <View style={[styles.input, { width: '30%' }]}>
+                  <View style={[constStyles.signUpinput, { width: '30%' }]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, { width: '100%', marginBottom: 0 }]}
+                      style={[constStyles.signUpinput, { width: '100%', marginBottom: 0 }]}
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text style={{ color: 'black', paddingLeft: 5 }}>Zip<Text style={{color: 'red'}}> *</Text></Text>
+                    <Text style={constStyles.signUpsmalltitle}>Zip<Text style={{color: 'red'}}> *</Text></Text>
                   </View>
                 </View>
               </View>
             </View>
 
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Logo / Pic</Text>
+              <Text style={constStyles.signUpSubtitle}> Logo / Pic</Text>
               <View style={{ flexDirection: 'row', width: '100%' }}>
                 <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
-                  <Text style={{ fontWeight: '400', padding: 0, fontSize: 14, color: 'black' }}>Choose File</Text>
+                  <Text style={{ fontWeight: '400', padding: 0, fontSize: RFValue(12), color: 'black' }}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, { width: '70%', color: 'black' }]}
+                  style={[constStyles.signUpinput, { width: '70%', color: 'black' }]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
                   value={credentials.avatar.name || ''}
                 />
               </View>
-              <Text style={{ color: 'black' }}> "optional"</Text>
+              <Text style={constStyles.signUpsmalltitle}> "optional"</Text>
             </View>
 
             <View style={[styles.btn, { marginTop: 20 }]}>
@@ -709,25 +692,25 @@ export default function FacilitySignUp({ navigation }) {
           >
             <StatusBar translucent backgroundColor='transparent' />
             <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
-              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
-                <View style={[styles.header, { height: 100 }]}>
-                  <Text style={styles.headerText}>Choose File</Text>
+              <View style={[styles.viewContainer, { marginTop: '40%' }]}>
+                <View style={[styles.header, { height: RFValue(100) }]}>
+                  <Text style={constStyles.signUpheaderText}>Choose File</Text>
                   <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
                     <Image source={images.close} style={{ width: 20, height: 20 }} />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.body}>
-                  <View style={[styles.modalBody, { marginBottom: 20 }]}>
+                  <View style={[styles.modalBody, { marginBottom: RFValue(20) }]}>
                     <View style={styles.cameraContain}>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
+                      <TouchableOpacity activeOpacity={0.5} style={constStyles.signUpbtnSheet} onPress={openCamera}>
                         <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
+                      <TouchableOpacity activeOpacity={0.5} style={constStyles.signUpbtnSheet} onPress={pickGallery}>
                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
+                      <TouchableOpacity activeOpacity={0.5} style={constStyles.signUpbtnSheet} onPress={pickFile}>
                         <Image source={images.folder} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>
@@ -745,32 +728,26 @@ export default function FacilitySignUp({ navigation }) {
   );
 }
 
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    // paddingVertical: 4,
-    // paddingHorizontal: 10,
-    borderRadius: 4,
-    color: 'black',
-    // paddingRight: 30,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: 'hsl(0, 0%, 86%)',
-    margin: 0,
-  },
-  inputAndroid: {
-    fontSize: 8,
-    // paddingHorizontal: 10,
-    // paddingVertical: 0,
-    margin: 0,
-    borderRadius: 10,
-    color: 'black',
-    // paddingRight: 30,
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: 'hsl(0, 0%, 86%)',
-  },
-});
+// const pickerSelectStyles = StyleSheet.create({
+//   inputIOS: {
+//     fontSize: 16,
+//     borderRadius: 4,
+//     color: 'black',
+//     backgroundColor: 'white',
+//     borderWidth: 1,
+//     borderColor: 'hsl(0, 0%, 86%)',
+//     margin: 0,
+//   },
+//   inputAndroid: {
+//     fontSize: 8,
+//     margin: 0,
+//     borderRadius: 10,
+//     color: 'black',
+//     backgroundColor: 'white',
+//     borderWidth: 1,
+//     borderColor: 'hsl(0, 0%, 86%)',
+//   },
+// });
 
 const styles = StyleSheet.create({
   button: {
@@ -783,7 +760,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(155, 155, 155, 0.61))'
   },
   scroll: {
-    marginTop: 97,
+    marginTop: height * 0.157,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -804,16 +781,6 @@ const styles = StyleSheet.create({
     padding: 15,
     width: '90%',
     backgroundColor: 'transparent'
-  },
-  marker: {
-    width: 5,
-    height: 5,
-    borderRadius: 5,
-    backgroundColor: 'white',
-    borderColor: 'black',
-    borderWidth: 1,
-    marginRight: 10,
-    marginTop: 17
   },
   text: {
     fontSize: 14,
@@ -839,9 +806,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffffa8',
   },
   intro: {
-    marginTop: 30,
-    paddingHorizontal: 20,
-    marginBottom: 20
+    marginTop: RFValue(30),
+    paddingHorizontal: RFValue(20),
+    marginBottom: RFValue(20)
   },
   input: {
     backgroundColor: 'white',
@@ -913,30 +880,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
-  drinksButton: {
-    fontSize: 18,
-    padding: 15,
-    borderWidth: 3,
-    borderColor: 'white',
-
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  checkmark: {
-    color: '#000',
-  },
-  signature: {
-    flex: 1,
-    width: '100%',
-    height: 150,
-  },
   chooseFile: {
     width: '30%',
     height: 30,
@@ -996,16 +939,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#c4c4c4',
     borderBottomWidth: 1,
   },
-  headerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black'
-  },
+  
   textStyle: {
     color: 'black'
-  },
-  closeButton: {
-    color: 'red',
   },
   body: {
     marginTop: 10,
@@ -1017,25 +953,5 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		flexDirection: 'row'
 	},
-  pressBtn:{
-    top: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingRight: 10
-  },
-  btnSheet: {
-		height: 100,
-		width:100,
-		justifyContent: "center",
-		alignItems: "center",
-		borderRadius: 10,
-		shadowOpacity: 0.5,
-		shadowRadius: 10,
-		margin: 5,
-		shadowColor: '#000',
-		shadowOffset: { width: 3, height: 3 },
-		marginVertical: 14, padding: 5,
-	},
+  
 });
