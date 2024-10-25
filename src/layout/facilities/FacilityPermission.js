@@ -11,6 +11,7 @@ import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import { facilityAcknowledgementAtom, signatureAtom } from '../../context/FacilityAuthProvider';
 import { Update } from '../../utils/useApi';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 
 export default function FacilityPermission ({ navigation }) {
@@ -117,7 +118,7 @@ export default function FacilityPermission ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-        <ScrollView style={{width: '100%', marginTop: 157}}
+        <ScrollView style={{width: '100%', marginTop: 160}}
           showsVerticalScrollIndicator={false}
         >
           <Hyperlink linkDefault={true}>
@@ -292,14 +293,15 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,
@@ -310,17 +312,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   title: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     fontWeight: 'bold',
     color: '#2a53c1',
     textDecorationLine: 'underline'
   },
   subTitle: {
+    fontSize: RFValue(15),
     fontWeight: 'bold',
     color: 'black'
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'black',
     fontWeight: 'normal',
     marginVertical: 20,
@@ -345,7 +348,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(17),
   },
 });
   

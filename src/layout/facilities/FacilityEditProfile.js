@@ -14,6 +14,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function FacilityEditProfile({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -314,7 +315,7 @@ export default function FacilityEditProfile({ navigation }) {
       >
         <View style={styles.modal}>
           <View style={styles.authInfo}>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Company Name </Text>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
@@ -323,7 +324,7 @@ export default function FacilityEditProfile({ navigation }) {
                   value={credentials.companyName || ''}
                 />
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Contact Name <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
@@ -340,7 +341,7 @@ export default function FacilityEditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Contact Email <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
@@ -354,7 +355,7 @@ export default function FacilityEditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Contact Phone <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
@@ -366,7 +367,7 @@ export default function FacilityEditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Address </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
                 <View style={{width: '100%', marginBottom: 10}}>
@@ -378,7 +379,7 @@ export default function FacilityEditProfile({ navigation }) {
                     onChangeText={e => handleCredentials('street', e)}
                     value={credentials.address.street || ''}
                   />
-                  <Text style = {{color : 'black', marginLeft: 5}}>Street Address</Text>
+                  <Text style = {styles.smailTitle}>Street Address</Text>
                 </View>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
@@ -389,7 +390,7 @@ export default function FacilityEditProfile({ navigation }) {
                     onChangeText={e => handleCredentials('street2', e)}
                     value={credentials.address.street2 || ''}
                   />
-                  <Text style = {{color : 'black', marginLeft: 5}}>Street Address2</Text>
+                  <Text style = {styles.smailTitle}>Street Address2</Text>
                 </View>
                 <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
                   <View style={[styles.input, {width: '45%'}]}>
@@ -399,7 +400,7 @@ export default function FacilityEditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text style = {{color : 'black', marginLeft: 5}}>City</Text>
+                    <Text style = {styles.smailTitle}>City</Text>
                   </View>
                   <View style={[styles.input, {width: '20%'}]}>
                     <TextInput
@@ -408,7 +409,7 @@ export default function FacilityEditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text style = {{color : 'black', marginLeft: 5}}>State</Text>
+                    <Text style = {styles.smailTitle}>State</Text>
                   </View>
                   <View style={[styles.input, {width: '30%'}]}>
                     <TextInput
@@ -418,24 +419,24 @@ export default function FacilityEditProfile({ navigation }) {
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text style = {{color : 'black', marginLeft: 5}}>Zip</Text>
+                    <Text style = {styles.smailTitle}>Zip</Text>
                   </View>
                 </View>
               </View>
             </View>
-            <View style={styles.email}>
+            <View>
               <Text style={styles.subtitle}> Logo / Pic </Text>
               {credentials.avatar.name &&
               <View style={{marginBottom: 10}}>
-                <Text style={{ color: 'blue' }}>{credentials.avatar.name}</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={{ color: 'blue', fontSize: RFValue(14) }}>{credentials.avatar.name}</Text>
+                <Text style={{color: '#0000ff', textDecorationLine: 'underline', fontSize: RFValue(14)}}
                   onPress = {() => handleRemove('avatar')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color:"black"}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(12), color:"black"}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, {width: '70%', color: 'black'}]}
@@ -538,7 +539,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 151,
+    marginTop: 165,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -548,6 +549,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     marginTop: 10,
     borderRadius: 10
+  },
+  smailTitle:{
+    color : 'black', 
+    marginLeft: 5,
+    fontSize:RFValue(14)
   },
   title: {
     fontSize: 20,
@@ -602,7 +608,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
+    marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',
@@ -618,8 +624,9 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
-    marginBottom: 10, 
+    height: RFValue(30), 
+    marginBottom: RFValue(10), 
+    fontSize: RFValue(15),
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
   },
@@ -650,7 +657,7 @@ const styles = StyleSheet.create({
     marginLeft: '25%',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,
@@ -658,9 +665,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   middleText: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     margin: 0,
-    lineHeight: 16,
+    lineHeight: RFValue(16),
     color: 'black'
   },
   authInfo: {
@@ -677,14 +684,13 @@ const styles = StyleSheet.create({
   btn: {
     flexDirection: 'column',
     gap: 20,
-    marginBottom: 30,
   },
   subBtn: {
     marginTop: 0,
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(18),
   },
   drinksButton: {
     fontSize: 18,

@@ -14,6 +14,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const itemsPerPage = 100;
 
@@ -241,7 +242,7 @@ export default function ShiftListing ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-        <ScrollView style={{width: '100%', marginTop: 155}}
+        <ScrollView style={{width: '100%', marginTop: 160}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -255,75 +256,78 @@ export default function ShiftListing ({ navigation }) {
             <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
             <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
           </View>
-          <View style={styles.profile}>
-            <View style={styles.profileTitleBg}>
-              <Text style={styles.profileTitle}>🖥️ ALL AVAILABLE SHIFTS</Text>
-            </View>
-            <View style={styles.searchBar}>
-              <TextInput
-                style={[styles.searchText]}
-                placeholder=""
-                onChangeText={e => setSearchTem(e)}
-                value={searchTerm || ''}
-              />
-              <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
-                <Text>Search</Text>
-              </TouchableOpacity>
-            </View>
-            {
-              filteredData.length>itemsPerPage ?
-              <View>
-                <Text style={styles.name}>Showing 1-{itemsPerPage} of {filteredData.length}</Text>
-                <Dropdown
-                  style={[styles.dropdown, isDegreeFocus && { borderColor: 'blue' }]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  inputSearchStyle={styles.inputSearchStyle}
-                  itemTextStyle={styles.itemTextStyle}
-                  iconStyle={styles.iconStyle}
-                  data={pageItems}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={'Page 1'}
-                  value={pageItemValue}
-                  onFocus={() => setIsPageItemFocus(true)}
-                  onBlur={() => setIsPageItemFocus(false)}
-                  onChange={(item) => {
-                    setPageItemValue(item.value)
-                    handlePageChange(item.value);
-                    setIsPageItemFocus(false);
-                  }}
-                  renderLeftIcon={() => (
-                    <View
-                      style={styles.icon}
-                      color={isPageItemFocus ? 'blue' : 'black'}
-                      name="Safety"
-                      size={20}
-                    />
-                  )}
-                />
+          <View style = {{ width : '100%', flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <View style={styles.profile}>
+              <View style={styles.profileTitleBg}>
+                <Text style={styles.profileTitle}>🖥️ ALL AVAILABLE SHIFTS</Text>
               </View>
-              :
-              <></>
-            }
-            {itemsToShow.map((it, idx) =>
-              <View key={idx} style={styles.subBar}>
-                {it.map((item, index) => 
-                  <View key={index} style={{flexDirection: 'row', width: '100%'}}>
-                    <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
-                    <Text style={[
-                      styles.content, 
-                      item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
-                    ]}>{item.content}</Text>
-                  </View>
-                )}
-                <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx + (currentPage-1) * itemsPerPage)}>
-                  <Text style={{color: 'white', fontWeight: 'bold'}}> VIEW & APPLY</Text>
+              <View style={styles.searchBar}>
+                <TextInput
+                  style={[styles.searchText]}
+                  placeholder=""
+                  onChangeText={e => setSearchTem(e)}
+                  value={searchTerm || ''}
+                />
+                <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
+                  <Text>Search</Text>
                 </TouchableOpacity>
-              </View>)
-            }
+              </View>
+              {
+                filteredData.length>itemsPerPage ?
+                <View>
+                  <Text style={styles.name}>Showing 1-{itemsPerPage} of {filteredData.length}</Text>
+                  <Dropdown
+                    style={[styles.dropdown, isDegreeFocus && { borderColor: 'blue' }]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    itemTextStyle={styles.itemTextStyle}
+                    iconStyle={styles.iconStyle}
+                    data={pageItems}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    placeholder={'Page 1'}
+                    value={pageItemValue}
+                    onFocus={() => setIsPageItemFocus(true)}
+                    onBlur={() => setIsPageItemFocus(false)}
+                    onChange={(item) => {
+                      setPageItemValue(item.value)
+                      handlePageChange(item.value);
+                      setIsPageItemFocus(false);
+                    }}
+                    renderLeftIcon={() => (
+                      <View
+                        style={styles.icon}
+                        color={isPageItemFocus ? 'blue' : 'black'}
+                        name="Safety"
+                        size={20}
+                      />
+                    )}
+                  />
+                </View>
+                :
+                <></>
+              }
+              {itemsToShow.map((it, idx) =>
+                <View key={idx} style={styles.subBar}>
+                  {it.map((item, index) => 
+                    <View key={index} style={{flexDirection: 'row', width: '100%'}}>
+                      <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
+                      <Text style={[
+                        styles.content, 
+                        item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
+                      ]}>{item.content}</Text>
+                    </View>
+                  )}
+                  <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx + (currentPage-1) * itemsPerPage)}>
+                    <Text style={{color: 'white', fontWeight: 'bold', fontSize: RFValue(16)}}> VIEW & APPLY</Text>
+                  </TouchableOpacity>
+                </View>)
+              }
+            </View>
           </View>
+          
         </ScrollView>
         {isModal && <Modal
           Visible={false}
@@ -339,8 +343,8 @@ export default function ShiftListing ({ navigation }) {
             <View style={styles.viewContainer}>
               <View style={styles.header}>
                 <Text style={styles.headerText}>View Job / Shift Details</Text>
-                <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
-                  <Image source = {images.close} style={{width: 20, height: 20,}}/>
+                <TouchableOpacity style={styles.modalCloseImage} onPress={toggleModal}>
+                  <Image source = {images.close} style={styles.modalCloseImage}/>
                 </TouchableOpacity>
               </View>
               <View style={styles.body}>
@@ -355,9 +359,6 @@ export default function ShiftListing ({ navigation }) {
                     </View>
                   )}
                 </View>
-                {/* <View style={[styles.profileTitleBg, {marginTop: 20}]}>
-                  <Text style={styles.profileTitle}>🖥️ SUBMIT INTEREST IN THIS SHIFT</Text>
-                </View> */}
                 <Text style={[styles.text, {color: 'blue', fontWeight: 'bold', marginTop: 20, textAlign: 'left'}]}>You will be notified via email if this shift is awarded to you!</Text>
                 <View style={styles.msgBar}>
                   <Text style={[styles.subtitle, {textAlign: 'left', marginTop: 10, fontWeight: 'bold'}]}>ADD A BRIEF MESSAGE (optional)</Text>
@@ -370,7 +371,7 @@ export default function ShiftListing ({ navigation }) {
                     placeholder=""
                   />
                 </View>
-                <View style={[styles.btn, {marginTop: 20}]}>
+                <View style={[styles.btn, {marginTop: RFValue(20)}]}>
                   <HButton style={styles.subBtn} onPress={()=> handleSubmit(modalData) }>
                     Submit
                   </HButton>
@@ -430,11 +431,11 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'black',
     fontWeight: '300',
     textAlign: 'center',
-    marginTop: 30,
+    marginTop: RFValue(30),
     width: '90%',
     marginLeft: '5%'
   },
@@ -449,53 +450,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
   },
-  homepage: {
-    // paddingHorizontal: 30,
-    // paddingVertical: 70,
-    marginLeft: '15%',
-    width: 250,
-    height: 200,
-    marginTop: 30,
-    marginBottom: 100
-  },
   profile: {
-    marginTop: 20,
-    width: '84%',
-    marginLeft: '7%',
-    padding: 20,
+    marginTop: RFValue(20),
+    width: '85%',
+    padding: RFValue(20),
     backgroundColor: '#c2c3c42e',
-    borderRadius: 30,
+    borderRadius: RFValue(30),
     borderWidth: 2,
     borderColor: '#b0b0b0',
-    // elevation: 1,
-    // // shadowColor: 'rgba(0, 0, 0, 0.4)',
-    // // shadowOffset: { width: 1, height: 1 },
-    // shadowRadius: 0,
-    marginBottom: 100
+    marginBottom: RFValue(100)
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 30,
+    fontSize: RFValue(16),
+    lineHeight: RFValue(30),
     width: '40%'
   },
   content: {
-    fontSize: 16,
-    lineHeight: 30,
+    fontSize: RFValue(16),
+    lineHeight: RFValue(30),
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
-    padding: 10,
-    borderRadius: 10,
+    padding: RFValue(10),
+    borderRadius: RFValue(10),
     flexDirection: 'row',
     justifyContent: 'center',
-    // width: '80%',
+    width: '100%',
     marginRight: '10%',
-    marginBottom: 20
+    marginBottom: RFValue(20)
   },
   profileTitle: {
     fontWeight: 'bold',
     color: 'white',
+    fontSize: RFValue(16)
   },
   nurse: {
     width: 200,
@@ -506,13 +494,13 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   backBtn: {
-    padding: 10,
-    width: '70%',
+    padding: RFValue(10),
+    width: '80%',
     justifyContent: 'flex-start',
     borderColor: '#ffaa22',
     borderWidth: 2,
-    borderRadius: 20,
-    marginBottom: 10,
+    borderRadius: RFValue(20),
+    marginBottom: RFValue(10),
     backgroundColor: '#194f69'
   },
   edit: {
@@ -521,7 +509,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontWeight: 'bold',
     color: 'white',
-    width: '55%',
+    width: '70%',
     paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -601,8 +589,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
+  },
+  modalCloseImage:{
+    width: RFValue(20), 
+    height: RFValue(20),
   },
   closeButton: {
     color: 'red',
@@ -627,19 +619,19 @@ const styles = StyleSheet.create({
   },
   subBtn: {
     marginTop: 0,
-    padding: 10,
+    padding: RFValue(10),
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   searchBar: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
     width: '60%',
-    borderRadius: 10,
-    height: 30,
-    marginBottom: 10,
+    borderRadius: RFValue(10),
+    height: RFValue(30),
+    marginBottom: RFValue(10),
   },
   searchText: {
     width: '70%',
@@ -647,18 +639,19 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 30,
+    height: RFValue(30),
     paddingVertical: 0,
     color: 'black'
   },
   searchBtn: {
-    width: '30%',
+    width: '40%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.08)',
     color: '#2a53c1',
-    height: 30,
+    height: RFValue(30),
+    fontSize: RFValue(14)
   },
   dropdown: {
     height: 30,
@@ -685,11 +678,11 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
     color: 'black'

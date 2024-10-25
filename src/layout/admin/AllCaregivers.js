@@ -50,7 +50,7 @@ export default function AllCaregivers({ navigation }) {
   const [pageList, setPageList] = useState([
     {label: 'Page 1', value: 1}
   ]);
-  const widths = [120, 150, 150, 180, 300, 150, 150, 150, 80, 100, 80, 120];
+  const widths = [150, 200, 200, 180, 300, 200, 150, 150, 100, 150, 100, 120];
   const [credentials, setCredentials] = useState({
     email: '',
     driverLicense: {
@@ -1241,7 +1241,7 @@ export default function AllCaregivers({ navigation }) {
                     <Image source = {images.close} style={{width: 20, height: 20,}}/>
                   </TouchableOpacity>
                 </View>
-                <View style={styles.body}>
+                <View style={[styles.body, { marginBottom: 0 }]}>
                   <View style={styles.modalBody}>
                     <Text style={styles.subtitle}> Password <Text style={{color: 'red'}}>*</Text></Text>
                     <TextInput
@@ -2734,7 +2734,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#A020F0',
     padding: 10,
     marginTop: 30,
     borderRadius: 5,

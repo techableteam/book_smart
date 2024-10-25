@@ -32,7 +32,7 @@ export default function AdminAllUser({ navigation }) {
   const [pageList, setPageList] = useState([
     {label: 'Page 1', value: 1}
   ]);
-  const widths = [120, 250, 150, 150, 150, 80];
+  const widths = [200, 300, 150, 250, 150, 120];
   const tableHead = [
     'Name',
     'Email',
@@ -495,7 +495,7 @@ export default function AdminAllUser({ navigation }) {
                                   ]);
                                 }}
                               >
-                                <Text style={styles.profileTitle}>Del</Text>
+                                <Text style={styles.profileTitle}>Delete</Text>
                               </TouchableOpacity>
                             </View>
                           );
@@ -653,7 +653,7 @@ export default function AdminAllUser({ navigation }) {
                     <Image source = {images.close} style={{width: 20, height: 20,}}/>
                   </TouchableOpacity>
                 </View>
-                <View style={styles.body}>
+                <View style={[styles.body, { marginBottom: 0 }]}>
                   <View style={styles.modalBody}>
                     <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>User Status</Text>
                     <Dropdown
@@ -996,15 +996,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#007BFF', // Button color
-    padding: 10,    
-    marginLeft: '35%',
+    backgroundColor: '#A020F0', // Button color
+    padding: 10,
     marginTop: 30,           // Padding inside the button
     borderRadius: 5,          // Rounded corners
-    
   },
   buttonText: {
-    textAlign: 'center',
     color: 'white',            // Text color
     fontSize: 16,              // Text size
   },

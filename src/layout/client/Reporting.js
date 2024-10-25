@@ -11,6 +11,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function Reporting ({ navigation }) {
   const [data, setData] = useState({reportData: [],dailyPay: 0, weeklyPay: 0});
@@ -172,52 +173,69 @@ export default function Reporting ({ navigation }) {
             <ImageButton title={"All Shift Listings"} onPress={() => handleNavigate('ShiftListing')} />
             <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
           </View>
-          <View style={styles.profile}>
-            <View style={styles.profileTitleBg}>
-              <Text style={styles.profileTitle}>MY SHIFTS BY MONTH</Text>
-            </View>
-            <Text style={styles.name}>"Click On Any Value To View Details"</Text>
-            {
-              userInfos.map((item, index) => 
-                <View key={index} style={[styles.row, {paddingHorizontal: 0}, index === 0 || index === userInfos.length-1 ? styles.evenRow : null]}>
-                  <Text style={{width: '50%', textAlign: 'center', fontWeight: 'bold'}}>{item.month}</Text>
-                  <View style={{width: 1, height: 40, backgroundColor: 'hsl(0, 0%, 86%)', position: 'absolute', left: '50%'}} />
-                  <Text style={[{width: '50%', textAlign: 'center'}, index == 0 || index === userInfos.length-1 ? {fontWeight: 'bold'}: {fontWeight: '400'}]} onPress={() => handleClick(item.month)}>{item.number}</Text>
-                </View>
-              )
-            }
-            {
-              clocks.map((item, index) => 
-                <View key={index} style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10,height: 40}}>
-                  {
-                    item.laborState === 2 ? 
-                    <Text style={{backgroundColor: '#394232', padding: 10, textAlign: 'center', fontWeight: 'bold', color: 'black', borderRadius: 5}}
-                    >
-                      Ended
-                    </Text>
-                    :
-                    <TouchableOpacity onPress={() => handleButtonClick(item.jobId, item.laborState)}>
-                      <Text style={{backgroundColor: '#BC222F', padding: 10, textAlign: 'center', fontWeight: 'bold', borderRadius: 5, color: 'white'}}>
-                        {item.laborState === 0?'Clock In': 'Clock Out'}
+          <View style = {{ width:'100', flex : 1, justifyContent: 'center', alignItems:'center'}}>
+            <View style={styles.profile}>
+              <View style={styles.profileTitleBg}>
+                <Text style={styles.profileTitle}>MY SHIFTS BY MONTH</Text>
+              </View>
+              <Text style={styles.name}>"Click On Any Value To View Details"</Text>
+              {
+                userInfos.map((item, index) => 
+                  <View key={index} style={[styles.row, {paddingHorizontal: 0}, index === 0 || index === userInfos.length-1 ? styles.evenRow : null]}>
+                    <Text style={{width: '50%', textAlign: 'center', fontWeight: 'bold'}}>{item.month}</Text>
+                    <View style={{width: 1, height: RFValue(40), backgroundColor: 'hsl(0, 0%, 86%)', position: 'absolute', left: '50%'}} />
+                    <Text style={[{width: '50%', textAlign: 'center'}, index == 0 || index === userInfos.length-1 ? {fontWeight: 'bold'}: {fontWeight: '400'}]} onPress={() => handleClick(item.month)}>{item.number}</Text>
+                  </View>
+                )
+              }
+              {
+                clocks.map((item, index) => 
+                  <View key={index} style={{flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 10, height: 120}}>
+                    {
+                      item.laborState === 2 ? 
+                      <Text style={{backgroundColor: '#394232', padding: RFValue(10), fontSize: RFValue(14), textAlign: 'center', fontWeight: 'bold', color: 'black', borderRadius: 5}}
+                      >
+                        Ended
                       </Text>
-                    </TouchableOpacity>
-                  }
-                  <Text style={[styles.name, {padding: 10, height: '100%',}]}>JobId: {item.jobId}</Text>
-                  <View style={{height: '100%'}}>
-                    <Text style={styles.name}>{item.shiftStartTime}</Text>
-                    <Text style={styles.name}>{item.shiftEndTime}</Text>
+                      :
+                      <TouchableOpacity onPress={() => handleButtonClick(item.jobId, item.laborState)}>
+                        <Text style={{backgroundColor: '#BC222F', padding: RFValue(10), fontSize: RFValue(14), textAlign: 'center', fontWeight: 'bold', borderRadius: 5, color: 'white'}}>
+                          {item.laborState === 0 ?'Clock In': 'Clock Out'}
+                        </Text>
+                      </TouchableOpacity>
+                    }
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                      <Text style={[styles.name, {paddingHorizontal: 10, height: '100%',}]}>JobId: {item.jobId}</Text>
+                      <View style={{height: '100%', width: '50%', marginLeft: 10}}>
+                        <Text style={styles.name}>{item.shiftStartTime}</Text>
+                        <Text style={styles.name}>{item.shiftEndTime}</Text>
+                      </View>
+                    </View>
+                  </View>
+                )
+              }
+              <View style={[styles.profileTitleBg, {marginTop: 30}]}>
+                <Text style={styles.profileTitle}>Daily & Weekly Pay</Text>
+              </View>
+              <View style={{width: '90%', marginBottom: 30}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                  <Text style={[styles.name, { width: '25%' }]}>Day:</Text>
+                  <View>
+                    <Text style={styles.name}>{dailyPay.date}</Text>
+                    <Text style={styles.name}>${dailyPay.pay}</Text>
                   </View>
                 </View>
-              )
-            }
-            <View style={[styles.profileTitleBg, {marginTop: 30}]}>
-              <Text style={styles.profileTitle}>Daily & Weekly Pay</Text>
-            </View>
-            <View style={{width: '90%', marginBottom: 30}}>
-              <Text style={styles.name}>{`Day:     ${dailyPay.date}                        $${dailyPay.pay}`}</Text>
-              <Text style={styles.name}>{`Week:  ${weeklyPay.date}  $${weeklyPay.pay}`}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                  <Text style={[styles.name, { width: '25%' }]}>Week:</Text>
+                  <View>
+                    <Text style={styles.name}>{weeklyPay.date}</Text>
+                    <Text style={styles.name}>${weeklyPay.pay}</Text>
+                  </View>
+                </View>
+              </View>
             </View>
           </View>
+          
         </ScrollView>
           {showModal && <Modal
             Visible={false}
@@ -329,19 +347,14 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   profile: {
-    marginTop: 20,
-    width: '84%',
-    marginLeft: '7%',
-    padding: 20,
+    marginTop: RFValue(20),
+    width: '85%',
+    padding: RFValue(20),
     backgroundColor: '#c2c3c42e',
-    borderRadius: 30,
+    borderRadius: RFValue(30),
     borderWidth: 2,
     borderColor: '#b0b0b0',
-    marginBottom: 100
-    // elevation: 1,
-    // // shadowColor: 'rgba(0, 0, 0, 0.4)',
-    // // shadowOffset: { width: 1, height: 1 },
-    // shadowRadius: 0,
+    marginBottom: RFValue(100)
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
@@ -349,23 +362,23 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'center',
-    width: '80%',
-    marginLeft: '10%',
+    width: '100%',
     marginBottom: 20
   },
   profileTitle: {
     fontWeight: 'bold',
     color: 'white',
+    fontSize: RFValue(16)
   },
   name: {
-    fontSize: 14,
-    marginBottom: 10,
+    fontSize: RFValue(13),
+    marginBottom: RFValue(10),
     fontStyle: 'italic',
     color: '#22138e',
     fontWeight: 'bold',
   },
   row: {
-    padding: 10,
+    padding: RFValue(10),
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     flexDirection: 'row',

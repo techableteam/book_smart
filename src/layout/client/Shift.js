@@ -17,6 +17,11 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 import AnimatedHeader from '../AnimatedHeader';
+import { Dimensions } from 'react-native';
+import constStyles from '../../assets/styles';
+import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function Shift ({ navigation }) {
   const [isModal, setModal] = useState(false);
@@ -562,10 +567,10 @@ export default function Shift ({ navigation }) {
           </View>
           <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"PENDING VERIFICAITON"&nbsp;</Text>.</Text>
           {downloading ? (
-            <Text style={[styles.text, { marginTop: 15 }]}>Downloading...</Text>
+            <Text style={[styles.text, { marginTop: RFValue(15) }]}>Downloading...</Text>
           ) : (
             <TouchableOpacity onPress={fileDownload}>
-              <Text style={[styles.text, { marginTop: 15, color: 'blue', textDecorationLine: 'underline' }]}>DOWNLOAD TIMESHEET HERE</Text>
+              <Text style={[styles.text, { marginTop: RFValue(15), color: 'blue', textDecorationLine: 'underline' }]}>DOWNLOAD TIMESHEET HERE</Text>
             </TouchableOpacity>
           )}
           <View style={styles.imageButton}>
@@ -629,7 +634,7 @@ export default function Shift ({ navigation }) {
                     <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
                     {item.title == "TimeSheet" ? (
                       <Text
-                        style={[styles.content, { color: '#2a53c1', textDecorationLine: 'underline' }]}
+                        style={[styles.content, { color: '#2a53c1', textDecorationLine: 'underline'}]}
                         onPress={() => { handleShowFile(it); }}
                       >{item.content}</Text>
                     ) : (
@@ -637,9 +642,11 @@ export default function Shift ({ navigation }) {
                     )}
                   </View>
                 )}
-                <TouchableOpacity style={[styles.edit, {marginTop: 15, backgroundColor: '#A020F0', marginLeft: '20%'}]} onPress = {() => handleUploadEdit(it[0].content)}>
-                  <Text style={{color: 'white'}}> Upload Timesheet</Text>
-                </TouchableOpacity>
+                <View style={{ flex:1, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                  <TouchableOpacity style={[styles.edit, {marginTop: RFValue(15), backgroundColor: '#A020F0'}]} onPress = {() => handleUploadEdit(it[0].content)}>
+                    <Text style={{color: 'white', fontSize: RFValue(14), fontWeight:'bold'}}> Upload Timesheet</Text>
+                  </TouchableOpacity>
+                </View>
               </View>)
             }
           </View>
@@ -877,17 +884,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10
   },
   bottomBar: {
-    marginTop: 30,
-    height: 5,
+    marginTop: RFValue(30),
+    height: RFValue(5),
     backgroundColor: '#4f70ee1c',
     width: '100%'
   },
   text: {
-    fontSize: 13,
+    fontSize: RFValue(13),
     color: 'black',
     fontWeight: '300',
     textAlign: 'center',
-    marginTop: 30,
+    marginTop: RFValue(30),
     width: '96%',
     marginLeft: '2%'
   },
@@ -915,13 +922,13 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 30,
+    fontSize: RFValue(14),
+    lineHeight: RFValue(30),
     width: '35%'
   },
   content: {
-    fontSize: 16,
-    lineHeight: 30,
+    fontSize: RFValue(14),
+    lineHeight: RFValue(30),
     width: '60%'
   },
   profileTitleBg: {
@@ -937,6 +944,7 @@ const styles = StyleSheet.create({
   profileTitle: {
     fontWeight: 'bold',
     color: 'white',
+    fontSize: RFValue(16)
   },
   name: {
     fontSize: 14,
@@ -944,23 +952,23 @@ const styles = StyleSheet.create({
   },
   edit: {
     backgroundColor: '#22138e',
-    padding: 5,
-    borderRadius: 10,
+    padding: RFValue(10),
+    borderRadius: RFValue(10),
     fontWeight: 'bold',
     color: 'white',
-    width: '55%',
+    width: '70%',
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 10
+    marginBottom: RFValue(10)
   },
   subBar: {
     width: '100%',
     backgroundColor: "#dcd6fa",
-    padding: 10,
-    borderRadius: 20,
+    padding: RFValue(10),
+    borderRadius: RFValue(20),
     borderWidth: 2,
     borderColor: "#c6c5c5",
-    marginBottom: 10
+    marginBottom: RFValue(10)
   },
   modalContainer: {
     flex: 1,
@@ -984,14 +992,14 @@ const styles = StyleSheet.create({
     padding: 20
   },
   dropdown: {
-    height: 40,
+    height: RFValue(40),
     width: '60%',
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    marginBottom: 10
+    borderRadius: RFValue(8),
+    paddingHorizontal: RFValue(8),
+    marginBottom: RFValue(10)
   },
   icon: {
     marginRight: 5,
@@ -1011,10 +1019,11 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(14),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,
@@ -1022,7 +1031,7 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   viewContainer: {
     backgroundColor: '#f2f2f2',
@@ -1053,7 +1062,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
   },
   closeButton: {

@@ -198,11 +198,11 @@ const styles = StyleSheet.create({
   titles: {
     fontWeight: 'bold',
     fontSize: 16,
-    lineHeight: 40,
+    lineHeight: 30,
     width: '40%'
   },
   content: {
-    fontSize: 16,
+    fontSize: 14,
     width: '60%',
     lineHeight: 40,
   },
@@ -212,11 +212,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'center',
-    width: '80%',
-    marginLeft: '10%',
+    width: '90%',
+    marginLeft: '5%',
     marginBottom: 20
   },
   profileTitle: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: 'white',
   },

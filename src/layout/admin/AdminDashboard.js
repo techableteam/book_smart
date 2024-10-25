@@ -234,12 +234,12 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 40,
+    fontSize: 14,
+    lineHeight: 30,
     textAlign: 'center',
     color: 'white',
     padding: 5,
-    width: '60%',
+    width: '70%',
     backgroundColor: "#2243f3", 
     borderRadius: 10
   },
@@ -258,13 +258,14 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   profileTitle: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: 'white',
   },
   Italic: {
     fontStyle: 'italic',
     color: '#0000ff',
-    // marginLeft: '10%',
+    fontSize: 12,
     marginBottom: 20, 
   },
   head: {

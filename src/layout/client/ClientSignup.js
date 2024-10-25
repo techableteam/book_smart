@@ -833,7 +833,7 @@ export default function ClientSignUp({ navigation }) {
               </HButton>
             </View>
 
-            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', fontSize: RFValue(14), marginBottom: RFValue(100)}}
+            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', fontSize: RFValue(14), marginBottom: 20}}
               onPress={handleBack}
             >
               Back to 🏚️ Caregiver Home
@@ -942,6 +942,7 @@ const styles = StyleSheet.create({
   modal: {
     width: '90%',
     borderRadius: 10,
+    marginBottom: 100,
     margin: '5%',
     borderWidth: 1,
     borderColor: 'grey',

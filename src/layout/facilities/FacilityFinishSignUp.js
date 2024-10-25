@@ -3,6 +3,7 @@ import { View, StyleSheet, StatusBar } from 'react-native';
 import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 
 export default function FacilityFinishSignup ({ navigation }) {
@@ -18,7 +19,7 @@ export default function FacilityFinishSignup ({ navigation }) {
         <View style={{width: '100%', height: '60%', marginTop: 99, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', flexWrap: 'wrap'}]}> Your registration is complete! Click the back link to log in.</Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', fontSize: RFValue(18), flexWrap: 'wrap'}]}> Your registration is complete! Click the back link to log in.</Text>
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >

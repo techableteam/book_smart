@@ -39,7 +39,7 @@ export default function AdminFacilities({ navigation }) {
   const [pageList, setPageList] = useState([
     {label: 'Page 1', value: 1}
   ]);
-  const widths = [100, 150, 250, 150, 150, 100, 100, 100];
+  const widths = [100, 150, 250, 200, 150, 150, 150, 100];
   const tableHead = [
     'ID',
     'Date Added',
@@ -465,7 +465,7 @@ export default function AdminFacilities({ navigation }) {
         <View style={{ marginTop: 30, flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10 }}>
           <TouchableOpacity style={[styles.subBtn, { width: 'auto' }]} onPress={() => navigation.navigate('AddNewFacility')}>
             <View style={{ backgroundColor: 'white', borderRadius: 10, width: 16, height: 16, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-              <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', lineHeight: 16 }}>+</Text>
+              <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', lineHeight: 15 }}>+</Text>
             </View>
             <Text style={styles.profileTitle}>Add A New Facility</Text>
           </TouchableOpacity>

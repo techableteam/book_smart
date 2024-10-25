@@ -16,6 +16,7 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const CELL_COUNT = 6;
 
@@ -110,7 +111,7 @@ export default function ClientPhoneVerify ({ navigation }) {
         >
           <View style={styles.authInfo}>
             {/* <Text style={styles.subject}> You Received Verify Code? </Text> */}
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', marginTop: 30}]}> Enter your verificaiton code below. </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', marginTop: 30, fontSize: RFValue(18)}]}>Enter your verificaiton code below. </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Verification Code </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   verify: {
       width: "100%",
@@ -230,10 +231,10 @@ const styles = StyleSheet.create({
       marginRight: "4%"
   },
   cell: {
-    width: 40,
-    height: 50,
-    lineHeight: 40,
-    fontSize: 20,
+    width: RFValue(40),
+    height: RFValue(50),
+    lineHeight: RFValue(40),
+    fontSize: RFValue(20),
     fontWeight: '700',
     textAlign: 'center',
     textAlignVertical:'center',

@@ -8,6 +8,7 @@ import SubNavbar from '../../components/SubNavbar';
 import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, contactPhoneAtom, contactEmailAtom, avatarAtom } from '../../context/FacilityAuthProvider'
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function FacilityProfile ({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -37,7 +38,7 @@ export default function FacilityProfile ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"FacilityLogin"}/>
-        <ScrollView style={{width: '100%', marginTop: 157}}
+        <ScrollView style={{width: '100%', marginTop: 160}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -73,19 +74,11 @@ export default function FacilityProfile ({ navigation }) {
                   <Text style={styles.titles}>{item.title}</Text>
                   <Text style={[
                     styles.content, 
-                    item.title == "Phone" || item.title == "Email" ? {color: '#2a53c1', textDecorationLine:'underline', width: '100%'} : {}
+                    item.title == "Phone" || item.title == "Email" ? {color: '#2a53c1', textDecorationLine:'underline', width: '100%', fontSize: RFValue(15)} : {}
                   ]}>{item.content}</Text>
                 </View>
               )
             }
-            {/* <MapView
-              initialRegion={{
-                latitude: 37.78825,
-                longitude: -122.4324,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              }}
-            /> */}
           </View>
         </ScrollView>
         <MFooter />
@@ -103,8 +96,8 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   mark: {
-    width:225,
-    height: 68,
+    width:RFValue(225),
+    height: RFValue(68),
   },
   topView: {
     marginTop: 50,
@@ -184,14 +177,14 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 40,
+    fontSize: RFValue(16),
+    lineHeight: RFValue(40),
     width: '100%'
   },
   content: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     width: '100%',
-    lineHeight: 40,
+    lineHeight: RFValue(40),
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
@@ -206,14 +199,16 @@ const styles = StyleSheet.create({
   profileTitle: {
     fontWeight: 'bold',
     color: 'white',
+    fontSize: RFValue(16)
   },
   nurse: {
-    width: 200,
-    height: 200
+    width: RFValue(200),
+    height: RFValue(200)
   },
   name: {
-    fontSize: 20,
-    marginVertical: 10,
+    fontSize: RFValue(16),
+    marginVertical: RFValue(10),
+    fontWeight: 'bold'
   },
   edit: {
     backgroundColor: '#BC222F',

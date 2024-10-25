@@ -51,14 +51,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 500,
     color: 'black',
-    top: RFValue(10)
+    top: RFValue(10),
   },
   title: {
     fontSize: RFValue(19),
     color: 'white',
     fontWeight: 'bold',
-    textAlign: 'left',
     backgroundColor: 'transparent',
-    paddingVertical: RFValue(10)
+    paddingVertical: RFValue(10),
+    textAlign: "center"
   },
 });

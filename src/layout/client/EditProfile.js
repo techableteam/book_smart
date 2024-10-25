@@ -16,6 +16,11 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
+import constStyles from '../../assets/styles';
+import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default function EditProfile({ navigation }) {
   const [aic, setAIC] = useAtom(aicAtom);
@@ -450,28 +455,28 @@ export default function EditProfile({ navigation }) {
       <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.authInfo}>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Name <Text style={{color: 'red'}}>*</Text> </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Name <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
-                  style={[styles.input, {width: '50%'}]}
+                  style={[constStyles.signUpinput, {width: '50%'}]}
                   placeholder="First"
                   onChangeText={e => handleCredentials('firstName', e)}
                   value={credentials.firstName || ''}
                 />
                 <TextInput
-                  style={[styles.input, {width: '50%'}]}
+                  style={[constStyles.signUpinput, {width: '50%'}]}
                   placeholder="Last"
                   onChangeText={e => handleCredentials('lastName', e)}
                   value={credentials.lastName || ''}
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Email <Text style={{color: 'red'}}>*</Text> </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Email <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
-                  style={[styles.input, {width: '100%'}]}
+                  style={[constStyles.signUpinput, {width: '100%'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -481,23 +486,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Phone <Text style={{color: 'red'}}>*</Text> </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Phone <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   value={credentials.phoneNumber}
-                  style={[styles.input, {width: '100%'}]}
+                  style={[constStyles.signUpinput, {width: '100%'}]}
                   onChangeText={handlePhoneNumberChange}
                   keyboardType="phone-pad"
                   placeholder={credentials.phoneNumber}
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> SSN <Text style={{color: 'red'}}>*</Text> </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> SSN <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
-                  style={[styles.input, {width: '100%'}]}
+                  style={[constStyles.signUpinput, {width: '100%'}]}
                   placeholder={credentials.socialSecurityNumber}
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -507,13 +512,13 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Date of Birth <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 50, zIndex: 10}}>
+                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: RFValue(50), zIndex: RFValue(10)}}>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                  style={[constStyles.signUpinput, {width: '100%', position: 'absolute', zIndex: 0}]}
                   placeholder=""
                   value={birthday.toDateString()}
                   editable={false}
@@ -528,77 +533,77 @@ export default function EditProfile({ navigation }) {
                     mode="date" // Set the mode to "date" to allow year and month selection
                     androidVariant="native"
                   />
-                  <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />
+                  <Button title="confirm" style = {constStyles.loginMainButton} onPress={(day) =>{setShowCalendar(!showCalender);}} />
                 </>
                 }
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Caregiver Address <Text style={{color: 'red'}}>*</Text> </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Caregiver Address <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'column', width: '100%', gap: 5}}>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
-                    style={[styles.input, {width: '100%', marginBottom: 0}]}
+                    style={[constStyles.signUpinput, {width: '100%', marginBottom: 0}]}
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
                     onChangeText={e => handleCredentials('streetAddress', e)}
                     value={credentials.address.streetAddress || ''}
                   />
-                  <Text style = {{color: "black", marginLeft: 5}}>Street Address</Text>
+                  <Text style = {constStyles.signUpsmalltitle}>Street Address</Text>
                 </View>
                 <View style={{width: '100%', marginBottom: 10}}>
                   <TextInput
-                    style={[styles.input, {width: '100%', marginBottom: 0}]}
+                    style={[constStyles.signUpinput, {width: '100%', marginBottom: 0}]}
                     placeholder=""
                     autoCorrect={false}
                     autoCapitalize="none"
                     onChangeText={e => handleCredentials('streetAddress2', e)}
                     value={credentials.address.streetAddress2 || ''}
                   />
-                  <Text style = {{color: "black", marginLeft: 5}}>Street Address2</Text>
+                  <Text style = {constStyles.signUpsmalltitle}>Street Address2</Text>
                 </View>
                 <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
-                  <View style={[styles.input, {width: '45%'}]}>
+                  <View style={[constStyles.signUpinput, {width: '45%'}]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, {width: '100%', marginBottom: 0}]}
+                      style={[constStyles.signUpinput, {width: '100%', marginBottom: 0}]}
                       onChangeText={e => handleCredentials('city', e)}
                       value={credentials.address.city || ''}
                     />
-                    <Text style = {{color: "black", marginLeft: 5}}>City</Text>
+                    <Text style = {constStyles.signUpsmalltitle}>City</Text>
                   </View>
-                  <View style={[styles.input, {width: '20%'}]}>
+                  <View style={[constStyles.signUpinput, {width: '20%'}]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, {width: '100%', marginBottom: 0}]}
+                      style={[constStyles.signUpinput, {width: '100%', marginBottom: 0}]}
                       onChangeText={e => handleCredentials('state', e)}
                       value={credentials.address.state || ''}
                     />
-                    <Text style = {{color: "black", marginLeft: 5}}>State</Text>
+                    <Text style = {constStyles.signUpsmalltitle}>State</Text>
                   </View>
-                  <View style={[styles.input, {width: '30%'}]}>
+                  <View style={[constStyles.signUpinput, {width: '30%'}]}>
                     <TextInput
                       placeholder=""
-                      style={[styles.input, {width: '100%', marginBottom: 0}]}
+                      style={[constStyles.signUpinput, {width: '100%', marginBottom: 0}]}
                       // keyboardType="numeric" // Set the keyboardType to "numeric" for zip input
                       onChangeText={e => handleCredentials('zip', e)}
                       value={credentials.address.zip || ''}
                     />
-                    <Text style = {{color: "black", marginLeft: 5}}>Zip</Text>
+                    <Text style = {constStyles.signUpsmalltitle}>Zip</Text>
                   </View>
                 </View>
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Title <Text style={{color: 'red'}}>*</Text> </Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Title <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{position: 'relative', width: '100%', gap: 5, height: 50}}>
                 <TouchableOpacity onPress = {()=>setShowModal(true)}
                   style={{height: 40, zIndex: 1}}
                 >
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                  style={[constStyles.signUpinput, {width: '100%', position: 'absolute', zIndex: 0}]}
                   placeholder="First"
                   editable= {false}
                   // onChangeText={e => handleCredentials('firstName', e)}
@@ -614,32 +619,32 @@ export default function EditProfile({ navigation }) {
                 >
                   <View style={styles.modalContainer}>
                     <View style={styles.calendarContainer}>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('')}>Select Title...</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('CNA')}>CNA</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('LPN')}>LPN</Text>
-                      <Text style={styles.subtitle} onPress={()=>handleItemPress('RN')}>RN</Text>
+                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('')}>Select Title...</Text>
+                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('CNA')}>CNA</Text>
+                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('LPN')}>LPN</Text>
+                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('RN')}>RN</Text>
                     </View>
                   </View>
                 </Modal>}
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Pic. (Optional)</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Pic. (Optional)</Text>
               {credentials.photoImage.name !== "" && <View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.photoImage })}
                 >{credentials.photoImage.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('photoImage')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('photoImage')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(12), color: 'black'}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -653,23 +658,23 @@ export default function EditProfile({ navigation }) {
             <View style={styles.profileTitleBg}>
               <Text style={styles.profileTitle}>MY DOCUMENTS</Text>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Driver's License</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Driver's License</Text>
               {credentials.driverLicense.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'driverLicense' })}
                 >{credentials.driverLicense.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('driverLicense')}
                 >remove</Text>
               </View>}
 
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('driverLicense')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -677,23 +682,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Social Security Card</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Social Security Card</Text>
               {credentials.socialCard.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'socialCard' })}
                 >{credentials.socialCard.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('socialCard')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('socialCard')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -701,23 +706,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Physical Exam</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Physical Exam</Text>
               {credentials.physicalExam.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'physicalExam' })}
                 >{credentials.physicalExam.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('physicalExam')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('physicalExam')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -725,23 +730,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> PPD (TB Test)</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> PPD (TB Test)</Text>
               {credentials.ppd.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'ppd' })}
                 >{credentials.ppd.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('ppd')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('ppd')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -749,23 +754,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> MMR (Immunizations)</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> MMR (Immunizations)</Text>
               {credentials.mmr.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'mmr' })}
                 >{credentials.mmr.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('mmr')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('mmr')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -773,23 +778,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Healthcare License</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Healthcare License</Text>
               {credentials.healthcareLicense.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'healthcareLicense' })}
                 >{credentials.healthcareLicense.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('healthcareLicense')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('healthcareLicense')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -797,23 +802,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> Resume</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> Resume</Text>
               {credentials.resume.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'resume' })}
                 >{credentials.resume.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('resume')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('resume')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -821,23 +826,23 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> COVID Card</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> COVID Card</Text>
               {credentials.covidCard.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'covidCard' })}
                 >{credentials.covidCard.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('covidCard')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('covidCard')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -845,30 +850,30 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={styles.email}>
-              <Text style={styles.subtitle}> BLS(CPR card)</Text>
+            <View>
+              <Text style={constStyles.loginSubTitle}> BLS(CPR card)</Text>
               {credentials.bls.name !== "" &&<View style={{marginBottom: 10}}>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'bls' })}
                 >{credentials.bls.name} &nbsp;&nbsp;</Text>
-                <Text style={{color: '#0000ff', textDecorationLine: 'underline'}}
+                <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('bls')}
                 >remove</Text>
               </View>}
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={()=>handleChangeFileType('bls')} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color: 'black'}}>Choose File</Text>
+                  <Text style={constStyles.profileChooseButton}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, {width: '70%', color: 'black'}]}
+                  style={[constStyles.signUpinput, {width: '70%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
                   value={credentials.bls.name || ''}
                 />
               </View>
-              <Text style={[styles.subtitle, {lineHeight: 40}]}> W - 9 {'\n'}
+              <Text style={[constStyles.signUpSubtitle, {lineHeight:30}]}> W - 9 {'\n'}
                 Standard State Criminal{'\n'}
                 Drug Test{'\n'}
                 Hep B (shot or declination){'\n'}
@@ -882,13 +887,14 @@ export default function EditProfile({ navigation }) {
                 Submit
               </HButton>
             </View>
+            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 20 }}
+              onPress={handleBack}
+            >
+              Back to 🏚️ Caregiver Profile
+            </Text>
           </View>
         </View>
-        <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, marginLeft: '10%'}}
-          onPress={handleBack}
-        >
-          Back to 🏚️ Caregiver Profile
-        </Text>
+
         {fileTypeSelectModal && (
           <Modal
             visible={fileTypeSelectModal} // Changed from Visible to visible
@@ -974,7 +980,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 151,
+    marginTop: height * 0.26,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -1015,6 +1021,7 @@ const styles = StyleSheet.create({
   profileTitle: {
     fontWeight: 'bold',
     color: 'white',
+    fontSize: RFValue(16)
   },
   marker: {
     width: 5,
@@ -1038,7 +1045,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
+    marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',
@@ -1115,11 +1122,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   subBtn: {
-    marginTop: 0,
-    padding: 10,
+    padding: RFValue(10),
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   drinksButton: {
     fontSize: 18,

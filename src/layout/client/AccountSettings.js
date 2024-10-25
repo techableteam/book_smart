@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, View, TextInput, StyleSheet, ScrollView, StatusBar } from 'react-native';
-import { Text } from 'react-native-paper';
+import { configureFonts, Text } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
@@ -10,7 +10,11 @@ import { useAtom } from 'jotai';
 import { firstNameAtom as clinicalFirstNameAtom, lastNameAtom as clinicalLastNameAtom, emailAtom as clinicalEmailAtom, passwordAtom as clinicalPasswordAtom } from '../../context/ClinicalAuthProvider';
 import { firstNameAtom as adminFirstNameAtom, lastNameAtom as adminLastNameAtom, emailAtom as adminEmailAtom, passInfAtom as adminPasswordAtom } from '../../context/AdminAuthProvider';
 import { firstNameAtom as facilityFirstNameAtom, lastNameAtom as facilityLastNameAtom, contactEmailAtom as facilityContactEmailAtom, passwordAtom as facilityPasswordAtom } from '../../context/FacilityAuthProvider';
+import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions } from 'react-native';
+import constStyles from '../../assets/styles';
 
+const { width, height } = Dimensions.get('window');
 
 export default function AccountSettings ({ route, navigation }) {
   const { userRole } = route.params;
@@ -188,13 +192,13 @@ export default function AccountSettings ({ route, navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"ClientSignIn"} />
-        <ScrollView style={{width: '100%', marginTop: 160}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.authInfo}>
-            <Text style={styles.subject}> Account Settings </Text>
+            <Text style={constStyles.loginMainTitle}> Account Settings </Text>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Name <Text style={{color: 'red'}}>*</Text> </Text>
+              <Text style={constStyles.loginSubTitle}> Name <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   style={[styles.input, {width: '50%'}]}
@@ -211,7 +215,7 @@ export default function AccountSettings ({ route, navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={styles.subtitle}> Email <Text style={{color: 'red'}}>*</Text> </Text>
+              <Text style={constStyles.loginSubTitle}> Email <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   style={[styles.input, {width: '100%'}]}
@@ -231,7 +235,7 @@ export default function AccountSettings ({ route, navigation }) {
             </View>
           </View>
           <View style={styles.authInfo}>
-            <Text style={[styles.subject, {marginVertical: 10, marginTop: 20}]}> Change Password </Text>
+            <Text style={[constStyles.loginMainTitle, {marginVertical: 10, marginTop: 20}]}> Change Password </Text>
             <View style={styles.email}>
               <View style={{flexDirection: 'row'}}>
                 <Text style={{
@@ -398,8 +402,8 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
-    marginBottom: 10, 
+    height: RFValue(40), 
+    marginBottom: RFValue(10), 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
     paddingVertical: 5
@@ -428,10 +432,10 @@ const styles = StyleSheet.create({
   },
   subBtn: {
     marginTop: 0,
-    padding: 10,
+    padding: RFValue(10),
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
 });
   

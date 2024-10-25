@@ -9,6 +9,7 @@ import SignatureCapture from 'react-native-signature-capture';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import { Update } from '../../utils/useApi';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function ClientPermission ({ navigation }) {
     const items = [
@@ -295,14 +296,15 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,
@@ -313,17 +315,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   title: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     fontWeight: 'bold',
     color: '#2a53c1',
     textDecorationLine: 'underline'
   },
   subTitle: {
+    fontSize:RFValue(15),
     fontWeight: 'bold',
     color: 'black'
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'black',
     fontWeight: 'normal',
     marginVertical: 20,

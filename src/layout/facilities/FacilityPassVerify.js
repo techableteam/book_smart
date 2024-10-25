@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, View, TextInput, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, View, StyleSheet, StatusBar } from 'react-native';
 import { Text, PaperProvider, DataTable } from 'react-native-paper';
-import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
-import SubNavbar from '../../components/SubNavbar';
-import { useAtom } from 'jotai';
-import { contactEmailAtom } from '../../context/FacilityAuthProvider';
 import { VerifyCodeSend } from '../../utils/useApi';
 import {
   CodeField,

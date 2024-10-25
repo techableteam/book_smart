@@ -449,7 +449,7 @@ export default function AdminEditProfile({ navigation }) {
                   <Text style = {{color:"black", marginLeft:5}}>Street Address2</Text>
                 </View>
                 <View style={{flexDirection: 'row', width: '100%', gap: 5, marginBottom: 30}}>
-                  <View style={[styles.input, {width: '45%'}]}>
+                  <View style={{width: '45%'}}>
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
@@ -458,7 +458,7 @@ export default function AdminEditProfile({ navigation }) {
                     />
                     <Text style = {{color:"black", marginLeft:5}}>City</Text>
                   </View>
-                  <View style={[styles.input, {width: '20%'}]}>
+                  <View style={{width: '20%'}}>
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
@@ -467,7 +467,7 @@ export default function AdminEditProfile({ navigation }) {
                     />
                     <Text style = {{color:"black", marginLeft:5}}>State</Text>
                   </View>
-                  <View style={[styles.input, {width: '30%'}]}>
+                  <View style={{width: '30%'}}>
                     <TextInput
                       placeholder=""
                       style={[styles.input, {width: '100%', marginBottom: 0}]}
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 151,
+    marginTop: 166,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
+    marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',
@@ -709,9 +709,9 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 130
   },
-  btn: {flexDirection: 'column',
-    gap: 20,
-    marginBottom: 30,
+  btn: {
+    flexDirection: 'column',
+    gap: 20
   },
   subBtn: {
     marginTop: 0,

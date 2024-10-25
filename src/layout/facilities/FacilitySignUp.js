@@ -674,7 +674,7 @@ export default function FacilitySignUp({ navigation }) {
               </HButton>
             </View>
 
-            <Text style={{ textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100 }}
+            <Text style={{ textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 20 }}
               onPress={handleBack}
             >
               Back to 🏚️ Facilities Home
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
+    marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',

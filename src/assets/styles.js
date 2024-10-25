@@ -120,7 +120,8 @@ const constStyles = StyleSheet.create({
     signUpsmalltitle:{
         color: 'black', 
         paddingLeft: 5, 
-        fontSize: RFValue(13)
+        fontSize: RFValue(13),
+        marginTop: RFValue(2)
     },
 
     signUpbtnSheet: {
@@ -143,6 +144,19 @@ const constStyles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'black'
     },
+
+    profileChooseButton : {
+        fontWeight: '400', 
+        padding: 0, 
+        fontSize: RFValue(12), 
+        color: 'black',
+    },
+
+    profileChoosenText : {
+        color: '#0000ff', 
+        textDecorationLine: 'underline', 
+        fontSize: RFValue(12)
+    }
 })
 
 export default constStyles;

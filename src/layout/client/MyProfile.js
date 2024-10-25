@@ -11,7 +11,10 @@ import ImageButton from '../../components/ImageButton';
 import { useAtom } from 'jotai';
 import { firstNameAtom, emailAtom, userRoleAtom, entryDateAtom, phoneNumberAtom, addressAtom, photoImageAtom } from '../../context/ClinicalAuthProvider';
 import AnimatedHeader from '../AnimatedHeader';
-// import MapView from 'react-native-maps';
+import { RFValue } from "react-native-responsive-fontsize";
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default function MyProfile ({ navigation }) {
   //---------------------------------------Animation of Background---------------------------------------
@@ -53,11 +56,6 @@ export default function MyProfile ({ navigation }) {
     {title: 'email', content: email},
   ]
 
-  // const userInfo = [
-  //   {title: 'Entry Date', content: "17/11/2024"},
-  //   {title: 'Phone', content: '1231231234'},
-  //   {title: 'Email', content: "dalewong008@gmail.com"},
-  // ]
 
   const handleEdit = () => {
     console.log('handleEdit')
@@ -72,8 +70,7 @@ export default function MyProfile ({ navigation }) {
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
         <ScrollView style={{width: '100%', marginTop: 140}}
-          showsVerticalScrollIndicator={false}
-        >
+          showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <AnimatedHeader title="CAREGIVER PROFILE & DOCS" />
             <View style={styles.bottomBar}/>

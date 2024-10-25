@@ -14,6 +14,7 @@ import { addDegreeItem, addLocationItem, getDegreeList, getLocationList, PostJob
 import SubNavbar from '../../components/SubNavbar';
 import { companyNameAtom, facilityIdAtom } from '../../context/FacilityAuthProvider'
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AddJobShift({ navigation }) {
   const [facility, setFacility] = useAtom(companyNameAtom);
@@ -183,7 +184,7 @@ export default function AddJobShift({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.modal}>
-          <View style= {{width: '60%', marginLeft: '20%', marginTop: 20}}>
+          <View style= {{width: '100%',  marginTop: 20, paddingHorizontal: RFValue(20)}}>
             <Text style={styles.headBar}>
               Add A New Job / Shift
             </Text>
@@ -343,8 +344,8 @@ export default function AddJobShift({ navigation }) {
           <View style={styles.calendarContainer}>
             <View style={styles.header}>
               <Text style={styles.headerText}>Add a new option</Text>
-              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddDegreeModal}>
-                <Image source = {images.close} style={{width: 20, height: 20,}}/>
+              <TouchableOpacity style={{width: RFValue(20), height: RFValue(20), }} onPress={toggleAddDegreeModal}>
+                <Image source = {images.close} style={{width: RFValue(20), height: RFValue(20),}}/>
               </TouchableOpacity>
             </View>
             <View style={styles.body}>
@@ -356,7 +357,9 @@ export default function AddJobShift({ navigation }) {
                     onChangeText={e => setDegreeItem(e)}
                     value={degreeItem}
                   />
-                  <Button title="Submit" onPress={handleAddDegree} />
+                  <HButton style={[styles.subBtn, { width: 'auto', paddingHorizontal: 10, paddingVertical: 5, fontWeight: '100', fontSize: RFValue(14) }]} onPress={handleAddDegree}>
+                    Submit
+                  </HButton>
                 </View>
               </View>
             </View>
@@ -388,7 +391,9 @@ export default function AddJobShift({ navigation }) {
                     onChangeText={e => setLocationItem(e)}
                     value={locationItem}
                   />
-                  <Button title="Submit" onPress={handleAddLocation} />
+                  <HButton style={[styles.subBtn, { width: 'auto', paddingHorizontal: 10, paddingVertical: 5, fontWeight: '100', fontSize: RFValue(14) }]} onPress={handleAddLocation}>
+                    Submit
+                  </HButton>
                 </View>
               </View>
             </View>
@@ -433,15 +438,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 158,
+    marginTop: 160,
   },
   headBar: {
     textAlign: 'center',
     backgroundColor: '#BC222F',
     color: 'white',
-    paddingVertical: 10,
-    borderRadius: 10,
-    fontSize: 18,
+    paddingVertical: RFValue(10),
+    borderRadius: RFValue(10),
+    fontSize: RFValue(18),
     fontWeight: 'bold'
   },
   text: {
@@ -456,7 +461,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
+    marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',
@@ -469,8 +474,8 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
-    marginBottom: 10, 
+    height: RFValue(30), 
+    marginBottom: RFValue(10), 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
   },
@@ -501,11 +506,11 @@ const styles = StyleSheet.create({
     marginLeft: '25%',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: RFValue(10),
+    paddingBottom: RFValue(10),
     fontWeight: 'bold'
   },
   middleText: {
@@ -525,9 +530,9 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 130
   },
-  btn: {flexDirection: 'column',
+  btn: {
+    flexDirection: 'column',
     gap: 20,
-    marginBottom: 30,
   },
   subBtn: {
     marginTop: 0,
@@ -580,7 +585,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(16),
     fontWeight: 'bold',
     color: "black"
   },
@@ -629,14 +634,15 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,

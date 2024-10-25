@@ -9,6 +9,7 @@ import MHeader from '../../components/Mheader';
 import { emailAtom } from '../../context/ClinicalAuthProvider';
 import { verifyPhoneAtom } from '../../context/BackProvider';
 import { PhoneSms } from '../../utils/useApi';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 
 export default function ClientPhone ({ navigation }) {
@@ -108,7 +109,7 @@ export default function ClientPhone ({ navigation }) {
         >
           <View style={styles.authInfo}>
             <Text style={styles.subject}> 2FA Authentication </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}>Click the submit button below and we'll send a verification code to your registered phone number for login. </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', fontSize: RFValue(16)}]}>Click the submit button below and we'll send a verification code to your registered phone number for login. </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Phone Number </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
@@ -132,7 +133,7 @@ export default function ClientPhone ({ navigation }) {
                 Submit
               </HButton>
             </View>
-            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
+            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, fontSize: RFValue(16), textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
               Back to 🏚️ Caregiver Home
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,
@@ -182,8 +183,8 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     width: '90%',
     color: 'black',
-    marginTop: 30,
-    fontSize: 24,
+    marginTop: RFValue(30),
+    fontSize: RFValue(24),
     borderRadius: 5,
   },
   email: {
@@ -208,7 +209,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
 });
   
