@@ -11,6 +11,7 @@ import AHeader from '../../components/Aheader';
 import { getAllFacility, getFacilityInfo, updatePassword, updateUserInfo } from '../../utils/useApi';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AdminFacilities({ navigation }) {
   const [data, setData] = useState([]);
@@ -490,8 +491,10 @@ export default function AdminFacilities({ navigation }) {
         <View>
           <View style={styles.body}>
             <View style={styles.modalBody}>
-              <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                <Text style={styles.profileTitle}>🖥️ ALL PLATFORM FACILITIES</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30, width: '95%' }]}>
+                  <Text style={styles.profileTitle}>🖥️ ALL PLATFORM FACILITIES</Text>
+                </View>
               </View>
               <View style={styles.searchBar}>
                 <TextInput
@@ -556,7 +559,7 @@ export default function AdminFacilities({ navigation }) {
                   />
                 )}
               />
-              <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
+              <ScrollView horizontal={true} style={{ width: '100%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
                   <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
                     {tableHead.map((item, index) => (
@@ -653,7 +656,7 @@ export default function AdminFacilities({ navigation }) {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.body}>
-                  <View style={styles.modalBody}>
+                  <View style={[styles.modalBody, { marginTop: 0, marginBottom: 0 }]}>
                     <Text style={styles.subtitle}> Password <Text style={{color: 'red'}}>*</Text></Text>
                     <TextInput
                       autoCorrect={false}
@@ -765,7 +768,7 @@ export default function AdminFacilities({ navigation }) {
                 </View>
                 <View style={[styles.body, { marginBottom: 100, paddingHorizontal: 10 }]}>
                   <ScrollView>
-                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10, margin: 0 }]}>
+                    <View style={[styles.modalBody, { padding: 0, paddingVertical: 10, marginTop: 0 }]}>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Date Added</Text>
                         <Text style={styles.content}>{formatDate(facility?.entryDate)}</Text>
@@ -790,9 +793,9 @@ export default function AdminFacilities({ navigation }) {
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Contact Phone</Text>
                         <Text style={[styles.content, { color: 'blue' }]}>{facility?.contactPhone}</Text>
                       </View>
-                      <View style={{flexDirection: 'row', width: '100%'}}>
+                      <View style={{flexDirection: 'row', width: '95%', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ ALL FACILITY SHIFT LISTINGS</Text>
+                          <Text style={[styles.profileTitle, { fontSize: RFValue(12) }]}>🖥️ ALL FACILITY SHIFT LISTINGS</Text>
                         </View>
                       </View>
                       <View style={{maxHeight: 200, flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
@@ -824,7 +827,7 @@ export default function AdminFacilities({ navigation }) {
                 </View>
                 <View style={[styles.body, { marginBottom: 100 }]}>
                   <ScrollView>
-                    <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Where</Text>
+                    <Text style={{ fontSize: RFValue(15), marginBottom: 5, marginTop: 20 }}>Where</Text>
                     {filters.map((filter, index) => (
                       <View key={index} style={styles.filterRow}>
                         {index !== 0 && (
@@ -948,7 +951,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   content: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     lineHeight: 30,
     width: '60%'
   },
@@ -973,12 +976,12 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: RFValue(16),
     lineHeight: 30,
     width: '40%'
   },
   title: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'left',
@@ -992,7 +995,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'black',
     fontWeight: '300',
     textAlign: 'center',
@@ -1047,8 +1050,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'center',
-    width: '80%',
-    marginLeft: '10%',
     marginBottom: 20
   },
   profileTitle: {
@@ -1056,7 +1057,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   name: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     marginBottom: 10,
     fontStyle: 'italic',
     color: '#22138e',
@@ -1087,7 +1088,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
   },
   closeButton: {
@@ -1123,7 +1124,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-start',
     marginTop: 30,
-    paddingLeft: '5%'
   },
   searchBar: {
     flexDirection: 'row',
@@ -1216,18 +1216,19 @@ const styles = StyleSheet.create({
     top: 8,
     zIndex: 999,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: RFValue(14),
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,
@@ -1236,7 +1237,7 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     color: 'black',
     height: 40,
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   button: {
     backgroundColor: '#A020F0',
@@ -1246,7 +1247,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   input: {
     backgroundColor: 'white', 

@@ -56,7 +56,7 @@ export default function AdminForgotPwd ({ navigation }) {
           translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
+        <View style={{width: '100%', height: '60%', marginTop: 50, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
             <Text style={constStyles.loginMainTitle}> Forgot Password? </Text>
@@ -80,7 +80,7 @@ export default function AdminForgotPwd ({ navigation }) {
                 Submit
               </HButton>
             </View>
-            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
+            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 20, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
               Back to 🏚️ Caregiver Home
@@ -103,14 +103,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#cccccc'
   },
   text: {
-    fontSize: 20,
+    fontSize: RFValue(20),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 30,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     width: '90%',
     color: 'black',
     marginTop: 30,
-    fontSize: 24,
+    fontSize: RFValue(24),
     borderRadius: 5,
   },
   email: {
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
 });
   

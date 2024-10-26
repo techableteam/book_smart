@@ -11,6 +11,7 @@ import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { PostJob, getDegreeList, addDegreeItem, Clinician, getLocationList } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AdminJobShift({ navigation }) {
   const [facility, setFacility] = useState([]);
@@ -204,7 +205,7 @@ export default function AdminJobShift({ navigation }) {
       <SubNavbar navigation={navigation} name={"FacilityLogin"} />
       <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
-          <View style= {{width: '60%', marginLeft: '20%', marginTop: 20}}>
+          <View style= {{width: '80%', marginLeft: '10%', marginTop: 20}}>
             <Text style={styles.headBar}>Add A New Job / Shift</Text>
           </View>
           <View style={styles.authInfo}>
@@ -404,7 +405,9 @@ export default function AdminJobShift({ navigation }) {
                     onChangeText={e => setDegreeItem(e)}
                     value={degreeItem}
                   />
-                  <Button title="Submit" onPress={() => handleAddDegree(degreeItem) } />
+                  <HButton style={[styles.subBtn, { width: 'auto', paddingVertical: 5 }]} onPress={() => handleAddDegree(degreeItem)}>
+                    Submit
+                  </HButton>
                 </View>
               </View>
             </View>
@@ -418,25 +421,19 @@ export default function AdminJobShift({ navigation }) {
 
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
-    fontSize: 16,
-    // paddingVertical: 4,
-    // paddingHorizontal: 10,
+    fontSize: RFValue(16),
     borderRadius: 4,
     color: 'black',
-    // paddingRight: 30,
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: 'hsl(0, 0%, 86%)',
     margin: 0,
   },
   inputAndroid: {
-    fontSize: 8,
-    // paddingHorizontal: 10,
-    // paddingVertical: 0,
+    fontSize: RFValue(8),
     margin: 0,
     borderRadius: 10,
     color: 'black',
-    // paddingRight: 30,
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: 'hsl(0, 0%, 86%)',
@@ -457,11 +454,11 @@ const styles = StyleSheet.create({
     color: 'white',
     paddingVertical: 10,
     borderRadius: 10,
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold'
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'hsl(0, 0%, 29%)',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -472,7 +469,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
+    marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',
@@ -500,7 +497,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 30,
     marginLeft: '10%',
-    fontSize: 20,
+    fontSize: RFValue(20),
     borderRadius: 5,
   },
   mark: {
@@ -517,7 +514,7 @@ const styles = StyleSheet.create({
     marginLeft: '25%',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,
@@ -525,7 +522,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   middleText: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     margin: 0,
     lineHeight: 16,
     color: 'black'
@@ -541,23 +538,22 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 130
   },
-  btn: {flexDirection: 'column',
-    gap: 20,
-    marginBottom: 30,
+  btn: {
+    flexDirection: 'column',
+    gap: 20
   },
   subBtn: {
     marginTop: 0,
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   drinksButton: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     padding: 15,
     borderWidth: 3,
     borderColor: 'white',
-
   },
   checkbox: {
     width: 20,
@@ -596,7 +592,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
   },
   closeButton: {
@@ -640,18 +636,19 @@ const styles = StyleSheet.create({
     top: 8,
     zIndex: 999,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: RFValue(14),
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,
@@ -659,7 +656,7 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 30,
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   addItems: {
     flexDirection: 'row',
@@ -668,7 +665,7 @@ const styles = StyleSheet.create({
     gap: 10
   },
   middleText: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     margin: 0,
     lineHeight: 16,
     color: 'black'

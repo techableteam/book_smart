@@ -17,6 +17,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 import AnimatedHeader from '../AnimatedHeader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AllCaregivers({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -658,7 +659,7 @@ export default function AllCaregivers({ navigation }) {
     </View>
   );
 
-  const awardedTableHeaderWidth = [150, 150, 140, 150];
+  const awardedTableHeaderWidth = [150, 150, 250, 150];
   const awardedTableHeader = ['Job-ID', 'Entry Date', 'Facility', 'Job Status'];
   const RenderItem1 = ({ item, index }) => (
     <View
@@ -992,8 +993,10 @@ export default function AllCaregivers({ navigation }) {
         <View>
           <View style={styles.body}>
             <View style={styles.modalBody}>
-              <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                <Text style={styles.profileTitle}>ALL CAREGIVERS</Text>
+              <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
+                  <Text style={styles.profileTitle}>ALL CAREGIVERS</Text>
+                </View>
               </View>
               {/* <View style={styles.searchBar}>
                 <TextInput
@@ -1058,7 +1061,7 @@ export default function AllCaregivers({ navigation }) {
                   />
                 )}
               />
-              <ScrollView horizontal={true} style={{ width: '95%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
+              <ScrollView horizontal={true} style={{ width: '100%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
                   <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
                     {tableHead.map((item, index) => (
@@ -1299,9 +1302,9 @@ export default function AllCaregivers({ navigation }) {
                 <View style={styles.body}>
                   <ScrollView>
                     <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
-                      <View style={{flexDirection: 'row', width: '100%'}}>
-                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ CAREGIVER PROFILE</Text>
+                      <View style={{flexDirection: 'row',  width: '100%', justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={styles.profileTitleBg}>
+                          <Text style={[styles.profileTitle, { fontSize: RFValue(12) }]}>🖥️ CAREGIVER PROFILE</Text>
                         </View>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
@@ -1380,9 +1383,9 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>Bank Account Type</Text>
                         <Text style={styles.content}></Text>
                       </View>
-                      <View style={{flexDirection: 'row', width: '100%'}}>
+                      <View style={{flexDirection: 'row',  width: '100%', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ SHIFTS APPLIED FOR</Text>
+                          <Text style={[styles.profileTitle, { fontSize: RFValue(12) }]}>🖥️ SHIFTS APPLIED FOR</Text>
                         </View>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
@@ -1390,9 +1393,9 @@ export default function AllCaregivers({ navigation }) {
                           {appliedList.length > 0 ? <AppliedListTable /> : <Text>No applied items available</Text>}
                         </ScrollView>
                       </View>
-                      <View style={{flexDirection: 'row', width: '100%'}}>
+                      <View style={{flexDirection: 'row',  width: '100%', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ SHIFTS AWARDED</Text>
+                          <Text style={[styles.profileTitle, { fontSize: RFValue(12) }]}>🖥️ SHIFTS AWARDED</Text>
                         </View>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', paddingRight: '5%'}}>
@@ -1425,9 +1428,9 @@ export default function AllCaregivers({ navigation }) {
                 <View style={styles.body}>
                   <ScrollView>
                     <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
-                      <View style={{flexDirection: 'row', width: '100%'}}>
-                        <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ CAREGIVER PROFILE</Text>
+                      <View style={{flexDirection: 'row',  width: '100%', justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={styles.profileTitleBg}>
+                          <Text style={[styles.profileTitle, { fontSize: RFValue(12) }]}>🖥️ CAREGIVER PROFILE</Text>
                         </View>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
@@ -1469,14 +1472,14 @@ export default function AllCaregivers({ navigation }) {
 
                       <View style={[styles.line, { backgroundColor: '#8d8dff' }]}></View>
 
-                      <View style={{flexDirection: 'row', width: '100%'}}>
+                      <View style={{flexDirection: 'row',  width: '100%', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: 30 }]}>
-                          <Text style={[styles.profileTitle, { fontSize: 12 }]}>🖥️ CAREGIVER DOCUMENTS</Text>
+                          <Text style={[styles.profileTitle, { fontSize: RFValue(12) }]}>🖥️ CAREGIVER DOCUMENTS</Text>
                         </View>
                       </View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}} key={1}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Driver's License</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Driver's License</Text>
                         {credentials?.driverLicense.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('driverLicense'); }}>{credentials?.driverLicense.name}</Text>
@@ -1485,7 +1488,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('driverLicense')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1513,7 +1516,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Physical Exam</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Physical Exam</Text>
                         {credentials?.physicalExam.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('physicalExam'); }}>{credentials?.physicalExam.name}</Text>
@@ -1522,7 +1525,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('physicalExam')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1550,7 +1553,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Social Security Card</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Social Security Card</Text>
                         {credentials?.socialCard.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('socialCard'); }}>{credentials?.socialCard.name}</Text>
@@ -1559,7 +1562,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('socialCard')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1587,7 +1590,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>PPD (TB Test)</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>PPD (TB Test)</Text>
                         {credentials.ppd.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('ppd'); }}>{credentials.ppd.name}</Text>
@@ -1596,7 +1599,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('ppd')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1624,7 +1627,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>MMR (Immunizations)</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>MMR (Immunizations)</Text>
                         {credentials?.mmr.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('mmr') }}>{credentials?.mmr.name}</Text>
@@ -1633,7 +1636,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('mmr')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1661,7 +1664,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Hep B (shot or declination)</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Hep B (shot or declination)</Text>
                         {credentials?.hepB.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('hepB') }}>{credentials?.hepB.name}</Text>
@@ -1670,7 +1673,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('hepB')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1698,7 +1701,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Flu (shot or declination)</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Flu (shot or declination)</Text>
                         {credentials.flu.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('flu'); }}>{credentials.flu.name}</Text>
@@ -1707,7 +1710,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('flu')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1735,7 +1738,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CNA Certificate or LPN/RN License</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CNA Certificate or LPN/RN License</Text>
                         {credentials?.cna.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('cna'); }}>{credentials?.cna.name}</Text>
@@ -1744,7 +1747,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('cna')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1772,7 +1775,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>BLS (CPR card)</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>BLS (CPR card)</Text>
                         {credentials?.bls.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('bls'); }}>{credentials?.bls.name}</Text>
@@ -1781,7 +1784,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('bls')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1809,7 +1812,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>COVID Card</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>COVID Card</Text>
                         {credentials?.covidCard.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('covidCard'); }}>{credentials?.covidCard.name}</Text>
@@ -1818,7 +1821,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('covidCard')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1846,7 +1849,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Resume</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Resume</Text>
                         {credentials?.resume.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('resume'); }}>{credentials?.resume.name}</Text>
@@ -1855,7 +1858,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('resume')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1883,7 +1886,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Tax Form</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Tax Form</Text>
                         {credentials.taxForm.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('taxForm'); }}>{credentials.taxForm.name}</Text>
@@ -1892,7 +1895,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('taxForm')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1920,7 +1923,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Healthcare License</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Healthcare License</Text>
                         {credentials?.healthcareLicense.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('healthcareLicense'); }}>{credentials?.healthcareLicense.name}</Text>
@@ -1929,7 +1932,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('healthcareLicense')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1957,7 +1960,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 102 Form</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 102 Form</Text>
                         {credentials?.chrc102.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('chrc102'); }}>{credentials?.chrc102.name}</Text>
@@ -1966,7 +1969,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('chrc102')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -1994,7 +1997,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 103 Form</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 103 Form</Text>
                         {credentials?.chrc103.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('chrc103'); }}>{credentials?.chrc103.name}</Text>
@@ -2003,7 +2006,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('chrc103')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -2031,7 +2034,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Drug Test</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Drug Test</Text>
                         {credentials?.drug.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('drug'); }}>{credentials?.drug.name}</Text>
@@ -2040,7 +2043,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('drug')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -2069,7 +2072,7 @@ export default function AllCaregivers({ navigation }) {
 
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Standard State Criminal</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Standard State Criminal</Text>
                         {credentials?.ssc.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('ssc'); }}>{credentials?.ssc.name}</Text>
@@ -2078,7 +2081,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('ssc')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -2106,7 +2109,7 @@ export default function AllCaregivers({ navigation }) {
                       <View style={[styles.line, { backgroundColor: '#ccc' }]}></View>
 
                       <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Copy Of TB Test</Text>
+                        <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Copy Of TB Test</Text>
                         {credentials?.copyOfTB.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
                             <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('copyOfTB'); }}>{credentials?.copyOfTB.name}</Text>
@@ -2115,7 +2118,7 @@ export default function AllCaregivers({ navigation }) {
                         }
                         <View style={{flexDirection: 'row', width: '100%'}}>
                           <TouchableOpacity title="Select File" onPress={() => handleChangeFileType('copyOfTB')} style={styles.chooseFile}>
-                            <Text style={{fontWeight: '400', padding: 0, fontSize: 14}}>Choose File</Text>
+                            <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14)}}>Choose File</Text>
                           </TouchableOpacity>
                           <TextInput
                             style={[styles.input, {height: 30, width: '70%', color: 'black', paddingVertical: 5}]}
@@ -2280,7 +2283,7 @@ export default function AllCaregivers({ navigation }) {
             </View>
             <View style={[styles.body, { marginBottom: 100 }]}>
               <ScrollView>
-                <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Where</Text>
+                <Text style={{ fontSize: RFValue(15), marginBottom: 5, marginTop: 20 }}>Where</Text>
                 {filters.map((filter, index) => (
                   <View key={index} style={styles.filterRow}>
                     {index !== 0 && (
@@ -2435,18 +2438,18 @@ const styles = StyleSheet.create({
     top: 10
   },
   content: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     lineHeight: 30,
     width: '60%'
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: RFValue(16),
     lineHeight: 30,
     width: '35%'
   },
   title: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'left',
@@ -2460,7 +2463,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'black',
     fontWeight: '300',
     textAlign: 'center',
@@ -2495,7 +2498,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     width: '80%',
-    marginLeft: '10%',
     marginBottom: 20
   },
   profileTitle: {
@@ -2503,7 +2505,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   name: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     marginBottom: 10,
     fontStyle: 'italic',
     color: '#22138e',
@@ -2572,7 +2574,7 @@ const styles = StyleSheet.create({
     marginBottom: 5
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
   },
   closeButton: {
@@ -2712,18 +2714,19 @@ const styles = StyleSheet.create({
     top: 8,
     zIndex: 999,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: RFValue(14),
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,
@@ -2731,7 +2734,7 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   button: {
     backgroundColor: '#A020F0',
@@ -2742,7 +2745,7 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: 'center',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   input: {
     backgroundColor: 'white', 

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Image } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
@@ -11,6 +10,7 @@ import { Signup } from '../../utils/useApi';
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AddNewFacility({ navigation }) {
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
@@ -535,8 +535,7 @@ export default function AddNewFacility({ navigation }) {
                 <Text style={{
                   backgroundColor: 'yellow',
                   marginBottom: 10,
-                  // width: 140, 
-                  fontSize: 16,
+                  fontSize: RFValue(16),
                   fontWeight: 'bold',
                   color: 'black'
                 }}>
@@ -562,7 +561,7 @@ export default function AddNewFacility({ navigation }) {
                 onChangeText={e => handleCredentials('confirmPassword', e)}
                 value={credentials.confirmPassword || ''}
               />
-              <Text style={[styles.subtitle, { fontStyle: 'italic', fontSize: 14, color: 'red' }]}>Create your password to access the platform</Text>
+              <Text style={[styles.subtitle, { fontStyle: 'italic', fontSize: RFValue(14), color: 'red' }]}>Create your password to access the platform</Text>
             </View>
             {/* <View style={styles.password}>
               <View style={{ flexDirection: 'row' }}>
@@ -647,7 +646,7 @@ export default function AddNewFacility({ navigation }) {
               <Text style={styles.subtitle}> Logo / Pic</Text>
               <View style={{ flexDirection: 'row', width: '100%' }}>
                 <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
-                  <Text style={{ fontWeight: '400', padding: 0, fontSize: 14, color: 'black' }}>Choose File</Text>
+                  <Text style={{ fontWeight: '400', padding: 0, fontSize: RFValue(14), color: 'black' }}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, { width: '70%', color: 'black' }]}
@@ -666,7 +665,7 @@ export default function AddNewFacility({ navigation }) {
               </HButton>
             </View>
 
-            <Text style={{ textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100 }}
+            <Text style={{ textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 20 }}
               onPress={handleBack}
             >
               Back to 🏚️ All Facilities
@@ -769,7 +768,7 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   title: {
-    fontSize: 20,
+    fontSize: RFValue(20),
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -790,7 +789,7 @@ const styles = StyleSheet.create({
     marginTop: 17
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'hsl(0, 0%, 29%)',
     fontWeight: 'bold',
     textAlign: 'center',
@@ -801,7 +800,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    // marginBottom: 100,
+    marginBottom: 100,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',
@@ -834,7 +833,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 30,
     marginLeft: '10%',
-    fontSize: 18,
+    fontSize: RFValue(18),
     borderRadius: 5,
   },
   mark: {
@@ -851,7 +850,7 @@ const styles = StyleSheet.create({
     marginLeft: '25%',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,
@@ -859,7 +858,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   middleText: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     margin: 0,
     lineHeight: 16,
     color: 'black'
@@ -885,10 +884,10 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   drinksButton: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     padding: 15,
     borderWidth: 3,
     borderColor: 'white',
@@ -971,7 +970,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
     color: 'black'
   },

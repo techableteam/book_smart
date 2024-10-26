@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         top: 10
     },
     title: {
-        fontSize: 18,
+        fontSize: RFValue(18),
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'left',
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         borderColor: 'hsl(0, 0%, 86%)',
     },
     text: {
-        fontSize: 14,
+        fontSize: RFValue(14),
         color: 'black',
         fontWeight: '300',
         textAlign: 'center',
@@ -175,14 +175,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#eaeaea',
         width: 'auto',
         fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: RFValue(14),
         lineHeight: 20,
         marginTop: 5,
         marginRight: 10,
         padding: 5
     },
     content: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         lineHeight: 40,
     },
     profileTitleBg: {
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         height: 200
     },
     name: {
-        fontSize: 20,
+        fontSize: RFValue(20),
         marginVertical: 10,
     },
     edit: {

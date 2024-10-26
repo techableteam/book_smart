@@ -12,6 +12,7 @@ import DatePicker from 'react-native-date-picker';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import images from '../../assets/images';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function CaregiverTimeSheet({ navigation }) {
   const [data, setData] = useState([]);
@@ -42,7 +43,7 @@ export default function CaregiverTimeSheet({ navigation }) {
     'Lunch Equation',
     'Final Hours Equatioin'
   ];
-  const widths = [100, 150, 150, 180, 250, 100, 100, 150, 200];
+  const widths = [100, 150, 300, 250, 250, 100, 100, 150, 200];
   const logicItems = [
     {label: 'and', value: 'and'},
     {label: 'or', value: 'or'}
@@ -493,7 +494,7 @@ export default function CaregiverTimeSheet({ navigation }) {
               </View>
               <View style={styles.body}>
                 <ScrollView>
-                  <Text style={{ fontSize: 15, marginBottom: 5, marginTop: 20 }}>Where</Text>
+                  <Text style={{ fontSize: RFValue(15), marginBottom: 5, marginTop: 20 }}>Where</Text>
                   {filters.map((filter, index) => (
                     <View key={index} style={styles.filterRow}>
                       {index !== 0 && (
@@ -643,7 +644,7 @@ const styles = StyleSheet.create({
     top: 10
   },
   title: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'left',
@@ -657,7 +658,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'black',
     fontWeight: '300',
     textAlign: 'center',
@@ -704,7 +705,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   name: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     marginBottom: 10,
     fontStyle: 'italic',
     color: '#22138e',
@@ -735,7 +736,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
   },
   closeButton: {
@@ -875,18 +876,19 @@ const styles = StyleSheet.create({
     top: 8,
     zIndex: 999,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: RFValue(14),
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   itemTextStyle: {
-    color: 'black'
+    color: 'black',
+    fontSize: RFValue(16),
   },
   iconStyle: {
     width: 20,
@@ -894,7 +896,7 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   button: {
     backgroundColor: '#007BFF',
@@ -905,7 +907,7 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: 'center',
     color: 'white',            // Text color
-    fontSize: 16,              // Text size
+    fontSize: RFValue(16),              // Text size
   },
   input: {
     backgroundColor: 'white', 

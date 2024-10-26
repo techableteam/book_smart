@@ -3,6 +3,7 @@ import { View, StyleSheet, StatusBar } from 'react-native';
 import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 
 export default function AdminPending ({ navigation }) {
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#cccccc'
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,

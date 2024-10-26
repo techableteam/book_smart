@@ -10,6 +10,7 @@ import { useAtom } from 'jotai';
 import { emailAtom } from '../../context/AdminAuthProvider'
 import { getAdminInfo } from '../../utils/useApi';
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AdminCompany ({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
     top: 10
   },
   title: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'left',
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     borderColor: 'hsl(0, 0%, 86%)',
   },
   text: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     color: 'black',
     fontWeight: '300',
     textAlign: 'center',
@@ -197,12 +198,12 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: RFValue(16),
     lineHeight: 30,
     width: '40%'
   },
   content: {
-    fontSize: 14,
+    fontSize: RFValue(14),
     width: '60%',
     lineHeight: 40,
   },
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   profileTitle: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: 'bold',
     color: 'white',
   },
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
     height: 200
   },
   name: {
-    fontSize: 20,
+    fontSize: RFValue(20),
     marginVertical: 10,
   },
   edit: {

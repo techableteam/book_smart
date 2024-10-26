@@ -9,6 +9,7 @@ import { GetDashboardData } from '../../utils/useApi';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AdminDashboard ({ navigation }) {
   const [jobInfo, setJobInfo] = useState([
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
     top: 10
   },
   title: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'left',
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: RFValue(14),
     lineHeight: 30,
     textAlign: 'center',
     color: 'white',
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   content: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     lineHeight: 40,
   },
   profileTitleBg: {
@@ -258,14 +259,14 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   profileTitle: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: 'bold',
     color: 'white',
   },
   Italic: {
     fontStyle: 'italic',
     color: '#0000ff',
-    fontSize: 12,
+    fontSize: RFValue(12),
     marginBottom: 20, 
   },
   head: {

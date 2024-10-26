@@ -14,6 +14,7 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function AdminEditProfile({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -412,10 +413,10 @@ export default function AdminEditProfile({ navigation }) {
               
               <View style={{flexDirection: 'row', width: '100%'}}>
                 <TouchableOpacity title="Select File" onPress={toggleFileTypeSelectModal} style={styles.chooseFile}>
-                  <Text style={{fontWeight: '400', padding: 0, fontSize: 14, color:"black"}}>Choose File</Text>
+                  <Text style={{fontWeight: '400', padding: 0, fontSize: RFValue(14), color:"black"}}>Choose File</Text>
                 </TouchableOpacity>
                 <TextInput
-                  style={[styles.input, { width: '70%', color: 'black', height: 30 }]}
+                  style={[styles.input, { width: '65%', color: 'black', height: 30 }]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -685,7 +686,7 @@ const styles = StyleSheet.create({
     marginLeft: '25%',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     color: 'black',
     textAlign: 'left',
     paddingTop: 10,
@@ -693,7 +694,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   middleText: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     margin: 0,
     lineHeight: 16,
     color: 'black'
@@ -718,10 +719,10 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   drinksButton: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     padding: 15,
     borderWidth: 3,
     borderColor: 'white',
@@ -804,7 +805,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerText: {
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontWeight: 'bold',
     color: 'black'
   },
