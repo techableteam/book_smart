@@ -31,13 +31,13 @@ export default function HButton({
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: RFValue(18),
+    fontSize: RFValue(16),
     fontWeight: '800',
     color: 'white',
     textAlign: 'center',
     borderRadius: 10,
     backgroundColor: '#A020F0',
-    padding: RFValue(15),
+    padding: RFValue(12),
     marginTop: RFValue(10),
     width: width * 0.45,
   }

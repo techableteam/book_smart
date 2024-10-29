@@ -74,8 +74,8 @@ const constStyles = StyleSheet.create({
     },
 
     loginMainButton: {
-        fontSize: RFValue(13),
-        padding: RFValue(15),
+        fontSize: RFValue(12),
+        padding: RFValue(11),
         borderWidth: RFValue(3),
         borderColor: 'white',
         borderRadius: RFValue(10)
