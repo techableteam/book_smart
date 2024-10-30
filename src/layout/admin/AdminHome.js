@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -7,6 +7,8 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, userRoleAtom } from '../../context/AdminAuthProvider';
 import AHeader from '../../components/Aheader';
 import AnimatedHeader from '../AnimatedHeader';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AdminHome ({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -23,7 +25,7 @@ export default function AdminHome ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent"/>
         <AHeader currentPage={3} navigation={navigation} style={{zIndex: 10}}/>
         <SubNavbar navigation={navigation} name={"AdminLogin"} style={{zIndex: 0}}/>
-        <ScrollView style={{width: '100%', marginTop: 160}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
