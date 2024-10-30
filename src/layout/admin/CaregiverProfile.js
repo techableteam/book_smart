@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, StatusBar, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
@@ -7,6 +7,8 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { getClientInfoWithJobId } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function CaregiverProfile({ navigation, route }) {
     const { id } = route.params;
@@ -34,7 +36,7 @@ export default function CaregiverProfile({ navigation, route }) {
             <StatusBar translucent backgroundColor="transparent" />
             <MHeader navigation={navigation} />
             <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-            <ScrollView style={{ width: '100%', marginTop: 160 }} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{ width: '100%', marginTop: height * 0.25 }} showsVerticalScrollIndicator={false} >
 
                 <View style = {{ flex:1, justifyContent:'center', alignItems: 'center', width: '100%' }}>
 

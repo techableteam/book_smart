@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#777777'
   },
   scroll: {
-    marginTop: height * 0.157,
+    marginTop: height * 0.15,
   },
   modal: {
     width: '90%',

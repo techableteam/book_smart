@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, TextInput, View, StyleSheet, Image, ScrollView, Button, StatusBar, Modal } from 'react-native';
+import { TouchableOpacity, TextInput, View, StyleSheet, Image, ScrollView, Dimensions, StatusBar, Modal } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
@@ -8,11 +8,12 @@ import { Table } from 'react-native-table-component';
 import { Clinician, getCaregiverTimesheets } from '../../utils/useApi';
 import { Dropdown } from 'react-native-element-dropdown';
 import AHeader from '../../components/Aheader';
-import DatePicker from 'react-native-date-picker';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import images from '../../assets/images';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function CaregiverTimeSheet({ navigation }) {
   const [data, setData] = useState([]);
@@ -370,7 +371,7 @@ export default function CaregiverTimeSheet({ navigation }) {
       <StatusBar translucent backgroundColor="transparent"/>
       <AHeader navigation={navigation}  currentPage={7} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 160 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }} showsVerticalScrollIndicator={false}>
         <View style={styles.topView}>
           <AnimatedHeader title="Jobs" />
           <View style={styles.bottomBar} />
@@ -617,7 +618,6 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'

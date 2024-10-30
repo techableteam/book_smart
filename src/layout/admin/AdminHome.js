@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, ScrollView, StatusBar } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
@@ -20,12 +20,10 @@ export default function AdminHome ({ navigation }) {
 
   return (
       <View style={styles.container}>
-        <StatusBar 
-            translucent backgroundColor="transparent"
-        />
+        <StatusBar translucent backgroundColor="transparent"/>
         <AHeader currentPage={3} navigation={navigation} style={{zIndex: 10}}/>
         <SubNavbar navigation={navigation} name={"AdminLogin"} style={{zIndex: 0}}/>
-        <ScrollView style={{width: '100%', marginTop: 155}}
+        <ScrollView style={{width: '100%', marginTop: 160}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>

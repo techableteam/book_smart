@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
+import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Dimensions } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import images from '../../assets/images';
 import { TextInput } from 'react-native-paper';
@@ -15,6 +15,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AdminEditProfile({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -573,7 +575,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 166,
+    marginTop: height * 0.25,
   },
   backTitle: {
     backgroundColor: 'black',

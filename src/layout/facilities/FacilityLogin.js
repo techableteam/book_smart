@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   scroll: {
-    marginTop: height * 0.157,
+    marginTop: height * 0.15,
   },
   modal: {
     width: '90%',

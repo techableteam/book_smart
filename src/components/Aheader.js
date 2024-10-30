@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, StatusBar, Text, TouchableOpacity, Modal,TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, StatusBar, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom,  } from '../context/AdminAuthProvider';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AHeader({currentPage, navigation}) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -19,7 +21,7 @@ export default function AHeader({currentPage, navigation}) {
 
   return (
     <Card style={styles.shadow}>
-      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: height * 0.143,}}>
         <TouchableOpacity style={{width: 40, height: 70, flexDirection: 'column', justifyContent:'space-between', paddingTop: 50, paddingLeft: 20, zIndex: 0}} onPress={toggleModal}>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
@@ -69,6 +71,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     backgroundColor: '#13032f',
     width: '100%',
+    minHeight: height * 0.15,
     top: 0,
     position:'absolute',
   },
@@ -91,7 +94,7 @@ const styles = StyleSheet.create({
   },
   bottomStyle: {
     width: '100%',
-    height: 5,
+    height: height * 0.007,
     backgroundColor: "#BC222F"
   },
   modalContainer: {

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Image } from 'react-native';
+import { Alert, Animated, Easing, StyleSheet, View, Text, Dimensions, ScrollView, TouchableOpacity, Modal, StatusBar, Image } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
@@ -11,6 +11,8 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AddNewFacility({ navigation }) {
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
@@ -756,7 +758,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(155, 155, 155, 0.61))'
   },
   scroll: {
-    marginTop: 97,
+    marginTop: height * 0.15,
   },
   backTitle: {
     backgroundColor: 'black',

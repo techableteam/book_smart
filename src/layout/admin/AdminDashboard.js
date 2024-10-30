@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
 import AHeader from '../../components/Aheader';
@@ -10,6 +10,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AdminDashboard ({ navigation }) {
   const [jobInfo, setJobInfo] = useState([
@@ -131,7 +133,7 @@ export default function AdminDashboard ({ navigation }) {
         />
         <AHeader navigation={navigation} currentPage={0} />
         <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-        <ScrollView style={{width: '100%', marginTop: 155}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>

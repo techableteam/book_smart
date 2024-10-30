@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
@@ -11,6 +11,8 @@ import { emailAtom } from '../../context/AdminAuthProvider'
 import { getAdminInfo } from '../../utils/useApi';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AdminCompany ({ navigation }) {
   const [firstName, setFirstName] = useState('');
@@ -64,7 +66,7 @@ export default function AdminCompany ({ navigation }) {
         />
         <AHeader navigation={navigation}  currentPage={2} />
         <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-        <ScrollView style={{width: '100%', marginTop: 155}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -125,7 +127,6 @@ const styles = StyleSheet.create({
     height: 68,
   },
   topView: {
-    marginTop: 50,
     marginLeft: '10%',
     width: '80%',
     flexDirection: 'column',

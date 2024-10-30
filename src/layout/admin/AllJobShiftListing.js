@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TextInput, View, Image, TouchableWithoutFeedback, StyleSheet, ScrollView, StatusBar, Alert, TouchableOpacity } from 'react-native';
+import { Modal, TextInput, View, Image, TouchableWithoutFeedback, StyleSheet, Dimensions, ScrollView, StatusBar, Alert, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -20,6 +20,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AllJobShiftListing({ navigation }) {
   const [data, setData] = useState([]);
@@ -1287,7 +1289,7 @@ export default function AllJobShiftListing({ navigation }) {
       />
       <AHeader navigation={navigation}  currentPage={1} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 160 }}
+      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
@@ -2575,7 +2577,6 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   topView: {
-    marginTop: 30,
     marginLeft: '10%',
     width: '80%',
   },

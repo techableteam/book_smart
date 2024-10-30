@@ -10,7 +10,7 @@ const constStyles = StyleSheet.create({
         color: 'black',
         fontWeight: 'bold',
         textAlign: 'center',
-        marginTop: 10,
+        marginTop: 10
     },
 
     loginMainTitle1: {
@@ -43,6 +43,7 @@ const constStyles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'left',
         marginTop: RFValue(10),
+        paddingHorizontal: 15
     },
 
     loginTextInput : {
@@ -75,7 +76,7 @@ const constStyles = StyleSheet.create({
 
     loginMainButton: {
         fontSize: RFValue(12),
-        padding: RFValue(11),
+        padding: RFValue(10),
         borderWidth: RFValue(3),
         borderColor: 'white',
         borderRadius: RFValue(10)

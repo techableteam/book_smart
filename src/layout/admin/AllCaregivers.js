@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Alert, Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Alert, Modal, TextInput, View, Image, StyleSheet, Dimensions, ScrollView, StatusBar, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Text } from 'react-native-paper';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
-import { useFocusEffect } from '@react-navigation/native';
 import { Table } from 'react-native-table-component';
 import RadioGroup from 'react-native-radio-buttons-group';
 import { Update, updatePassword, getUserProfile, getUserInfo, updateUserStatus, allCaregivers, getDegreeList } from '../../utils/useApi';
@@ -18,6 +17,8 @@ import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 import AnimatedHeader from '../AnimatedHeader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AllCaregivers({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -960,7 +961,7 @@ export default function AllCaregivers({ navigation }) {
       />
       <AHeader navigation={navigation}  currentPage={4} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 155 }}
+      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
@@ -2409,7 +2410,6 @@ const styles = StyleSheet.create({
     marginBottom: 30
   },
   topView: {
-    marginTop: 30,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'

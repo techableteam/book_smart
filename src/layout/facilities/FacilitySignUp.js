@@ -760,7 +760,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(155, 155, 155, 0.61))'
   },
   scroll: {
-    marginTop: height * 0.157,
+    marginTop: height * 0.15,
   },
   backTitle: {
     backgroundColor: 'black',

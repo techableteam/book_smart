@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableWithoutFeedback, Alert, Modal, View, TextInput, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { TouchableWithoutFeedback, Alert, Modal, View, Dimensions, TextInput, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
@@ -12,6 +12,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AdminAllUser({ navigation }) {
   const [data, setData] = useState([]);
@@ -355,7 +357,7 @@ export default function AdminAllUser({ navigation }) {
       <AHeader navigation={navigation}  currentPage={5} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView
-        style={{ width: '100%', marginTop: 160 }}
+        style={{ width: '100%', marginTop: height * 0.25 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
@@ -721,7 +723,6 @@ const styles = StyleSheet.create({
     marginBottom: 30
   },
   topView: {
-    marginTop: 30,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'

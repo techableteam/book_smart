@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
+import { Alert, StyleSheet, View, Image, Button, Text, Dimensions, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
@@ -12,6 +12,8 @@ import MFooter from '../../components/Mfooter';
 import { PostJob, getDegreeList, addDegreeItem, Clinician, getLocationList } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AdminJobShift({ navigation }) {
   const [facility, setFacility] = useState([]);
@@ -446,7 +448,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 158,
+    marginTop: height * 0.25
   },
   headBar: {
     textAlign: 'center',

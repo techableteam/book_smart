@@ -8,7 +8,9 @@ const { width, height } = Dimensions.get('window');
 export default function MHeader({props, navigation}) {
   return (
     <Card style={styles.shadow}>
-      <Text style={styles.text}>BookSmart™</Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.text}>BookSmart™</Text>
+      </View>
       <View style={styles.bottomStyle}></View>
     </Card>
   );
@@ -23,17 +25,17 @@ const styles = StyleSheet.create({
     top: 0,
     position:'absolute',
   },
-  text: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+  textContainer: {
     width: '100%',
-    paddingTop: 70,
+    display: 'flex',
     minHeight: height * 0.143,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 30
+  },
+  text: {
     color: 'white',
-    fontSize: RFValue(25),
-    textAlign: 'center',
+    fontSize: RFValue(25)
   },
   bottomStyle: {
     width: '100%',

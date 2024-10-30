@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
+import { StyleSheet, PixelRatio, View, Alert, Text, ScrollView, TouchableOpacity, Pressable, Image, StatusBar } from 'react-native';
 import images from '../../assets/images';
 import { TextInput } from 'react-native-paper';
 import { useAtom } from 'jotai';
@@ -27,6 +27,7 @@ import { Dimensions } from 'react-native';
 import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get('window');
+const pixelRatio = PixelRatio.getFontScale();
 
 export default function ClientSignIn({ navigation }) {
   const [aic, setAIC] = useAtom(aicAtom);
@@ -294,12 +295,12 @@ export default function ClientSignIn({ navigation }) {
         <View style={styles.buttonWrapper}>
           <HButton
             onPress={() => navigation.navigate('AdminLogin')}
-            style={constStyles.loginMainButton}>
+            style={[constStyles.loginMainButton, { fontSize:  pixelRatio > 1.5 ? RFValue(10) : RFValue(12) }]}>
             Admin Login
           </HButton>
           <HButton
             onPress={() => navigation.navigate('FacilityLogin')}
-            style={[constStyles.loginMainButton]}>
+            style={[constStyles.loginMainButton, { fontSize:  pixelRatio > 1.5 ? RFValue(10) : RFValue(12) }]}>
             Facilities Home
           </HButton>
         </View>
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   scroll: {
-    marginTop: height * 0.157,
+    marginTop: height * 0.15,
   },
   modal: {
     width: '90%',

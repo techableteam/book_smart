@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonWrapper: {
     flexDirection: 'row',
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   button: {
+    fontSize: RFValue(14),
     marginHorizontal: 5, // Replace gap with marginHorizontal
   },
 });

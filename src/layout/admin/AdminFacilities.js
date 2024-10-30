@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableWithoutFeedback, Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { TouchableWithoutFeedback, Modal, TextInput, View, Image, Dimensions, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -12,6 +12,8 @@ import { getAllFacility, getFacilityInfo, updatePassword, updateUserInfo } from 
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AdminFacilities({ navigation }) {
   const [data, setData] = useState([]);
@@ -458,7 +460,7 @@ export default function AdminFacilities({ navigation }) {
       <StatusBar translucent backgroundColor="transparent"/>
       <AHeader navigation={navigation}  currentPage={6} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: 155 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }} showsVerticalScrollIndicator={false}>
         <View style={styles.topView}>
           <AnimatedHeader title="ALL PLATFORM FACILITIES" />
           <View style={styles.bottomBar} />
@@ -956,7 +958,6 @@ const styles = StyleSheet.create({
     width: '60%'
   },
   topView: {
-    marginTop: 30,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'

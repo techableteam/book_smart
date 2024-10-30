@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     position:'absolute',
     width: '100%',
     paddingVertical: RFValue(10),
-    height: height * 0.11
+    height: height * 0.10
   },
   text: {
     paddingHorizontal: RFValue(10),

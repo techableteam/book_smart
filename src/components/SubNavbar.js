@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, PixelRatio } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useAtom } from 'jotai';
 import { firstNameAtom as clinicalFirstNameAtom } from '../context/ClinicalAuthProvider';
@@ -9,6 +9,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { Dimensions } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
+const pixelRatio = PixelRatio.getFontScale();
 
 export default function SubNavbar({name, navigation}) {
   let userRole = 'clinical';
@@ -24,14 +25,14 @@ export default function SubNavbar({name, navigation}) {
   return (
     <Card style={styles.shadow}>
       <View>
-        <Text style={{color: "black", fontSize: RFValue(14)}}>
+        <Text style={{color: "black", fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)}}>
           Logged in as&nbsp;
-          <Text style={{fontWeight: 'bold', color:"black", fontSize: RFValue(14)}}>{firstName}</Text>&nbsp;-&nbsp;
+          <Text style={{fontWeight: 'bold', color:"black", fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)}}>{firstName}</Text>&nbsp;-&nbsp;
           <Text 
             style={{
               color: '#2a53c1', 
               textDecorationLine: 'underline',
-              fontSize: RFValue(14)
+              fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)
             }}
             onPress={()=>handleNavigate('AccountSettings')}
           >
@@ -44,7 +45,7 @@ export default function SubNavbar({name, navigation}) {
             style={{
               color: '#2a53c1', 
               textDecorationLine: 'underline',
-              fontSize: RFValue(14)
+              fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)
             }}
             onPress={()=>handleNavigate(name)}>
             Log Out
