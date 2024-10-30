@@ -299,7 +299,7 @@ export default function ClientSignIn({ navigation }) {
           </HButton>
           <HButton
             onPress={() => navigation.navigate('FacilityLogin')}
-            style={constStyles.loginMainButton}>
+            style={[constStyles.loginMainButton, {fontSize: RFValue(14), padding: RFValue(15),}]}>
             Facilities Home
           </HButton>
         </View>

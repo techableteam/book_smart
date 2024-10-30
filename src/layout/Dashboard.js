@@ -30,6 +30,7 @@ export default function Dashboard ({ navigation }) {
       <Image
         source={images.homepage}
         style={styles.homepage}
+        resizeMode="contain"
       />
       <Text style={styles.text}>Are you looking to work or to hire?</Text>
       <View style={styles.buttonWrapper}>
@@ -58,22 +59,22 @@ const styles = StyleSheet.create({
     position: 'relative'
   },
   homepage: {
-    width: width * 0.7,
-    height: height * 0.3,
+    width: width * 0.65,
+    height: height * 0.25,
     marginTop: 30,
     resizeMode: 'cover'
   },
   text: {
-    fontSize: RFValue(18),
+    fontSize: RFValue(17),
     color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 30,
+    marginTop: 20,
   },
   buttonWrapper: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 15,
   },
   button: {
     marginHorizontal: 5, // Replace gap with marginHorizontal
