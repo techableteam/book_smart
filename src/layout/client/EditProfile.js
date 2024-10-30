@@ -27,7 +27,6 @@ export default function EditProfile({ navigation }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [userRole, setUserRole] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [address, setAddress] = useState('');
   const [photoImage, setPhotoImage] = useState('');
@@ -980,7 +979,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: height * 0.26,
+    marginTop: height * 0.25,
   },
   backTitle: {
     backgroundColor: 'black',

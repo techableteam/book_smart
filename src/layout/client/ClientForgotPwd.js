@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, View, TextInput, StyleSheet, StatusBar } from 'react-native';
+import { Alert, View, TextInput, StyleSheet, StatusBar, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
@@ -10,6 +10,7 @@ import { ForgotPassword } from '../../utils/useApi';
 import constStyles from '../../assets/styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 
+const { width, height } = Dimensions.get('window');
 
 export default function ClientForgotPwd ({ navigation }) {
   const [email, setEmail] = useAtom(emailAtom);
@@ -58,7 +59,7 @@ export default function ClientForgotPwd ({ navigation }) {
           translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
+        <View style={{width: '100%', height: '60%', marginTop: height * 0.17, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
             <Text style={constStyles.loginMainTitle}> Forgot Password? </Text>

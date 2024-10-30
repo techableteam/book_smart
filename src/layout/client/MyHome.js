@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
-import { Text, PaperProvider, DataTable } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import images from '../../assets/images';
-import  { useNavigation, useRoute } from '@react-navigation/native';
-import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -22,22 +20,22 @@ export default function MyHome ({ navigation }) {
   const [userRole, setUserRole] = useAtom(userRoleAtom);
   const [caregiver, setCaregiver] = useAtom(caregiverAtom);
   const handleNavigate = (navigateUrl) => {
-      navigation.navigate(navigateUrl);
-  }
+    navigation.navigate(navigateUrl);
+  };
 
   const userInfo = [
     {title: 'Name', content: firstName + ' ' + lastName},
     {title: 'Email', content: email},
     {title: 'User Roles', content: userRole},
     {title: 'Caregiver', content: caregiver},
-  ]
+  ];
 
   return (
       <View style={styles.container}>
         <StatusBar translucent backgroundColor="transparent"/>
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.257}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <Image

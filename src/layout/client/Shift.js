@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, TextInput, View, Image, Platform, Alert, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
@@ -18,7 +18,6 @@ import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 import AnimatedHeader from '../AnimatedHeader';
 import { Dimensions } from 'react-native';
-import constStyles from '../../assets/styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 const { width, height } = Dimensions.get('window');
@@ -560,7 +559,7 @@ export default function Shift ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent" />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: 160}} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <AnimatedHeader title="AWARDED & COMPLETED SHIFTS" />
             <View style={styles.bottomBar}/>

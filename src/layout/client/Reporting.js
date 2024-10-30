@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
+import { FlatList, Modal, TextInput, View, Image, Dimensions, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
@@ -12,6 +12,8 @@ import moment from 'moment';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function Reporting ({ navigation }) {
   const [data, setData] = useState({reportData: [],dailyPay: 0, weeklyPay: 0});
@@ -162,7 +164,7 @@ export default function Reporting ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent" />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: 160}} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <AnimatedHeader title="CAREGIVER REPORTING" />
             <View style={styles.bottomBar}/>

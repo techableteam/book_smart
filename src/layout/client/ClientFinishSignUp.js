@@ -16,7 +16,7 @@ export default function ClientFinishSignup ({ navigation }) {
           translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <View style={{width: '100%', height: '60%', marginTop: 99, justifyContent:'center', alignItems: 'center', display: 'flex'}}
+        <View style={{width: '100%', height: '60%', marginTop: 120, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
             <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', flexWrap: 'wrap', fontSize: RFValue(18)}]}> Your registration is complete! Click the back link to log in.</Text>

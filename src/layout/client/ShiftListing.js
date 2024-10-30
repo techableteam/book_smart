@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Modal, TextInput, View, Image, StyleSheet, Dimensions, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton'
@@ -16,6 +16,7 @@ import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
 
+const { width, height } = Dimensions.get('window');
 const itemsPerPage = 100;
 
 export default function ShiftListing ({ navigation }) {
@@ -242,7 +243,7 @@ export default function ShiftListing ({ navigation }) {
         />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-        <ScrollView style={{width: '100%', marginTop: 160}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>

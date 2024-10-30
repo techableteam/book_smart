@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Dimensions, Image, Alert } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -10,6 +10,8 @@ import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import { Update } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function ClientPermission ({ navigation }) {
     const items = [
@@ -107,7 +109,7 @@ export default function ClientPermission ({ navigation }) {
             <StatusBar translucent backgroundColor="transparent"/>
             <MHeader navigation={navigation} />
             <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-            <ScrollView style={{width: '100%', marginTop: 160}} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false} >
                 <Hyperlink linkDefault={true}>
                     <View style={styles.permission}>
                         <View style={styles.titleBar}>
@@ -296,15 +298,15 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(12),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(12),
   },
   itemTextStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(12),
   },
   iconStyle: {
     width: 20,
@@ -312,7 +314,7 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16,
+    fontSize: RFValue(12),
   },
   title: {
     fontSize: RFValue(16),

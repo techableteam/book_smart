@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { Alert, View, TextInput, StyleSheet, StatusBar } from 'react-native';
+import { Alert, View, TextInput, StyleSheet, StatusBar, ScrollView, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
@@ -11,6 +11,7 @@ import { verifyPhoneAtom } from '../../context/BackProvider';
 import { PhoneSms } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
 
+const { width, height } = Dimensions.get('window');
 
 export default function ClientPhone ({ navigation }) {
   const [verifyPhone, setVerifyPhone] = useAtom(verifyPhoneAtom);
@@ -105,8 +106,7 @@ export default function ClientPhone ({ navigation }) {
           translucent backgroundColor="transparent"
         />
         <MHeader navigation={navigation} />
-        <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
-        >
+        <ScrollView style={{width: '100%', height: '60%', marginTop: height * 0.15}}>
           <View style={styles.authInfo}>
             <Text style={styles.subject}> 2FA Authentication </Text>
             <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', fontSize: RFValue(16)}]}>Click the submit button below and we'll send a verification code to your registered phone number for login. </Text>
@@ -139,7 +139,7 @@ export default function ClientPhone ({ navigation }) {
               Back to 🏚️ Caregiver Home
             </Text>
           </View>
-        </View>
+        </ScrollView>
         <MFooter />
       </View>
   )
@@ -172,11 +172,12 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
+    height: 40,
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
-    paddingVertical: 5
+    paddingVertical: 5,
+    fontSize: RFValue(11)
   },
   subject: {
     borderRadius: 2,
@@ -195,9 +196,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     width: '90%',
+    marginLeft: '5%',
     borderRadius: 20,
     backgroundColor: '#F2F2F2',
-    marginTop: 140
+    marginTop: 50,
+    marginBottom: 150
   },
   btn: {flexDirection: 'column',
     gap: 20,
