@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
+import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Dimensions } from 'react-native';
 import React, { useState } from 'react';
 import images from '../../assets/images';
 import { TextInput } from 'react-native-paper';
@@ -15,6 +15,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function FacilityEditProfile({ navigation }) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
@@ -305,14 +307,10 @@ export default function FacilityEditProfile({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation}/>
       <MSubNavbar navigation={navigation} name={"Facilities"} />
-      <ScrollView style = {styles.scroll}    
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.authInfo}>
             <View>
@@ -539,7 +537,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 165,
+    marginTop: height * 0.25,
   },
   backTitle: {
     backgroundColor: 'black',
@@ -608,7 +606,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    marginBottom: 100,
+    marginBottom: 150,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',

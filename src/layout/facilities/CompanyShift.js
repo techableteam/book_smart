@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Modal, TextInput, View, Image, StyleSheet, ScrollView, StatusBar, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import StarRating, { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -19,8 +19,9 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs'
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
-import { RFC_2822 } from 'moment';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function CompanyShift({ navigation }) {
   const [totalPages, setTotalPages] = useState(1);
@@ -1008,19 +1009,14 @@ export default function CompanyShift({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation} />
       <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-      <ScrollView style={{ width: '100%', marginTop: 160 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }}>
         <View style={styles.topView}>
           <AnimatedHeader title="COMPANY JOBS / SHIFTS" />
           <View style={styles.bottomBar} />
         </View>
-        
         <View style={{ marginTop: RFValue(30), flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10, flexWrap: 'wrap' }}>
           <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => navigation.navigate('AddJobShift')}>
             <View style={{ backgroundColor: 'white', borderRadius: RFValue(10), width: RFValue(16), height: RFValue(16), justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
@@ -2119,7 +2115,7 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(12),
   },
   webView: {
     flex: 1,
@@ -2135,11 +2131,15 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(12),
   },
   itemTextStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(12),
+  },
+  inputSearchStyle: {
+    color: 'black',
+    fontSize: RFValue(12),
   },
   searchBar: {
     flexDirection: 'row',

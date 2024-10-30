@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Modal, StatusBar } from 'react-native';
+import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Dimensions, Modal, StatusBar } from 'react-native';
 import React, { useState } from 'react';
 import DatePicker from 'react-native-date-picker';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -15,6 +15,8 @@ import SubNavbar from '../../components/SubNavbar';
 import { companyNameAtom, facilityIdAtom } from '../../context/FacilityAuthProvider'
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function AddJobShift({ navigation }) {
   const [facility, setFacility] = useAtom(companyNameAtom);
@@ -175,14 +177,10 @@ export default function AddJobShift({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar 
-        translucent backgroundColor="transparent"
-      />
+      <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation}/>
       <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-      <ScrollView style = {styles.scroll}    
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style= {{width: '100%',  marginTop: 20, paddingHorizontal: RFValue(20)}}>
             <Text style={styles.headBar}>
@@ -438,7 +436,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: 160,
+    marginTop: height * 0.25,
   },
   headBar: {
     textAlign: 'center',
@@ -461,7 +459,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    marginBottom: 100,
+    marginBottom: 150,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',

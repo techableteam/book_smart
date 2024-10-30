@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     margin: '5%',
-    marginBottom: 100,
+    marginBottom: 150,
     borderWidth: 1,
     borderColor: 'grey',
     overflow: 'hidden',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, View, TextInput, StyleSheet, StatusBar } from 'react-native';
+import { Alert, View, TextInput, StyleSheet, StatusBar, Dimensions, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import HButton from '../../components/Hbutton'
 import MFooter from '../../components/Mfooter';
@@ -9,6 +9,8 @@ import { contactEmailAtom } from '../../context/FacilityAuthProvider';
 import { ForgotPassword } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
 import constStyles from '../../assets/styles';
+
+const { width, height } = Dimensions.get('window');
 
 export default function FacilityForgotPwd ({ navigation }) {
   const [email, setEmail] = useAtom(contactEmailAtom);
@@ -53,14 +55,11 @@ export default function FacilityForgotPwd ({ navigation }) {
 
   return (
       <View style={styles.container}>
-        <StatusBar 
-          translucent backgroundColor="transparent"
-        />
+        <StatusBar translucent backgroundColor="transparent"/>
         <MHeader navigation={navigation} />
-        <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
-        >
+        <ScrollView style={{width: '100%', height: '60%', marginTop: height * 0.15}}>
           <View style={styles.authInfo}>
-            <Text style={constStyles.loginMainTitle}> Forgot Password? </Text>
+            <Text style={constStyles.loginMainTitle}> Forgot Password ?</Text>
             <Text style={[constStyles.loginSubTitle,{textAlign: 'left', width: '90%', fontWeight: '400', fontSize: RFValue(14)}]}>Enter your email address below and we will send you a link to reset your password. </Text>
             <View style={styles.email}>
               <Text style={constStyles.loginSubTitle}> Email Address </Text>
@@ -84,10 +83,10 @@ export default function FacilityForgotPwd ({ navigation }) {
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
-              Back to 🏚️ Caregiver Home
+              Back to 🏚️ Facility Login
             </Text>
           </View>
-        </View>
+        </ScrollView>
         <MFooter />
       </View>
   )
@@ -109,9 +108,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     width: '90%',
+    marginLeft: '5%',
     borderRadius: RFValue(20),
     backgroundColor: '#F2F2F2',
-    marginTop: RFValue(140)
+    marginBottom: 150,
+    marginTop: 30
   },
   
   btn: {

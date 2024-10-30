@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, Dimensions } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -9,14 +9,14 @@ import { Dropdown } from 'react-native-element-dropdown';
 import SignatureCapture from 'react-native-signature-capture';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
-import { facilityAcknowledgementAtom, signatureAtom } from '../../context/FacilityAuthProvider';
+import { facilityAcknowledgementAtom } from '../../context/FacilityAuthProvider';
 import { Update } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
 
+const { width, height } = Dimensions.get('window');
 
 export default function FacilityPermission ({ navigation }) {
   const [facilityAcknowledgement, setFacilityAcknowledgement] = useAtom(facilityAcknowledgementAtom);
-  const [signature, setSignature] = useAtom(signatureAtom);
   const items = [
     {label: 'Yes', value: 1},
     {label: 'No', value: 2},
@@ -27,11 +27,9 @@ export default function FacilityPermission ({ navigation }) {
     signature: '',
     facilityAcknowledgeTerm: facilityAcknowledgement
   });
-  const [key, setKey] = useState(0);
   let signatureRef = useRef(null);
 
   const onSaveEvent = (result) => {
-    console.log(result)
     setCredentials(prevCredentials => ({
       ...prevCredentials, 
       signature: result.encoded
@@ -41,12 +39,6 @@ export default function FacilityPermission ({ navigation }) {
   const getSignature = () => {
     if (signatureRef.current) {
       signatureRef.current.saveImage();
-    }
-  };
-
-  const resetSignature = () => {
-    if (signatureRef.current) {
-      signatureRef.current.resetImage();
     }
   };
 
@@ -61,6 +53,7 @@ export default function FacilityPermission ({ navigation }) {
     if (value != 1) {
       return;
     }
+
     try {
       const response = await Update(credentials, 'facilities');
       if (!response?.error) {
@@ -113,14 +106,10 @@ export default function FacilityPermission ({ navigation }) {
 
   return (
       <View style={styles.container}>
-        <StatusBar 
-            translucent backgroundColor="transparent"
-        />
+        <StatusBar translucent backgroundColor="transparent" />
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-        <ScrollView style={{width: '100%', marginTop: 160}}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
           <Hyperlink linkDefault={true}>
             <View style={styles.permission}>
               <View style={styles.titleBar}>
