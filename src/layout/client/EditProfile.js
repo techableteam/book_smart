@@ -631,7 +631,7 @@ export default function EditProfile({ navigation }) {
               <Text style={constStyles.loginSubTitle}> Pic. (Optional)</Text>
               {credentials.photoImage.name !== "" && <View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
-                  onPress={() => navigation.navigate("FileViewer", { jobId: '', fileData: credentials.photoImage })}
+                  onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'photoImage' })}
                 >{credentials.photoImage.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('photoImage')}

@@ -79,7 +79,7 @@ export default function AdminCompany ({ navigation }) {
             </View>
             {avatar.content && <Image
               source={{ uri: `data:image/jpeg;base64,${avatar.content}` }}
-              resizeMode="cover"
+              resizeMode="contain"
               style={styles.nurse}
             />}
             <Text style={styles.name}>{firstName || ""} {lastName || ""}</Text>
