@@ -905,6 +905,11 @@ export default function AllCaregivers({ navigation }) {
     navigation.navigate("UserFileViewer", { userId: selectedUserId, filename: data });
   };
 
+  const handleFileViewer = (data) => {
+    toggleVerificationModal();
+    navigation.navigate("FileViewer", { jobId: '', fileData: data });
+  };
+
   const renderInputField = (filter, index) => {
     const { valueType, value } = filter;
 
@@ -999,7 +1004,7 @@ export default function AllCaregivers({ navigation }) {
                   <Text style={styles.profileTitle}>ALL CAREGIVERS</Text>
                 </View>
               </View>
-              {/* <View style={styles.searchBar}>
+              <View style={styles.searchBar}>
                 <TextInput
                   style={styles.searchText}
                   placeholder=""
@@ -1012,7 +1017,7 @@ export default function AllCaregivers({ navigation }) {
                 {search && <TouchableOpacity style={styles.searchBtn} onPress={handleReset}>
                   <Text>Reset</Text>
                 </TouchableOpacity>}
-              </View> */}
+              </View>
               {/* <View>
                 <TouchableOpacity style={[styles.filterBtn, { marginLeft: 0, marginBottom: 5 }]} onPress={toggleAddFilterModal}>
                   <Text>Add Filter</Text>
@@ -1483,7 +1488,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Driver's License</Text>
                         {credentials?.driverLicense.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('driverLicense'); }}>{credentials?.driverLicense.name}</Text>
+                            <Text
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.driverLicense.content != "") {
+                                  handleFileViewer(credentials?.driverLicense);
+                                } else {
+                                  handleShowFile('driverLicense');
+                                }
+                              }}
+                            >{credentials?.driverLicense.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('driverLicense')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1520,7 +1534,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Physical Exam</Text>
                         {credentials?.physicalExam.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('physicalExam'); }}>{credentials?.physicalExam.name}</Text>
+                            <Text
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.physicalExam.content != "") {
+                                  handleFileViewer(credentials?.physicalExam);
+                                } else {
+                                  handleShowFile('physicalExam');
+                                }
+                              }}
+                            >{credentials?.physicalExam.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('physicalExam')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1557,7 +1580,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Social Security Card</Text>
                         {credentials?.socialCard.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('socialCard'); }}>{credentials?.socialCard.name}</Text>
+                            <Text
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]}
+                              onPress={() => { 
+                                if (credentials?.socialCard.content != "") {
+                                  handleFileViewer(credentials?.socialCard);
+                                } else {
+                                  handleShowFile('socialCard');
+                                }
+                              }}
+                            >{credentials?.socialCard.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('socialCard')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1594,7 +1626,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>PPD (TB Test)</Text>
                         {credentials.ppd.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('ppd'); }}>{credentials.ppd.name}</Text>
+                            <Text
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]}
+                              onPress={() => { 
+                                if (credentials?.ppd.content != "") {
+                                  handleFileViewer(credentials?.ppd);
+                                } else {
+                                  handleShowFile('ppd');
+                                }
+                              }}
+                            >{credentials.ppd.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('ppd')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1631,7 +1672,15 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>MMR (Immunizations)</Text>
                         {credentials?.mmr.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('mmr') }}>{credentials?.mmr.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.mmr.content != "") {
+                                  handleFileViewer(credentials?.mmr);
+                                } else {
+                                  handleShowFile('mmr')
+                                }
+                              }}>{credentials?.mmr.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('mmr')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1668,7 +1717,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Hep B (shot or declination)</Text>
                         {credentials?.hepB.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('hepB') }}>{credentials?.hepB.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.hepB.content != "") {
+                                  handleFileViewer(credentials?.hepB);
+                                } else {
+                                  handleShowFile('hepB')
+                                }
+                              }}
+                            >{credentials?.hepB.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('hepB')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1705,7 +1763,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Flu (shot or declination)</Text>
                         {credentials.flu.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('flu'); }}>{credentials.flu.name}</Text>
+                            <Text
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.flu.content != "") {
+                                  handleFileViewer(credentials?.flu);
+                                } else {
+                                  handleShowFile('flu');
+                                } 
+                              }}
+                            >{credentials.flu.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('flu')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1742,7 +1809,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CNA Certificate or LPN/RN License</Text>
                         {credentials?.cna.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('cna'); }}>{credentials?.cna.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => {
+                                if (credentials?.cna.content != "") {
+                                  handleFileViewer(credentials?.cna);
+                                } else {
+                                  handleShowFile('cna');
+                                }
+                              }}
+                            >{credentials?.cna.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('cna')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1779,7 +1855,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>BLS (CPR card)</Text>
                         {credentials?.bls.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('bls'); }}>{credentials?.bls.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.bls.content != "") {
+                                  handleFileViewer(credentials?.bls);
+                                } else {
+                                  handleShowFile('bls');
+                                }
+                              }}
+                            >{credentials?.bls.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('bls')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1816,7 +1901,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>COVID Card</Text>
                         {credentials?.covidCard.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('covidCard'); }}>{credentials?.covidCard.name}</Text>
+                            <Text
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.covidCard.content != "") {
+                                  handleFileViewer(credentials?.covidCard);
+                                } else {
+                                  handleShowFile('covidCard');
+                                }
+                              }}
+                            >{credentials?.covidCard.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('covidCard')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1853,7 +1947,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Resume</Text>
                         {credentials?.resume.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('resume'); }}>{credentials?.resume.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.resume.content != "") {
+                                  handleFileViewer(credentials?.resume);
+                                } else {
+                                  handleShowFile('resume');
+                                }
+                              }}
+                            >{credentials?.resume.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('resume')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1890,7 +1993,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Tax Form</Text>
                         {credentials.taxForm.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('taxForm'); }}>{credentials.taxForm.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.taxForm.content != "") {
+                                  handleFileViewer(credentials?.taxForm);
+                                } else {
+                                  handleShowFile('taxForm');
+                                }
+                              }}
+                            >{credentials.taxForm.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('taxForm')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1927,7 +2039,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Healthcare License</Text>
                         {credentials?.healthcareLicense.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('healthcareLicense'); }}>{credentials?.healthcareLicense.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.healthcareLicense.content != "") {
+                                  handleFileViewer(credentials?.healthcareLicense);
+                                } else {
+                                  handleShowFile('healthcareLicense');
+                                }
+                              }}
+                            >{credentials?.healthcareLicense.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('healthcareLicense')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -1964,7 +2085,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 102 Form</Text>
                         {credentials?.chrc102.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('chrc102'); }}>{credentials?.chrc102.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.chrc102.content != "") {
+                                  handleFileViewer(credentials?.chrc102);
+                                } else {
+                                  handleShowFile('chrc102');
+                                }
+                              }}
+                            >{credentials?.chrc102.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('chrc102')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -2001,7 +2131,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>CHRC 103 Form</Text>
                         {credentials?.chrc103.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('chrc103'); }}>{credentials?.chrc103.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.chrc103.content != "") {
+                                  handleFileViewer(credentials?.chrc103);
+                                } else {
+                                  handleShowFile('chrc103');
+                                }
+                              }}
+                            >{credentials?.chrc103.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('chrc103')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -2038,7 +2177,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Drug Test</Text>
                         {credentials?.drug.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('drug'); }}>{credentials?.drug.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.drug.content != "") {
+                                  handleFileViewer(credentials?.drug);
+                                } else {
+                                  handleShowFile('drug');
+                                }
+                              }}
+                            >{credentials?.drug.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('drug')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -2076,7 +2224,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Standard State Criminal</Text>
                         {credentials?.ssc.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('ssc'); }}>{credentials?.ssc.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.ssc.content != "") {
+                                  handleFileViewer(credentials?.ssc);
+                                } else {
+                                  handleShowFile('ssc');
+                                }
+                              }}
+                            >{credentials?.ssc.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('ssc')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
@@ -2113,7 +2270,16 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={{fontWeight: 'bold', fontSize: RFValue(16), lineHeight: 30, marginBottom: 5, backgroundColor: '#F7F70059'}}>Copy Of TB Test</Text>
                         {credentials?.copyOfTB.name != "" && 
                           <View style={{ flexDirection: 'row' }}>
-                            <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { handleShowFile('copyOfTB'); }}>{credentials?.copyOfTB.name}</Text>
+                            <Text 
+                              style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
+                              onPress={() => { 
+                                if (credentials?.copyOfTB.content != "") {
+                                  handleFileViewer(credentials?.copyOfTB);
+                                } else {
+                                  handleShowFile('copyOfTB');
+                                }
+                              }}
+                            >{credentials?.copyOfTB.name}</Text>
                             <Text style={{color: 'blue'}} onPress= {() => handleRemove('copyOfTB')}>&nbsp;&nbsp;remove</Text>
                           </View>
                         }
