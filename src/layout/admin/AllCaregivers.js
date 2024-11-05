@@ -510,7 +510,7 @@ export default function AllCaregivers({ navigation }) {
       setLoading(false);
       Alert.alert(
         'Warning!',
-        "Please try again later.",
+        `${data?.error}`,
         [
           {
             text: 'OK',
