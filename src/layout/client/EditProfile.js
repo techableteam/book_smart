@@ -1,6 +1,5 @@
 import { Alert, StyleSheet, View, Image, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Button } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import { useAtom } from 'jotai';
 import images from '../../assets/images';
 import { TextInput } from 'react-native-paper';
@@ -78,7 +77,18 @@ export default function EditProfile({ navigation }) {
     content: '',
     type: '',
     name: ''
-  }); 
+  });
+
+  const [isSendDL, setIsSendDL] = useState(false);
+  const [isSendSC, setIsSendSC] = useState(false);
+  const [isSendPE, setIsSendPE] = useState(false);
+  const [isSendPPD, setIsSendPPD] = useState(false);
+  const [isSendMMR, setIsSendMMR] = useState(false);
+  const [isSendHL, setIsSendHL] = useState(false);
+  const [isSendResume, setIsSendResume] = useState(false);
+  const [isSendCC, setIsSendCC] = useState(false);
+  const [isSendBLS, setIsSendBLS] = useState(false);
+
   const [sfileType, setFiletype] = useState('');
   const [fileTypeSelectModal, setFiletypeSelectModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -93,15 +103,6 @@ export default function EditProfile({ navigation }) {
     socialSecurityNumber: socialSecurityNumber,
     address: address,
     photoImage: photoImage,
-    driverLicense:driverLicense, 
-    socialCard: socialCard,
-    physicalExam: physicalExam, 
-    ppd: ppd, 
-    mmr: mmr, 
-    healthcareLicense: healthcareLicense, 
-    resume: resume, 
-    covidCard: covidCard, 
-    bls: bls
   });
 
   const getData = async () => {
@@ -124,6 +125,43 @@ export default function EditProfile({ navigation }) {
           }
         }
       });
+      
+      if (result.userData['driverLicense']) {
+        setDriverLicense(result.userData['driverLicense']);
+      }
+
+      if (result.userData['socialCard']) {
+        setSocialCard(result.userData['socialCard']);
+      }
+
+      if (result.userData['physicalExam']) {
+        setPhysicalExam(result.userData['physicalExam']);
+      }
+
+      if (result.userData['ppd']) {
+        setPPD(result.userData['ppd']);
+      }
+
+      if (result.userData['mmr']) {
+        setMMR(result.userData['mmr']);
+      }
+
+      if (result.userData['healthcareLicense']) {
+        setHealthcareLicense(result.userData['healthcareLicense']);
+      }
+
+      if (result.userData['resume']) {
+        setResume(result.userData['resume']);
+      }
+
+      if (result.userData['covidCard']) {
+        setCovidCard(result.userData['covidCard']);
+      }
+
+      if (result.userData['bls']) {
+        setBls(result.userData['bls']);
+      }
+
       setCredentials(updatedCredentials);
       setLoading(false);
     } else {
@@ -154,9 +192,117 @@ export default function EditProfile({ navigation }) {
     getData();
   }, []);
 
+  const handleSendFile = async (target) => {
+    let data = {};
+    if (target == "driverLicense") {
+      data = {
+        driverLicense: driverLicense
+      };
+      setIsSendDL(false);
+    } else if (target == "socialCard") {
+      data = {
+        socialCard: socialCard
+      };
+      setIsSendSC(false);
+    } else if (target == "physicalExam") {
+      data = {
+        physicalExam: physicalExam
+      };
+      setIsSendPE(false);
+    } else if (target == "ppd") {
+      data = {
+        ppd: ppd
+      };
+      setIsSendPPD(false);
+    } else if (target == "mmr") {
+      data = {
+        mmr: mmr
+      };
+      setIsSendMMR(false);
+    } else if (target == "healthcareLicense") {
+      data = {
+        healthcareLicense: healthcareLicense
+      };
+      setIsSendHL(false);
+    } else if (target == "resume") {
+      data = {
+        resume: resume
+      };
+      setIsSendResume(false);
+    } else if (target == "covidCard") {
+      data = {
+        covidCard: covidCard
+      };
+      setIsSendCC(false);
+    } else if (target == "bls") {
+      data = {
+        bls: bls
+      };
+      setIsSendBLS(false);
+    }
+
+    setLoading(true);
+    try {
+      const response = await Update(data, 'clinical');
+      if (!response?.error) {
+        console.log('successfully Updated');
+        data = {};
+        setLoading(false);
+        Alert.alert(
+          'Success!',
+          'Updated',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      } else {
+        console.log('=====================');
+        console.log(JSON.stringify(response.error));
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Update failed: ', error)
+    }
+  };
+
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
-      setCredentials({...credentials, [target]: e});
+      if (target == "driverLicense") {
+        setDriverLicense((prev) => ({ ...prev, ...e }));
+        setIsSendDL(true);
+      } else if (target == "socialCard") {
+        setSocialCard((prev) => ({ ...prev, ...e }));
+        setIsSendSC(true);
+      } else if (target == "physicalExam") {
+        setPhysicalExam((prev) => ({ ...prev, ...e }));
+        setIsSendPE(true);
+      } else if (target == "ppd") {
+        setPPD((prev) => ({ ...prev, ...e }));
+        setIsSendPPD(true);
+      } else if (target == "mmr") {
+        setMMR((prev) => ({ ...prev, ...e }));
+        setIsSendMMR(true);
+      } else if (target == "healthcareLicense") {
+        setHealthcareLicense((prev) => ({ ...prev, ...e }));
+        setIsSendHL(true);
+      } else if (target == "resume") {
+        setResume((prev) => ({ ...prev, ...e }));
+        setIsSendResume(true);
+      } else if (target == "covidCard") {
+        setCovidCard((prev) => ({ ...prev, ...e }));
+        setIsSendCC(true);
+      } else if (target == "bls") {
+        setBls((prev) => ({ ...prev, ...e }));
+        setIsSendBLS(true);
+      } else {
+        setCredentials({...credentials, [target]: e});
+      }
     } else {
       setCredentials({...credentials, address: {...credentials.address, [target]: e}})
     }
@@ -169,10 +315,8 @@ export default function EditProfile({ navigation }) {
   };
 
   //-------------------------------------------Date Picker---------------------------------------
-  const [birthday, setBirthday] = useState(new Date());
   const [showCalender, setShowCalendar] = useState(false);
   const handleDayChange = (target, day) => {
-    setBirthday(day);
     handleCredentials(target, day);
   }
 
@@ -419,7 +563,19 @@ export default function EditProfile({ navigation }) {
         if (!response?.error) {
           console.log('successfully Updated')
           setLoading(false);
-          navigation.navigate("MyHome")
+          Alert.alert(
+            'Success!',
+            'Updated',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  console.log('');
+                },
+              },
+            ],
+            { cancelable: false }
+          );
         } else {
           console.log('=====================');
           console.log(JSON.stringify(response.error));
@@ -644,6 +800,11 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
+            <View style={[styles.btn, {marginTop: 20}]}>
+              <HButton style={styles.subBtn} onPress={ handleSubmit }>
+                Submit
+              </HButton>
+            </View>
             <View style={styles.bottomBar}/>
           </View>
           <View style={styles.authInfo}>
@@ -652,10 +813,10 @@ export default function EditProfile({ navigation }) {
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> Driver's License</Text>
-              {credentials.driverLicense.name !== "" &&<View style={{marginBottom: 10}}>
+              {driverLicense.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                   onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'driverLicense' })}
-                >{credentials.driverLicense.name} &nbsp;&nbsp;</Text>
+                >{driverLicense.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('driverLicense')}
                 >remove</Text>
@@ -670,16 +831,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.driverLicense.name || ''}
+                  value={driverLicense.name || ''}
                 />
+              </View>
+              <View>
+                {isSendDL && <TouchableOpacity title="Select File" onPress={() => handleSendFile('driverLicense')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> Social Security Card</Text>
-              {credentials.socialCard.name !== "" &&<View style={{marginBottom: 10}}>
+              {socialCard.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                   onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'socialCard' })}
-                >{credentials.socialCard.name} &nbsp;&nbsp;</Text>
+                >{socialCard.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('socialCard')}
                 >remove</Text>
@@ -694,16 +860,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.socialCard.name || ''}
+                  value={socialCard.name || ''}
                 />
+              </View>
+              <View>
+                {isSendSC && <TouchableOpacity title="Select File" onPress={() => handleSendFile('socialCard')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> Physical Exam</Text>
-              {credentials.physicalExam.name !== "" &&<View style={{marginBottom: 10}}>
+              {physicalExam.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'physicalExam' })}
-                >{credentials.physicalExam.name} &nbsp;&nbsp;</Text>
+                >{physicalExam.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('physicalExam')}
                 >remove</Text>
@@ -718,16 +889,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.physicalExam.name || ''}
+                  value={physicalExam.name || ''}
                 />
+              </View>
+              <View>
+                {isSendPE && <TouchableOpacity title="Select File" onPress={() => handleSendFile('physicalExam')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> PPD (TB Test)</Text>
-              {credentials.ppd.name !== "" &&<View style={{marginBottom: 10}}>
+              {ppd.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'ppd' })}
-                >{credentials.ppd.name} &nbsp;&nbsp;</Text>
+                >{ppd.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('ppd')}
                 >remove</Text>
@@ -742,16 +918,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.ppd.name || ''}
+                  value={ppd.name || ''}
                 />
+              </View>
+              <View>
+                {isSendPPD && <TouchableOpacity title="Select File" onPress={() => handleSendFile('ppd')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> MMR (Immunizations)</Text>
-              {credentials.mmr.name !== "" &&<View style={{marginBottom: 10}}>
+              {mmr.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'mmr' })}
-                >{credentials.mmr.name} &nbsp;&nbsp;</Text>
+                >{mmr.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('mmr')}
                 >remove</Text>
@@ -766,16 +947,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.mmr.name || ''}
+                  value={mmr.name || ''}
                 />
+              </View>
+              <View>
+                {isSendMMR && <TouchableOpacity title="Select File" onPress={() => handleSendFile('mmr')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> Healthcare License</Text>
-              {credentials.healthcareLicense.name !== "" &&<View style={{marginBottom: 10}}>
+              {healthcareLicense.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'healthcareLicense' })}
-                >{credentials.healthcareLicense.name} &nbsp;&nbsp;</Text>
+                >{healthcareLicense.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('healthcareLicense')}
                 >remove</Text>
@@ -790,16 +976,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.healthcareLicense.name || ''}
+                  value={healthcareLicense.name || ''}
                 />
+              </View>
+              <View>
+                {isSendHL && <TouchableOpacity title="Select File" onPress={() => handleSendFile('healthcareLicense')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> Resume</Text>
-              {credentials.resume.name !== "" &&<View style={{marginBottom: 10}}>
+              {resume.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'resume' })}
-                >{credentials.resume.name} &nbsp;&nbsp;</Text>
+                >{resume.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('resume')}
                 >remove</Text>
@@ -814,16 +1005,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.resume.name || ''}
+                  value={resume.name || ''}
                 />
+              </View>
+              <View>
+                {isSendResume && <TouchableOpacity title="Select File" onPress={() => handleSendFile('resume')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> COVID Card</Text>
-              {credentials.covidCard.name !== "" &&<View style={{marginBottom: 10}}>
+              {covidCard.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'covidCard' })}
-                >{credentials.covidCard.name} &nbsp;&nbsp;</Text>
+                >{covidCard.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('covidCard')}
                 >remove</Text>
@@ -838,16 +1034,21 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.covidCard.name || ''}
+                  value={covidCard.name || ''}
                 />
+              </View>
+              <View>
+                {isSendCC && <TouchableOpacity title="Select File" onPress={() => handleSendFile('covidCard')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
             </View>
             <View>
               <Text style={constStyles.loginSubTitle}> BLS(CPR card)</Text>
-              {credentials.bls.name !== "" &&<View style={{marginBottom: 10}}>
+              {bls.name !== "" &&<View style={{marginBottom: 10}}>
                 <Text style={constStyles.profileChoosenText}
                 onPress={() => navigation.navigate("UserFileViewer", { userId: aic, filename: 'bls' })}
-                >{credentials.bls.name} &nbsp;&nbsp;</Text>
+                >{bls.name} &nbsp;&nbsp;</Text>
                 <Text style={constStyles.profileChoosenText}
                   onPress = {() => handleRemove('bls')}
                 >remove</Text>
@@ -862,8 +1063,13 @@ export default function EditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.bls.name || ''}
+                  value={bls.name || ''}
                 />
+              </View>
+              <View>
+                {isSendBLS && <TouchableOpacity title="Select File" onPress={() => handleSendFile('bls')} style={styles.saveFile}>
+                  <Text style={constStyles.saveFileBtn}>Save</Text>
+                </TouchableOpacity>}
               </View>
               <Text style={[constStyles.signUpSubtitle, {lineHeight:30}]}> W - 9 {'\n'}
                 Standard State Criminal{'\n'}
@@ -873,11 +1079,6 @@ export default function EditProfile({ navigation }) {
                 CHRC 102 Form{'\n'}
                 CHRC 103 Form{'\n'}
               </Text>
-            </View>
-            <View style={[styles.btn, {marginTop: 20}]}>
-              <HButton style={styles.subBtn} onPress={ handleSubmit }>
-                Submit
-              </HButton>
             </View>
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 20 }}
               onPress={handleBack}
@@ -1145,13 +1346,29 @@ const styles = StyleSheet.create({
   },
   chooseFile: {
     width: '30%', 
-    height: 30, 
+    height: RFValue(30), 
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f0f0f0',
     borderWidth: 1,
     borderColor: 'black'
+  },
+  saveFile: {
+    width: 80, 
+    height: 25, 
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: 'black'
+  },
+  saveFileBtn: {
+    fontWeight: '400', 
+    padding: 0, 
+    fontSize: RFValue(9), 
+    color: 'black',
   },
   modalContainer: {
     flex: 1,
