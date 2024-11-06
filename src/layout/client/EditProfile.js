@@ -424,23 +424,6 @@ export default function EditProfile({ navigation }) {
           console.log('=====================');
           console.log(JSON.stringify(response.error));
         }
-        // setFirstName(response.user.firstName);
-        // setLastName(response.user.lastName);
-        // setBirthdays(response.user.birthday);
-        // setPhoneNumber(response.user.phoneNumber);
-        // setEmail(response.user.email);
-        // setTitle(response.user.title);
-        // setPhotoImage(response.user.photoImage);
-        // setUserRole(response.user.userRole);
-        // setDriverLicense(response.user.driverLicense);
-        // setSocialCard(response.user.socialCard);
-        // setPhysicalExam(response.user.physicalExam);
-        // setPPD(response.user.ppd);
-        // setMMR(response.user.mmr);
-        // setHealthcareLicense(response.user.healthcareLicense);
-        // setResume(response.user.resume);
-        // setCovidCard(response.user.covidCard);
-        // setBls(response.user.bls);
       } catch (error) {
         setLoading(false);
         console.error('Update failed: ', error)
