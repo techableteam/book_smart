@@ -19,6 +19,7 @@ import Loader from '../Loader';
 import constStyles from '../../assets/styles';
 import { RFValue } from "react-native-responsive-fontsize";
 import { Dimensions } from 'react-native';
+import moment from 'moment';
 
 const { width, height } = Dimensions.get('window');
 
@@ -111,9 +112,12 @@ export default function EditProfile({ navigation }) {
       const updatedCredentials = { ...credentials };
       Object.keys(updatedCredentials).forEach((key) => {
         if (result.userData[key]) {
-          if (typeof updatedCredentials[key] === 'object') {
+          if (key === 'birthday') {
+            updatedCredentials[key] = new Date(result.userData[key]);
+            setBirthdays(new Date(result.userData[key]));
+          } else if (typeof updatedCredentials[key] === 'object') {
             updatedCredentials[key] = { ...updatedCredentials[key], ...result.userData[key] };
-          } else if (result.userData[key] == true) {
+          } else if (typeof result.userData[key] == 'boolean') {
             updatedCredentials[key] = result.userData[key] == true ? 1 : 0;
           } else {
             updatedCredentials[key] = result.userData[key];
@@ -146,6 +150,7 @@ export default function EditProfile({ navigation }) {
   //   }, [])
   // );
   useEffect(() => {
+    console.log('===========================================');
     getData();
   }, []);
 
@@ -519,7 +524,7 @@ export default function EditProfile({ navigation }) {
                 <TextInput
                   style={[constStyles.signUpinput, {width: '100%', position: 'absolute', zIndex: 0}]}
                   placeholder=""
-                  value={birthday.toDateString()}
+                  value={moment(credentials.birthday).format("YYYY-MM-DD")}
                   editable={false}
                 />
                 
@@ -527,7 +532,7 @@ export default function EditProfile({ navigation }) {
                 {showCalender && 
                 <>
                   <DatePicker
-                    date={birthday}
+                    date={credentials.birthday}
                     onDateChange={(day) => handleDayChange('birthday', day)}
                     mode="date" // Set the mode to "date" to allow year and month selection
                     androidVariant="native"
