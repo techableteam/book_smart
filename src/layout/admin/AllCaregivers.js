@@ -782,7 +782,9 @@ export default function AllCaregivers({ navigation }) {
             name: response.assets[0].fileName,
           });
           toggleFileTypeSelectModal();
-          toggleVerificationModal();
+          setTimeout(() => {
+            toggleVerificationModal();
+          }, 500);
         }
       });
     } catch (err) {
@@ -837,7 +839,9 @@ export default function AllCaregivers({ navigation }) {
             name: response.assets[0].fileName,
           });
           toggleFileTypeSelectModal();
-          toggleVerificationModal();
+          setTimeout(() => {
+            toggleVerificationModal();
+          }, 500);
         } else {
           Alert.alert(
             'Alert!',
@@ -890,7 +894,9 @@ export default function AllCaregivers({ navigation }) {
       }
       handleCredentials(sfileType, { content: `${fileContent}`, type: fileType, name: res[0].name });
       toggleFileTypeSelectModal();
-      toggleVerificationModal();
+      setTimeout(() => {
+        toggleVerificationModal();
+      }, 500);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker
