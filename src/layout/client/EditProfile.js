@@ -416,6 +416,14 @@ export default function EditProfile({ navigation }) {
       setLoading(true);
       try {
         const response = await Update(credentials, 'clinical');
+        if (!response?.error) {
+          console.log('successfully Updated')
+          setLoading(false);
+          navigation.navigate("MyHome")
+        } else {
+          console.log('=====================');
+          console.log(JSON.stringify(response.error));
+        }
         // setFirstName(response.user.firstName);
         // setLastName(response.user.lastName);
         // setBirthdays(response.user.birthday);
@@ -433,9 +441,6 @@ export default function EditProfile({ navigation }) {
         // setResume(response.user.resume);
         // setCovidCard(response.user.covidCard);
         // setBls(response.user.bls);
-        console.log('successfully Updated')
-        setLoading(false);
-        navigation.navigate("MyHome")
       } catch (error) {
         setLoading(false);
         console.error('Update failed: ', error)
