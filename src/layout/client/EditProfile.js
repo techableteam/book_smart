@@ -8,7 +8,7 @@ import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import DatePicker from 'react-native-date-picker';
 import MSubNavbar from '../../components/MSubNavbar';
-import { getUserInfo, Update } from '../../utils/useApi';
+import { getDegreeList, getUserInfo, Update } from '../../utils/useApi';
 import { aicAtom } from '../../context/ClinicalAuthProvider';
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
@@ -190,6 +190,7 @@ export default function EditProfile({ navigation }) {
   useEffect(() => {
     console.log('===========================================');
     getData();
+    getDegree();
   }, []);
 
   const handleSendFile = async (target) => {
@@ -270,6 +271,21 @@ export default function EditProfile({ navigation }) {
       console.error('Update failed: ', error)
     }
   };
+
+  const [degrees, setDegree] = useState([]);
+  const getDegree = async () => {
+    const response = await getDegreeList('degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push(item.degreeName);
+      });
+      tempArr.unshift('');
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
+    }
+  }
 
   const handleCredentials = (target, e) => {
     if (target !== "streetAddress" && target !== "streetAddress2" && target !== "city" && target !== "state" && target !== "zip") {
@@ -588,11 +604,40 @@ export default function EditProfile({ navigation }) {
   }
 
   const handleRemove = (name) => {
-    handleCredentials(name, {
-      content: '',
-      name: '',
-      type: ''
-    });
+    if (name == "driverLicense") {
+      setDriverLicense({ content: '', name: '', type: '' });
+      setIsSendDL(false);
+    } else if (name == "socialCard") {
+      setSocialCard({ content: '', name: '', type: '' });
+      setIsSendSC(false);
+    } else if (name == "physicalExam") {
+      setPhysicalExam({ content: '', name: '', type: '' });
+      setIsSendPE(false);
+    } else if (name == "ppd") {
+      setPPD({ content: '', name: '', type: '' });
+      setIsSendPPD(false);
+    } else if (name == "mmr") {
+      setMMR({ content: '', name: '', type: '' });
+      setIsSendMMR(false);
+    } else if (name == "healthcareLicense") {
+      setHealthcareLicense({ content: '', name: '', type: '' });
+      setIsSendHL(false);
+    } else if (name == "resume") {
+      setResume({ content: '', name: '', type: '' });
+      setIsSendResume(false);
+    } else if (name == "covidCard") {
+      setCovidCard({ content: '', name: '', type: '' });
+      setIsSendCC(false);
+    } else if (name == "bls") {
+      setBls({ content: '', name: '', type: '' });
+      setIsSendBLS(false);
+    } else {
+      handleCredentials(name, {
+        content: '',
+        name: '',
+        type: ''
+      });
+    }
   };
 
   return (
@@ -767,10 +812,15 @@ export default function EditProfile({ navigation }) {
                 >
                   <View style={styles.modalContainer}>
                     <View style={styles.calendarContainer}>
-                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('')}>Select Title...</Text>
-                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('CNA')}>CNA</Text>
-                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('LPN')}>LPN</Text>
-                      <Text style={constStyles.signUpinput} onPress={()=>handleItemPress('RN')}>RN</Text>
+                    {degrees.map((value, index) => (
+                      <Text
+                        key={index}
+                        style={[constStyles.signUpSubtitle, { lineHeight: RFValue(25) }]}
+                        onPress={() => handleItemPress(value)}
+                      >
+                        {value === "" ? "Select Title ..." : value}
+                      </Text>
+                    ))}
                     </View>
                   </View>
                 </Modal>}

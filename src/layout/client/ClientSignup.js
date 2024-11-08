@@ -6,7 +6,7 @@ import DatePicker from 'react-native-date-picker';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { Signup } from '../../utils/useApi';
+import { getDegreeList, Signup } from '../../utils/useApi';
 import images from '../../assets/images';
 import Loader from '../Loader';
 import DocumentPicker from 'react-native-document-picker';
@@ -92,6 +92,24 @@ export default function ClientSignUp({ navigation }) {
 
     Animated.loop(sequenceAnimation).start();
   }, [fadeAnim]);
+  const [degrees, setDegree] = useState([]);
+  const getDegree = async () => {
+    const response = await getDegreeList('degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push(item.degreeName);
+      });
+      tempArr.unshift('');
+      setDegree(tempArr);
+    } else {
+      setDegree([]);
+    }
+  }
+
+  useEffect(() => {
+    getDegree();
+  }, []);
 
   const handleItemPress = (text) => {
     setTitle(text);
@@ -641,10 +659,15 @@ export default function ClientSignUp({ navigation }) {
                 >
                   <View style={styles.modalContainer}>
                     <View style={styles.calendarContainer}>
-                      <Text style={constStyles.signUpSubtitle} onPress={()=> handleItemPress('')}>Select Title...</Text>
-                      <Text style={constStyles.signUpSubtitle} onPress={()=> handleItemPress('CNA')}>CNA</Text>
-                      <Text style={constStyles.signUpSubtitle} onPress={()=> handleItemPress('LPN')}>LPN</Text>
-                      <Text style={constStyles.signUpSubtitle} onPress={()=> handleItemPress('RN')}>RN</Text>
+                    {degrees.map((value, index) => (
+                      <Text
+                        key={index}
+                        style={[constStyles.signUpSubtitle, { lineHeight: RFValue(25) }]}
+                        onPress={() => handleItemPress(value)}
+                      >
+                        {value === "" ? "Select Title ..." : value}
+                      </Text>
+                    ))}
                     </View>
                   </View>
                 </Modal>}

@@ -1125,7 +1125,8 @@ export default function AllCaregivers({ navigation }) {
                                 onPress={() => {
                                   console.log('user =>', rowData[12]);
                                   setSelectedUserId(rowData[12]);
-                                  handleShowUserInfoModal(rowData[12]);
+                                  // handleShowUserInfoModal(rowData[12]);
+                                  navigation.navigate("Verifycation", { id: rowData[12] });
                                 }}
                               >
                                 <Text style={styles.profileTitle}>View Here</Text>
