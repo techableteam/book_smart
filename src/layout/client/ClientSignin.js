@@ -295,12 +295,12 @@ export default function ClientSignIn({ navigation }) {
         <View style={styles.buttonWrapper}>
           <HButton
             onPress={() => navigation.navigate('AdminLogin')}
-            style={[constStyles.loginMainButton, { fontSize:  pixelRatio > 1.5 ? RFValue(10) : RFValue(12) }]}>
+            style={[constStyles.loginMainButton, { fontSize:  pixelRatio > 1.1 ? RFValue(10) : RFValue(12) }]}>
             Admin Login
           </HButton>
           <HButton
             onPress={() => navigation.navigate('FacilityLogin')}
-            style={[constStyles.loginMainButton, { fontSize:  pixelRatio > 1.5 ? RFValue(10) : RFValue(12) }]}>
+            style={[constStyles.loginMainButton, { fontSize:  pixelRatio > 1.1 ? RFValue(10) : RFValue(12) }]}>
             Facilities Home
           </HButton>
         </View>

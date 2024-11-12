@@ -24,39 +24,41 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>16.171.170.177</key>
+			<key>52.14.179.250</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
 		</dict>
 	</dict>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-	</array>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need access to your photo library to upload images.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need access to save images to your photo library.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Access to camera is required to capture photos needed for your profile and shift's timesheet.</string>
 	<key>NSDocumentsUsageDescription</key>
 	<string>We need access to documents to allow you to upload files.</string>
 	<key>NSFileProviderDomainUsageDescription</key>
 	<string>We need access to files from your document provider.</string>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<true/>
-	<key>UIFileSharingEnabled</key>
-	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>Access to camera is required to capture photos needed for your profile and shift's timesheet.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location while you use the app to show relevant content and suggestions.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We need your location to provide personalized content and updates based on your location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location while you use the app to show relevant content and suggestions.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need access to save images to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to upload images.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string></string>
 	<key>UIRequiredDeviceCapabilities</key>
