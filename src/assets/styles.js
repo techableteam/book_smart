@@ -84,7 +84,7 @@ const constStyles = StyleSheet.create({
 
     forgotInputText: {
         backgroundColor: 'white', 
-        height: RFValue(40), 
+        height: RFValue(30), 
         marginBottom: RFValue(10), 
         borderWidth: RFValue(1), 
         borderColor: 'hsl(0, 0%, 86%)',

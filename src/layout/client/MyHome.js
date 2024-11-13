@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
@@ -35,19 +35,21 @@ export default function MyHome ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent"/>
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
-          showsVerticalScrollIndicator={false}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
-            <Image
+            {/* <Image
               source={images.mark}
               resizeMode="contain"
               style={styles.mark}
             />
-            <View style={styles.bottomBar}/>
+            <View style={styles.bottomBar}/> */}
+            <TouchableOpacity onPress={() => navigation.navigate("ShiftListing")}>
+              <Text style={styles.headBar}>Book Shifts Now!</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.imageButton}>
             <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
-            <ImageButton title={"All Shift Listings"} onPress={() => handleNavigate('ShiftListing')} />
+            <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
             <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
             <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
           </View>
@@ -138,6 +140,15 @@ const styles = StyleSheet.create({
   content: {
     fontSize: RFValue(16),
     lineHeight: RFValue(30),
-  }
+  },
+  headBar: {
+    textAlign: 'center',
+    backgroundColor: '#BC222F',
+    color: 'white',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    fontSize: RFValue(18),
+    fontWeight: 'bold'
+  },
 });
-  

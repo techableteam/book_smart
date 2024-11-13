@@ -4,8 +4,7 @@ import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import { WebView } from 'react-native-webview';
 
-export default function TimesheetForm ({ navigation, route }) {
-    const { detailInfo, infoData } = route.params;
+export default function TimesheetForm ({ navigation }) {
 
     return (
         <View style={styles.container}>

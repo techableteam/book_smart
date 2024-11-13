@@ -204,7 +204,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F2F2',
     marginTop: 140
   },
-  btn: {flexDirection: 'column',
+  btn: {
+    flexDirection: 'column',
     gap: 20,
     marginBottom: 30,
     width: '90%'
@@ -212,8 +213,8 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
+    backgroundColor: '#A020F0',
+    color: '#fff',
     fontSize: 16,
   },
   verify: {

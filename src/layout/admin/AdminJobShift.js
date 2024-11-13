@@ -9,7 +9,7 @@ import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
 import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
-import { PostJob, getDegreeList, addDegreeItem, Clinician, getLocationList } from '../../utils/useApi';
+import { PostJob, getDegreeList, addDegreeItem, Clinician, getLocationList, addLocationItem } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
 import { RFValue } from 'react-native-responsive-fontsize';
 
@@ -23,10 +23,12 @@ export default function AdminJobShift({ navigation }) {
   const [isDegreeFocus, setIsDegreeFocus] = useState(false);
   const [locationValue, setLocationValue] = useState(null);
   const [showAddDegreeModal, setShowAddDegreeModal] = useState(false);
+  const [showAddLocationModal, setShowAddLocationModal] = useState(false);
   const [isLocationFocus, setIsLocationFocus] = useState(false);
   const [shiftFromDay, setShiftFromDay] = useState(new Date());
   const [showCalender, setShowCalendar] = useState(false);
   const [degreeItem, setDegreeItem] = useState('');
+  const [locationItem, setLocationItem] = useState('');
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const [degree, setDegree] = useState([]);
   const [location, setLocation] = useState([]);
@@ -127,6 +129,10 @@ export default function AdminJobShift({ navigation }) {
     setShowAddDegreeModal(!showAddDegreeModal);
   };
 
+  const toggleAddLocationModal = () => {
+    setShowAddLocationModal(!showAddLocationModal);
+  };
+
   const handleDayChange = (target, day) => {
     handleCredentials(target, moment(day).format("MM/DD/YYYY"));
   };
@@ -198,6 +204,22 @@ export default function AdminJobShift({ navigation }) {
     }
     setShowAddDegreeModal(!showAddDegreeModal)
     setDegreeItem('')
+  };
+
+  const handleAddLocation = async () => {
+    let response = await addLocationItem({ item: locationItem }, 'location');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.locationName, value: item.locationName });
+      });
+      tempArr.unshift({ label: 'Select...', value: 'Select...' });
+      setLocation(tempArr);
+    } else {
+      setLocation([]);
+    }
+    setLocationItem('');
+    toggleAddLocationModal();
   };
 
   return (
@@ -352,6 +374,10 @@ export default function AdminJobShift({ navigation }) {
                   />
                 )}
               />
+              <TouchableOpacity style={styles.addItems} onPress={toggleAddLocationModal}>
+                <Image source={images.plus} style={{width: 15, height: 15}} />
+                <Text style={[styles.text, {color: '#2a53c1', marginTop: 0}]}>Add a new options</Text>
+              </TouchableOpacity>
             </View>
             <View>
               <Text style={styles.subtitle}> Pay Rate </Text>
@@ -408,6 +434,40 @@ export default function AdminJobShift({ navigation }) {
                     value={degreeItem}
                   />
                   <HButton style={[styles.subBtn, { width: 'auto', paddingVertical: 5 }]} onPress={() => handleAddDegree(degreeItem)}>
+                    Submit
+                  </HButton>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>}
+      {showAddLocationModal && <Modal
+        Visible={false}
+        transparent= {true}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowAddLocationModal(!showAddLocationModal);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.calendarContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Add a new location</Text>
+              <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleAddLocationModal}>
+                <Image source = {images.close} style={{width: 20, height: 20,}}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.modalBody}>
+                <View style={styles.searchBar}>
+                  <TextInput
+                    style={[styles.input, {width: '100%'}]}
+                    placeholder=""
+                    onChangeText={e => setLocationItem(e)}
+                    value={locationItem}
+                  />
+                  <HButton style={[styles.subBtn, { width: 'auto', paddingHorizontal: 10, paddingVertical: 5, fontWeight: '100', fontSize: RFValue(14) }]} onPress={handleAddLocation}>
                     Submit
                   </HButton>
                 </View>
