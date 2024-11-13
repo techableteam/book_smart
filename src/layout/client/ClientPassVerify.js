@@ -16,6 +16,7 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const CELL_COUNT = 6;
 
@@ -59,7 +60,7 @@ export default function ClientPassVerify ({ navigation }) {
     return (
       <Text
         key={index}
-        style={[styles.cell, isFocused && styles.focusCell,{ borderWidth: 1, borderColor }]}
+        style={[styles.cell, isFocused && styles.focusCell, {  borderWidth: 1, borderColor }]}
         onLayout={getCellOnLayoutHandler(index)}>
         {textChild}
       </Text>
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: '#fff',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
   verify: {
       width: "100%",
@@ -226,11 +227,16 @@ const styles = StyleSheet.create({
       marginRight: "4%"
   },
   cell: {
-    width: 40,
-    height: 40,
-    lineHeight: 40,
-    fontSize: 40,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: RFValue(30),
+    height: RFValue(40),
+    lineHeight: RFValue(40),
+    fontSize: RFValue(20),
     marginLeft: "2.8%",
+    fontWeight: '700',
+    textAlign: 'center',
     backgroundColor: '#dddddd',
     color: 'black'
   },

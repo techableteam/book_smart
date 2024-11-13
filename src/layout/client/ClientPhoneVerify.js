@@ -231,8 +231,11 @@ const styles = StyleSheet.create({
       marginRight: "4%"
   },
   cell: {
-    width: RFValue(40),
-    height: RFValue(50),
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: RFValue(30),
+    height: RFValue(40),
     lineHeight: RFValue(40),
     fontSize: RFValue(20),
     fontWeight: '700',
