@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, Text, Alert, TextInput, TouchableOpacity, Modal, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, Text, Alert, Dimensions, TextInput, TouchableOpacity, Modal, Image } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -11,6 +11,8 @@ import Loader from '../Loader';
 import HButton from '../../components/Hbutton';
 import { updateTimeSheet } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function UploadTimesheet ({ navigation, route }) {
     const { detailInfo, fileData } = route.params;
@@ -280,7 +282,7 @@ export default function UploadTimesheet ({ navigation, route }) {
             <StatusBar translucent backgroundColor="transparent" />
             <MHeader navigation={navigation} />
             <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-            <ScrollView style={{width: '100%', marginTop: 160}} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false} >
                 <View style={styles.modal}>
                     <View style= {{width: '100%', marginTop: RFValue(20), paddingHorizontal : RFValue(50)}}>
                         <Text style={styles.headBar}>Upload TimeSheet</Text>

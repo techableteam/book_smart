@@ -138,6 +138,17 @@ export default function Shift ({ navigation }) {
     navigation.navigate(navigateUrl);
   };
 
+  const handleGoToFormPage = (id) => {
+    let infoData = data.reportData.find(item => item.jobId === id)
+    let detailInfo = [
+      { title: 'Job-ID', content: infoData.jobId },
+      { title: 'Caregiver', content: infoData.caregiver },
+      { title: 'TimeSheet', content: infoData.timeSheet.name },
+    ];
+
+    navigation.navigate('TimesheetForm', { detailInfo: detailInfo, infoData: infoData });
+  };
+
   const handleContent = (target, e) => {
     setContent({...content, [target]: e});
   };
@@ -643,7 +654,12 @@ export default function Shift ({ navigation }) {
                 )}
                 <View style={{ flex:1, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
                   <TouchableOpacity style={[styles.edit, {marginTop: RFValue(15), backgroundColor: '#A020F0'}]} onPress = {() => handleUploadEdit(it[0].content)}>
-                    <Text style={{color: 'white', fontSize: RFValue(14), fontWeight:'bold'}}> Upload Timesheet</Text>
+                    <Text style={{color: 'white', fontSize: RFValue(14), fontWeight:'bold'}}>Upload Timesheet</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex:1, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                  <TouchableOpacity style={[styles.edit, {marginTop: RFValue(15), backgroundColor: '#A020F0'}]} onPress = {() => handleGoToFormPage(it[0].content)}>
+                    <Text style={{color: 'white', fontSize: RFValue(14), fontWeight:'bold'}}>Timesheet Form</Text>
                   </TouchableOpacity>
                 </View>
               </View>)

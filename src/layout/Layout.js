@@ -62,6 +62,7 @@ import CaregiverProfile from './admin/CaregiverProfile.js';
 import UserFileViewer from './UserFileViewer.js';
 import UploadTimesheet from './client/UploadTimesheet.js';
 import VerifyCation from './admin/Verifycation.js';
+import TimesheetForm from './client/TimesheetForm.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -101,6 +102,11 @@ function Layout() {
       <Stack.Screen 
         name= 'UserFileViewer'
         component = {UserFileViewer}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'TimesheetForm'
+        component = {TimesheetForm}
         options={{headerShown: false}}
       />
       <Stack.Screen 
