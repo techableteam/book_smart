@@ -36,15 +36,47 @@ export default function UploadTimesheet ({ navigation, route }) {
         navigation.navigate("FileViewer", { jobId: jobId, fileData: '' });
     };
 
-    const handleDelete = () => {
-        setDetailedInfos(prevUploadInfo => {
-            return prevUploadInfo.map((item, index) => {
-                if (index === 2) {
-                    return { ...item, content: '' };
-                }
-                return item;
-            });
-        });
+    const handleDelete = async () => {
+        Alert.alert('Alert!', 'Are you sure you want to delete this document?', [
+            {
+                text: 'OK',
+                onPress: async () => {
+                    const data = {jobId: submitData.jobId, timeSheet: ""};
+                    const response = await updateTimeSheet(data, 'jobs');
+                    setLoading(false);
+                    if (!response?.error) {
+                        Alert.alert(
+                            'Success!',
+                            'Your timesheet has been removed.',
+                            [
+                                {
+                                text: 'OK',
+                                onPress: () => {
+                                    navigation.navigate('Shift');
+                                },
+                                }
+                            ],
+                            { cancelable: false }
+                        );
+                    } else {
+                        Alert.alert(
+                            'Failure!',
+                            'Pleae try later',
+                            [
+                                {
+                                    text: 'OK',
+                                    onPress: () => {
+                                    console.log('');
+                                    },
+                                },
+                            ],
+                            { cancelable: false }
+                        );
+                    }
+                },
+            },
+            { text: 'Cancel', style: 'cancel' },
+        ]);
     };
 
     const handleUploadSubmit = async () => {

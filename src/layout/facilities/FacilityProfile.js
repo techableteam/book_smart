@@ -148,8 +148,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   imageButton: {
-    marginLeft: '10%',
-    width: '80%',
+    marginLeft: '5%',
+    width: '90%',
     justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
