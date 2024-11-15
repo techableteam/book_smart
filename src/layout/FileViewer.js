@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Dimensions, Text } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { StyleSheet, View, Dimensions, Text, Image } from 'react-native';
 import Pdf from 'react-native-pdf';
 import { getTimesheet } from '../utils/useApi';
 import Loader from './Loader';
@@ -26,7 +25,7 @@ export default function FileViewer({ navigation, route }) {
                 content = `
                     <html>
                     <body style="margin: 0; padding: 0;">
-                        <img src="data:image/jpeg;base64,${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
+                        <img src="${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
                     </body>
                     </html>
                 `;
@@ -57,6 +56,7 @@ export default function FileViewer({ navigation, route }) {
     const setData = async () => {
         setLoading(true);
         const fetchedFileInfo = fileData;
+        console.log(fileData);
         let content = '';
 
         if (fetchedFileInfo.type === 'pdf') {
@@ -103,14 +103,15 @@ export default function FileViewer({ navigation, route }) {
             </View>
             {fileInfo.type === 'pdf' ? (
                 <Pdf
-                    source={{ uri: `data:application/pdf;base64,${fileInfo.content}` }}
+                    source={{ uri: fileInfo.content }}
                     style={styles.pdf}
+                    {...(jobId ? { trustAllCerts: false } : {})}
                 />
             ) : (
-                <WebView
-                    originWhitelist={['*']}
-                    source={{ html: htmlContent }}
+                fileInfo.content && <Image
+                    source={{ uri: fileInfo.content }}
                     style={styles.webView}
+                    resizeMode="contain"
                 />
             )}
             <Loader visible={loading} />

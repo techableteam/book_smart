@@ -36,57 +36,75 @@ export default function VerifyCation ({ navigation, route }) {
     const [driverLicense, setDriverLicense] = useState({ name: '', content: '', type: '' });
     const [driverLicenseStatus, setDriverLicenseStatus] = useState(0);
     const [driverLicenseUpload, setDriverLicenseUpload] = useState(false);
+    const [driverLicenseUrl, setDriverLicenseUrl] = useState('');
     const [socialCard, setSocialCard] = useState({ name: '', content: '', type: '' });
     const [socialCardStatus, setSocialCardStatus] = useState(0);
     const [socialCardUpload, setSocialCardUpload] = useState(false);
+    const [socialCardUrl, setSocialCardUrl] = useState('');
     const [physicalExam, setPhysicalExam] = useState({ name: '', content: '', type: '' });
     const [physicalExamStatus, setPhysicalExamStatus] = useState(0);
     const [physicalExamUpload, setPhysicalExamUpload] = useState(false);
+    const [physicalExamUrl, setPhysicalExamUrl] = useState('');
     const [ppd, setPpd] = useState({ name: '', content: '', type: '' });
     const [ppdStatus, setPpdStatus] = useState(0);
     const [ppdUpload, setPpdUpload] = useState(false);
+    const [ppdUrl, setPpdUrl] = useState('');
     const [mmr, setMmr] = useState({ name: '', content: '', type: '' });
     const [mmrStatus, setMmrStatus] = useState(0);
     const [mmrUpload, setMmrUpload] = useState(false);
+    const [mmrUrl, setMmrUrl] = useState('');
     const [healthcareLicense, setHealthcareLicense] = useState({ name: '', content: '', type: '' });
     const [healthcareLicenseStatus, setHealthcareLicenseStatus] = useState(0);
     const [healthcareLicenseUpload, setHealthcareLicenseUpload] = useState(false);
+    const [healthcareLicenseUrl, setHealthcareLicenseUrl] = useState('');
     const [resume, setResume] = useState({ name: '', content: '', type: '' });
     const [resumeStatus, setResumeStatus] = useState(0);
     const [resumeUpload, setResumeUpload] = useState(false);
+    const [resumeUrl, setResumeUrl] = useState('');
     const [covidCard, setCovidCard] = useState({ name: '', content: '', type: '' });
     const [covidCardStatus, setCovidCardStatus] = useState(0);
     const [covidCardUpload, setCovidCardUpload] = useState(false);
+    const [covidCardUrl, setCovidCardUrl] = useState('');
     const [bls, setBls] = useState({ name: '', content: '', type: '' });
     const [blsStatus, setBlsStatus] = useState(0);
     const [blsUpload, setBlsUpload] = useState(false);
+    const [blsUrl, setBlsUrl] = useState('');
     const [hepB, setHepB] = useState({ name: '', content: '', type: '' });
     const [hepBStatus, setHepBStatus] = useState(0);
     const [hepBUpload, setHepBUpload] = useState(false);
+    const [hepBUrl, setHepBUrl] = useState('');
     const [flu, setFlu] = useState({ name: '', content: '', type: '' });
     const [fluStatus, setFluStatus] = useState(0);
     const [fluUpload, setFluUpload] = useState(false);
+    const [fluUrl, setFluUrl] = useState('');
     const [cna, setCna] = useState({ name: '', content: '', type: '' });
     const [cnaStatus, setCnaStatus] = useState(0);
     const [cnaUpload, setCnaUpload] = useState(false);
+    const [cnaUrl, setCnaUrl] = useState('');
     const [taxForm, setTaxForm] = useState({ name: '', content: '', type: '' });
     const [taxFormStatus, setTaxFormStatus] = useState(0);
     const [taxFormUpload, setTaxFormUpload] = useState(false);
+    const [taxFormUrl, setTaxFormUrl] = useState('');
     const [chrc102, setChrc102] = useState({ name: '', content: '', type: '' });
     const [chrc102Status, setChrc102Status] = useState(0);
     const [chrc102Upload, setChrc102Upload] = useState(false);
+    const [chrc102Url, setChrc102Url] = useState('');
     const [chrc103, setChrc103] = useState({ name: '', content: '', type: '' });
     const [chrc103Status, setChrc103Status] = useState(0);
     const [chrc103Upload, setChrc103Upload] = useState(false);
+    const [chrc103Url, setChrc103Url] = useState('');
     const [drug, setDrug] = useState({ name: '', content: '', type: '' });
     const [drugStatus, setDrugStatus] = useState(0);
     const [drugUpload, setDrugUpload] = useState(false);
+    const [drugUrl, setDrugUrl] = useState('');
     const [ssc, setSsc] = useState({ name: '', content: '', type: '' });
     const [sscStatus, setSscStatus] = useState(0);
     const [sscUpload, setSscUpload] = useState(false);
+    const [sscUrl, setSscUrl] = useState('');
     const [copyOfTB, setCopyOfTB] = useState({ name: '', content: '', type: '' });
     const [copyOfTBStatus, setCopyOfTBStatus] = useState(0);
     const [copyOfTBUpload, setCopyOfTBUpload] = useState(false);
+    const [copyOfTBUrl, setCopyOfTBUrl] = useState('');
 
     async function getData() {
         setLoading(true);
@@ -380,6 +398,46 @@ export default function VerifyCation ({ navigation, route }) {
         }
     };
 
+    const handleSetUrl = (target, e) => {
+        if (target == "driverLicense") {
+            setDriverLicenseUrl(e);
+        } else if (target == "socialCard") {
+            setSocialCardUrl(e);
+        } else if (target == "physicalExam") {
+            setPhysicalExamUrl(e);
+        } else if (target == "ppd") {
+            setPpdUrl(e);
+        } else if (target == "mmr") {
+            setMmrUrl(e);
+        } else if (target == "healthcareLicense") {
+            setHealthcareLicenseUrl(e);
+        } else if (target == "resume") {
+            setResumeUrl(e);
+        } else if (target == "covidCard") {
+            setCovidCardUrl(e);
+        } else if (target == "bls") {
+            setBlsUrl(e);
+        } else if (target == "hepB") {
+            setHepBUrl(e);
+        } else if (target == "flu") {
+            setFluUrl(e);
+        } else if (target == "cna") {
+            setCnaUrl(e);
+        } else if (target == "taxForm") {
+            setTaxFormUrl(e);
+        } else if (target == "chrc102") {
+            setChrc102Url(e);
+        } else if (target == "chrc103") {
+            setChrc103Url(e);
+        } else if (target == "drug") {
+            setDrugUrl(e);
+        } else if (target == "ssc") {
+            setSscUrl(e);
+        } else if (target == "copyOfTB") {
+            setCopyOfTBUrl(e);
+        }
+    };
+
     const toggleFileTypeSelectModal = () => {
         setFiletypeSelectModal(!fileTypeSelectModal);
     };
@@ -436,6 +494,7 @@ export default function VerifyCation ({ navigation, route }) {
                         type: 'image',
                         name: response.assets[0].fileName,
                     });
+                    handleSetUrl(sfileType, fileUri);
                     toggleFileTypeSelectModal();
                 }
             });
@@ -486,6 +545,7 @@ export default function VerifyCation ({ navigation, route }) {
                         type: 'image',
                         name: response.assets[0].fileName,
                     });
+                    handleSetUrl(sfileType, pickedImage);
                     toggleFileTypeSelectModal();
                 } else {
                     Alert.alert(
@@ -534,6 +594,7 @@ export default function VerifyCation ({ navigation, route }) {
                 fileType = 'unknown';
             }
             handleCredentials(sfileType, { content: `${fileContent}`, type: fileType, name: res[0].name });
+            handleSetUrl(sfileType, res[0].uri)
             toggleFileTypeSelectModal();
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
@@ -552,8 +613,50 @@ export default function VerifyCation ({ navigation, route }) {
         navigation.navigate("UserFileViewer", { userId: id, filename: data });
     };
     
-    const handleFileViewer = (data) => {
-        navigation.navigate("FileViewer", { jobId: '', fileData: data });
+    const handleFileViewer = (target, data) => {
+        let content = '';
+        if (target == "driverLicense") {
+            content = driverLicenseUrl;
+        } else if (target == "socialCard") {
+            content = socialCardUrl
+        } else if (target == "physicalExam") {
+            content = physicalExamUrl;
+        } else if (target == "ppd") {
+            content = ppdUrl;
+        } else if (target == "mmr") {
+            content = mmrUrl;
+        } else if (target == "healthcareLicense") {
+            content = healthcareLicenseUrl;
+        } else if (target == "resume") {
+            content = resumeUrl;
+        } else if (target == "covidCard") {
+            content = covidCardUrl;
+        } else if (target == "bls") {
+            content = blsUrl;
+        } else if (target == "hepB") {
+            content = hepBUrl;
+        } else if (target == "flu") {
+            content = fluUrl;
+        } else if (target == "cna") {
+            content = cnaUrl;
+        } else if (target == "taxForm") {
+            content = taxFormUrl;
+        } else if (target == "chrc102") {
+            content = chrc102Url;
+        } else if (target == "chrc103") {
+            content = chrc103Url;
+        } else if (target == "drug") {
+            content = drugUrl;
+        } else if (target == "ssc") {
+            content = sscUrl;
+        } else if (target == "copyOfTB") {
+            content = copyOfTBUrl;
+        }
+
+        if (content == "") {
+            content = data.content;
+        }
+        navigation.navigate("FileViewer", { jobId: '', fileData: { name: data.name, type: data.type, content: content } });
     };
 
     const handleRemove = (target) => {
@@ -765,9 +868,9 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (driverLicense.content != "") {
-                                        handleFileViewer(driverLicense);
+                                            handleFileViewer('driverLicense', driverLicense);
                                         } else {
-                                        handleShowFile('driverLicense');
+                                            handleShowFile('driverLicense');
                                         }
                                     }}
                                 >{driverLicense.name}</Text>
@@ -816,7 +919,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (socialCard.content != "") {
-                                        handleFileViewer(socialCard);
+                                        handleFileViewer('socialCard', socialCard);
                                         } else {
                                         handleShowFile('socialCard');
                                         }
@@ -867,7 +970,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (physicalExam.content != "") {
-                                        handleFileViewer(physicalExam);
+                                        handleFileViewer('physicalExam', physicalExam);
                                         } else {
                                         handleShowFile('physicalExam');
                                         }
@@ -918,7 +1021,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (ppd.content != "") {
-                                        handleFileViewer(ppd);
+                                        handleFileViewer('ppd', ppd);
                                         } else {
                                         handleShowFile('ppd');
                                         }
@@ -969,7 +1072,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (mmr.content != "") {
-                                        handleFileViewer(mmr);
+                                        handleFileViewer('mmr', mmr);
                                         } else {
                                         handleShowFile('mmr');
                                         }
@@ -1020,7 +1123,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (healthcareLicense.content != "") {
-                                        handleFileViewer(healthcareLicense);
+                                        handleFileViewer('healthcareLicense', healthcareLicense);
                                         } else {
                                         handleShowFile('healthcareLicense');
                                         }
@@ -1071,7 +1174,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (resume.content != "") {
-                                        handleFileViewer(resume);
+                                        handleFileViewer('resume', resume);
                                         } else {
                                         handleShowFile('resume');
                                         }
@@ -1122,7 +1225,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (covidCard.content != "") {
-                                        handleFileViewer(covidCard);
+                                        handleFileViewer('covidCard', covidCard);
                                         } else {
                                         handleShowFile('covidCard');
                                         }
@@ -1173,7 +1276,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (bls.content != "") {
-                                        handleFileViewer(bls);
+                                        handleFileViewer('bls', bls);
                                         } else {
                                         handleShowFile('bls');
                                         }
@@ -1224,7 +1327,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (hepB.content != "") {
-                                        handleFileViewer(hepB);
+                                        handleFileViewer('hepB', hepB);
                                         } else {
                                         handleShowFile('hepB');
                                         }
@@ -1275,7 +1378,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (flu.content != "") {
-                                        handleFileViewer(flu);
+                                        handleFileViewer('flu', flu);
                                         } else {
                                         handleShowFile('flu');
                                         }
@@ -1326,7 +1429,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (cna.content != "") {
-                                        handleFileViewer(cna);
+                                        handleFileViewer('cna', cna);
                                         } else {
                                         handleShowFile('cna');
                                         }
@@ -1377,7 +1480,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (taxForm.content != "") {
-                                        handleFileViewer(taxForm);
+                                        handleFileViewer('taxForm', taxForm);
                                         } else {
                                         handleShowFile('taxForm');
                                         }
@@ -1428,7 +1531,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (chrc102.content != "") {
-                                        handleFileViewer(chrc102);
+                                        handleFileViewer('chrc102', chrc102);
                                         } else {
                                         handleShowFile('chrc102');
                                         }
@@ -1479,7 +1582,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (chrc103.content != "") {
-                                        handleFileViewer(chrc103);
+                                        handleFileViewer('chrc103', chrc103);
                                         } else {
                                         handleShowFile('chrc103');
                                         }
@@ -1530,7 +1633,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (drug.content != "") {
-                                        handleFileViewer(drug);
+                                        handleFileViewer('drug', drug);
                                         } else {
                                         handleShowFile('drug');
                                         }
@@ -1581,7 +1684,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (ssc.content != "") {
-                                        handleFileViewer(ssc);
+                                        handleFileViewer('ssc', ssc);
                                         } else {
                                         handleShowFile('ssc');
                                         }
@@ -1632,7 +1735,7 @@ export default function VerifyCation ({ navigation, route }) {
                                     style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} 
                                     onPress={() => { 
                                         if (copyOfTB.content != "") {
-                                        handleFileViewer(copyOfTB);
+                                        handleFileViewer('copyOfTB', copyOfTB);
                                         } else {
                                         handleShowFile('copyOfTB');
                                         }

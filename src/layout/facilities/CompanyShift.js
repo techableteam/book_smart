@@ -727,7 +727,7 @@ export default function CompanyShift({ navigation }) {
         content = `
           <html>
           <body style="margin: 0; padding: 0;">
-              <img src="data:image/jpeg;base64,${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
+              <img src="${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
           </body>
           </html>
         `;
@@ -1444,8 +1444,9 @@ export default function CompanyShift({ navigation }) {
                   <View style={[styles.modalBody, { padding: 0, paddingVertical: 10 }]}>
                   {fileInfo.type.indexOf('pdf') >= 0 ? (
                     <Pdf
-                      source={{ uri: `data:application/pdf;base64,${fileInfo.content}` }}
+                      source={{ uri: `${fileInfo.content}` }}
                       style={styles.pdf}
+                      trustAllCerts={false}
                     />
                   ) : (
                     <WebView

@@ -1,64 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Dimensions, Text, Image } from 'react-native';
 import Pdf from 'react-native-pdf';
-import { useFocusEffect } from '@react-navigation/native';
-import { getUserImage } from '../utils/useApi';
 import Loader from './Loader';
 
-export default function UserFileViewer({ navigation, route }) {
-    const { userId, filename } = route.params;
+export default function AdminFileViewer({ navigation, route }) {
+    const { fileData } = route.params;
+    const [loading, setLoading] = useState(false);
     const [htmlContent, setHtmlContent] = useState('');
     const [fileInfo, setFileInfo] = useState({ content: '', type: '', name: '' });
-    const [loading, setLoading] = useState(false);
 
-    const getData = async () => {
+    const setData = async () => {
         setLoading(true);
-        console.log(userId);
-        let result = await getUserImage({ userId, filename }, 'clinical');
-        console.log(result);
-        if (!result?.error) {
-            const fetchedFileInfo = result;
-            let content = '';
+        const fetchedFileInfo = fileData;
+        console.log(fileData);
+        let content = '';
 
-            if (fetchedFileInfo.type === 'pdf') {
-                setFileInfo(fetchedFileInfo);
-            } else if (fetchedFileInfo.type === 'image') {
-                content = `
-                    <html>
-                    <body style="margin: 0; padding: 0;">
-                        <img src="${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
-                    </body>
-                    </html>
-                `;
-                setHtmlContent(content);
-                setFileInfo(fetchedFileInfo);
-            } else {
-                content = `
-                    <html>
-                        <body style="margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100%;">
-                            <p>No valid file type found.</p>
-                        </body>
-                    </html>
-                `;
-                setHtmlContent(content);
-            }
-        } else {
-            setHtmlContent(`
+        if (fetchedFileInfo.type === 'pdf') {
+            // For PDF, no need to generate HTML
+            setFileInfo(fetchedFileInfo);
+        } else if (fetchedFileInfo.type === 'image') {
+            content = `
                 <html>
-                    <body>
-                        <p>Error fetching the file.</p>
+                <body style="margin: 0; padding: 0;">
+                    <img src="data:image/jpeg;base64,${fetchedFileInfo.content}" style="display: block; margin-left: auto; margin-right: auto; width: 80%;"/>
+                </body>
+                </html>
+            `;
+            setHtmlContent(content);
+            setFileInfo(fetchedFileInfo);
+        } else {
+            content = `
+                <html>
+                    <body style="margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100%;">
+                        <p>No valid file type found.</p>
                     </body>
                 </html>
-            `);
+            `;
+            setHtmlContent(content);
         }
         setLoading(false);
     };
 
-    useFocusEffect(
-        React.useCallback(() => {
-            getData();
-        }, [])
-    );
+    useEffect(() => {
+        setData();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -69,9 +54,8 @@ export default function UserFileViewer({ navigation, route }) {
             </View>
             {fileInfo.type === 'pdf' ? (
                 <Pdf
-                    source={{ uri: `${fileInfo.content}` }}
+                    source={{ uri: fileInfo.content }}
                     style={styles.pdf}
-                    trustAllCerts={false}
                 />
             ) : (
                 fileInfo.content && <Image
@@ -87,7 +71,7 @@ export default function UserFileViewer({ navigation, route }) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     webView: {
         flex: 1,

@@ -23,6 +23,7 @@ export default function AdminEditProfile({ navigation }) {
   const [lastName, setLastName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [phone, setPhone] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
   const [email, setEmail] = useAtom(emailAtom);
   const [tfirstName, settfirstNmae] = useAtom(firstNameAtom);
   const [tlastName, settlastNmae] = useAtom(lastNameAtom);
@@ -58,6 +59,7 @@ export default function AdminEditProfile({ navigation }) {
       setAvatar({  name: '', type: '', content: '' });
       setTemail('');
       setAddress({ street: '', street2: '', city: '', state: '', zip: '' });
+      setPhotoUrl('');
     } else {
       setFirstName(response.user.firstName);
       setLastName(response.user.lastName);
@@ -66,6 +68,7 @@ export default function AdminEditProfile({ navigation }) {
       setAvatar(response.user.photoImage);
       setTemail(response.user.email);
       setAddress(response.user.address);
+      setPhotoUrl(response.user.photoImage.content);
     }
     setLoading(false);
   };
@@ -135,6 +138,7 @@ export default function AdminEditProfile({ navigation }) {
           console.log('Camera error code: ', response.errorCode);
         } else {
           const fileUri = response.assets[0].uri;
+          setPhotoUrl(fileUri);
           const fileContent = await RNFS.readFile(fileUri, 'base64');
           
           setAvatar({
@@ -190,7 +194,7 @@ export default function AdminEditProfile({ navigation }) {
         } else if (response.assets && response.assets.length > 0) {
           const pickedImage = response.assets[0].uri;
           const fileContent = await RNFS.readFile(pickedImage, 'base64');
-          
+          setPhotoUrl(pickedImage);
           setAvatar({
             content: fileContent,
             type: 'image',
@@ -247,6 +251,7 @@ export default function AdminEditProfile({ navigation }) {
       } else {
         fileType = 'unknown';
       }
+      setPhotoUrl(res[0].uri);
       setAvatar({ content: `${fileContent}`, type: fileType, name: res[0].name });
       toggleFileTypeSelectModal();
     } catch (err) {
@@ -323,6 +328,7 @@ export default function AdminEditProfile({ navigation }) {
         setEmail(response.user.email);
         settfirstNmae(response.user.firstName);
         settlastNmae(response.user.lastName);
+        console.log(response);
         navigation.goBack();
       } catch (error) {
         console.error('Signup failed: ', error);
@@ -336,7 +342,7 @@ export default function AdminEditProfile({ navigation }) {
   }
 
   const handleShowFile = (data) => {
-    navigation.navigate("FileViewer", { jobId: '', fileData: data });
+    navigation.navigate("AdminFileViewer", { fileData: { name: data.name, type: data.type, content: photoUrl } });
   };
 
   return (

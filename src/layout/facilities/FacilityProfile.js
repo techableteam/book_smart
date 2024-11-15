@@ -58,7 +58,7 @@ export default function FacilityProfile ({ navigation }) {
               <Text style={styles.profileTitle}>FACILITY PROFILE</Text>
             </View>
             {avatar.content && <Image
-              source={{ uri: `data:image/jpeg;base64,${avatar.content}` }}
+              source={{ uri: `${avatar.content}` }}
               resizeMode="cover"
               style={styles.nurse}
             />}

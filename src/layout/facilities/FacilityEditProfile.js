@@ -282,7 +282,6 @@ export default function FacilityEditProfile({ navigation }) {
     } else {
       try {
         setLoading(true);
-        console.log('credentials: ', credentials);
         const response = await Update(credentials, "facilities");
         setFirstName(response.user.firstName);
         setLastName(response.user.lastName);
@@ -291,7 +290,6 @@ export default function FacilityEditProfile({ navigation }) {
         setCompanyName(response.user.companyName);
         setAddress(response.user.address);
         setAvatar(response.user.avatar);
-        console.log('Signup successful: ', response)
         setLoading(false);
         navigation.navigate('FacilityProfile');
       } catch (error) {
@@ -716,7 +714,7 @@ const styles = StyleSheet.create({
   },
   chooseFile: {
     width: '30%', 
-    height: 30, 
+    height: RFValue(30), 
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'center',

@@ -37,6 +37,7 @@ export default function AdminCompany ({ navigation }) {
   const getData = async () => {
     setLoading(true);
     let response = await getAdminInfo({ email: email });
+    console.log(response);
     if (response?.error) {
       setFirstName('');
       setLastName('');
@@ -78,7 +79,7 @@ export default function AdminCompany ({ navigation }) {
               <Text style={styles.profileTitle}>ADMIN / COMPANY PROFILE</Text>
             </View>
             {avatar.content && <Image
-              source={{ uri: `data:image/jpeg;base64,${avatar.content}` }}
+              source={{ uri: `${avatar.content}` }}
               resizeMode="contain"
               style={styles.nurse}
             />}
