@@ -105,7 +105,7 @@ export default function ClientPhone ({ navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <ScrollView style={{width: '100%', height: '60%', marginTop: height * 0.15}}>
           <View style={styles.authInfo}>
             <Text style={styles.subject}> 2FA Authentication </Text>

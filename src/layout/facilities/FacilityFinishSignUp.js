@@ -15,7 +15,7 @@ export default function FacilityFinishSignup ({ navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <View style={{width: '100%', height: '60%', marginTop: 99, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>

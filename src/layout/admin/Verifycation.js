@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Image, StatusBar, Modal, Dimensions, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useFocusEffect } from '@react-navigation/native';
+import RNBlobUtil from "react-native-blob-util";
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import { getUserInfo, Update } from '../../utils/useApi';
@@ -593,8 +593,23 @@ export default function VerifyCation ({ navigation, route }) {
             } else {
                 fileType = 'unknown';
             }
+
+            if (res[0].uri.startsWith("content://")) {
+                const targetPath = `${RNBlobUtil.fs.dirs.DocumentDir}/${res[0].name}`;
+
+                RNBlobUtil.fs
+                    .cp(uri, targetPath)
+                    .then(() => {
+                        handleSetUrl(sfileType, targetPath)
+                    })
+                    .catch((err) => {
+                        console.error("Error copying file:", err);
+                    });
+            } else {
+                handleSetUrl(sfileType, res[0].uri)
+            }
             handleCredentials(sfileType, { content: `${fileContent}`, type: fileType, name: res[0].name });
-            handleSetUrl(sfileType, res[0].uri)
+            
             toggleFileTypeSelectModal();
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {

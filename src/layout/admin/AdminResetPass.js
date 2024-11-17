@@ -33,16 +33,11 @@ export default function AdminResetPassword ({ navigation }) {
   }
 
   const handleSubmit = async () => {
-    console.log('email: ', email)
     if (password === confirmPassword) {
       const response = await ResetPassword({password: password, email: email}, 'admin');
-      console.log(response)
       if (!response.error) {
-        console.log('success');
-        
         navigation.navigate('AdminPending')
-      }
-      else {
+      } else {
         Alert.alert(
           'Failed!',
           `${response.error}`,
@@ -82,7 +77,7 @@ export default function AdminResetPassword ({ navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
@@ -101,7 +96,7 @@ export default function AdminResetPassword ({ navigation }) {
                   value={password || ''}
                 />
                 <TextInput
-                  style={[styles.input, {width: '100%', color: 'black'}]}
+                  style={[constStyles.forgotInputText, {width: '90%', color: 'black'}]}
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"        
@@ -116,10 +111,10 @@ export default function AdminResetPassword ({ navigation }) {
                 Submit
               </HButton>
             </View>
-            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
+            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 20, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
-              Back to 🏚️ Caregiver Home
+              Back to 🏚️ Admin Home
             </Text>
           </View>
         </View>
@@ -190,9 +185,9 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
-    fontSize: 16,
+    backgroundColor: '#A020F0',
+    color: 'white',
+    fontSize: RFValue(16),
   },
 });
   

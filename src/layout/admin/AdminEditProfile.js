@@ -350,7 +350,7 @@ export default function AdminEditProfile({ navigation }) {
       <StatusBar 
         translucent backgroundColor="transparent"
       />
-      <MHeader navigation={navigation}/>
+      <MHeader navigation={navigation} back={true} />
       <MSubNavbar navigation={navigation} name={"Admin"} />
       <ScrollView style = {styles.scroll}    
         showsVerticalScrollIndicator={false}

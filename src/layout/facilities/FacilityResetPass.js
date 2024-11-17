@@ -10,6 +10,7 @@ import SubNavbar from '../../components/SubNavbar';
 import { useAtom } from 'jotai';
 import { contactEmailAtom } from '../../context/FacilityAuthProvider';
 import { ResetPassword } from '../../utils/useApi';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 
 export default function FacilityResetPassword ({ navigation }) {
@@ -81,7 +82,7 @@ export default function FacilityResetPassword ({ navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
@@ -118,7 +119,7 @@ export default function FacilityResetPassword ({ navigation }) {
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
-              Back to 🏚️ Caregiver Home
+              Back to 🏚️ Facility Home
             </Text>
           </View>
         </View>
@@ -154,7 +155,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white', 
-    height: 30, 
+    height: RFValue(30), 
     marginBottom: 10, 
     borderWidth: 1, 
     borderColor: 'hsl(0, 0%, 86%)',
@@ -189,9 +190,9 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
-    fontSize: 16,
+    backgroundColor: '#A020F0',
+    color: 'white',
+    fontSize: RFValue(16),
   },
 });
   

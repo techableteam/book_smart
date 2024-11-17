@@ -306,7 +306,7 @@ export default function FacilityEditProfile({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent"/>
-      <MHeader navigation={navigation}/>
+      <MHeader navigation={navigation} back={true} />
       <MSubNavbar navigation={navigation} name={"Facilities"} />
       <ScrollView style = {styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>

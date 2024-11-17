@@ -94,8 +94,6 @@ export default function AccountSettings ({ route, navigation }) {
         {
           text: 'OK',
           onPress: () => {
-            setPassword('');
-            setConfirmPassword('');
             console.log('OK pressed')
           },
         },
@@ -149,17 +147,22 @@ export default function AccountSettings ({ route, navigation }) {
   };
   
   const handlePasswordSubmit = async () => {
-    if (password !== currentPassword ) {
+    console.log('currentpassword', currentPassword);
+    console.log('password', password);
+    console.log('creden', credentials.password);
+    console.log('confirm', confirmPassword);
+    console.log('userrole', userRole);
+    if (password !== currentPassword || credentials.password == "" || confirmPassword == "" ) {
       showAlert('Please enter correct Password');
     } else {
       if (credentials.password !== confirmPassword) {
-        showAlert('Please enter correct Password');
+        showAlert('Your password not matched. please input password again.');
       } else {
         let updateData = {};
         if (userRole === 'facilities') {
           updateData = {contactEmail: credentials.contactEmail, password: confirmPassword}
         } else {
-          updateData = {email: credentials.email, password: password}
+          updateData = {email: credentials.email, password: confirmPassword}
         }
         
         let Data = await Updates(updateData, userRole);
@@ -190,7 +193,7 @@ export default function AccountSettings ({ route, navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <SubNavbar navigation={navigation} name={"ClientSignIn"} />
         <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}

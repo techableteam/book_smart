@@ -55,7 +55,7 @@ export default function AdminForgotPwd ({ navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <View style={{width: '100%', height: '60%', marginTop: 50, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
@@ -83,7 +83,7 @@ export default function AdminForgotPwd ({ navigation }) {
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 20, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
-              Back to 🏚️ Caregiver Home
+              Back to 🏚️ Admin Home
             </Text>
           </View>
         </View>

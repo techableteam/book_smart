@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     height: '100%',
     top: 0,
     left: 0,
-    zIndex: 9999, // Ensure this is higher than any modal or other component
+    zIndex: 999999, // Ensure this is higher than any modal or other component
   },
   loaderContent: {
     flexDirection: 'row',

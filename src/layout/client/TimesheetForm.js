@@ -5,24 +5,15 @@ import MHeader from '../../components/Mheader';
 import { WebView } from 'react-native-webview';
 
 export default function TimesheetForm ({ navigation }) {
-    const handleBack = () => {
-        navigation.navigate('MyHome');
-    };
-
     return (
         <View style={styles.container}>
             <StatusBar translucent backgroundColor="transparent" />
-            <MHeader navigation={navigation} />
+            <MHeader navigation={navigation} back={true} />
             <WebView
                 originWhitelist={['*']}
                 source={{ uri: 'https://form.jotform.com/242875749430163' }}
                 style={styles.webView}
             />
-            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
-              onPress={handleBack}
-            >
-              Back to 🏚️ Caregiver Home
-            </Text>
             <MFooter />
         </View>
     );

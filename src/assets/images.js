@@ -19,7 +19,8 @@ const images = {
     plus: require("./images/plus.png"),
     folder: require("./images/folder.png"),
     gallery: require("./images/gallery.png"),
-    camera: require("./images/camera.png")
+    camera: require("./images/camera.png"),
+    back: require('./images/back.png')
 };
   
   export default images;

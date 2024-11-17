@@ -87,6 +87,7 @@ export default function AdminLogin({ navigation }) {
         setLastName(response.user.lastName);
         setEmail(response.user.email);
         setUserRole(response.user.userRole);
+        setPassword(response.user.password);
         if (checked) {
           await AsyncStorage.setItem('AdminEmail', credentials.email);
           await AsyncStorage.setItem('AdminPassword', credentials.password);

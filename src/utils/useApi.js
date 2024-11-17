@@ -68,15 +68,9 @@ export const PhoneSms = async (credentials, endpoint) => {
 
 export const VerifyCodeSend = async (credentials, endpoint) => {
   try {
-    console.log("login", credentials);
     const response = await axios.post(`api/${endpoint}/verifyCode`, credentials);
-    console.log(response);
-    // if (response.data.verifyCode) {
-    //   await AsyncStorage.setItem('token', response.data.verifyCode);
-    // }
-    return response.data;
-  } catch (error) {
-    console.error(error)    
+    return response;
+  } catch (error) {    
     return {error: error.response.data.message};
   }
 }
@@ -155,8 +149,7 @@ export const ResetPassword = async (credentials, endpoint) => {
   try {
     const response = await axios.post(`api/${endpoint}/resetPassword`, credentials);
     return response.data;
-  } catch (error) {
-    console.error(error)    
+  } catch (error) { 
     return {error: error.response.data.message};
   }
 }
@@ -322,7 +315,7 @@ export const removeAccount = async (data, endpoint) => {
 
 export const Updates = async (updateData, endpoint) => {
   try {
-    console.log("update");
+    console.log("update", updateData);
     // Existing token (obtained from AsyncStorage or login)
     const existingToken = await AsyncStorage.getItem('token');
 

@@ -469,7 +469,7 @@ export default function AddNewFacility({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent"/>
-      <MHeader navigation={navigation} />
+      <MHeader navigation={navigation} back={true} />
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
           <View style={styles.intro}>

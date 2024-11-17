@@ -241,7 +241,7 @@ export default function ShiftListing ({ navigation }) {
         <StatusBar 
             translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'} />
         <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}

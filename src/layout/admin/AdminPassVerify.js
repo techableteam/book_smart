@@ -16,6 +16,7 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const CELL_COUNT = 6;
 
@@ -69,14 +70,10 @@ export default function AdminPassVerify ({ navigation }) {
   const handleSubmit = async () => {
     console.log('email: ', email, value);
     handleCredentials('verifyCode', value)
-    const response = await VerifyCodeSend({verifyCode: value}, 'admin');
-    console.log(response)
+    const response = await VerifyCodeSend({verifyCode: value, email: email}, 'admin');
     if (!response.error) {
-      console.log('success');
-      
       navigation.navigate('AdminResetPassword')
-    }
-    else {
+    } else {
       Alert.alert(
         'Failed!',
         `${response.error}`,
@@ -100,7 +97,7 @@ export default function AdminPassVerify ({ navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
@@ -141,7 +138,7 @@ export default function AdminPassVerify ({ navigation }) {
             <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
-              Back to 🏚️ Caregiver Home
+              Back to 🏚️ Admin Home
             </Text>
           </View>
         </View>
@@ -212,9 +209,9 @@ const styles = StyleSheet.create({
   subBtn: {
     marginTop: 0,
     padding: 10,
-    backgroundColor: '#447feb',
-    color: 'black',
-    fontSize: 16,
+    backgroundColor: '#A020F0',
+    color: 'white',
+    fontSize: RFValue(16),
   },
   verify: {
       width: "100%",
@@ -225,10 +222,10 @@ const styles = StyleSheet.create({
       marginRight: "4%"
   },
   cell: {
-    width: 40,
-    height: 50,
-    lineHeight: 20,
-    fontSize: 20,
+    width: RFValue(30),
+    height: RFValue(40),
+    lineHeight: RFValue(15),
+    fontSize: RFValue(15),
     fontWeight: '700',
     textAlign: 'center',
     textAlignVertical:'center',

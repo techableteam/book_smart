@@ -106,7 +106,7 @@ export default function ClientPhoneVerify ({ navigation }) {
         <StatusBar 
           translucent backgroundColor="transparent"
         />
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <View style={{width: '100%', height: '60%', marginTop: 110, justifyContent:'center', alignItems: 'center', display: 'flex'}}
         >
           <View style={styles.authInfo}>
@@ -231,13 +231,10 @@ const styles = StyleSheet.create({
       marginRight: "4%"
   },
   cell: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
     width: RFValue(30),
     height: RFValue(40),
-    lineHeight: RFValue(40),
-    fontSize: RFValue(20),
+    lineHeight: RFValue(15),
+    fontSize: RFValue(15),
     fontWeight: '700',
     textAlign: 'center',
     textAlignVertical:'center',

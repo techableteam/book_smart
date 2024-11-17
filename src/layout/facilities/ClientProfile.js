@@ -41,7 +41,7 @@ export default function ClientProfile({ navigation, route }) {
     return (
         <View style={styles.container}>
             <StatusBar translucent backgroundColor="transparent" />
-            <MHeader navigation={navigation} />
+            <MHeader navigation={navigation} back={true} />
             <SubNavbar navigation={navigation} name={'ClientSignIn'} />
             <ScrollView style={{ width: '100%', marginTop: 160 }} showsVerticalScrollIndicator={false} >
                 <View style = {{ flex: 1, justifyContent: 'center', alignItems: 'center', width : '100%'}}>

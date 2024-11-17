@@ -1010,7 +1010,7 @@ export default function CompanyShift({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent"/>
-      <MHeader navigation={navigation} />
+      <MHeader navigation={navigation} back={true} />
       <SubNavbar navigation={navigation} name={"FacilityLogin"} />
       <ScrollView style={{ width: '100%', marginTop: height * 0.25 }}>
         <View style={styles.topView}>

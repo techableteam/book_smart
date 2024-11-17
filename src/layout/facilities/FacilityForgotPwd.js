@@ -56,7 +56,7 @@ export default function FacilityForgotPwd ({ navigation }) {
   return (
       <View style={styles.container}>
         <StatusBar translucent backgroundColor="transparent"/>
-        <MHeader navigation={navigation} />
+        <MHeader navigation={navigation} back={true} />
         <ScrollView style={{width: '100%', height: '60%', marginTop: height * 0.15}}>
           <View style={styles.authInfo}>
             <Text style={constStyles.loginMainTitle}> Forgot Password ?</Text>
@@ -80,10 +80,10 @@ export default function FacilityForgotPwd ({ navigation }) {
                 Submit
               </HButton>
             </View>
-            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 100, textAlign: 'left', width: '90%'}}
+            <Text style={{textDecorationLine: 'underline', color: '#2a53c1', marginBottom: 30, textAlign: 'left', width: '90%'}}
               onPress={handleBack}
             >
-              Back to 🏚️ Facility Login
+              Back to 🏚️ Facility Home
             </Text>
           </View>
         </ScrollView>

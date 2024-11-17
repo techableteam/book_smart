@@ -134,6 +134,7 @@ export default function AddJobShift({ navigation }) {
     } else {
       try {
         const response = await PostJob(credentials, 'jobs');
+        console.log(response);
         setloading(false);
         navigation.navigate('CompanyShift');
       } catch (error) {
@@ -178,7 +179,7 @@ export default function AddJobShift({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar translucent backgroundColor="transparent"/>
-      <MHeader navigation={navigation}/>
+      <MHeader navigation={navigation} back={true} />
       <SubNavbar navigation={navigation} name={"FacilityLogin"} />
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.modal}>
@@ -328,7 +329,6 @@ export default function AddJobShift({ navigation }) {
             </View>
           </View>
         </View>
-        <Loader visible={loading}/>
       </ScrollView>
       {showAddDegreeModal && <Modal
         Visible={false}
@@ -398,6 +398,7 @@ export default function AddJobShift({ navigation }) {
           </View>
         </View>
       </Modal>}
+      <Loader visible={loading}/>
       <MFooter />
     </View>
   );
