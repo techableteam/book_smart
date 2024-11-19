@@ -10,6 +10,7 @@ import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom, emailAtom, userRoleAtom, caregiverAtom } from '../../context/ClinicalAuthProvider';
 import { RFValue } from "react-native-responsive-fontsize";
 import { Dimensions } from 'react-native';
+import AnimatedHeader from '../AnimatedHeader';
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,7 +45,7 @@ export default function MyHome ({ navigation }) {
             />
             <View style={styles.bottomBar}/> */}
             <TouchableOpacity onPress={() => navigation.navigate("ShiftListing")}>
-              <Text style={styles.headBar}>Book Shifts Now!</Text>
+              <AnimatedHeader title="Book Shifts Now!" />
             </TouchableOpacity>
           </View>
           <View style={styles.imageButton}>

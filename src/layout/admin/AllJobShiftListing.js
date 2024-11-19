@@ -523,7 +523,7 @@ export default function AllJobShiftListing({ navigation }) {
       // getLocation();
       // getDegree();
       // getNurseList();
-      getData();
+      // getData();
       setLoading(false);
     }, [])
   );

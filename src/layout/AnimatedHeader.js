@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     backgroundColor: 'transparent',
     paddingVertical: RFValue(10),
+    paddingHorizontal: RFValue(10),
     textAlign: "center"
   },
 });

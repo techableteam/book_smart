@@ -921,13 +921,13 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: RFValue(14),
-    lineHeight: RFValue(30),
+    fontSize: RFValue(12),
+    lineHeight: RFValue(24),
     width: '35%'
   },
   content: {
-    fontSize: RFValue(14),
-    lineHeight: RFValue(30),
+    fontSize: RFValue(12),
+    lineHeight: RFValue(24),
     width: '60%'
   },
   profileTitleBg: {

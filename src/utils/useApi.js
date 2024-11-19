@@ -578,7 +578,7 @@ export const Jobs = async (data, endpoint, role) => {
       }
     });
 
-    if (response.data.token) {
+    if (response?.data?.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
     return response.data;
