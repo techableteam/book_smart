@@ -41,7 +41,6 @@ export default function AllJobShiftListing({ navigation }) {
   const [lunch, setLunch] = useState('');
   const [content, setContent] = useState('');
   const [approved, setApproved] = useState(false);
-  const [clinicians, setClinicians] = useState([]);
   const [isJobEditModal, setIsJobEditModal] = useState(false);
   const [accouts, setAccounts] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -328,7 +327,7 @@ export default function AllJobShiftListing({ navigation }) {
   const handleSubmit = () => {
     setIsSubmitted(true);
     toggleAddFilterModal();
-    const requestData = { search: search, page: curPage, filters: filters };
+    const requestData = { search: search, page: curPage };
     getData(requestData, true);
   };
 
@@ -402,10 +401,7 @@ export default function AllJobShiftListing({ navigation }) {
     'Delete'
   ];
 
-  const getData = async (requestData = { search: search, page: curPage, filters: filters }, isFilter = isSubmitted ) => {
-    // if (!isFilter) {
-    //   requestData.filters = [];
-    // }
+  const getData = async (requestData = { search: search, page: curPage }, isFilter = isSubmitted ) => {
     setLoading(true);
     let result = await Jobs(requestData, 'jobs', 'Admin');
     if(!result) {
@@ -420,27 +416,6 @@ export default function AllJobShiftListing({ navigation }) {
       setData(result.dataArray);
       setLoading(false);
     }
-    const uniqueValues = new Set();
-    const transformed = [];
-    
-    let clinicianData = await Clinician('clinical/clinician', 'Admin');
-    const extractData = clinicianData.map(item => {
-      const firstName = item[1];
-      const lastName = item[2];
-      return firstName ? `${firstName} ${lastName}` : null;
-    });
-
-    const uniqueNames = Array.from(new Set(extractData.filter(name => name)));
-
-    uniqueNames.forEach(subarray => {
-      const value = subarray;
-      if (!uniqueValues.has(value)) {
-          uniqueValues.add(value);
-          transformed.push({ label: value, value: value });
-      }
-    });
-
-    setClinicians(transformed);
   }
 
   const getAccounts = async () => {
@@ -1136,12 +1111,13 @@ export default function AllJobShiftListing({ navigation }) {
   const handleReset = (event) => {
     event.persist();
     setSearch(''); 
-    getData({ search: '', page: curPage, filters: filters });
+    getData({ search: '', page: curPage });
   };
   
   const handleSearch = (event) => {
     event.persist();
-    getData();
+    setCurPage(1);
+    getData({ search: search, page: 1 });
   };
 
   useEffect(() => {
@@ -1581,106 +1557,6 @@ export default function AllJobShiftListing({ navigation }) {
             </View>
           </View>
           
-          <Modal
-            visible={modal}
-            transparent= {true}
-            animationType="slide"
-            onRequestClose={() => {
-              setModal(!modal);
-            }}
-          >
-            <View style={styles.modalContainer}>
-              <View style={styles.calendarContainer}>
-                <View style={styles.header}>
-                  <Text style={styles.headerText}>{tableHead[modalItem]}</Text>
-                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleModal}>
-                    <Image source = {images.close} style={{width: 20, height: 20,}}/>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.body}>
-                  <View style={styles.modalBody}>
-                    {
-                      (modalItem === 1) || (modalItem === 4) || (modalItem === 9) ?
-                        <Dropdown
-                          style={[styles.dropdown, {width: '100%'}, isFocus && { borderColor: 'blue' }]}
-                          placeholderStyle={styles.placeholderStyle}
-                          selectedTextStyle={styles.selectedTextStyle}
-                          inputSearchStyle={styles.inputSearchStyle}
-                          itemTextStyle={styles.itemTextStyle}
-                          iconStyle={styles.iconStyle}
-                          data={
-                            modalItem === 1 ? clinicians :
-                            modalItem === 4 ?  location :
-                            (modalItem === 9) && jobStatus
-                          }
-                          // search
-                          maxHeight={300}
-                          labelField="label"
-                          valueField="value"
-                          placeholder={label}
-                          // searchPlaceholder="Search..."
-                          value={label}
-                          onFocus={() => setJobIsFocus(true)}
-                          onBlur={() => setJobIsFocus(false)}
-                          onChange={item => {
-                            setLabel(item.label);
-                            setJobIsFocus(false);
-                          }}
-                          renderLeftIcon={() => (
-                            <View
-                              style={styles.icon}
-                              color={isJobFocus ? 'blue' : 'black'}
-                              name="Safety"
-                              size={20}
-                            />
-                          )}
-                        />
-                      :
-                      (modalItem === 3) || (modalItem === 6) || (modalItem === 10) ?
-                        (<TextInput
-                          style={[styles.searchText, {width: '100%', paddingTop: 0, paddingBottom: 0, textAlignVertical: 'center'}]}
-                          placeholder=""
-                          onChangeText={e => setLabel(e)}
-                          value={label || ''}
-                        />)
-                      :
-                      modalItem === 5 ?
-                        <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
-                          <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalendar)}} style={{width: '100%', height: 40}}>
-                            <View pointerEvents="none">
-                              <TextInput
-                                style={[styles.searchText, {width: '100%', paddingTop: 0, textAlignVertical: 'center', color: 'black', paddingBottom: 0, fontSize: RFValue(18)}]}
-                                placeholder=""
-                                value={label}
-                                editable={false}
-                              />
-                            </View>
-                          </TouchableOpacity>
-                          {showCalendar 
-                            && 
-                            <>
-                              <DatePicker
-                                date={date}
-                                onDateChange={(day) => handleDay(day)}
-                                mode="date"
-                                theme='light'
-                                androidVariant="native"
-                              />
-                              <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalendar);}} />
-                            </>
-                          }
-                        </View>
-                      :
-                      <></>
-                    }
-                    <TouchableOpacity style={styles.button} onPress={handlePress} underlayColor="#0056b3">
-                      <Text style={styles.buttonText}>Update</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </Modal>
           <Modal
             visible={isJobDetailModal}
             transparent= {true}
