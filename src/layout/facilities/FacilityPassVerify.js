@@ -215,11 +215,10 @@ const styles = StyleSheet.create({
   cell: {
     width: RFValue(30),
     height: RFValue(40),
-    lineHeight: RFValue(15),
-    fontSize: RFValue(15),
+    lineHeight: RFValue(40),
+    fontSize: RFValue(20),
     fontWeight: '700',
     textAlign: 'center',
-    textAlignVertical:'center',
     marginLeft: "2.8%",
     borderRadius: 10,
     backgroundColor: '#dddddd',
