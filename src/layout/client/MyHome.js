@@ -45,7 +45,7 @@ export default function MyHome ({ navigation }) {
             />
             <View style={styles.bottomBar}/> */}
             <TouchableOpacity onPress={() => navigation.navigate("ShiftListing")}>
-              <AnimatedHeader title="Book Shifts Now!" />
+              <AnimatedHeader title="Book Shifts Now!" style={{ paddingHorizontal: 30 }} />
             </TouchableOpacity>
           </View>
           <View style={styles.imageButton}>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: RFValue(40),
+    marginTop: RFValue(5),
     marginLeft: '10%',
     width: '80%',
     flexDirection: 'column',

@@ -5,7 +5,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const { width, height } = Dimensions.get('window');
 
-export default AnimatedHeader = ({ title }) => {
+export default AnimatedHeader = ({ title, style = null }) => {
   const [colorIndex, setColorIndex] = useState(0); // Initial color index
   const [backgroundColor, setBackgroundColor] = useState(new Animated.Value(0)); // Animated value
 
@@ -33,7 +33,7 @@ export default AnimatedHeader = ({ title }) => {
   });
 
   return (
-    <Animated.View style={[styles.backTitle, { backgroundColor: bgColor }]}>
+    <Animated.View style={[styles.backTitle, style ? style : {}, { backgroundColor: bgColor }]}>
       <Text style={styles.title}>{title}</Text>
     </Animated.View>
   );

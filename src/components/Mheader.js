@@ -16,9 +16,9 @@ export default function MHeader({back}) {
 
   return (
     <Card style={styles.shadow}>
-      <View style={styles.textContainer}>
+      <View style={styles.textContainer} >
         {back ? (
-          <TouchableOpacity onPress={handleBack} style={{ zIndex: 11111 }}>
+          <TouchableOpacity onPress={handleBack} style={{ zIndex: 12000 }}>
             <Image source={images.back} style={{ width: 30, height: 40 }} />
           </TouchableOpacity>
         ) : (
