@@ -31,7 +31,7 @@ export default function EditProfile({ navigation }) {
   const [address, setAddress] = useState('');
   const [photoImage, setPhotoImage] = useState('');
   const [title, setTitle] = useState('');
-  const [birthdays, setBirthdays] = useState('');
+  const [birthdays, setBirthdays] = useState(new Date());
   const [socialSecurityNumber, setSocialSecurityNumber] = useState('');
   const [driverLicense, setDriverLicense] = useState({
     content: '',
@@ -114,8 +114,13 @@ export default function EditProfile({ navigation }) {
       Object.keys(updatedCredentials).forEach((key) => {
         if (result.userData[key]) {
           if (key === 'birthday') {
-            updatedCredentials[key] = new Date(result.userData[key]);
-            setBirthdays(new Date(result.userData[key]));
+            if (result.userData[key]) {
+              updatedCredentials[key] = new Date(result.userData[key]);
+              setBirthdays(new Date(result.userData[key]));
+            } else {
+              updatedCredentials[key] = new Date();
+              setBirthdays(new Date());
+            }
           } else if (typeof updatedCredentials[key] === 'object') {
             updatedCredentials[key] = { ...updatedCredentials[key], ...result.userData[key] };
           } else if (typeof result.userData[key] == 'boolean') {
