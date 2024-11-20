@@ -12,10 +12,12 @@ import MFooter from '../../components/Mfooter';
 import { PostJob, getDegreeList, addDegreeItem, Clinician, getLocationList, addLocationItem } from '../../utils/useApi';
 import SubNavbar from '../../components/SubNavbar';
 import { RFValue } from 'react-native-responsive-fontsize';
+import Loader from '../Loader';
 
 const { width, height } = Dimensions.get('window');
 
 export default function AdminJobShift({ navigation }) {
+  const [loading, setLoading] = useState(false);
   const [facility, setFacility] = useState([]);
   const [facilityValue, setFacilityValue] = useState('');
   const [isFacilityFocus, setIsFacilityFocus] = useState(false);
@@ -59,7 +61,9 @@ export default function AdminJobShift({ navigation }) {
   }, [credentials.facilityId]);
 
   const getData = async () => {
+    setLoading(true);
     let data = await Clinician('facilities/getFacilityList', 'Admin');
+    setLoading(false);
     if(!data?.error) {
       const uniqueValues = new Set();
       const transformed = [];
@@ -476,6 +480,7 @@ export default function AdminJobShift({ navigation }) {
           </View>
         </View>
       </Modal>}
+      <Loader visible={loading}/>
       <MFooter />
     </View>
   );
