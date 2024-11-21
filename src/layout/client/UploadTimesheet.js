@@ -321,18 +321,18 @@ export default function UploadTimesheet ({ navigation, route }) {
                     </View>
                     <View style={{ marginHorizontal: 20, marginBottom: 30 }}>
                         <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                            <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[0]?.title}</Text>
-                            <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[0]?.content}</Text>
+                            <Text style={[styles.titles, {marginBottom: 5,  marginTop: 20, paddingLeft: 2, minWidth: 300}]}>{detailedInfos[0]?.title}</Text>
+                            <Text style={[styles.content, { marginTop: 0, minWidth: 300}]}>{detailedInfos[0]?.content}</Text>
                         </View>
                         <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                            <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[1]?.title}</Text>
-                            <Text style={[styles.content, {lineHeight: 20, marginTop: 0}]}>{detailedInfos[1]?.content}</Text>
+                            <Text style={[styles.titles, {marginBottom: 5,  marginTop: 20, paddingLeft: 2, minWidth: 300}]}>{detailedInfos[1]?.title}</Text>
+                            <Text style={[styles.content, { marginTop: 0, minWidth: 300}]}>{detailedInfos[1]?.content}</Text>
                         </View>
                         <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
-                            <Text style={[styles.titles, {marginBottom: 5, lineHeight: 20, marginTop: 20, paddingLeft: 2}]}>{detailedInfos[2]?.title}</Text>
+                            <Text style={[styles.titles, {marginBottom: 5,  marginTop: 20, paddingLeft: 2, minWidth: 300}]}>{detailedInfos[2]?.title}</Text>
                             {detailedInfos[2]?.content && 
                             <View style={{ flexDirection: 'row' }}>
-                                <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: '80%' }]} onPress={() => { handleShowFile(detailedInfos); }}>{detailedInfos[2]?.content}</Text>
+                                <Text style={[styles.content, {  marginTop: 0, color: 'blue', width: '80%' }]} onPress={() => { handleShowFile(detailedInfos); }}>{detailedInfos[2]?.content}</Text>
                                 <Text style={{color: 'blue'}} onPress= {handleDelete}>&nbsp;&nbsp;remove</Text>
                             </View>}
                         </View>
@@ -383,18 +383,18 @@ export default function UploadTimesheet ({ navigation, route }) {
                             <View style={styles.body}>
                                 <View style={[styles.modalBody, { marginBottom: 20 }]}>
                                     <View style={styles.cameraContain}>
-                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
-                                        <Image source={images.camera} style={styles.modalImage} />
-                                        <Text style={styles.textStyle}>Camera</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
-                                        <Image source={images.gallery} style={styles.modalImage} />
-                                        <Text style={styles.textStyle}>Gallery</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
-                                        <Image source={images.folder} style={styles.modalImage} />
-                                        <Text style={styles.textStyle}>Folder</Text>
-                                    </TouchableOpacity>
+                                        <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
+                                            <Image source={images.camera} style={styles.modalImage} />
+                                            <Text style={styles.textStyle}>Camera</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
+                                            <Image source={images.gallery} style={styles.modalImage} />
+                                            <Text style={styles.textStyle}>Gallery</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
+                                            <Image source={images.folder} style={styles.modalImage} />
+                                            <Text style={styles.textStyle}>Folder</Text>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
                             </View>
@@ -456,14 +456,14 @@ const styles = StyleSheet.create({
     },
     titles: {
         fontWeight: 'bold',
-        fontSize: RFValue(18),
-        lineHeight: RFValue(30),
+        fontSize: RFValue(15),
+        lineHeight: RFValue(20),
         width: '40%',
         color: "black"
     },
     content: {
-        fontSize: RFValue(16),
-        lineHeight: RFValue(30),
+        fontSize: RFValue(15),
+        lineHeight: RFValue(20),
         width: '60%',
         color: "black"
     },
@@ -551,14 +551,13 @@ const styles = StyleSheet.create({
         fontSize: RFValue(16),
     },
     btnSheet: {
-        height: RFValue(100),
-        width: RFValue(100),
+        height: RFValue(80),
+        width: RFValue(80),
         justifyContent: "center",
         alignItems: "center",
         borderRadius: RFValue(10),
         shadowOpacity: 0.5,
         shadowRadius: 10,
-        margin: 5,
         shadowColor: '#000',
         shadowOffset: { width: 3, height: 3 },
         marginVertical: RFValue(14),

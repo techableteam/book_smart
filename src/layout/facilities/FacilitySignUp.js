@@ -702,15 +702,15 @@ export default function FacilitySignUp({ navigation }) {
                 <View style={styles.body}>
                   <View style={[styles.modalBody, { marginBottom: RFValue(20) }]}>
                     <View style={styles.cameraContain}>
-                      <TouchableOpacity activeOpacity={0.5} style={constStyles.signUpbtnSheet} onPress={openCamera}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={openCamera}>
                         <Image source={images.camera} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Camera</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={constStyles.signUpbtnSheet} onPress={pickGallery}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickGallery}>
                         <Image source={images.gallery} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Gallery</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity activeOpacity={0.5} style={constStyles.signUpbtnSheet} onPress={pickFile}>
+                      <TouchableOpacity activeOpacity={0.5} style={styles.btnSheet} onPress={pickFile}>
                         <Image source={images.folder} style={{ width: 50, height: 50 }} />
                         <Text style={styles.textStyle}>Folder</Text>
                       </TouchableOpacity>
@@ -805,6 +805,19 @@ const styles = StyleSheet.create({
     elevation: 0, // Elevation for Android devices
     backgroundColor: '#ffffffa8',
   },
+  btnSheet: {
+    height: RFValue(80),
+    width: RFValue(80),
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
   intro: {
     marginTop: RFValue(30),
     paddingHorizontal: RFValue(20),

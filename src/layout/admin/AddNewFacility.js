@@ -1001,8 +1001,8 @@ const styles = StyleSheet.create({
     paddingRight: 10
   },
   btnSheet: {
-		height: 100,
-		width:100,
+    height: RFValue(80),
+    width: RFValue(80),
 		justifyContent: "center",
 		alignItems: "center",
 		borderRadius: 10,

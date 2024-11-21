@@ -2448,6 +2448,19 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
     paddingVertical: 20
 	},
+  btnSheet: {
+    height: RFValue(80),
+    width: RFValue(80),
+		justifyContent: "center",
+		alignItems: "center",
+		borderRadius: 10,
+		shadowOpacity: 0.5,
+		shadowRadius: 10,
+		margin: 5,
+		shadowColor: '#000',
+		shadowOffset: { width: 3, height: 3 },
+		marginVertical: 14, padding: 5,
+	},
   removeButton: {
     textAlign: 'center',
     color: 'white'
