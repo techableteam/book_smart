@@ -246,10 +246,10 @@ export default function ShiftListing ({ navigation }) {
         <ScrollView style={{width: '100%', marginTop: height * 0.25}}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.topView}>
+          {/* <View style={styles.topView}>
             <AnimatedHeader title="JOB / SHIFT LISTINGS" />
             <View style={styles.bottomBar}/>
-          </View>
+          </View> */}
           <Text style={styles.text}>View and Apply for Shifts below, once applied the Facility will be notified, and if <Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> the shift will appear on your <Text style={{fontWeight: 'bold'}}>&nbsp;"MY SHIFTS TAB"&nbsp;</Text>.</Text>
           <View style={styles.imageButton}>
             <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
