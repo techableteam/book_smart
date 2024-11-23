@@ -1265,7 +1265,7 @@ export default function AllJobShiftListing({ navigation }) {
       />
       <AHeader navigation={navigation}  currentPage={1} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }}
+      <ScrollView style={{ width: '100%', marginTop: height * 0.22 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>

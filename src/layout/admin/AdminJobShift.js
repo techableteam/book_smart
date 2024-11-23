@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffff8'
   },
   scroll: {
-    marginTop: height * 0.25
+    marginTop: height * 0.22
   },
   headBar: {
     textAlign: 'center',

@@ -36,7 +36,7 @@ export default function CaregiverProfile({ navigation, route }) {
             <StatusBar translucent backgroundColor="transparent" />
             <MHeader navigation={navigation} back={true} />
             <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-            <ScrollView style={{ width: '100%', marginTop: height * 0.25 }} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{ width: '100%', marginTop: height * 0.22 }} showsVerticalScrollIndicator={false} >
 
                 <View style = {{ flex:1, justifyContent:'center', alignItems: 'center', width: '100%' }}>
 
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     topView: {
-        marginTop: 30,
+        marginTop: 10,
         marginLeft: '10%',
         width: '80%',
         flexDirection: 'column',

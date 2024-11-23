@@ -164,7 +164,7 @@ export default function Reporting ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent" />
         <MHeader navigation={navigation} back={true} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <AnimatedHeader title="CAREGIVER REPORTING" />
             <View style={styles.bottomBar}/>
@@ -219,7 +219,7 @@ export default function Reporting ({ navigation }) {
               <View style={[styles.profileTitleBg, {marginTop: 30}]}>
                 <Text style={styles.profileTitle}>Daily & Weekly Pay</Text>
               </View>
-              <View style={{width: '90%', marginBottom: 30}}>
+              <View style={{width: '90%', marginBottom: 0}}>
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
                   <Text style={[styles.name, { width: '25%' }]}>Day:</Text>
                   <View>
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
+    marginTop: 0,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'

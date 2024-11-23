@@ -1012,7 +1012,7 @@ export default function CompanyShift({ navigation }) {
       <StatusBar translucent backgroundColor="transparent"/>
       <MHeader navigation={navigation} back={true} />
       <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }}>
+      <ScrollView style={{ width: '100%', marginTop: height * 0.22 }}>
         <View style={styles.topView}>
           <AnimatedHeader title="COMPANY JOBS / SHIFTS" />
           <View style={styles.bottomBar} />
@@ -1135,7 +1135,7 @@ export default function CompanyShift({ navigation }) {
           <View style={styles.modalContainer}>
             <View style={styles.calendarContainer}>
               <View style={styles.header}>
-                <Text style={styles.headerText}>Add / View Rating</Text>
+                <Text style={styles.headerText}>Add Rating</Text>
                 <TouchableOpacity style={{width: RFValue(20), height: RFValue(20)}} onPress={toggleRatingsModal}>
                   <Image source = {images.close} style={{width: RFValue(20), height: RFValue(20)}}/>
                 </TouchableOpacity>
@@ -1833,7 +1833,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
+    marginTop: 10,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'

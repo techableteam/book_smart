@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, StatusBar } from 'react-native';
+import { View, Image, StyleSheet, ScrollView, StatusBar, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
-import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { getClientInfoWithJobId } from '../../utils/useApi';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const { width, height } = Dimensions.get('window');
 
 export default function ClientProfile({ navigation, route }) {
     const { id } = route.params;
@@ -43,7 +44,7 @@ export default function ClientProfile({ navigation, route }) {
             <StatusBar translucent backgroundColor="transparent" />
             <MHeader navigation={navigation} back={true} />
             <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-            <ScrollView style={{ width: '100%', marginTop: 160 }} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{ width: '100%',  marginTop: height * 0.22 }} showsVerticalScrollIndicator={false} >
                 <View style = {{ flex: 1, justifyContent: 'center', alignItems: 'center', width : '100%'}}>
                     <View style={styles.profile}>
                         <View style={styles.profileTitleBg}>
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     topView: {
-        marginTop: 30,
+        marginTop: 10,
         marginLeft: '10%',
         width: '80%',
         flexDirection: 'column',

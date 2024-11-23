@@ -25,7 +25,7 @@ export default function AdminHome ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent"/>
         <AHeader currentPage={3} navigation={navigation} style={{zIndex: 10}}/>
         <SubNavbar navigation={navigation} name={"AdminLogin"} style={{zIndex: 0}}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
+    marginTop: 10,
     marginLeft: '10%',
     width: '80%',
     flexDirection: 'column',

@@ -38,7 +38,7 @@ export default function FacilityProfile ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent"/>
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={"FacilityLogin"}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <Image
               source={images.mark}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     height: RFValue(68),
   },
   topView: {
-    marginTop: 50,
+    marginTop: 20,
     marginLeft: '10%',
     width: '80%',
     flexDirection: 'column',

@@ -559,11 +559,11 @@ export default function Shift ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent" />
         <MHeader navigation={navigation} back={true} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
-          <View style={styles.topView}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
+          {/* <View style={styles.topView}>
             <AnimatedHeader title="AWARDED & COMPLETED SHIFTS" />
             <View style={styles.bottomBar}/>
-          </View>
+          </View> */}
           <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"PENDING VERIFICAITON"&nbsp;</Text>.</Text>
           {downloading ? (
             <Text style={[styles.text, { marginTop: RFValue(15) }]}>Downloading...</Text>
@@ -642,7 +642,7 @@ export default function Shift ({ navigation }) {
                   </View>
                 )}
                 <View style={{ flex:1, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                  <TouchableOpacity style={[styles.edit, {marginTop: RFValue(15), backgroundColor: '#A020F0'}]} onPress = {() => handleUploadEdit(it[0].content)}>
+                  <TouchableOpacity style={[styles.edit, {marginTop: RFValue(10), backgroundColor: '#A020F0'}]} onPress = {() => handleUploadEdit(it[0].content)}>
                     <Text style={{color: 'white', fontSize: RFValue(14), fontWeight:'bold'}}>Upload Timesheet</Text>
                   </TouchableOpacity>
                 </View>
@@ -811,7 +811,7 @@ export default function Shift ({ navigation }) {
           >
             <StatusBar translucent backgroundColor='transparent' />
             <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
-              <View style={[styles.viewContainer, { marginTop: '1%' }]}>
+              <View style={[styles.viewContainer, { marginTop: '50%' }]}>
                 <View style={[styles.header, { height: 100 }]}>
                   <Text style={styles.headerText}>Choose File</Text>
                   <TouchableOpacity style={{ width: 20, height: 20 }} onPress={toggleFileTypeSelectModal}>
@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
+    marginTop: 10,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'
@@ -958,7 +958,6 @@ const styles = StyleSheet.create({
     width: '70%',
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: RFValue(10)
   },
   subBar: {
     width: '100%',

@@ -25,14 +25,14 @@ export default function SubNavbar({name, navigation}) {
   return (
     <Card style={styles.shadow}>
       <View>
-        <Text style={{color: "black", fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)}}>
+        <Text style={{color: "black", fontSize: pixelRatio > 1 ? RFValue(8) : RFValue(14)}}>
           Logged in as&nbsp;
-          <Text style={{fontWeight: 'bold', color:"black", fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)}}>{firstName}</Text>&nbsp;-&nbsp;
+          <Text style={{fontWeight: 'bold', color:"black", fontSize: pixelRatio > 1 ? RFValue(8) : RFValue(14)}}>{firstName}</Text>&nbsp;-&nbsp;
           <Text 
             style={{
               color: '#2a53c1', 
               textDecorationLine: 'underline',
-              fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)
+              fontSize: pixelRatio > 1 ? RFValue(8) : RFValue(14)
             }}
             onPress={()=>handleNavigate('AccountSettings')}
           >
@@ -45,7 +45,7 @@ export default function SubNavbar({name, navigation}) {
             style={{
               color: '#2a53c1', 
               textDecorationLine: 'underline',
-              fontSize: pixelRatio > 1.5 ? RFValue(10) : RFValue(14)
+              fontSize: pixelRatio > 1 ? RFValue(8) : RFValue(14)
             }}
             onPress={()=>handleNavigate(name)}>
             Log Out
@@ -61,12 +61,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'hsl(0, 0%, 80%)',
     position: 'absolute',
     top: height * 0.15,
-    height: height * 0.1,
+    height: height * 0.07,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'flex-end',
     paddingHorizontal: RFValue(10),
-    paddingVertical: RFValue(5)
+    paddingVertical: pixelRatio > 1 ? RFValue(0) : RFValue(5)
   },
   actionsContainer: {
     width: '100%',

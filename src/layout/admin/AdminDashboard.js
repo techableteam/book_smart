@@ -133,7 +133,7 @@ export default function AdminDashboard ({ navigation }) {
         />
         <AHeader navigation={navigation} currentPage={0} />
         <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topView}>
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
+    marginTop: 10,
     marginLeft: '10%',
     width: '80%',
     flexDirection: 'column',

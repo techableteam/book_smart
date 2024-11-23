@@ -460,7 +460,7 @@ export default function AdminFacilities({ navigation }) {
       <StatusBar translucent backgroundColor="transparent"/>
       <AHeader navigation={navigation}  currentPage={6} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
-      <ScrollView style={{ width: '100%', marginTop: height * 0.25 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ width: '100%', marginTop: height * 0.22 }} showsVerticalScrollIndicator={false}>
         <View style={styles.topView}>
           <AnimatedHeader title="ALL PLATFORM FACILITIES" />
           <View style={styles.bottomBar} />

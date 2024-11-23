@@ -1,8 +1,10 @@
-import { TouchableOpacity, StyleSheet, Image, ToastAndroid } from 'react-native';
+import { TouchableOpacity, StyleSheet, Image, PixelRatio } from 'react-native';
 import React from 'react';
 import { Text } from 'react-native-paper';
 import images from '../assets/images';
 import { RFValue } from 'react-native-responsive-fontsize';
+
+const pixelRatio = PixelRatio.getFontScale();
 
 export default function ImageButton({
   title,
@@ -32,8 +34,8 @@ export default function ImageButton({
 
 const styles = StyleSheet.create({
   button: {
-    width: RFValue(130),
-    height: RFValue(130),
+    width: RFValue(105),
+    height: RFValue(105),
     borderRadius: RFValue(20),
     backgroundColor: "#A020F0",
     borderColor: 'white',
@@ -44,11 +46,11 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   image: {
-    width: RFValue(50),
-    height: RFValue(50),
+    width: RFValue(40),
+    height: RFValue(40),
   },
   text: {
-    fontSize: RFValue(16),
+    fontSize:  pixelRatio > 1.5 ? RFValue(9) : RFValue(14),
     fontWeight: '800',
     color: 'white',
     textAlign: 'center',

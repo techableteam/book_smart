@@ -243,7 +243,7 @@ export default function ShiftListing ({ navigation }) {
         />
         <MHeader navigation={navigation} back={true} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'} />
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}}
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}}
           showsVerticalScrollIndicator={false}
         >
           {/* <View style={styles.topView}>
@@ -343,13 +343,13 @@ export default function ShiftListing ({ navigation }) {
           <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
             <View style={styles.viewContainer}>
               <View style={styles.header}>
-                <Text style={styles.headerText}>View Job / Shift Details</Text>
+                <Text style={styles.headerText}>Book Shifts Now</Text>
                 <TouchableOpacity style={styles.modalCloseImage} onPress={toggleModal}>
                   <Image source = {images.close} style={styles.modalCloseImage}/>
                 </TouchableOpacity>
               </View>
               <View style={styles.body}>
-                <TouchableOpacity style={styles.backBtn} onPress = {handleBack}>
+                <TouchableOpacity style={[styles.backBtn, { width: '100%' }]} onPress = {handleBack}>
                   <Text style={[styles.profileTitle, {textAlign: 'center'}]}>Back to Job / Shift Listings {'>'}</Text>
                 </TouchableOpacity>
                 <View style={styles.modalBody}>
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
+    marginTop: 10,
     marginLeft: '10%',
     width: '80%',
     position: 'relative'
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
   subBar: {
     width: '100%',
     backgroundColor: "#dcd6fa",
-    padding: 20,
+    paddingHorizontal: RFValue(20),
     borderRadius: 20,
     borderWidth: 2,
     borderColor: "#c6c5c5",
@@ -601,7 +601,6 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   body: {
-    marginTop: 10,
     paddingHorizontal:20,
   },
   inputs: {

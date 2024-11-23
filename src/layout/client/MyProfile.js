@@ -38,7 +38,7 @@ export default function MyProfile ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent"/>
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             <AnimatedHeader title="CAREGIVER PROFILE & DOCS" />
             <View style={styles.bottomBar}/>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   topView: {
-    marginTop: 30,
+    marginTop: 10,
     marginLeft: '10%',
     width: '80%',
     flexDirection: 'column',

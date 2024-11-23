@@ -28,7 +28,7 @@ export default function MyHome ({ navigation }) {
     {title: 'Name', content: firstName + ' ' + lastName},
     {title: 'Email', content: email},
     {title: 'User Roles', content: userRole},
-    {title: 'Caregiver', content: caregiver},
+    // {title: 'Caregiver', content: caregiver},
   ];
 
   return (
@@ -36,7 +36,7 @@ export default function MyHome ({ navigation }) {
         <StatusBar translucent backgroundColor="transparent"/>
         <MHeader navigation={navigation} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-        <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
             {/* <Image
               source={images.mark}
@@ -68,15 +68,12 @@ export default function MyHome ({ navigation }) {
                 )
               }
             </View>
-
             <Image
               source={images.homepage}
               resizeMode="cover"
               style={styles.homepage}
             />
           </View>
-          
-          
         </ScrollView>
         <MFooter />
       </View>
@@ -132,7 +129,8 @@ const styles = StyleSheet.create({
   profile: {
     marginTop: RFValue(20),
     width: '84%',
-    padding: RFValue(20),
+    paddingHorizontal: RFValue(20),
+    paddingVertical: RFValue(5),
     backgroundColor: '#c2c3c42e',
     borderRadius: RFValue(30),
     borderWidth: RFValue(2),

@@ -855,7 +855,7 @@ export default function EditProfile({ navigation }) {
                 />
               </View>
             </View>
-            <View style={[styles.btn, {marginTop: 20}]}>
+            <View style={[styles.btn, {marginTop: 10, marginBottom: 20}]}>
               <HButton style={styles.subBtn} onPress={ handleSubmit }>
                 Submit
               </HButton>
@@ -1251,7 +1251,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent'
   },
   bottomBar: {
-    marginTop: 20,
     height: 5,
     backgroundColor: '#C0D1DD',
     width: '100%'
@@ -1264,7 +1263,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '80%',
     marginLeft: '10%',
-    marginVertical: 20
+    marginTop: RFValue(10)
   },
   profileTitle: {
     fontWeight: 'bold',
@@ -1365,7 +1364,8 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 130
   },
-  btn: {flexDirection: 'column',
+  btn: {
+    flexDirection: 'column',
     gap: 20,
     marginBottom: 30,
   },

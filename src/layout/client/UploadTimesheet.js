@@ -314,12 +314,12 @@ export default function UploadTimesheet ({ navigation, route }) {
             <StatusBar translucent backgroundColor="transparent" />
             <MHeader navigation={navigation} back={true} />
             <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-            <ScrollView style={{width: '100%', marginTop: height * 0.25}} showsVerticalScrollIndicator={false} >
+            <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false} >
                 <View style={styles.modal}>
                     <View style= {{width: '100%', marginTop: RFValue(20), paddingHorizontal : RFValue(50)}}>
                         <Text style={styles.headBar}>Upload TimeSheet</Text>
                     </View>
-                    <View style={{ marginHorizontal: 20, marginBottom: 30 }}>
+                    <View style={{ marginHorizontal: 20, marginBottom: 10 }}>
                         <View style={{flexDirection: 'column', width: '100%', gap: 10}}>
                             <Text style={[styles.titles, {marginBottom: 5,  marginTop: 20, paddingLeft: 2, minWidth: 300}]}>{detailedInfos[0]?.title}</Text>
                             <Text style={[styles.content, { marginTop: 0, minWidth: 300}]}>{detailedInfos[0]?.content}</Text>
@@ -348,13 +348,13 @@ export default function UploadTimesheet ({ navigation, route }) {
                                 value={submitData?.timeSheet?.name || ''}
                             />
                         </View>
-                        <View style={[styles.btn, {marginTop: RFValue(20)}]}>
+                        <View style={[styles.btn, {marginTop: RFValue(5)}]}>
                             <HButton style={styles.subBtn} onPress={handleUploadSubmit }>
                                 Submit
                             </HButton>
                         </View>
                         <Text
-                            style={{textDecorationLine: 'underline', color: '#2a53c1', marginTop: RFValue(20), fontSize: RFValue(14), textAlign: 'left', width: '90%'}}
+                            style={{textDecorationLine: 'underline', color: '#2a53c1', marginTop: RFValue(10), fontSize: RFValue(14), textAlign: 'left', width: '90%'}}
                             onPress={handleBack}
                         >
                             Back to My Shift
@@ -373,7 +373,7 @@ export default function UploadTimesheet ({ navigation, route }) {
                 >
                     <StatusBar translucent backgroundColor='transparent' />
                     <ScrollView style={styles.modalsContainer} showsVerticalScrollIndicator={false}>
-                        <View style={[styles.viewContainer, { marginTop: '1%' }]}>
+                        <View style={[styles.viewContainer, { marginTop: '50%' }]}>
                             <View style={[styles.header, { height: RFValue(100) }]}>
                                 <Text style={styles.headerText}>Choose File</Text>
                                 <TouchableOpacity style={styles.modalClose} onPress={toggleFileTypeSelectModal}>
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: 'white', 
         height: 30, 
-        marginBottom: 10, 
+        marginBottom: 0, 
         borderWidth: 1, 
         borderColor: 'hsl(0, 0%, 86%)',
         paddingVertical: 5

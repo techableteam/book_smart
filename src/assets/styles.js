@@ -111,8 +111,7 @@ const constStyles = StyleSheet.create({
     signUpinput: {
         backgroundColor: 'white', 
         fontSize: RFValue(14),
-        height: RFValue(30), 
-        marginBottom: RFValue(10), 
+        height: RFValue(30),
         borderWidth: 1, 
         borderColor: 'hsl(0, 0%, 86%)',
     },
