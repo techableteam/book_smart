@@ -64,6 +64,7 @@ import UploadTimesheet from './client/UploadTimesheet.js';
 import VerifyCation from './admin/Verifycation.js';
 import TimesheetForm from './client/TimesheetForm.js';
 import AdminFileViewer from './AdminFileViewer.js';
+import BookShiftsNow from './client/BookShiftsNow.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -284,6 +285,11 @@ function Layout() {
       <Stack.Screen 
         name= 'AdminFacilities'
         component = {AdminFacilities}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'BookShiftsNow'
+        component = {BookShiftsNow}
         options={{headerShown: false}}
       />
       <Stack.Screen 

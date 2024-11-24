@@ -41,9 +41,10 @@ export default function ShiftListing ({ navigation }) {
   const getData = async () => {
     setGettingData(true);
     let data = await Jobs({}, 'jobs', 'Clinician');
+    console.log(data);
     if(data?.error) {
       setGettingData(false);
-      setData(['No Data'])
+      setData(['No Data']);
     } else {
       setData(data.dataArray);
       const transformedData = data.dataArray.map(item => [{
@@ -130,7 +131,7 @@ export default function ShiftListing ({ navigation }) {
     console.log('handleEdit--->', id);
     console.log(detailedInfos[id])
     setModalData(filteredDetailData[id]);
-    toggleModal()  
+    navigation.navigate("BookShiftsNow", { modalData: filteredDetailData[id], firstName: firstName, lastName: lastName, aic: aic }); 
   };
 
   const [showModal, setShowModal] = useState(false);

@@ -27,6 +27,8 @@ export default function CompanyShift({ navigation }) {
   const [totalPages, setTotalPages] = useState(1);
   const [tableData, setTableData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [curPage, setCurPage] = useState(1);
+  const [search, setSearch] = useState('');
   const [value, setValue] = useState(100);
   const [isFocus, setIsFocus] = useState(false);
   const [showShiftDate, setShowShiftDate] = useState(false);
@@ -100,14 +102,11 @@ export default function CompanyShift({ navigation }) {
       value: 2
     }
   ]), []);
-  const pageItems = [
-    {label: '10 per page', value: '10'},
-    {label: '25 per page', value: '25'},
-    {label: '50 per page', value: '50'},
-    {label: '100 per page', value: '100'},
-    {label: '500 per page', value: '500'},
-    {label: '1000 per page', value: '1000'},
-  ];
+
+  const [pageItems, setPageList] = useState([
+    {label: 'Page 1', value: 1}
+  ]);
+
   const jobStatus = [
     {label: 'Available', value: 'Available'},
     {label: 'Awarded', value: 'Awarded'},
@@ -146,15 +145,20 @@ export default function CompanyShift({ navigation }) {
 
   const [data, setData] = useState([]);
 
-  const getData = async () => {
+  const getData = async (requestData = { search: search, page: curPage }) => {
     setLoading(true);
-    let result = await Jobs({}, 'jobs', 'Facilities');
+    let result = await Jobs(requestData, 'jobs', 'Facilities');
     if(result.error) {
       setData(['No Data']);
       setTableData([]);
       setLoading(false);
     } else {
-      setData(result.dataArray)
+      let pageContent = [];
+      for (let i = 1; i <= result.totalPageCnt; i++) {
+        pageContent.push({ label: 'Page ' + i, value: i });
+      }
+      setPageList(pageContent);
+      setData(result.dataArray);
       setFilteredData(result.dataArray);
       result.dataArray.unshift(tableHead);
       setTableData(result.dataArray);
@@ -191,12 +195,22 @@ export default function CompanyShift({ navigation }) {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     getData();
+  //   }, [])
+  // );
+
+  useEffect(() => {
+    getData();
+  }, [curPage]);
   
+  const handleReset = (event) => {
+    event.persist();
+    setSearch(''); 
+    getData({ search: '', page: curPage });
+  };
+
   useEffect(() => {
     getDegree();
     getLocation();
@@ -670,25 +684,29 @@ export default function CompanyShift({ navigation }) {
 
   //------------------------------------------Search Function----------------
   const [searchTerm, setSearchTem] = useState(''); // Search term
-  const handleSearch = (e) => {
-    setSearchTem(e);
-    // let Data = []
-    // if (data.length >1) {
-    //   Data = data.shift(data[0]);
-    // } else {
-    //   Data = data
-    // }
+  // const handleSearch = (e) => {
+  //   setSearchTem(e);
+  //   // let Data = []
+  //   // if (data.length >1) {
+  //   //   Data = data.shift(data[0]);
+  //   // } else {
+  //   //   Data = data
+  //   // }
     
-    // const filtered = Data.filter(row => 
-    //   row.some(cell => 
-    //     cell && cell.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    //   )
-    // );
-    // setFilteredData(filtered);
-    // filtered.unshift(tableHead);
-    // setTableData(tableData);
+  //   // const filtered = Data.filter(row => 
+  //   //   row.some(cell => 
+  //   //     cell && cell.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  //   //   )
+  //   // );
+  //   // setFilteredData(filtered);
+  //   // filtered.unshift(tableHead);
+  //   // setTableData(tableData);
+  // };
+  const handleSearch = (event) => {
+    event.persist();
+    setCurPage(1);
+    getData({ search: search, page: 1 });
   };
-
   //----------------------------change Current page--------------------------
   const [currentPage, setCurrentPage] = useState(1);
   const getItemsForPage = (page) => {
@@ -989,7 +1007,7 @@ export default function CompanyShift({ navigation }) {
   
   const TableComponent = () => (
     <View style={{ borderColor: '#AAAAAA', borderWidth: 1, marginBottom: 3 }}>
-      {itemsToShow.map((item, index) => (
+      {data.map((item, index) => (
         <RenderItem key={index} item={item} index={index} />
       ))}
     </View>
@@ -1065,16 +1083,19 @@ export default function CompanyShift({ navigation }) {
               <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: RFValue(30) }]}>
                 <Text style={styles.profileTitle}>🖥️ FACILITY / SHIFT LISTINGS</Text>
               </View>
-              <View style={[styles.searchBar, {width: '70%'}]}>
+              <View style={styles.searchBar1}>
                 <TextInput
-                  style={[styles.searchText, {height: 30}]}
+                  style={styles.searchText1}
                   placeholder=""
-                  onChangeText={e => handleSearch(e)}
-                  value={searchTerm || ''}
+                  onChangeText={e => setSearch(e)}
+                  value={search}
                 />
-                <TouchableOpacity style={styles.searchBtn}>
+                <TouchableOpacity style={styles.searchBtn1} onPress={handleSearch}>
                   <Text>Search</Text>
                 </TouchableOpacity>
+                {search && <TouchableOpacity style={styles.searchBtn1} onPress={handleReset}>
+                  <Text>Reset</Text>
+                </TouchableOpacity>}
               </View>
               <View style= {{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Dropdown
@@ -1089,13 +1110,14 @@ export default function CompanyShift({ navigation }) {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  placeholder={'100 per page'}
+                  placeholder={'Page 1'}
                   // searchPlaceholder="Search..."
-                  value={value ? value : pageItems[3].value}
+                  value={curPage}
                   onFocus={() => setIsFocus(true)}
                   onBlur={() => setIsFocus(false)}
                   onChange={item => {
                     setValue(item.value);
+                    setCurPage(item.value);
                     setIsFocus(false);
                     const len = tableData.length;
                     const page = Math.ceil(len / item.value);
@@ -1111,15 +1133,8 @@ export default function CompanyShift({ navigation }) {
                   )}
                 />
               </View>
-              { totalPages> 1 &&
-                <View style={{display: 'flex', flexDirection: 'row', height: 30, marginBottom: 10, alignItems: 'center'}}>
-                  <Text onPress={handlePrevPage} style={{width: 20}}>{currentPage>1 ? "<": " "}</Text>
-                  <Text style={{width: 20}}>{" "+currentPage+" "}</Text>
-                  <Text onPress={handleNextPage} style={{width: 20}}>{currentPage<totalPages ? ">" : " "}</Text>
-                </View>
-              }
               <ScrollView horizontal={true} style={{marginBottom: 30, width: '95%'}}>
-                <TableComponent style={{width: '95%', fontSize: RFValue(14)}} data={itemsToShow} />
+                <TableComponent style={{width: '95%', fontSize: RFValue(14)}} data={data} />
               </ScrollView>
             </View>
           </View>
@@ -1947,6 +1962,29 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: '#22138e',
     fontWeight: 'bold',
+  },
+  searchText1: {
+    width: 150,
+    backgroundColor: 'white',
+    paddingVertical: 5,
+    color: 'black',
+    height: 30,
+  },
+  searchBtn1: {
+    width: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    color: '#2a53c1',
+    height: 30
+  },
+  searchBar1: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    width: '60%',
+    borderRadius: 10,
+    marginBottom: 10
   },
   row: {
     padding: 10,
