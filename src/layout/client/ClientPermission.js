@@ -131,21 +131,21 @@ export default function ClientPermission ({ navigation }) {
                             <Text style={[styles.text, {marginTop: 0, marginBottom: 0}]}><Text style={{fontWeight: 'bold'}}>(d) Cancellation Policy. </Text>If you cancel a shift, you will not be able to apply to any shift that overlaps with the shift you canceled.</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                                 <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
-                                <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>If you cancel a shift within 12 hours, you will be bumped to next week’s pay but expected to work your shifts that are already confirmed.</Text>
+                                <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>If you cancel a shift within 12 hours, you will be bumped to next week’s pay but expected to work your shifts that are already confirmed.</Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                                 <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
-                                <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>If you cancel a second shift with a start time that is less than 12 hours away in any given 30-day period, you will be removed from the app.</Text>
+                                <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>If you cancel a second shift with a start time that is less than 12 hours away in any given 30-day period, you will be removed from the app.</Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                                 <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
-                                <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>If you No Call/No Show a shift you will be suspended for one week but expected to work shifts that are already confirmed. You will also lose SmartPay for that week.</Text>
+                                <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>If you No Call/No Show a shift you will be suspended for one week but expected to work shifts that are already confirmed. You will also lose SmartPay for that week.</Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                                 <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
-                                <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>If you No Call/No Show a second time, you will be automatically removed from the BOOKSMART™ app.</Text>
+                                <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>If you No Call/No Show a second time, you will be automatically removed from the BOOKSMART™ app.</Text>
                             </View>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black', marginTop: 20 }}>*Note: BOOKSMART™ is committed to helping our I/Cs work through any challenges they may face with regards to canceling a shift. If you feel your situation was unavoidable and you can provide written documentation such as a legible doctor’s note or police report to support this cancellation, we will consider lifting your suspension on a case-by-case basis.</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black', marginTop: 20 }}>*Note: BOOKSMART™ is committed to helping our I/Cs work through any challenges they may face with regards to canceling a shift. If you feel your situation was unavoidable and you can provide written documentation such as a legible doctor’s note or police report to support this cancellation, we will consider lifting your suspension on a case-by-case basis.</Text>
                             <Text style={[styles.text]}><Text style={{fontWeight: 'bold'}}>(e) No Authorization. </Text>Users of BOOKSMART™ Services acknowledge and agree that they are not the agent or representative of BOOKSMART™ and are not authorized to make any representation, contract or commitment on behalf of BOOKSMART™.</Text>
                             <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>(f) Qualifications. </Text>I/Cs represent that they are duly licensed (as applicable) and have the experience, qualifications, and ability to perform each Request each I/C accepts.</Text>
                             <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>(g) No Employment Relationship. </Text>In addition to the Terms set forth above, You expressly acknowledge and agree that there is no employment, part-time employment, consulting, contractor, partnership, or joint venture relationship between You and BOOKSMART™. You further agree and acknowledge that BOOKSMART™ is not an employment service or agency and does not secure employment for anyone. You acknowledge and agree that You are not entitled to any of the benefits that BOOKSMART™ makes available to its employees and/or officers and/or directors and/or agents, and users hereby waive and disclaim any rights to receive any such benefits. Users also acknowledge and agree that BOOKSMART™ does not pay any unemployment compensation taxes with respect to any provision of any work for any Client. Moreover, You acknowledge and agree that You are not entitled to any unemployment compensation benefits chargeable to or claimed from BOOKSMART™ during any period of time that You are partially or fully unemployed. You further acknowledge and agree You will not receive Paid Time Off (PTO), Overtime Compensation, Group Health, Short-term Disability Insurance, or Retirement Benefits.</Text>
@@ -167,18 +167,18 @@ export default function ClientPermission ({ navigation }) {
                             <Text style={[styles.text, {marginTop: 0}]}>A fee of $2/hour will be deducted for use of BOOKSMART™ and processing of payments and insurances (“Service Fee”). Further information about these insurances and carriers may be available at Whybookdumb.com/Insurance.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.subTitle}>5. Safety & Work-Related Injury Policy. <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Safety is a top priority. Each I/C is expected to obey general safety rules and exercise caution and common sense in all work activities.</Text></Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Each I/C must agree to comply with the following safe working practices:</Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree to follow established departmental safety procedures;</Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree to know and adhere to all work site specific safety rules and policies;</Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree to use all site-specific safety equipment provided by facility;</Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree to report to their facility supervisor any work-related accident or injury to themselves or others as soon as it occurs;</Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree that if you need medical treatment, you will immediately notify the facility and BOOKSMART™ and obtain “back to work” paperwork from physician prior to returning to picking up shifts;</Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agree to drug testing as part of any work-related accident and/or injury;</Text>
-                            <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Failure to follow the above procedures could result in expulsion from usage of BOOKSMART™ and potential loss of insurance claims.</Text>
+                            <Text style={styles.subTitle}>5. Safety & Work-Related Injury Policy. <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Safety is a top priority. Each I/C is expected to obey general safety rules and exercise caution and common sense in all work activities.</Text></Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Each I/C must agree to comply with the following safe working practices:</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Agree to follow established departmental safety procedures;</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Agree to know and adhere to all work site specific safety rules and policies;</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Agree to use all site-specific safety equipment provided by facility;</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Agree to report to their facility supervisor any work-related accident or injury to themselves or others as soon as it occurs;</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Agree that if you need medical treatment, you will immediately notify the facility and BOOKSMART™ and obtain “back to work” paperwork from physician prior to returning to picking up shifts;</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Agree to drug testing as part of any work-related accident and/or injury;</Text>
+                            <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Failure to follow the above procedures could result in expulsion from usage of BOOKSMART™ and potential loss of insurance claims.</Text>
                         </View>
                         <View style={styles.titleBar}>
-                            <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>6. HIPAA. </Text>Users expressly understand and acknowledge that as a result of the provision of Caregiver Services using BOOKSMART™ you may be considered a covered entity under the Health Insurance Portability and Accountability Act (“HIPAA”). You expressly agree to observe the Privacy, Security, and Breach Notification Rules set forth under HIPAA. You understand that failure to adhere any HIPAA Rules may result in the imposition of civil, or some cases, criminal sanctions.</Text>
+                            <Text style={[styles.text, { marginBottom: 0 }]}><Text style={{fontWeight: 'bold'}}>6. HIPAA. </Text>Users expressly understand and acknowledge that as a result of the provision of Caregiver Services using BOOKSMART™ you may be considered a covered entity under the Health Insurance Portability and Accountability Act (“HIPAA”). You expressly agree to observe the Privacy, Security, and Breach Notification Rules set forth under HIPAA. You understand that failure to adhere any HIPAA Rules may result in the imposition of civil, or some cases, criminal sanctions.</Text>
                         </View>
                         <View style={styles.titleBar}>
                             <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>7. Third-Party Beneficiaries. </Text>Users agree that the Terms of this Agreement shall apply only to you and are not for the benefit of any third-party beneficiaries.</Text>
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     top: 8,
     zIndex: 999,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: RFValue(14),
   },
   placeholderStyle: {
     color: 'black',
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline'
   },
   subTitle: {
-    fontSize:RFValue(15),
+    fontSize: RFValue(15),
     fontWeight: 'bold',
     color: 'black'
   },
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#A020F0',
     color: 'white',
-    fontSize: 16,
+    fontSize: RFValue(16),
   },
 });
   

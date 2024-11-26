@@ -156,7 +156,7 @@ export default function FacilityPermission ({ navigation }) {
                 <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>5. Third-Party Beneficiaries. </Text>Users agree that the Terms of this Agreement shall apply only to you and are not for the benefit of any third-party beneficiaries.</Text>
                 <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>6. Attorney’s Fees. </Text>In the event a court of competent jurisdiction determines that any User has materially breached the Terms under this Agreement, BOOKSMART™ shall be entitled to an award of any costs and reasonable attorney’s fees incurred by BOOKSMART™ as a result of such breach.</Text>
                 <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>7. Governing Law. </Text>The Terms under this Agreement will be construed in accordance with and governed by the laws of the State of New York, without regard to conflicts of laws principles. You agree that the exclusive venue for resolving any dispute arising under Terms shall be in the state and federal courts located in the County Erie, State of New York, and you consent to the jurisdiction of the federal and state courts located in Erie County, New York. You hereby waive any objection to Erie County, New York as venue for the hearing of any dispute between you and BOOKSMART™ that is not compelled to arbitration for any reason, including but not limited to any objection based on convenience.</Text>
-                <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>8. Indemnification. </Text>BOOKSMART™ will have no liability and you will indemnify, defend and hold BOOKSMART™ harmless against any loss, damage, cost, liability and expense (including reasonable attorneys’ fees and expenses) arising from any action or claim resulting from: (i) Your Content/Data; (ii) Your violation of the Terms under this Agreement, any law or regulation, or any rights (including Intellectual Property) of another party; (iii) Your access to or use of BOOKSMART™; and/or (iv) the classification of You as a Customer or Facility.</Text>
+                <Text style={[styles.text, {marginVertical: 0, padding: 0}]}><Text style={{fontWeight: 'bold'}}>8. Indemnification. </Text>BOOKSMART™ will have no liability and you will indemnify, defend and hold BOOKSMART™ harmless against any loss, damage, cost, liability and expense (including reasonable attorneys’ fees and expenses) arising from any action or claim resulting from: (i) Your Content/Data; (ii) Your violation of the Terms under this Agreement, any law or regulation, or any rights (including Intellectual Property) of another party; (iii) Your access to or use of BOOKSMART™; and/or (iv) the classification of You as a Customer or Facility.</Text>
               </View>
               <View style={styles.titleBar}>
                 <Text style={styles.subTitle}>9. Disclaimer of Warranties.</Text>
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(14),
     color: 'black',
     fontWeight: 'normal',
-    marginVertical: 20,
+    marginVertical: RFValue(20),
   },
   signature: {
     flex: 1,
