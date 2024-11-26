@@ -492,14 +492,17 @@ export default function AllJobShiftListing({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      setLoading(true);
-      getAccounts();
-      getBidderList();
-      // getLocation();
-      // getDegree();
-      // getNurseList();
-      // getData();
-      setLoading(false);
+      async function featch() {
+        setLoading(true);
+        await getAccounts();
+        await getBidderList();
+        // getLocation();
+        // getDegree();
+        // getNurseList();
+        await getData();
+        setLoading(false);
+      }
+      featch();
     }, [])
   );
 
