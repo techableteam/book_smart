@@ -1,5 +1,5 @@
 import { Alert, StyleSheet, View, Image, Button, Text, ScrollView, TouchableOpacity, Dimensions, Modal, StatusBar } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-native-date-picker';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
@@ -34,6 +34,19 @@ export default function AddJobShift({ navigation }) {
   const [loading, setloading] = useState(false);
   const [locationItem, setLocationItem] = useState('');
   const [location, setLocation] = useState([]);
+  const [startHour, setStartHour] = useState(1);
+  const [endHour, setEndHour] = useState(9);
+  const [startMinute, setStartMinute] = useState(0);
+  const [endMinute, setEndMinute] = useState(0);
+  const [startHourType, setStartHourType] = useState('AM');
+  const [endHourType, setEndHourType] = useState('AM');
+  const [isStartHourFocus, setIsStartHourFocus] = useState(false);
+  const [isEndHourFocus, setIsEndHourFocus] = useState(false);
+  const [isStartMinuteFocus, setIsStartMinuteFocus] = useState(false);
+  const [isEndMinuteFocus, setIsEndMinuteFocus] = useState(false);
+  const [isStartHourTypeFocus, setIsStartHourTypeFocus] = useState(false);
+  const [isEndHourTypeFocus, setIsEndHourTypeFocus] = useState(false);
+
   const [ credentials, setCredentials ] = useState({
     jobNum: '',
     degree: '',
@@ -45,6 +58,73 @@ export default function AddJobShift({ navigation }) {
     facility: facility,
     facilityId: facilityId
   });
+  const hours = [
+    {label: '1', value: 1},
+    {label: '2', value: 2},
+    {label: '3', value: 3},
+    {label: '4', value: 4},
+    {label: '5', value: 5},
+    {label: '6', value: 6},
+    {label: '7', value: 7},
+    {label: '8', value: 8},
+    {label: '9', value: 9},
+    {label: '10', value: 10},
+    {label: '11', value: 11},
+    {label: '12', value: 12},
+  ];
+  const minutes = [
+    {label: '00', value: 0},
+    {label: '15', value: 15},
+    {label: '30', value: 30},
+    {label: '45', value: 45},
+  ];
+  const hourtypes = [
+    {label: 'AM', value: 'AM'},
+    {label: 'PM', value: 'PM'}
+  ];
+
+  const formatTime = (hour, minute, type) => {
+    return `${hour}:${minute.toString().padStart(2, '0')} ${type}`;
+  };
+
+  const convertTo24HourFormat = (hour, minute, type) => {
+    const adjustedHour = type === 'PM' && hour !== 12 ? hour + 12 : type === 'AM' && hour === 12 ? 0 : hour;
+    return adjustedHour * 60 + minute; // Convert to minutes for easier comparison
+  };
+
+  useEffect(() => {
+    const startTimeInMinutes = convertTo24HourFormat(startHour, startMinute, startHourType);
+    const endTimeInMinutes = convertTo24HourFormat(endHour, endMinute, endHourType);
+    const time = `${formatTime(startHour, startMinute, startHourType)} - ${formatTime(endHour, endMinute, endHourType)}`;
+    if (startTimeInMinutes >= endTimeInMinutes) {
+      Alert.alert(
+        'Invalid Shift Time',
+        'The start time is later than the end time. Do you want to reset the shift time?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {
+              handleCredentials('shiftTime', time);
+            },
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              setStartHour(1);
+              setStartMinute(0);
+              setStartHourType('AM');
+              setEndHour(9);
+              setEndMinute(0);
+              setEndHourType('AM');
+              return;
+            }
+          },
+        ]
+      );
+    } else {
+      handleCredentials('shiftTime', time);
+    }
+  }, [startHour, endHour, startMinute, endMinute, startHourType, endHourType]);
 
   const getDegree = async () => {
     const response = await getDegreeList('degree');
@@ -236,12 +316,183 @@ export default function AddJobShift({ navigation }) {
             </View>
             <View>
               <Text style={styles.subtitle}> Shift <Text style={{color: 'red'}}>*</Text> </Text>
-                <TextInput
-                  style={[styles.input, {width: '100%'}]}
-                  placeholder=""
-                  onChangeText={e => handleCredentials('shiftTime', e)}
-                  value={credentials.shiftTime || ''}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <Dropdown
+                  style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isStartHourFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={hours}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  value={startHour}
+                  onFocus={() => setIsStartHourFocus(true)}
+                  onBlur={() => setIsStartHourFocus(false)}
+                  onChange={item => {
+                    setStartHour(item.value);
+                    setIsStartHourFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isStartHourFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
                 />
+                <Text> : </Text>
+                <Dropdown
+                  style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isStartMinuteFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={minutes}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  value={startMinute}
+                  onFocus={() => setIsStartMinuteFocus(true)}
+                  onBlur={() => setIsStartMinuteFocus(false)}
+                  onChange={item => {
+                    setStartMinute(item.value);
+                    setIsStartMinuteFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isStartMinuteFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
+                <Dropdown
+                  style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isStartHourTypeFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={hourtypes}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  value={startHourType}
+                  onFocus={() => setIsStartHourTypeFocus(true)}
+                  onBlur={() => setIsStartHourTypeFocus(false)}
+                  onChange={item => {
+                    setStartHourType(item.value);
+                    setIsStartHourTypeFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isStartHourTypeFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '100%', marginVertical: 5 }}>
+                <Text>To</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <Dropdown
+                  style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isEndHourFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={hours}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  value={endHour}
+                  onFocus={() => setIsEndHourFocus(true)}
+                  onBlur={() => setIsEndHourFocus(false)}
+                  onChange={item => {
+                    setEndHour(item.value);
+                    setIsEndHourFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isEndHourFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
+                <Text> : </Text>
+                <Dropdown
+                  style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isEndMinuteFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={minutes}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  value={endMinute}
+                  onFocus={() => setIsEndMinuteFocus(true)}
+                  onBlur={() => setIsEndMinuteFocus(false)}
+                  onChange={item => {
+                    setEndMinute(item.value);
+                    setIsEndMinuteFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isEndMinuteFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
+                <Dropdown
+                  style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isEndHourTypeFocus && { borderColor: 'blue' }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={hourtypes}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  value={endHourType}
+                  onFocus={() => setIsEndHourTypeFocus(true)}
+                  onBlur={() => setIsEndHourTypeFocus(false)}
+                  onChange={item => {
+                    setEndHourType(item.value);
+                    setIsEndHourTypeFocus(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isEndHourTypeFocus ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
+              </View>
             </View>
             <View>
               <Text style={styles.subtitle}>Date<Text style={{color: 'red'}}>*</Text> </Text>
@@ -633,15 +884,15 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
   },
   selectedTextStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
   },
   itemTextStyle: {
     color: 'black',
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
   },
   iconStyle: {
     width: 20,
@@ -649,7 +900,7 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: 30,
-    fontSize: 16,
+    fontSize: RFValue(14),
   },
   addItems: {
     flexDirection: 'row',
