@@ -250,7 +250,7 @@ export default function FacilityLogin({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.modal}>
-          <View style={styles.topBar} />
+          {/* <View style={styles.topBar} /> */}
           <View style={styles.intro}>
             <Image
               source={images.admin}
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   intro: {
-    marginTop: 30,
+    marginTop: 20,
     width: '100%',
     display: 'flex',
     justifyContent: 'center',
