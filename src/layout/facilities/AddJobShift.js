@@ -46,12 +46,14 @@ export default function AddJobShift({ navigation }) {
   const [isEndMinuteFocus, setIsEndMinuteFocus] = useState(false);
   const [isStartHourTypeFocus, setIsStartHourTypeFocus] = useState(false);
   const [isEndHourTypeFocus, setIsEndHourTypeFocus] = useState(false);
+  const [showEndDate, setShowEndDate] = useState(false);
+  const [endDate, setEndDate] = useState(moment(new Date()).format("MM/DD/YYYY"));
 
   const [ credentials, setCredentials ] = useState({
     jobNum: '',
     degree: '',
     shiftTime: "",
-    shiftDate: '',
+    shiftDate: moment(new Date()).format("MM/DD/YYYY"),
     location: '',
     payRate: '',
     bonus: '',
@@ -92,14 +94,54 @@ export default function AddJobShift({ navigation }) {
     return adjustedHour * 60 + minute; // Convert to minutes for easier comparison
   };
 
+  const formatDateTime = (date, hour, minute, type) => {
+    const adjustedHour =
+      type === 'PM' && hour !== 12 ? hour + 12 :
+      type === 'AM' && hour === 12 ? 0 :
+      hour;
+  
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), adjustedHour, minute);
+  };
+
   useEffect(() => {
-    const startTimeInMinutes = convertTo24HourFormat(startHour, startMinute, startHourType);
-    const endTimeInMinutes = convertTo24HourFormat(endHour, endMinute, endHourType);
+    if (credentials.shiftDate == "" || endDate == "") {
+      return;
+    }
+
+    // Helper function to parse "MM/DD/YYYY" into a Date object
+    const parseDate = (dateString) => {
+      const [month, day, year] = dateString.split('/').map(Number);
+      return new Date(year, month - 1, day); // JavaScript months are zero-based
+    };
+  
+    // Convert dates and combine with times
+    const startDate = parseDate(credentials.shiftDate);
+    const endDateObj = parseDate(endDate);
+    
+    const startTimeInMinutes = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate(),
+      startHour + (startHourType === 'PM' && startHour !== 12 ? 12 : 0) - (startHourType === 'AM' && startHour === 12 ? 12 : 0),
+      startMinute
+    ).getTime();
+  
+    const endTimeInMinutes = new Date(
+      endDateObj.getFullYear(),
+      endDateObj.getMonth(),
+      endDateObj.getDate(),
+      endHour + (endHourType === 'PM' && endHour !== 12 ? 12 : 0) - (endHourType === 'AM' && endHour === 12 ? 12 : 0),
+      endMinute
+    ).getTime();
+  
+    console.log(startTimeInMinutes, endTimeInMinutes);
+  
     const time = `${formatTime(startHour, startMinute, startHourType)} - ${formatTime(endHour, endMinute, endHourType)}`;
+  
     if (startTimeInMinutes >= endTimeInMinutes) {
       Alert.alert(
         'Invalid Shift Time',
-        'The start time is later than the end time. Do you want to reset the shift time?',
+        'The start time is later than or equal to the end time. Do you want to reset the shift time?',
         [
           {
             text: 'Cancel',
@@ -110,21 +152,31 @@ export default function AddJobShift({ navigation }) {
           {
             text: 'OK',
             onPress: () => {
+              handleDayChange('shiftDate', new Date());
+              setEndDate(moment(new Date()).format("MM/DD/YYYY"));
               setStartHour(1);
               setStartMinute(0);
               setStartHourType('AM');
               setEndHour(9);
               setEndMinute(0);
               setEndHourType('AM');
-              return;
-            }
+            },
           },
         ]
       );
     } else {
       handleCredentials('shiftTime', time);
     }
-  }, [startHour, endHour, startMinute, endMinute, startHourType, endHourType]);
+  }, [
+    startHour,
+    endHour,
+    startMinute,
+    endMinute,
+    startHourType,
+    endHourType,
+    credentials.shiftDate,
+    endDate,
+  ]);
 
   const getDegree = async () => {
     const response = await getDegreeList('degree');
@@ -316,6 +368,29 @@ export default function AddJobShift({ navigation }) {
             </View>
             <View>
               <Text style={styles.subtitle}> Shift <Text style={{color: 'red'}}>*</Text> </Text>
+              <View>
+                <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
+                  <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
+                  <TextInput
+                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                    placeholder=""
+                    value={credentials.shiftDate}
+                    editable={false}
+                  />
+                  {showCalender && 
+                    <>
+                      <DatePicker
+                        date={shiftFromDay}
+                        onDateChange={(day) => handleDayChange('shiftDate', day)}
+                        mode="date"
+                        theme='light'
+                        androidVariant="native"
+                      />
+                      <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />
+                    </>
+                  }
+                </View>
+              </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <Dropdown
                   style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isStartHourFocus && { borderColor: 'blue' }]}
@@ -406,6 +481,29 @@ export default function AddJobShift({ navigation }) {
               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '100%', marginVertical: 5 }}>
                 <Text>To</Text>
               </View>
+              <View>
+                <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
+                  <TouchableOpacity onPress={() => {setShowEndDate(true), console.log(showEndDate)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
+                  <TextInput
+                    style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
+                    placeholder=""
+                    value={endDate}
+                    editable={false}
+                  />
+                  {showEndDate && 
+                    <>
+                      <DatePicker
+                        date={shiftFromDay}
+                        onDateChange={(day) => setEndDate(moment(day).format("MM/DD/YYYY"))}
+                        mode="date"
+                        theme='light'
+                        androidVariant="native"
+                      />
+                      <Button title="confirm" onPress={(day) =>{setShowEndDate(!showEndDate);}} />
+                    </>
+                  }
+                </View>
+              </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                 <Dropdown
                   style={[styles.dropdown, { width: RFValue(80), marginBottom: 0 }, isEndHourFocus && { borderColor: 'blue' }]}
@@ -492,31 +590,6 @@ export default function AddJobShift({ navigation }) {
                     />
                   )}
                 />
-              </View>
-            </View>
-            <View>
-              <Text style={styles.subtitle}>Date<Text style={{color: 'red'}}>*</Text> </Text>
-              
-              <View style={{flexDirection: 'column', width: '100%', gap: 5, position: 'relative'}}>
-                <TouchableOpacity onPress={() => {setShowCalendar(true), console.log(showCalender)}} style={{width: '100%', height: 40, zIndex: 1}}></TouchableOpacity>
-                <TextInput
-                  style={[styles.input, {width: '100%', position: 'absolute', zIndex: 0}]}
-                  placeholder=""
-                  value={credentials.shiftDate}
-                  editable={false}
-                />
-                {showCalender && 
-                <>
-                  <DatePicker
-                    date={shiftFromDay}
-                    onDateChange={(day) => handleDayChange('shiftDate', day)}
-                    mode="date" // Set the mode to "date" to allow year and month selection
-                    theme='light'
-                    androidVariant="native"
-                  />
-                  <Button title="confirm" onPress={(day) =>{setShowCalendar(!showCalender);}} />
-                </>
-                }
               </View>
             </View>
             <View>
