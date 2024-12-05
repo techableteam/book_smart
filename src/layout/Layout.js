@@ -65,6 +65,7 @@ import VerifyCation from './admin/Verifycation.js';
 import TimesheetForm from './client/TimesheetForm.js';
 import AdminFileViewer from './AdminFileViewer.js';
 import BookShiftsNow from './client/BookShiftsNow.js';
+import ImageFileViewer from './ImageFileViewer.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -104,6 +105,11 @@ function Layout() {
       <Stack.Screen 
         name= 'UserFileViewer'
         component = {UserFileViewer}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'ImageFileViewer'
+        component = {ImageFileViewer}
         options={{headerShown: false}}
       />
       <Stack.Screen 

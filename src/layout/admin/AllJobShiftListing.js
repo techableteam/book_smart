@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, TextInput, View, Image, TouchableWithoutFeedback, StyleSheet, Dimensions, ScrollView, StatusBar, Alert, TouchableOpacity } from 'react-native';
+import { Modal, TextInput, View, Image, TouchableWithoutFeedback, StyleSheet, Dimensions, ScrollView, StatusBar, Alert, TouchableOpacity, Linking } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import RadioGroup from 'react-native-radio-buttons-group';
@@ -14,6 +14,7 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
 import { useFocusEffect } from '@react-navigation/native';
 import AnimatedHeader from '../AnimatedHeader';
+import { WebView } from 'react-native-webview'; 
 // Choose file
 import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -323,7 +324,6 @@ export default function AllJobShiftListing({ navigation }) {
     getData({ search: search, page: curPage, filters: newFilters }, true);
     setFilters(newFilters);
   };
-
   const handleSubmit = () => {
     setIsSubmitted(true);
     toggleAddFilterModal();
@@ -668,8 +668,8 @@ export default function AllJobShiftListing({ navigation }) {
           console.log('ImagePicker Error: ', response.error);
         } else if (response.assets && response.assets.length > 0) {
           const pickedImage = response.assets[0].uri;
+          console.log(response.assets);
           const fileContent = await RNFS.readFile(pickedImage, 'base64');
-          
           setTmpFile({
             content: fileContent,
             type: 'image',
@@ -1142,13 +1142,14 @@ export default function AllJobShiftListing({ navigation }) {
   };
 
   const handleUploadModal = (data, type, filename) => {
+    console.log(data);
     setUploadFileType(type);
     setSelectedJobId(data[2]);
     setTmpFileName(filename);
     setTmpFile({
-      content: '',
-      name: '',
-      type: ''
+      content: data[15].content,
+      name : data[15].name,
+      type: data[15].type
     });
     toggleTiemSheetUploadModal();
   };
@@ -1495,12 +1496,12 @@ export default function AllJobShiftListing({ navigation }) {
                             } else {
                               if (cellIndex == 15) {
                                 return (
-                                  <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUploadModal(rowData, 'timesheet', cellData)}>
+                                  <TouchableWithoutFeedback key={cellIndex} onPress={() => handleUploadModal(rowData, 'timesheet', cellData?.name)}>
                                     <Text
                                       key={cellIndex}
                                       style={[styles.tableItemStyle, { width: widths[cellIndex], color: 'blue', backgroundColor: 'white' }]}
                                     >
-                                      {cellData}
+                                      {cellData?.name}
                                     </Text>
                                   </TouchableWithoutFeedback>
                                 );
@@ -2178,12 +2179,28 @@ export default function AllJobShiftListing({ navigation }) {
                     <Image source = {images.close} style={{width: 20, height: 20,}}/>
                   </TouchableOpacity>
                 </View>
+                <View style={[styles.previewContainer, { marginTop: 10 }]}>
+                  {tmpFile.content && tmpFile.type === 'image' && (
+                    <Image
+                      source={{ uri: tmpFile.content }}
+                      style={{ width: 100, height: 100, resizeMode: 'contain' }}
+                    />
+                  )}
+                  {tmpFile.content && tmpFile.type === 'pdf' && (
+                    <Text
+                      style={{ color: 'blue', textDecorationLine: 'underline' }}
+                      onPress={() => Linking.openURL(tmpFile.content)}
+                    >
+                      View PDF
+                    </Text>
+                  )}
+                </View>
                 <View style={[styles.body, { marginBottom: 0 }]}>
                   <View style={[styles.modalBody, { paddingVertical: 10 }]}>
                     <View style={{flexDirection: 'column', width: '70%', gap: 10}}>
                       {tmpFileName && 
                         <View style={{ flexDirection: 'row' }}>
-                          <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => { console.log('openfile'); }}>{tmpFileName}</Text>
+                          <Text style={[styles.content, { lineHeight: 20, marginTop: 0, color: 'blue', width: 'auto' }]} onPress={() => navigation.navigate("ImageFileViewer", { url: tmpFile.content, type: tmpFile.type, name: tmpFile.name })}>{tmpFileName}</Text>
                           <Text style={{color: 'blue'}} onPress= {() => setTmpFileName('')}>&nbsp;&nbsp;remove</Text>
                         </View>
                       }
