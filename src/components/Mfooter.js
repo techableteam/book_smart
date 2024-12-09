@@ -13,7 +13,7 @@ export default function MFooter(props) {
     <View style={styles.shadow}>
       <View style={styles.bottomStyle}></View>
       <Text style={styles.text}>Support by Email: support@whybookdumb.com{'\n'}
-        Support by Text: 716.997.9990
+        Support by Text: 844.558.BOOK
       </Text>
     </View>
   );
