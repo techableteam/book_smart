@@ -12,6 +12,7 @@ import HButton from '../../components/Hbutton';
 import { facilityAcknowledgementAtom } from '../../context/FacilityAuthProvider';
 import { Update } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
+import CheckBox from '@react-native-community/checkbox';
 
 const { width, height } = Dimensions.get('window');
 
@@ -146,23 +147,25 @@ export default function FacilityPermission ({ navigation }) {
                   <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
                   <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Customers who are with a direct Facility or Community must choose between the options of:</Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                  <CheckBox
-                    value={isChecked1}
-                    onValueChange={setIsChecked1} // Updates the state on toggle
-                    tintColors={{ true: 'black', false: 'gray' }} // Customize checkbox color
-                  />
-                  {/* <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} /> */}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start'}}>
+                  <View style = {styles.checkboxWrapper}>
+                    <CheckBox
+                      value={isChecked1}
+                      onValueChange={setIsChecked1} 
+                      tintColors={{ true: 'black', false: 'gray' }} 
+                    />
+                  </View>
                   <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>1. Paying Net 7 with a Fee of $7/hour for CNAs, $10/hour for LPNs or $15/hour for RNs for designated access to and use of BOOKSMART™ and processing of payments and insurances (“Service Fee”).
                   </Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                  <CheckBox
-                    value={isChecked2}
-                    onValueChange={setIsChecked2} // Updates the state on toggle
-                    tintColors={{ true: 'black', false: 'gray' }} // Customize checkbox color
-                  />
-                  {/* <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} /> */}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start'}}>
+                  <View style = {styles.checkboxWrapper}>  
+                    <CheckBox
+                      value={isChecked2}
+                      onValueChange={setIsChecked2} 
+                      tintColors={{ true: 'black', false: 'gray' }} 
+                    />
+                  </View>
                   <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>2. Paying Net 30 Bill rates set as: $35/hour for CNAs, $55/hour for LPNs, and $75/hour for RNs.</Text>
                 </View>
                 <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black', marginTop: 20 }}>A 50% Fee increase shall be applied for all hours worked by I/Cs in excess of 40 hours in any given week. Further, a 50% Fee increase shall be applied for any I/C hours worked on: New Years Day, Easter Sunday, Thanksgiving, Memorial Day, Independence Day, Labor Day, and Christmas Day. The Fee increases are non-compoundable so in the case a holiday falls on a weekend you will only be billed the 50% increase for hours over 40.</Text>
@@ -356,5 +359,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: RFValue(17),
   },
+  checkboxWrapper: {
+    transform: [{ scale: 0.8}],
+    marginTop: -5
+  }
 });
   
