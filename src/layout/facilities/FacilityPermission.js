@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, Dimensions
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
+import { RadioButton } from 'react-native-paper';
 import { useAtom } from 'jotai';
 import Hyperlink from 'react-native-hyperlink';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -12,8 +13,6 @@ import HButton from '../../components/Hbutton';
 import { facilityAcknowledgementAtom } from '../../context/FacilityAuthProvider';
 import { Update } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CheckBox from '@react-native-community/checkbox';
-
 const { width, height } = Dimensions.get('window');
 
 export default function FacilityPermission ({ navigation }) {
@@ -22,13 +21,13 @@ export default function FacilityPermission ({ navigation }) {
     {label: 'Yes', value: 1},
     {label: 'No', value: 2},
   ];
-  const [isChecked1, setIsChecked1] = useState(false);
-  const [isChecked2, setIsChecked2] = useState(false);
+  const [checked, setChecked] = React.useState('first');
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [credentials, setCredentials] = useState({
     signature: '',
-    facilityAcknowledgeTerm: facilityAcknowledgement
+    facilityAcknowledgeTerm: facilityAcknowledgement,
+    selectedoption: 'first'
   });
   let signatureRef = useRef(null);
 
@@ -149,22 +148,22 @@ export default function FacilityPermission ({ navigation }) {
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start'}}>
                   <View style = {styles.checkboxWrapper}>
-                    <CheckBox
-                      value={isChecked1}
-                      onValueChange={setIsChecked1} 
-                      tintColors={{ true: 'black', false: 'gray' }} 
+                    <RadioButton
+                      value="first"
+                      status={ checked === 'first' ? 'checked' : 'unchecked' }
+                      onPress={() => setChecked('first')}
                     />
                   </View>
                   <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>1. Paying Net 7 with a Fee of $7/hour for CNAs, $10/hour for LPNs or $15/hour for RNs for designated access to and use of BOOKSMART™ and processing of payments and insurances (“Service Fee”).
                   </Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start'}}>
-                  <View style = {styles.checkboxWrapper}>  
-                    <CheckBox
-                      value={isChecked2}
-                      onValueChange={setIsChecked2} 
-                      tintColors={{ true: 'black', false: 'gray' }} 
-                    />
+                  <View style = {styles.checkboxWrapper}> 
+                    <RadioButton
+                      value="second"
+                      status={ checked === 'second' ? 'checked' : 'unchecked' }
+                      onPress={() => setChecked('second')}
+                    /> 
                   </View>
                   <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>2. Paying Net 30 Bill rates set as: $35/hour for CNAs, $55/hour for LPNs, and $75/hour for RNs.</Text>
                 </View>
@@ -212,9 +211,9 @@ export default function FacilityPermission ({ navigation }) {
                     setValue(item.value);
                     setIsFocus(false);
                     if (item.value == 1) {
-                      setCredentials({...credentials, ["facilityAcknowledgeTerm"] : true})
+                      setCredentials({...credentials, ["facilityAcknowledgeTerm"] : true, ["selectedoption"]: checked})
                     } else 
-                      setCredentials({...credentials, ["facilityAcknowledgeTerm"] : false})
+                      setCredentials({...credentials, ["facilityAcknowledgeTerm"] : false, ["selectedoption"]: checked})
                   }}
                   renderLeftIcon={() => (
                     <View
