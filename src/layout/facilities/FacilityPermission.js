@@ -155,7 +155,7 @@ export default function FacilityPermission ({ navigation }) {
                     />
                   </View> */}
                   <TouchableOpacity onPress={() => setChecked('first')}>
-                    {checked=='first'?(<Image source={images.checkedbtn} style = {{width : 13, height : 13, marginTop: 7}}/>):(<Image  source={images.uncheckedbtn} style = {{width : 13, height : 13,  marginTop: 7}} />)}
+                    {checked=='first'?(<Image source={images.checkedbtn} style = {{width : 13, height : 13, marginTop: 7, marginRight: 7}}/>):(<Image  source={images.uncheckedbtn} style = {{width : 13, height : 13,  marginTop: 7, marginRight: 7}} />)}
                   </TouchableOpacity>
                   <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>1. Paying Net 7 with a Fee of $7/hour for CNAs, $10/hour for LPNs or $15/hour for RNs for designated access to and use of BOOKSMART™ and processing of payments and insurances (“Service Fee”).
                   </Text>
@@ -169,7 +169,7 @@ export default function FacilityPermission ({ navigation }) {
                     /> 
                   </View> */}
                   <TouchableOpacity onPress={() => setChecked('second')}>
-                    {checked=='second'?(<Image source={images.checkedbtn} style = {{width : 13, height : 13,  marginTop: 7}}/>):(<Image  source={images.uncheckedbtn} style = {{width : 13, height : 13,  marginTop: 7}}/>)}
+                    {checked=='second'?(<Image source={images.checkedbtn} style = {{width : 13, height : 13,  marginTop: 7, marginRight: 7}}/>):(<Image  source={images.uncheckedbtn} style = {{width : 13, height : 13,  marginTop: 7, marginRight: 7}}/>)}
                   </TouchableOpacity> 
                   <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>2. Paying Net 30 Bill rates set as: $35/hour for CNAs, $55/hour for LPNs, and $75/hour for RNs.</Text>
                 </View>
