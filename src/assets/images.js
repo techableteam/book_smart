@@ -20,7 +20,9 @@ const images = {
     folder: require("./images/folder.png"),
     gallery: require("./images/gallery.png"),
     camera: require("./images/camera.png"),
-    back: require('./images/back.png')
+    back: require('./images/back.png'),
+    checkedbtn: require('./images/checkedbtn.png'),
+    uncheckedbtn: require('./images/uncheckedbtn.png'),
 };
   
   export default images;
