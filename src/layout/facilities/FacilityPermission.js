@@ -41,18 +41,15 @@ export default function FacilityPermission ({ navigation }) {
     setIsSigned(true);
   }
 
-  const getSignature = () => {
-    if (signatureRef.current) {
-      signatureRef.current.saveImage();
-      console.log('Saved Signature:', signatureRef.current.saveImage());
-    }
-  };
-
   const handlePreSubmit = () => {
-    getSignature();
-    setTimeout(() => {
-        handleUploadSubmit();
-    }, 1000);
+    if (value != 1) {
+      return;
+    }
+    if (!isSigned) {
+      Alert.alert('Please sign and click save button');
+      return;
+    }
+    handleUploadSubmit();
   };
 
   const handleReset = () => {
@@ -65,7 +62,7 @@ export default function FacilityPermission ({ navigation }) {
       return;
     }
     if (!isSigned) {
-      Alert.alert('Please sign the terms of use');
+      Alert.alert('Please sign and click save button');
       return;
     }
     try {

@@ -321,38 +321,61 @@ export default function AdminFacilities({ navigation }) {
 
   const handleUpdate = async () => {
     try {
-      const response = await updateUserInfo({userEmail: cellData[10], userRole: cellData[7], status: status, password: ''}, 'admin');
-      if (!response?.error) {
-        getData();
-        toggleStatusModal();
-      } else {
+      if (!cellData || !status) {
+        Alert.alert('Error', 'Missing required data');
+        return;
+      }
+
+      const updatePayload = {
+        userEmail: cellData[10],
+        userRole: cellData[7],
+        status: status,
+        password: ''
+      };
+
+      console.log('Sending update payload:', updatePayload);
+
+      const response = await updateUserInfo(updatePayload, 'admin');
+      console.log('Update response:', response);
+
+      if (response && !response.error) {
         Alert.alert(
-          'Failure!',
-          'Network Error',
+          'Success',
+          'Status updated successfully',
           [
             {
               text: 'OK',
               onPress: () => {
-                console.log('OK pressed');
+                getData();
+                toggleStatusModal();
               },
             },
-          ],
-          { cancelable: false }
+          ]
+        );
+      } else {
+        const errorMessage = response?.message || 'Network Error';
+        Alert.alert(
+          'Update Failed',
+          errorMessage,
+          [
+            {
+              text: 'OK',
+              onPress: () => console.log('Error acknowledged'),
+            },
+          ]
         );
       }
     } catch (error) {
+      console.error('Update error:', error);
       Alert.alert(
-        'Failure!',
-        'Network Error',
+        'Error',
+        'An unexpected error occurred. Please try again.',
         [
           {
             text: 'OK',
-            onPress: () => {
-              console.log('OK pressed');
-            },
+            onPress: () => console.log('Error:', error),
           },
-        ],
-        { cancelable: false }
+        ]
       );
     }
   };
