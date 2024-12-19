@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, Dimensions, TouchableOpacity, Button } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -24,6 +24,7 @@ export default function FacilityPermission ({ navigation }) {
   const [checked, setChecked] = React.useState('first');
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
+  const [isSigned, setIsSigned] = useState(false);
   const [credentials, setCredentials] = useState({
     signature: '',
     facilityAcknowledgeTerm: facilityAcknowledgement,
@@ -32,15 +33,18 @@ export default function FacilityPermission ({ navigation }) {
   let signatureRef = useRef(null);
 
   const onSaveEvent = (result) => {
+    console.log('Saved Signature:', result.encoded);
     setCredentials(prevCredentials => ({
       ...prevCredentials, 
       signature: result.encoded
     }));
+    setIsSigned(true);
   }
 
   const getSignature = () => {
     if (signatureRef.current) {
       signatureRef.current.saveImage();
+      console.log('Saved Signature:', signatureRef.current.saveImage());
     }
   };
 
@@ -51,11 +55,19 @@ export default function FacilityPermission ({ navigation }) {
     }, 1000);
   };
 
+  const handleReset = () => {
+    signatureRef.current.resetImage();
+    setIsSigned(false);
+  }
+
   const handleUploadSubmit = async () => {
     if (value != 1) {
       return;
     }
-
+    if (!isSigned) {
+      Alert.alert('Please sign the terms of use');
+      return;
+    }
     try {
       const response = await Update(credentials, 'facilities');
       if (!response?.error) {
@@ -239,10 +251,14 @@ export default function FacilityPermission ({ navigation }) {
                   <SignatureCapture
                       style={styles.signature}
                       ref={signatureRef}
-                      onSaveEvent={onSaveEvent}
+                      onSaveEvent={(result) => onSaveEvent(result)}
                       saveImageFileInExtStorage={false}
-                      showNativeButtons={true}
+                      showNativeButtons={false}
                   />
+                    <View style={styles.buttonContainer}>
+                      <Button title="Save" onPress={() => signatureRef.current.saveImage()} />
+                      <Button title="Reset" onPress={handleReset} />
+                    </View>
                   </View>}
               </View>
               <View style={[styles.btn, {marginTop: 20, width: '90%'}]}>
@@ -367,6 +383,12 @@ const styles = StyleSheet.create({
   checkboxWrapper: {
     transform: [{ scale: 0.8}],
     marginTop: -5
-  }
+  },
+  buttonContainer: {
+    flexDirection: 'row', // Buttons side by side
+    justifyContent: 'space-around', // Add spacing between buttons
+    alignItems: 'center', // Align buttons vertically
+    marginVertical: 10,
+  },
 });
   

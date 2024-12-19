@@ -321,7 +321,7 @@ export default function AdminFacilities({ navigation }) {
 
   const handleUpdate = async () => {
     try {
-      const response = await updateUserInfo({userEmail: cellData[8], userRole: cellData[5], status: status, password: ''}, 'admin');
+      const response = await updateUserInfo({userEmail: cellData[10], userRole: cellData[7], status: status, password: ''}, 'admin');
       if (!response?.error) {
         getData();
         toggleStatusModal();
