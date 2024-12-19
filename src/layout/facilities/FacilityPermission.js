@@ -46,7 +46,7 @@ export default function FacilityPermission ({ navigation }) {
       return;
     }
     if (!isSigned) {
-      Alert.alert('Please sign and click save button');
+      Alert.alert('Please sign and click Save button');
       return;
     }
     handleUploadSubmit();
