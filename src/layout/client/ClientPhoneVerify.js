@@ -111,7 +111,7 @@ export default function ClientPhoneVerify ({ navigation }) {
         >
           <View style={styles.authInfo}>
             {/* <Text style={styles.subject}> You Received Verify Code? </Text> */}
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', marginTop: 30, fontSize: RFValue(18)}]}>Enter your verificaiton code below. </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400', marginTop: 30, fontSize: RFValue(18)}]}>Enter your verification code below. </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Verification Code </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>

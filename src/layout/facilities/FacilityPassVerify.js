@@ -93,7 +93,7 @@ export default function FacilityPassVerify ({ navigation }) {
         >
           <View style={styles.authInfo}>
             <Text style={styles.subject}> You Received Verify Code? </Text>
-            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your verify code below. </Text>
+            <Text style={[styles.subtitle,{textAlign: 'left', width: '90%', fontWeight: '400'}]}> Enter your verification code below. </Text>
             <View style={styles.email}>
               <Text style={styles.subtitle}> Verify Code </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>

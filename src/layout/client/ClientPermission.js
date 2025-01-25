@@ -179,9 +179,11 @@ export default function ClientPermission ({ navigation }) {
                         <View style={styles.titleBar}>
                             <Text style={[styles.text, { }]}><Text style={{fontWeight: 'bold'}}>6. HIPAA. </Text>Users expressly understand and acknowledge that as a result of the provision of Caregiver Services using BOOKSMART™ you may be considered a covered entity under the Health Insurance Portability and Accountability Act (“HIPAA”). You expressly agree to observe the Privacy, Security, and Breach Notification Rules set forth under HIPAA. You understand that failure to adhere any HIPAA Rules may result in the imposition of civil, or some cases, criminal sanctions.</Text>
                         </View>
+                        
                         <View style={styles.titleBar}>
                             <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>7. Third-Party Beneficiaries. </Text>Users agree that the Terms of this Agreement shall apply only to you and are not for the benefit of any third-party beneficiaries.</Text>
                         </View>
+                        
                         <View style={styles.titleBar}>
                             <Text style={[styles.text, { marginTop: 0 }]}><Text style={{fontWeight: 'bold'}}>8. Attorney’s Fees. </Text>In the event a court of competent jurisdiction determines that any User has materially breached the Terms under this Agreement, BOOKSMART™ shall be entitled to an award of any costs and reasonable attorney’s fees incurred by BOOKSMART™ because of such breach.</Text>
                         </View>
