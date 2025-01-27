@@ -235,9 +235,13 @@ export default function ClientSignIn({ navigation }) {
               resizeMode="contain"
               style={styles.homepage}
             />
-            <Text style={constStyles.loginSmallText}>Let your licensure and certifications pay off. {'\n'}
+            {/* <Text style={constStyles.loginSmallText}>Let your licensure and certifications pay off. {'\n'}
               Get the money you deserve by signing up {'\n'}
               and becoming a freelance clinician today!
+            </Text> */}
+
+            <Text style={constStyles.loginSmallText}>Let your licensure and certifications pay off. {'\n'}
+              Get the money you deserve by signing up and becoming a freelance clinician today!
             </Text>
 
           </View>
