@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Layout from './src/layout/Layout';
 import BackgroundTask from './src/utils/backgroundTask.js'
+import { requestUserPermission, setupForegroundNotificationListener } from './src/services/firebaseService.js';
 
 function App() {
+  useEffect(() => {
+    requestUserPermission();
+
+    const unsubscribe = setupForegroundNotificationListener();
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <NavigationContainer style = {styles.sectionContainer}>
       <Layout />
