@@ -3001,8 +3001,8 @@ __metadata:
   linkType: hard
 
 "@react-native-firebase/app@npm:^21.12.0":
-  version: 21.12.0
-  resolution: "@react-native-firebase/app@npm:21.12.0"
+  version: 21.12.2
+  resolution: "@react-native-firebase/app@npm:21.12.2"
   dependencies:
     firebase: 11.3.1
   peerDependencies:
@@ -3012,20 +3012,20 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 1ffaccba05f6fc5c2b0680a4215ee52985e5a6ef19268c0637966e35a2c34fc4542f12f9c982a10d9458ce97ed121433ed3be9bc9b05caf2129f40fe3dd510f1
+  checksum: f8318a365b6e296870d76c57c6ac8d2d3eb828328a33e3d2f3fcfd8d5cd602790c226d64cf503ad576f60825bc002e41f967c9bca9fedd11acf8860fc1d144fe
   languageName: node
   linkType: hard
 
 "@react-native-firebase/messaging@npm:^21.12.0":
-  version: 21.12.0
-  resolution: "@react-native-firebase/messaging@npm:21.12.0"
+  version: 21.12.2
+  resolution: "@react-native-firebase/messaging@npm:21.12.2"
   peerDependencies:
-    "@react-native-firebase/app": 21.12.0
+    "@react-native-firebase/app": 21.12.2
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 43b03a938e1289eba14a13888bc1fe42422d07a8d71d86bb22d03bc836c973d2bde13c1b5877bc27a8e7a6c7eaa1654ae20f5e27109e25bc1793cbcfa6dcfff9
+  checksum: 3e88d2775dd4eb79169cbd13e6c965b706ddfca2aa96776c3c915c49babc0c04e05021e01e2ecaf3ce84517dfbfd5ec337b5e153f79c7fe316de8dd58e22eab7
   languageName: node
   linkType: hard
 

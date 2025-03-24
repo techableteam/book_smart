@@ -23,7 +23,6 @@ export async function requestUserPermission() {
       messaging().onNotificationOpenedApp(remoteMessage => {
         console.log('Notification opened from background:', remoteMessage);
       });
-
     //   return token;
     } catch (error) {
       console.error('Error fetching FCM token:', error);
@@ -36,6 +35,8 @@ export async function requestUserPermission() {
 // Listen for foreground notifications
 export function setupForegroundNotificationListener() {
   return messaging().onMessage(async remoteMessage => {
-    Alert.alert('New Notification', remoteMessage.notification?.title);
+    console.log("Notification opened in frontend: ", remoteMessage);
+    // Alert.alert('New Notification', remoteMessage.notification?.title);
+    Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body)
   });
 }
