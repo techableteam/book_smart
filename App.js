@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Layout from './src/layout/Layout';
 import BackgroundTask from './src/utils/backgroundTask.js'
-import { requestUserPermission, setupForegroundNotificationListener } from './src/services/firebaseService.js';
+import { requestUserPermission } from './src/services/firebaseService.js';
 
 function App() {
   useEffect(() => {

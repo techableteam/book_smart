@@ -25,6 +25,16 @@ export const Signin = async (credentials, endpoint) => {
   }
 }
 
+export const sendFCMToken = async (credentials, endpoint) => {
+  try {
+    const response = await axios.post(`api/${endpoint}/saveFCMToken`, credentials);
+    return response.data;
+  } catch (error) {
+    console.error(error)    
+    return {error: error.response.data.message};
+  }
+}
+
 export const getAllFacility = async (userData, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
