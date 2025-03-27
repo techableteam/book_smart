@@ -1157,10 +1157,10 @@ PODS:
     - React-Core
   - RNDeviceInfo (11.1.0):
     - React-Core
-  - RNFBApp (21.12.2):
+  - RNFBApp (21.12.3):
     - Firebase/CoreOnly (= 11.10.0)
     - React-Core
-  - RNFBMessaging (21.12.2):
+  - RNFBMessaging (21.12.3):
     - Firebase/Messaging (= 11.10.0)
     - FirebaseCoreExtension
     - React-Core
@@ -1509,8 +1509,8 @@ SPEC CHECKSUMS:
   RNCPicker: 0e683a85cae99a8a739e97a49f269a4630de0a01
   RNDateTimePicker: 818460dc31b0dc5ec58289003e27dd8d022fb79c
   RNDeviceInfo: 900bd20e1fd3bfd894e7384cc4a83880c0341bd3
-  RNFBApp: fed929c76589400be1cb89ff3a457b3cef876907
-  RNFBMessaging: e4172056d9ae9231d6859080185851b734ca8755
+  RNFBApp: 69b4ee7d34eae5f4fa9184aebce0e1659697db91
+  RNFBMessaging: 7abe1697df06e0193f4fd84993ec83387f4c414c
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: 71902d798f4e1dc297f1041d33e717eaccd6af52
   RNPermissions: 4f7b81b0d457c8ec4e892cc36ef2376734a4b22c
@@ -1522,4 +1522,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: bafae67dccbbb6930db002ab79e7b4d240ddafca
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.14.3
