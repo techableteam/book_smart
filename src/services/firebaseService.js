@@ -1,5 +1,19 @@
 import messaging from '@react-native-firebase/messaging';
 import { Alert } from 'react-native';
+import {
+  RESULTS,
+  requestNotifications,
+} from 'react-native-permissions';
+
+export const requestNotificationsPermission = () => {
+  requestNotifications(['alert']).then(({ status }) => {
+    if (status === RESULTS.GRANTED) {
+      console.log("granted!!!!!");
+    } else {
+      console.log("blocked!!!!!");
+    }
+  });
+};
 
 export async function requestUserPermission() {
   const authStatus = await messaging().requestPermission();
