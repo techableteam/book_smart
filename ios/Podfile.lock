@@ -10,11 +10,25 @@ PODS:
     - React-Core (= 0.73.10)
     - React-jsi (= 0.73.10)
     - ReactCommon/turbomodule/core (= 0.73.10)
+  - Firebase/Auth (11.10.0):
+    - Firebase/CoreOnly
+    - FirebaseAuth (~> 11.10.0)
   - Firebase/CoreOnly (11.10.0):
     - FirebaseCore (~> 11.10.0)
   - Firebase/Messaging (11.10.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 11.10.0)
+  - FirebaseAppCheckInterop (11.10.0)
+  - FirebaseAuth (11.10.0):
+    - FirebaseAppCheckInterop (~> 11.0)
+    - FirebaseAuthInterop (~> 11.0)
+    - FirebaseCore (~> 11.10.0)
+    - FirebaseCoreExtension (~> 11.10.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
+    - GoogleUtilities/Environment (~> 8.0)
+    - GTMSessionFetcher/Core (< 5.0, >= 3.4)
+    - RecaptchaInterop (~> 101.0)
+  - FirebaseAuthInterop (11.10.0)
   - FirebaseCore (11.10.0):
     - FirebaseCoreInternal (~> 11.10.0)
     - GoogleUtilities/Environment (~> 8.0)
@@ -66,6 +80,7 @@ PODS:
   - GoogleUtilities/UserDefaults (8.0.2):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
+  - GTMSessionFetcher/Core (4.4.0)
   - hermes-engine (0.73.10):
     - hermes-engine/Pre-built (= 0.73.10)
   - hermes-engine/Pre-built (0.73.10)
@@ -1144,6 +1159,7 @@ PODS:
     - React-jsi (= 0.73.10)
     - React-logger (= 0.73.10)
     - React-perflogger (= 0.73.10)
+  - RecaptchaInterop (101.0.0)
   - RNCAsyncStorage (1.24.0):
     - React-Core
   - RNCCheckbox (0.5.17):
@@ -1160,6 +1176,10 @@ PODS:
   - RNFBApp (21.12.3):
     - Firebase/CoreOnly (= 11.10.0)
     - React-Core
+  - RNFBAuth (21.12.3):
+    - Firebase/Auth (= 11.10.0)
+    - React-Core
+    - RNFBApp
   - RNFBMessaging (21.12.3):
     - Firebase/Messaging (= 11.10.0)
     - FirebaseCoreExtension
@@ -1192,6 +1212,7 @@ DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
+  - FirebaseAuth
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
@@ -1256,6 +1277,7 @@ DEPENDENCIES:
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
+  - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -1269,6 +1291,9 @@ SPEC REPOS:
   trunk:
     - BEMCheckBox
     - Firebase
+    - FirebaseAppCheckInterop
+    - FirebaseAuth
+    - FirebaseAuthInterop
     - FirebaseCore
     - FirebaseCoreExtension
     - FirebaseCoreInternal
@@ -1277,9 +1302,11 @@ SPEC REPOS:
     - fmt
     - GoogleDataTransport
     - GoogleUtilities
+    - GTMSessionFetcher
     - libevent
     - nanopb
     - PromisesObjC
+    - RecaptchaInterop
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -1414,6 +1441,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-device-info"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
+  RNFBAuth:
+    :path: "../node_modules/@react-native-firebase/auth"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNFS:
@@ -1438,6 +1467,9 @@ SPEC CHECKSUMS:
   FBLazyVector: c039b29a5b130f817a6b07dd7bc33830a969ab27
   FBReactNativeSpec: 0368d296aba294bab9067f575175422a4754db27
   Firebase: 1fe1c0a7d9aaea32efe01fbea5f0ebd8d70e53a2
+  FirebaseAppCheckInterop: 9664c858489710f682766ef54e2b6741d3b62070
+  FirebaseAuth: c4146bdfdc87329f9962babd24dae89373f49a32
+  FirebaseAuthInterop: 01a804fb074424fd58b92dd50dd0272277199356
   FirebaseCore: 8344daef5e2661eb004b177488d6f9f0f24251b7
   FirebaseCoreExtension: 6f357679327f3614e995dc7cf3f2d600bdc774ac
   FirebaseCoreInternal: ef4505d2afb1d0ebbc33162cb3795382904b5679
@@ -1447,6 +1479,7 @@ SPEC CHECKSUMS:
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
+  GTMSessionFetcher: 75b671f9e551e4c49153d4c4f8659ef4f559b970
   hermes-engine: 42a7a4cbe3e20050fb031f64aaaffbe0c0b4a38f
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
@@ -1503,6 +1536,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 9186a3497f42314e864ce75bda541767a075300b
   React-utils: 01644ff1aa2e1d3484dd5a3fd30df3c473069e50
   ReactCommon: 35c1f7be1913cb944d47c6ec1efee5bbbebe36d3
+  RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
   RNCAsyncStorage: b6410dead2732b5c72a7fdb1ecb5651bbcf4674b
   RNCCheckbox: 450ce156f3e29e25efa0315c96cfbabe5a39ded1
   RNCMaskedView: 4c5ee1c8667d56077246cc6d1977f77393923560
@@ -1510,6 +1544,7 @@ SPEC CHECKSUMS:
   RNDateTimePicker: 818460dc31b0dc5ec58289003e27dd8d022fb79c
   RNDeviceInfo: 900bd20e1fd3bfd894e7384cc4a83880c0341bd3
   RNFBApp: 69b4ee7d34eae5f4fa9184aebce0e1659697db91
+  RNFBAuth: 76842d62315881d6752e389e85ca0bffd486bc3b
   RNFBMessaging: 7abe1697df06e0193f4fd84993ec83387f4c414c
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
   RNGestureHandler: 71902d798f4e1dc297f1041d33e717eaccd6af52
@@ -1520,6 +1555,6 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 66a97477b94264cc4e49990c8fe6b153260d871d
 
-PODFILE CHECKSUM: bafae67dccbbb6930db002ab79e7b4d240ddafca
+PODFILE CHECKSUM: 5525f724a44ad1329d515682b3dd9f8bf6757d3e
 
 COCOAPODS: 1.14.3

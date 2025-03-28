@@ -73,5 +73,30 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>  <!-- This disables the default Firebase App Delegate Proxy, allowing you to control AppDelegate. -->
+
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We use your data to send you notifications related to the app.</string> <!-- For iOS 14+ App Tracking Transparency (if needed) -->
+
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string> <!-- Optional, to set the default interface style. -->
+
+	<!-- Push Notification configurations -->
+	<key>UIApplicationExpectsUserPrivacyAuthorization</key>
+	<true/> <!-- Ensure the app asks for permission to show notifications on iOS 14+ -->
+
+	<key>NSUserNotificationUsageDescription</key>
+	<string>Your app uses push notifications to keep you updated.</string> <!-- Optional, for description of why the app uses notifications -->
+
+	<key>FirebaseMessagingAutoInitEnabled</key>
+	<true/> <!-- Optional, to allow automatic Firebase messaging initialization -->
+
 </dict>
 </plist>
