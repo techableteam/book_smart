@@ -1,11 +1,17 @@
 # Resolve react_native_pods.rb with node to allow for hoisting
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
-
-platform :ios, '14.0'
+def node_require(script)
+  require Pod::Executable.execute_command('node', ['-p',
+    "require.resolve(
+       '#{script}',
+       {paths: [process.argv[1]]},
+     )", __dir__]).strip
+end
+node_require('react-native/scripts/react_native_pods.rb')
+node_require('react-native-permissions/scripts/setup.rb')
+install! 'cocoapods', 
+  :generate_multiple_pod_projects => true,
+  :incremental_installation => true
+platform :ios, '15.0'
 use_modular_headers!
 prepare_react_native_project!
 
@@ -19,6 +25,9 @@ use_frameworks! :linkage => linkage.to_sym if linkage
 config = use_native_modules!
 
 target 'BookSmart' do
+
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
   use_react_native!(
     :path => config[:reactNativePath],
     :flipper_configuration => flipper_config,
@@ -27,13 +36,18 @@ target 'BookSmart' do
   # Explicitly add FirebaseAuth
   pod 'FirebaseAuth'
 
-  target 'BookSmartTests' do
-    inherit! :complete
-  end
+  # target 'BookSmartTests' do
+  #   inherit! :complete
+  # end
 end
 
 # ✅ Now config is accessible here
 post_install do |installer|
+  
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
   react_native_post_install(
     installer,
     config[:reactNativePath],
@@ -46,8 +60,26 @@ post_install do |installer|
   end
 
   installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    # Keep exactly one GoogleUtilities_Privacy bundle
+    if target.name.include?('GoogleUtilities_Privacy')
+      if google_utilities_kept
+        target.remove_from_project
+        puts "Removed duplicate GoogleUtilities target: #{target.name}"
+      else
+        google_utilities_kept = true
+        puts "Keeping GoogleUtilities target: #{target.name}"
+      end
+    end
+
+    # Keep exactly one RCTI18nStrings bundle
+    if target.name.include?('RCTI18nStrings')
+      if rct_i18n_kept
+        target.remove_from_project
+        puts "Removed duplicate RCTI18nStrings target: #{target.name}"
+      else
+        rct_i18n_kept = true
+        puts "Keeping RCTI18nStrings target: #{target.name}"
+      end
     end
   end
 end

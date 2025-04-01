@@ -22,6 +22,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -49,12 +51,17 @@
 	<string>We need your location to provide personalized content and updates based on your location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We need your location while you use the app to show relevant content and suggestions.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location to improve your experience.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>We need access to save images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to upload images.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We use this to provide notifications and improve your experience.</string>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>remote-notification</string>
 		<string>fetch</string>
 	</array>
 	<key>UIFileSharingEnabled</key>

@@ -11,10 +11,11 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		305BCA755BCBBD08F9637394 /* libPods-BookSmart-BookSmartTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FDBDE7605B705C67F0B3569 /* libPods-BookSmart-BookSmartTests.a */; };
+		700F75BB801591B829400188 /* libPods-BookSmart-BookSmartTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 61CA600BC343F1583846E079 /* libPods-BookSmart-BookSmartTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		846ECD4B2D98C14D000ABC3D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 846ECD4A2D98C14D000ABC3D /* GoogleService-Info.plist */; };
 		8B046AC2504FAA984F97728A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 57903D79F9D6B6E620B627FF /* PrivacyInfo.xcprivacy */; };
-		B508ED69C438B123EA822A47 /* libPods-BookSmart.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BDDB46924739A2B05368EB88 /* libPods-BookSmart.a */; };
+		D1E0C39DABB52D25E0537081 /* libPods-BookSmart.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB85E5F1FFF4B5DF681B1744 /* libPods-BookSmart.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,20 +32,16 @@
 		00E356EE1AD99517003FC87E /* BookSmartTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookSmartTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* BookSmartTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BookSmartTests.m; sourceTree = "<group>"; };
-		073A379D96F6F47594F5B152 /* Pods-BookSmart-BookSmartTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookSmart-BookSmartTests.debug.xcconfig"; path = "Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* BookSmart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookSmart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = BookSmart/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = BookSmart/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = BookSmart/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = BookSmart/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = BookSmart/main.m; sourceTree = "<group>"; };
-		2FDBDE7605B705C67F0B3569 /* libPods-BookSmart-BookSmartTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BookSmart-BookSmartTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		34761265C89D39645E7BF942 /* Pods-BookSmart.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookSmart.debug.xcconfig"; path = "Target Support Files/Pods-BookSmart/Pods-BookSmart.debug.xcconfig"; sourceTree = "<group>"; };
 		57903D79F9D6B6E620B627FF /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = BookSmart/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = BookSmart/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		84B43E042D95ACD3009731F3 /* BookSmart.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BookSmart.entitlements; path = BookSmart/BookSmart.entitlements; sourceTree = "<group>"; };
-		BA1AE9B794EF6F90C1EFE401 /* Pods-BookSmart.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookSmart.release.xcconfig"; path = "Target Support Files/Pods-BookSmart/Pods-BookSmart.release.xcconfig"; sourceTree = "<group>"; };
-		BDDB46924739A2B05368EB88 /* libPods-BookSmart.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BookSmart.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6C40D66E1871CF69666A955 /* Pods-BookSmart-BookSmartTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookSmart-BookSmartTests.debug.xcconfig"; path = "Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests.debug.xcconfig"; sourceTree = "<group>"; };
+		CB85E5F1FFF4B5DF681B1744 /* libPods-BookSmart.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BookSmart.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FA813EBD32A153FF9E99A797 /* Pods-BookSmart-BookSmartTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookSmart-BookSmartTests.release.xcconfig"; path = "Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -54,7 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				305BCA755BCBBD08F9637394 /* libPods-BookSmart-BookSmartTests.a in Frameworks */,
+				700F75BB801591B829400188 /* libPods-BookSmart-BookSmartTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B508ED69C438B123EA822A47 /* libPods-BookSmart.a in Frameworks */,
+				D1E0C39DABB52D25E0537081 /* libPods-BookSmart.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,7 +86,6 @@
 		13B07FAE1A68108700A75B9A /* BookSmart */ = {
 			isa = PBXGroup;
 			children = (
-				84B43E042D95ACD3009731F3 /* BookSmart.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -97,6 +93,7 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				57903D79F9D6B6E620B627FF /* PrivacyInfo.xcprivacy */,
+				846ECD4A2D98C14D000ABC3D /* GoogleService-Info.plist */,
 			);
 			name = BookSmart;
 			sourceTree = "<group>";
@@ -105,8 +102,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				BDDB46924739A2B05368EB88 /* libPods-BookSmart.a */,
-				2FDBDE7605B705C67F0B3569 /* libPods-BookSmart-BookSmartTests.a */,
+				CB85E5F1FFF4B5DF681B1744 /* libPods-BookSmart.a */,
+				61CA600BC343F1583846E079 /* libPods-BookSmart-BookSmartTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -145,10 +142,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				34761265C89D39645E7BF942 /* Pods-BookSmart.debug.xcconfig */,
-				BA1AE9B794EF6F90C1EFE401 /* Pods-BookSmart.release.xcconfig */,
-				073A379D96F6F47594F5B152 /* Pods-BookSmart-BookSmartTests.debug.xcconfig */,
-				FA813EBD32A153FF9E99A797 /* Pods-BookSmart-BookSmartTests.release.xcconfig */,
+				5AE060E499DF34573552A06E /* Pods-BookSmart.debug.xcconfig */,
+				6695AE97245D1B5895EEDFC1 /* Pods-BookSmart.release.xcconfig */,
+				C6C40D66E1871CF69666A955 /* Pods-BookSmart-BookSmartTests.debug.xcconfig */,
+				63116298710CF9D75108E0FB /* Pods-BookSmart-BookSmartTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -160,12 +157,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "BookSmartTests" */;
 			buildPhases = (
-				2B6414C71457FE8E306A1AB5 /* [CP] Check Pods Manifest.lock */,
+				E5E0AE256F31CD6FC6334503 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				7FA111EF94EE0A03BC4A531E /* [CP] Embed Pods Frameworks */,
-				9A6FE3E6809DB4C172D7CE76 /* [CP] Copy Pods Resources */,
+				FE1DD934AFB377FAD25F133D /* [CP] Embed Pods Frameworks */,
+				FD5C9767011CA597BC115B1A /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -181,13 +178,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "BookSmart" */;
 			buildPhases = (
-				BAB2ADA98903CDD28E237D5E /* [CP] Check Pods Manifest.lock */,
+				61745D8EBDD32CD00A4056E3 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				F6CED8FC6DC041A6BA93F220 /* [CP] Embed Pods Frameworks */,
-				DE6195742D76DD62678193DC /* [CP] Copy Pods Resources */,
+				520927FE6A72056AB245BAD2 /* [CP] Embed Pods Frameworks */,
+				513DC0D665C3E94E379B18C7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -247,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				846ECD4B2D98C14D000ABC3D /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				8B046AC2504FAA984F97728A /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -257,7 +255,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
@@ -267,33 +265,28 @@
 			name = "Bundle React Native code and images";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		2B6414C71457FE8E306A1AB5 /* [CP] Check Pods Manifest.lock */ = {
+		513DC0D665C3E94E379B18C7 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BookSmart/Pods-BookSmart-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-BookSmart-BookSmartTests-checkManifestLockResult.txt",
+				"${PODS_ROOT}/Target Support Files/Pods-BookSmart/Pods-BookSmart-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookSmart/Pods-BookSmart-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7FA111EF94EE0A03BC4A531E /* [CP] Embed Pods Frameworks */ = {
+		520927FE6A72056AB245BAD2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -327,7 +320,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BAB2ADA98903CDD28E237D5E /* [CP] Check Pods Manifest.lock */ = {
+		61745D8EBDD32CD00A4056E3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -349,7 +342,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DE6195742D76DD62678193DC /* [CP] Copy Pods Resources */ = {
+		E5E0AE256F31CD6FC6334503 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -363,24 +356,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookSmart/Pods-BookSmart-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F6CED8FC6DC041A6BA93F220 /* [CP] Embed Pods Frameworks */ = {
+		FE1DD934AFB377FAD25F133D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BookSmart/Pods-BookSmart-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BookSmart/Pods-BookSmart-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookSmart/Pods-BookSmart-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookSmart-BookSmartTests/Pods-BookSmart-BookSmartTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -416,7 +409,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 073A379D96F6F47594F5B152 /* Pods-BookSmart-BookSmartTests.debug.xcconfig */;
+			baseConfigurationReference = C6C40D66E1871CF69666A955 /* Pods-BookSmart-BookSmartTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -443,7 +436,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA813EBD32A153FF9E99A797 /* Pods-BookSmart-BookSmartTests.release.xcconfig */;
+			baseConfigurationReference = 63116298710CF9D75108E0FB /* Pods-BookSmart-BookSmartTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -467,7 +460,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 34761265C89D39645E7BF942 /* Pods-BookSmart.debug.xcconfig */;
+			baseConfigurationReference = 5AE060E499DF34573552A06E /* Pods-BookSmart.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon 3";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -482,7 +475,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.25;
+				MARKETING_VERSION = 1.0.26;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -498,7 +491,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BA1AE9B794EF6F90C1EFE401 /* Pods-BookSmart.release.xcconfig */;
+			baseConfigurationReference = 6695AE97245D1B5895EEDFC1 /* Pods-BookSmart.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon 3";
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
@@ -512,7 +505,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.25;
+				MARKETING_VERSION = 1.0.26;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -574,6 +567,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers/react/nativemodule/core",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers/platform/ios",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
@@ -600,6 +604,7 @@
 				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				USE_HERMES = true;
 			};
 			name = Debug;
@@ -646,6 +651,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers/react/nativemodule/core",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers/platform/ios",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
