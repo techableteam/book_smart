@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
+	<string>1.0.27</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -41,8 +41,22 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>This app requires access to your music library to play and manage your music.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app requires Bluetooth access to connect to and communicate with nearby devices.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>This app requires Bluetooth access to communicate with peripheral devices such as headphones or smartwatches.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>This app requires access to your calendar to add, view, and modify events.</string>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>This app requires access to your calendar to add events, but will not access any other information.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Access to camera is required to capture photos needed for your profile and shift's timesheet.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This app requires access to your contacts to allow you to send messages and make calls to your contacts.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app requires access to Face ID to authenticate your identity for secure login.</string>
 	<key>NSDocumentsUsageDescription</key>
 	<string>We need access to documents to allow you to upload files.</string>
 	<key>NSFileProviderDomainUsageDescription</key>
@@ -57,6 +71,16 @@
 	<string>We need access to save images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to upload images.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires access to your microphone to record audio for voice messages or video calls.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>This app requires access to your reminders to create and manage reminders on your behalf.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app requires access to speech recognition to transcribe voice into text.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app requires access to your motion sensors to track activity and detect movement.</string>
+	<key>NSSiriUsageDescription</key>
+	<string>This app requires access to Siri to allow voice-based commands and interaction with the app.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>We use this to provide notifications and improve your experience.</string>
 	<key>UIBackgroundModes</key>

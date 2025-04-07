@@ -25,7 +25,8 @@ use_frameworks! :linkage => linkage.to_sym if linkage
 config = use_native_modules!
 
 target 'BookSmart' do
-
+  pod 'Firebase', '~> 11.10.0'
+  pod 'Firebase/CoreOnly', '~> 11.10.0'
   pod 'GoogleUtilities', :modular_headers => true
   pod 'FirebaseCoreInternal', :modular_headers => true
   use_react_native!(
@@ -42,8 +43,6 @@ end
 post_install do |installer|
   use_frameworks! :linkage => :static
   $RNFirebaseAsStaticFramework = true
-  pod 'GoogleUtilities', :modular_headers => true
-  pod 'FirebaseCoreInternal', :modular_headers => true
   # Initialize flags for tracking which bundles we've kept
   google_utilities_kept = false
   rct_i18n_kept = false

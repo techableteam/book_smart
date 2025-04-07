@@ -27,14 +27,13 @@ export async function initFirebaseConfig() {
   console.log("APP NAME: 111", app.name)
 }
 
-export const requestNotificationsPermission = () => {
-  requestNotifications(['alert', 'sound', 'badge']).then(({ status }) => {
-    if (status === RESULTS.GRANTED) {
-      console.log("granted!!!!!");
-    } else {
-      console.log("blocked!!!!!");
-    }
-  });
+export const requestNotificationsPermission = async () => {
+  const { status } = await requestNotifications(['alert', 'sound', 'badge']);
+  if (status === RESULTS.GRANTED) {
+    console.log("granted!!!!!");
+  } else {
+    console.log("blocked!!!!!");
+  }
 };
 
 export async function requestUserPermission() {
@@ -48,17 +47,10 @@ export async function requestUserPermission() {
 
     try {
       await messaging().registerDeviceForRemoteMessages();
-      let fcmToken = "";
-      fcmToken = await messaging().getToken();
+      let fcmToken = await messaging().getToken();
       console.log('FCM Token:', fcmToken);
 
       // ✅ Show Alert with FCM Token for testing
-      Alert.alert(
-        'FCM Token',
-        fcmToken || 'No token received',
-        [{ text: 'OK' }],
-        { cancelable: false }
-      );
 
       // Handle background notifications
       messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -69,7 +61,7 @@ export async function requestUserPermission() {
       messaging().onNotificationOpenedApp(remoteMessage => {
         console.log('Notification opened from background:', remoteMessage);
       });
-    //   return token;
+
     } catch (error) {
       console.error('Error fetching FCM token:', error);
     }
