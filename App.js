@@ -6,37 +6,41 @@ import { Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Layout from './src/layout/Layout';
 import BackgroundTask from './src/utils/backgroundTask.js'
-import { requestUserPermission, requestNotificationsPermission } from './src/services/firebaseService.js';
+import { requestUserPermission, requestNotificationsPermission, initFirebaseConfig } from './src/services/firebaseService.js';
 import PushNotification from 'react-native-push-notification';
 
 function App() {
   useEffect(() => {
-    requestNotificationsPermission();
-    requestUserPermission();
-
-    PushNotification.createChannel(
-      {
-        channelId: "book_smart",
-        channelName: "Book Smart Notifications",
-        channelDescription: "Notifications related to the Book Smart app",
-        soundName: "default",
-        importance: 4,
-        vibrate: true,
-      },
-      (created) => console.log(`Channel created: ${created}`)
-    );
-
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log("Notification opened in foreground: ", remoteMessage);
-      Alert.alert(remoteMessage.notification?.title, remoteMessage.notification?.body);
-      PushNotification.localNotification({
-        channelId: "book_smart",
-        title: remoteMessage.notification?.title,
-        message: remoteMessage.notification?.body,
+    const initFCM = async () => {
+      await initFirebaseConfig();
+      await requestNotificationsPermission();
+      await requestUserPermission();
+  
+      PushNotification.createChannel(
+        {
+          channelId: "book_smart",
+          channelName: "Book Smart Notifications",
+          channelDescription: "Notifications related to the Book Smart app",
+          soundName: "default",
+          importance: 4,
+          vibrate: true,
+        },
+        (created) => console.log(`Channel created: ${created}`)
+      );
+  
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        console.log("Notification opened in foreground: ", remoteMessage);
+        Alert.alert(remoteMessage.notification?.title, remoteMessage.notification?.body);
+        PushNotification.localNotification({
+          channelId: "book_smart",
+          title: remoteMessage.notification?.title,
+          message: remoteMessage.notification?.body,
+        });
       });
-    });
-
-    return () => unsubscribe();
+  
+      return () => unsubscribe();
+    };
+    initFCM();
   }, []);
 
   return (
