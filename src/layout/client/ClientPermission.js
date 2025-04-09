@@ -69,7 +69,7 @@ export default function ClientPermission ({ navigation }) {
                         ],
                         { cancelable: false }
                     );
-                    navigation.navigate("ClientPhone")
+                    navigation.navigate("MyHome")
                 } else {
                     Alert.alert(
                         'Failed!',

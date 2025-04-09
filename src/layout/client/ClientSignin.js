@@ -153,11 +153,7 @@ export default function ClientSignIn({ navigation }) {
         }
 
         if (response.user.clinicalAcknowledgeTerm) {
-          if (response.phoneAuth) {
-            handleSignInNavigate('ClientPhone');
-          } else {
-            handleSignInNavigate('MyHome');
-          }
+          handleSignInNavigate('MyHome');
         } else {
           handleSignInNavigate('ClientPermission');
         }
