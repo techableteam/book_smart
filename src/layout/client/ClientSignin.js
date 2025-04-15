@@ -225,7 +225,7 @@ export default function ClientSignIn({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar  translucent backgroundColor="transparent" />
-      <MHeader navigation={navigation}/>
+      <MHeader navigation={navigation} back={true}/>
       <ScrollView style = {styles.scroll}
         showsVerticalScrollIndicator={false}
       >
