@@ -8,9 +8,11 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "postinstall": "node scripts/patch-rn-xcode16.js"
+    "postinstall": "node scripts/patch-rn-xcode16.js",
+    "bundle:ios": "react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/main.jsbundle --assets-dest ios"
   },
   "dependencies": {
+    "@notifee/react-native": "^9.1.8",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/datetimepicker": "^8.2.0",

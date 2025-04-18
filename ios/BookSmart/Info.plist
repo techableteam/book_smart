@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.27</string>
+	<string>1.0.28</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -110,9 +110,6 @@
 		<string>remote-notification</string>
 	</array>
 
-	<key>FirebaseAppDelegateProxyEnabled</key>
-	<false/>  <!-- This disables the default Firebase App Delegate Proxy, allowing you to control AppDelegate. -->
-
 	<key>NSUserTrackingUsageDescription</key>
 	<string>We use your data to send you notifications related to the app.</string> <!-- For iOS 14+ App Tracking Transparency (if needed) -->
 
@@ -128,6 +125,18 @@
 
 	<key>FirebaseMessagingAutoInitEnabled</key>
 	<true/> <!-- Optional, to allow automatic Firebase messaging initialization -->
-
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app uses the local network to communicate with development tools like Metro.</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UNNotificationExtensionDefaultContentHidden</key>
+	<false/>
+	<key>UNNotificationExtensionUserInteractionEnabled</key>
+	<true/>
 </dict>
 </plist>

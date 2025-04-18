@@ -564,7 +564,7 @@ export default function Shift ({ navigation }) {
             <AnimatedHeader title="AWARDED & COMPLETED SHIFTS" />
             <View style={styles.bottomBar}/>
           </View> */}
-          <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"PENDING VERIFICAITON"&nbsp;</Text>.</Text>
+          <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"PENDING VERIFICATION"&nbsp;</Text>.</Text>
           {downloading ? (
             <Text style={[styles.text, { marginTop: RFValue(15) }]}>Downloading...</Text>
           ) : (

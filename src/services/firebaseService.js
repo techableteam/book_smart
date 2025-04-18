@@ -41,25 +41,25 @@ export async function requestUserPermission() {
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
+  Alert.alert("firebase")
   if (enabled) {
     console.log('Notification permission granted.');
 
     try {
       await messaging().registerDeviceForRemoteMessages();
       let fcmToken = await messaging().getToken();
-      console.log('FCM Token:', fcmToken);
+      Alert.alert('FCM Token:', fcmToken);
 
       // ✅ Show Alert with FCM Token for testing
 
       // Handle background notifications
       messaging().setBackgroundMessageHandler(async remoteMessage => {
-        console.log('Message handled in the background!', remoteMessage);
+        Alert.alert('Message handled in the background!', remoteMessage);
       });
 
       // Handle when the app is opened from a notification
       messaging().onNotificationOpenedApp(remoteMessage => {
-        console.log('Notification opened from background:', remoteMessage);
+        Alert.alert('Notification opened from background:', remoteMessage);
       });
 
     } catch (error) {
