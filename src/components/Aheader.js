@@ -55,6 +55,7 @@ export default function AHeader({currentPage, navigation}) {
                     <Text style={[styles.subTitle, currentPage === 5 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminAllUser')}>🎯 Admin - All Users </Text>
                     <Text style={[styles.subTitle, currentPage === 6 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminFacilities')}>🏢 All Facilities</Text>
                     <Text style={[styles.subTitle, currentPage === 7 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('CaregiverTimeSheet')}>Caregiver Timesheet</Text>
+                    <Text style={[styles.subTitle, currentPage === 8 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminMessage')}>Message</Text>
                   </View>
                 </View>
               </View>

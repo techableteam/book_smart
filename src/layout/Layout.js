@@ -66,6 +66,7 @@ import TimesheetForm from './client/TimesheetForm.js';
 import AdminFileViewer from './AdminFileViewer.js';
 import BookShiftsNow from './client/BookShiftsNow.js';
 import ImageFileViewer from './ImageFileViewer.js';
+import AdminMessage from './admin/AdminMessage.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -90,6 +91,11 @@ function Layout() {
       <Stack.Screen 
         name= 'ClientSignUp'
         component = {ClientSignUp}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminMessage'
+        component = {AdminMessage}
         options={{headerShown: false}}
       />
       <Stack.Screen 
