@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Modal, TextInput, View, Image, StyleSheet, Dimensions, ScrollView, StatusBar, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Table } from 'react-native-table-component';
-import { allCaregivers } from '../../utils/useApi';
+import { CheckBox } from 'react-native-elements'
+import { allCaregivers, getDegreeList, sendMessage } from '../../utils/useApi';
 import images from '../../assets/images';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -15,16 +16,25 @@ import { RFValue } from 'react-native-responsive-fontsize';
 const { width, height } = Dimensions.get('window');
 
 export default function AdminMessage({ navigation }) {
-  const [updateStatusModal, setUpdateStatusModal] = useState(false);
   const [data, setData] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [isFocus, setIsFocus] = useState(false);
+  const [isFocusFilter, setIsFocusFilter] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState("");
   const [isMsgModal, setIsMsgModal] = useState(false);
   const [search, setSearch] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState("");
+  const [allChecked, setAllChecked] = useState(false);
   const [curPage, setCurPage] = useState(1);
   const [pageList, setPageList] = useState([
     {label: 'Page 1', value: 1}
+  ]);
+  const [filterItems, setFilterItems] = useState([
+    {
+      value: '',
+      label: ''
+    }
   ]);
   const tableHead = [
     'Name',
@@ -32,13 +42,68 @@ export default function AdminMessage({ navigation }) {
     'Degree/Discipline',
     'Email',
   ];
-  const widths = [200, 200, 180, 300];
+  const widths = [60, 200, 200, 180, 300];
+
+  const toggleCheckbox = (row) => {
+    setSelectedUsers(prev => 
+      prev.includes(row[4]) 
+        ? prev.filter(userId => userId !== row[4]) 
+        : [...prev, row[4]]
+    );
+  };
+
+  const checkState = (row) => {
+    return selectedUsers.includes(row[4]);
+  };
 
   function formatData(data) {
     return data.map(item => {
         const fullName = `${item[1]} ${item[2]}`;
         return [fullName, item[3], item[4], item[5], item[13]];
     });
+  };
+
+  useEffect(() => {
+    if (allChecked) {
+      const allUserIds = data.map(row => row[4]);
+      setSelectedUsers(allUserIds);
+      setSelectedFilter("All")
+    } else {
+      setSelectedUsers([]);
+    }
+  }, [allChecked]);
+
+  useEffect(() => {
+    if (selectedFilter === "All") {
+      const allUserIds = data.map(row => row[4]);
+      setSelectedUsers(allUserIds);
+      setAllChecked(true);
+    } else if (selectedFilter === "") {
+      setSelectedUsers([]);
+      setAllChecked(false);
+    } else {
+      const filteredUserIds = data
+        .filter(row => row[2] === selectedFilter)
+        .map(row => row[4]);
+      setSelectedUsers(filteredUserIds);
+      setAllChecked(false);
+    }
+  }, [selectedFilter]);
+
+  const getDegress = async () => {
+    const response = await getDegreeList('degree');
+    if (!response?.error) {
+      let tempArr = [];
+      response.data.map(item => {
+        tempArr.push({ label: item.degreeName, value: item.degreeName });
+      });
+      tempArr.unshift({ label: 'Unselect All', value: '' });
+      tempArr.unshift({ label: 'Select All', value: 'All' });
+      tempArr.unshift({ label: '', value: '' });
+      setFilterItems(tempArr);
+    } else {
+      setFilterItems([]);
+    }
   };
 
   const getData = async (requestData = { search: search, page: curPage, filters: [] }, isFilter = false ) => {
@@ -54,6 +119,18 @@ export default function AdminMessage({ navigation }) {
       }
       setPageList(pageContent);
       setData(modifiedData);
+
+      if (selectedFilter === "All") {
+        const allUserIds = modifiedData.map(row => row[4]);
+        setSelectedUsers(allUserIds);
+      } else if (selectedFilter === "") {
+        setSelectedUsers([]);
+      } else {
+        const filteredUserIds = modifiedData
+          .filter(row => row[2] === selectedFilter)
+          .map(row => row[4]);
+        setSelectedUsers(filteredUserIds);
+      }
     }
     setLoading(false);
   };
@@ -82,11 +159,60 @@ export default function AdminMessage({ navigation }) {
   };
 
   useEffect(() => {
+    getDegress();
     getData();
   }, []);
 
-  const toggleUpdateStatusModal = () => {
-    setUpdateStatusModal(!updateStatusModal);
+  const handleSendMsg = async () => {
+    if (content) {
+      const response = await sendMessage({ caregiverIds: selectedUsers, type: selectedFilter, message: content });
+      if (!response?.error) {
+        setIsMsgModal(false);
+        setLoading(false);
+        Alert.alert(
+          'Success!',
+          `Message sent successfully`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      } else {
+        setLoading(false);
+        Alert.alert(
+          'Failed!',
+          `${response.error}`,
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                console.log('OK pressed')
+              },
+            },
+          ],
+          { cancelable: false }
+        );
+      }
+    } else {
+      Alert.alert(
+        'Validation',
+        'Please enter message',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK pressed')
+            },
+          },
+        ],
+        { cancelable: false }
+      );
+    }
   };
 
   return (
@@ -149,8 +275,38 @@ export default function AdminMessage({ navigation }) {
                     />
                   )}
                 />
+              </View>
+              <View style={styles.filterContainer}>
+                <Dropdown
+                  style={[styles.dropdown, isFocusFilter && { borderColor: 'blue' }, { width: 200 }]}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  itemTextStyle={styles.itemTextStyle}
+                  iconStyle={styles.iconStyle}
+                  data={filterItems}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder={''}
+                  value={curPage ? curPage : 1}
+                  onFocus={() => setIsFocusFilter(true)}
+                  onBlur={() => setIsFocusFilter(false)}
+                  onChange={item => {
+                    setSelectedFilter(item.value);
+                    setIsFocusFilter(false);
+                  }}
+                  renderLeftIcon={() => (
+                    <View
+                      style={styles.icon}
+                      color={isFocusFilter ? 'blue' : 'black'}
+                      name="Safety"
+                      size={20}
+                    />
+                  )}
+                />
                 <TouchableOpacity
-                  style={styles.commonBtn}
+                  style={[styles.commonBtn, {  }]}
                   onPress={handleShowMsgModal}
                 >
                   <Text style={styles.profileTitle}>Send Message</Text>
@@ -159,10 +315,18 @@ export default function AdminMessage({ navigation }) {
               <ScrollView horizontal={true} style={{ width: '100%', borderWidth: 1, marginBottom: 30, borderColor: 'rgba(0, 0, 0, 0.08)' }}>
                 <Table >
                   <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccffff' }}>
+                    <View style={{ width: widths[0], borderColor: 'rgba(0, 0, 0, 0.08)', borderWidth: 1}} >
+                      <CheckBox
+                        checked={allChecked}
+                        onPress={() => setAllChecked(!allChecked)}
+                        checkedIcon={<Image source={images.checkedbtn} style={{ width: 20, height: 20 }} />}
+                        uncheckedIcon={<Image source={images.uncheckedbtn} style={{ width: 20, height: 20 }} />}
+                      />
+                    </View>
                     {tableHead.map((item, index) => (
                       <Text
                         key={index}
-                        style={[styles.tableText, { width: widths[index], textAlign: 'center' }]}
+                        style={[styles.tableText, { width: widths[index + 1], textAlign: 'center' }]}
                       >
                         {item}
                       </Text>
@@ -170,19 +334,27 @@ export default function AdminMessage({ navigation }) {
                   </View>
                   {data.map((rowData, rowIndex) => (
                     <View key={rowIndex} style={{ flexDirection: 'row' }}>
+                      <View style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', backgroundColor: '#E2E2E2', width: widths[0]}]}>
+                        <CheckBox
+                          checked={checkState(rowData)}
+                          onPress={() => toggleCheckbox(rowData)}
+                          checkedIcon={<Image source={images.checkedbtn} style={{ width: 20, height: 20 }} />}
+                          uncheckedIcon={<Image source={images.uncheckedbtn} style={{ width: 20, height: 20 }} />}
+                        />
+                      </View>
                       {rowData.map((cellData, cellIndex) => {
                         if (cellIndex >= tableHead.length) {
                           return (<View key={cellIndex}></View>);
                         } else {
                           if (cellIndex == 1 || cellIndex == 3) {
                             return (
-                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
+                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex + 1]}]}>
                                 <Text style={[styles.tableText, {borderWidth: 0, color: 'blue' }]}>{cellData}</Text>
                               </View>
                             );
                           } else {
                             return (
-                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex]}]}>
+                              <View key={cellIndex} style={[{ borderWidth: 1, borderColor: 'rgba(0, 0, 0, 0.08)', padding: 10, backgroundColor: '#E2E2E2', width: widths[cellIndex + 1]}]}>
                                 <Text style={[styles.tableText, {borderWidth: 0}]}>{cellData}</Text>
                               </View>
                             );
@@ -196,26 +368,33 @@ export default function AdminMessage({ navigation }) {
             </View>
           </View>
           <Modal
-            visible={updateStatusModal}
+            visible={isMsgModal}
             transparent= {true}
             animationType="slide"
             onRequestClose={() => {
-              setUpdateStatusModal(!updateStatusModal);
+              setIsMsgModal(!isMsgModal);
             }}
           >
             <View style={styles.modalContainer}>
               <View style={styles.calendarContainer}>
                 <View style={styles.header}>
-                  <Text style={styles.headerText}>Update Status</Text>
-                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={toggleUpdateStatusModal}>
+                  <Text style={styles.headerText}>Send Message</Text>
+                  <TouchableOpacity style={{width: 20, height: 20, }} onPress={() => setIsMsgModal(false)}>
                     <Image source = {images.close} style={{width: 20, height: 20,}}/>
                   </TouchableOpacity>
                 </View>
                 <View style={[styles.body, { marginBottom: 0 }]}>
                   <View style={styles.modalBody}>
-                    
-                    <TouchableOpacity style={styles.button} onPress={() => console.log("")} underlayColor="#0056b3">
-                      <Text style={styles.buttonText}>Update</Text>
+                    <TextInput
+                      style={[styles.inputs, { color: 'black' }]}
+                      onChangeText={setContent}
+                      value={content}
+                      multiline={true}
+                      textAlignVertical="top"
+                      placeholder=""
+                    />
+                    <TouchableOpacity style={styles.button} onPress={handleSendMsg} underlayColor="#0056b3">
+                      <Text style={styles.buttonText}>Send</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -250,6 +429,12 @@ const styles = StyleSheet.create({
     marginLeft: '10%',
     width: '80%',
     position: 'relative'
+  },
+  filterContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
   },
   bottomBar: {
     marginTop: 30,
@@ -327,8 +512,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   commonBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    // alignItems: 'center',
+    // justifyContent: 'center',
     paddingHorizontal: 20,
     paddingVertical: 5,
     backgroundColor: 'green',
@@ -386,6 +571,16 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: 'center',
     color: 'white',
-    fontSize: RFValue(16),
-  }
+    fontSize: RFValue(14),
+  },
+  inputs: {
+    marginTop: 5,
+    marginBottom: 0,
+    minHeight: 100,
+    width: '100%',
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10,
+    backgroundColor: 'white'
+  },
 });

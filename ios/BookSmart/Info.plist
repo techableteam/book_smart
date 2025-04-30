@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.28</string>
+	<string>1.0.29</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -32,7 +32,7 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>52.14.179.250</key>
+			<key>3.17.178.130</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
@@ -52,7 +52,7 @@
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>This app requires access to your calendar to add events, but will not access any other information.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Access to camera is required to capture photos needed for your profile and shift's timesheet.</string>
+	<string>Access to camera is required to capture photos needed for your profile and shift&apos;s timesheet.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>This app requires access to your contacts to allow you to send messages and make calls to your contacts.</string>
 	<key>NSFaceIDUsageDescription</key>
@@ -82,11 +82,11 @@
 	<key>NSSiriUsageDescription</key>
 	<string>This app requires access to Siri to allow voice-based commands and interaction with the app.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>We use this to provide notifications and improve your experience.</string>
+	<string>We use your data to send you notifications related to the app.</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>remote-notification</string>
 		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
@@ -104,27 +104,14 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-		<string>remote-notification</string>
-	</array>
-
-	<key>NSUserTrackingUsageDescription</key>
-	<string>We use your data to send you notifications related to the app.</string> <!-- For iOS 14+ App Tracking Transparency (if needed) -->
-
 	<key>UIUserInterfaceStyle</key>
-	<string>Light</string> <!-- Optional, to set the default interface style. -->
-
-	<!-- Push Notification configurations -->
+	<string>Light</string>
 	<key>UIApplicationExpectsUserPrivacyAuthorization</key>
-	<true/> <!-- Ensure the app asks for permission to show notifications on iOS 14+ -->
-
+	<true/>
 	<key>NSUserNotificationUsageDescription</key>
-	<string>Your app uses push notifications to keep you updated.</string> <!-- Optional, for description of why the app uses notifications -->
-
+	<string>Your app uses push notifications to keep you updated.</string>
 	<key>FirebaseMessagingAutoInitEnabled</key>
-	<true/> <!-- Optional, to allow automatic Firebase messaging initialization -->
+	<true/>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>This app uses the local network to communicate with development tools like Metro.</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
@@ -138,5 +125,10 @@
 	<false/>
 	<key>UNNotificationExtensionUserInteractionEnabled</key>
 	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>MaterialIcons.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+	</array>
 </dict>
 </plist>
