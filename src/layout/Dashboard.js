@@ -25,7 +25,7 @@ export default function Dashboard ({ navigation }) {
       <StatusBar  translucent backgroundColor="transparent" />
       <MHeader navigation={navigation} />
       <Text style={styles.text}>
-        Welcome to the BookSmart™ App {'\n'} where you make what you deserve!
+        Welcome to the BookSmart™ Healthcare App {'\n'} where you make what you deserve!
       </Text>
       <Image
         source={images.homepage}

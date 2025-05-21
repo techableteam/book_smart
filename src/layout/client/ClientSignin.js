@@ -250,7 +250,7 @@ export default function ClientSignIn({ navigation }) {
               and becoming a freelance clinician today!
             </Text> */}
 
-            <Text style={constStyles.loginSmallText}>Let your licensure and certifications pay off. Get the money you deserve by signing up and becoming a freelance clinician today!</Text>
+            <Text style={constStyles.loginSmallText}>Let your licensure and certifications {'\n'}pay off. Get the money you deserve by signing up and becoming a freelance clinician today!</Text>
 
           </View>
           <View style={styles.authInfo}>
