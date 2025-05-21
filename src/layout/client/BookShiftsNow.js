@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, Alert, TouchableOpacity, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, Alert, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
@@ -58,49 +58,61 @@ export default function BookShiftsNow ({ navigation, route }) {
     };    
 
     return (
-        <View style={styles.container}>
-            <StatusBar translucent backgroundColor="transparent"/>
-            <MHeader navigation={navigation} back={true} />
-            <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
-            <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
-                <View style={styles.body}>
-                    <TouchableOpacity style={[styles.backBtn, { width: '100%' }]} onPress={handleBack}>
-                        <Text style={[styles.profileTitle, { textAlign: 'center' }]}>Back to Job / Shift Listings {'>'}</Text>
-                    </TouchableOpacity>
-                    <View style={styles.modalBody}>
-                        {modalData.map((item, index) => 
-                            <View key={index} style={{ flexDirection: 'row', width: '100%', gap: 10 }}>
-                                <Text style={[styles.titles, { backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2 }]}>{item.title}</Text>
-                                <Text style={styles.content}>{item.content}</Text>
-                            </View>
-                        )}
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.containerBody}
+        >
+            <View style={styles.container}>
+                <StatusBar translucent backgroundColor="transparent"/>
+                <MHeader navigation={navigation} back={true} />
+                <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
+                <ScrollView
+                    style={{width: '100%', marginTop: height * 0.22}}
+                    showsVerticalScrollIndicator={false}
+                    automaticallyAdjustKeyboardInsets={true}
+                >
+                    <View style={styles.body}>
+                        <TouchableOpacity style={[styles.backBtn, { width: '100%' }]} onPress={handleBack}>
+                            <Text style={[styles.profileTitle, { textAlign: 'center' }]}>Back to Job / Shift Listings {'>'}</Text>
+                        </TouchableOpacity>
+                        <View style={styles.modalBody}>
+                            {modalData.map((item, index) => 
+                                <View key={index} style={{ flexDirection: 'row', width: '100%', gap: 10 }}>
+                                    <Text style={[styles.titles, { backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2 }]}>{item.title}</Text>
+                                    <Text style={styles.content}>{item.content}</Text>
+                                </View>
+                            )}
+                        </View>
+                        <Text style={[styles.text, {color: 'blue', fontWeight: 'bold', marginTop: 20, textAlign: 'left'}]}>You will be notified via email if this shift is awarded to you!</Text>
+                        <View style={styles.msgBar}>
+                            <Text style={[styles.subtitle, {textAlign: 'left', marginTop: 10, fontWeight: 'bold'}]}>ADD A BRIEF MESSAGE (optional)</Text>
+                            <TextInput
+                                style={[styles.inputs, { color: 'black' }]}
+                                onChangeText={setContent}
+                                value={content}
+                                multiline={true}
+                                textAlignVertical="top"
+                                placeholder=""
+                            />
+                        </View>
+                        <View style={[styles.btn, { marginTop: RFValue(20) }]}>
+                            <HButton style={styles.subBtn} onPress={()=> handleSubmit(modalData) }>
+                                Submit
+                            </HButton>
+                        </View>
                     </View>
-                    <Text style={[styles.text, {color: 'blue', fontWeight: 'bold', marginTop: 20, textAlign: 'left'}]}>You will be notified via email if this shift is awarded to you!</Text>
-                    <View style={styles.msgBar}>
-                        <Text style={[styles.subtitle, {textAlign: 'left', marginTop: 10, fontWeight: 'bold'}]}>ADD A BRIEF MESSAGE (optional)</Text>
-                        <TextInput
-                            style={[styles.inputs, { color: 'black' }]}
-                            onChangeText={setContent}
-                            value={content}
-                            multiline={true}
-                            textAlignVertical="top"
-                            placeholder=""
-                        />
-                    </View>
-                    <View style={[styles.btn, { marginTop: RFValue(20) }]}>
-                        <HButton style={styles.subBtn} onPress={()=> handleSubmit(modalData) }>
-                            Submit
-                        </HButton>
-                    </View>
-                </View>
-            </ScrollView>
-            <Loader visible={bidsubmit}/>
-            <MFooter />
-        </View>
+                </ScrollView>
+                <Loader visible={bidsubmit}/>
+                <MFooter />
+            </View>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
+    containerBody: {
+        flex: 1
+    },
     container: {
         height: '100%',
         flexDirection: 'column',

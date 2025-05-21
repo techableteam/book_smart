@@ -169,6 +169,7 @@ export default function AdminMessage({ navigation }) {
       if (!response?.error) {
         setIsMsgModal(false);
         setLoading(false);
+        setSelectedUsers([]);
         Alert.alert(
           'Success!',
           `Message sent successfully`,
@@ -220,7 +221,7 @@ export default function AdminMessage({ navigation }) {
       <StatusBar
         translucent backgroundColor="transparent"
       />
-      <AHeader navigation={navigation}  currentPage={8} />
+      <AHeader navigation={navigation}  currentPage={9} />
       <SubNavbar navigation={navigation} name={"AdminLogin"}/>
       <ScrollView style={{ width: '100%', marginTop: height * 0.22 }}
         showsVerticalScrollIndicator={false}

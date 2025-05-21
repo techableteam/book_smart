@@ -146,41 +146,10 @@ export default function FacilityPermission ({ navigation }) {
               </View>
               <View style={styles.titleBar}>
                 <Text style={styles.subTitle}>3. Payment and Insurance Terms.</Text>
-                <Text style={[styles.text, { marginBottom: 20 }]}><Text style={{fontWeight: 'bold'}}>(a) Payment Terms. </Text>For each Completed Requested Service that an I/C performs, BOOKSMART™ will receive from the Customer the I/C's hourly Fees plus applicable Rates and/or Fees as such:</Text>
+                <Text style={[styles.text, { marginBottom: 20 }]}><Text style={{fontWeight: 'bold'}}>(a) Payment Terms. </Text>For each Completed Requested Service that an I/C performs, BOOKSMART™ will receive from the Customer the I/C's Houly Rates plus Applicable Fees.</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                   <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
-                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>If Customer is a Staffing Agency or Managed Services Provider, that Fee is $5/hour per I/C designated access to and overall use of BookSmart™ for processing of payments and insurances (“Service Fee”).</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                  <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
-                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Customers who are with a direct Facility or Community must choose between the options of:</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start'}}>
-                  {/* <View style = {styles.checkboxWrapper}>
-                    <RadioButton
-                      value="first"
-                      status={ checked === 'first' ? 'checked' : 'unchecked' }
-                      onPress={() => setChecked('first')}
-                    />
-                  </View> */}
-                  <TouchableOpacity onPress={() => setChecked('first')}>
-                    {checked=='first'?(<Image source={images.checkedbtn} style = {{width : 13, height : 13, marginTop: 7, marginRight: 7}}/>):(<Image  source={images.uncheckedbtn} style = {{width : 13, height : 13,  marginTop: 7, marginRight: 7}} />)}
-                  </TouchableOpacity>
-                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>1. Paying Net 7 with a Fee of $7/hour for CNAs, $10/hour for LPNs or $15/hour for RNs for designated access to and use of BOOKSMART™ and processing of payments and insurances (“Service Fee”).
-                  </Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start'}}>
-                  {/* <View style = {styles.checkboxWrapper}> 
-                    <RadioButton
-                      value="second"
-                      status={ checked === 'second' ? 'checked' : 'unchecked' }
-                      onPress={() => setChecked('second')}
-                    /> 
-                  </View> */}
-                  <TouchableOpacity onPress={() => setChecked('second')}>
-                    {checked=='second'?(<Image source={images.checkedbtn} style = {{width : 13, height : 13,  marginTop: 7, marginRight: 7}}/>):(<Image  source={images.uncheckedbtn} style = {{width : 13, height : 13,  marginTop: 7, marginRight: 7}}/>)}
-                  </TouchableOpacity> 
-                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>2. Paying Net 30 Bill rates set as: $35/hour for CNAs, $55/hour for LPNs, and $75/hour for RNs.</Text>
+                  <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>Agreed Upon Rate</Text>
                 </View>
                 <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black', marginTop: 20 }}>A 50% Fee increase shall be applied for all hours worked by I/Cs in excess of 40 hours in any given week. Further, a 50% Fee increase shall be applied for any I/C hours worked on: New Years Day, Easter Sunday, Thanksgiving, Memorial Day, Independence Day, Labor Day, and Christmas Day. The Fee increases are non-compoundable so in the case a holiday falls on a weekend you will only be billed the 50% increase for hours over 40.</Text>
                 <Text style={{ textAlign: 'left', fontSize: 14, fontWeight: 'normal', color: 'black' }}>BOOKSMART™ shall remit to I/C within a reasonable time of a Service Request for which I/C provided to the Customer being marked as a Completed Service on the Service.</Text>

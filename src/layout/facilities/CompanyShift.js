@@ -10,7 +10,7 @@ import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
 import { Dropdown } from 'react-native-element-dropdown';
 import { addDegreeItem, addLocationItem, getDegreeList, getLocationList, getTimesheet, Job, Jobs, PostJob, RemoveJos, setAwarded, updateJobRatings, updateJobTSVerify } from '../../utils/useApi';
-import { useFocusEffect } from '@react-navigation/native';
+import { companyNameAtom, facilityIdAtom } from '../../context/FacilityAuthProvider'
 import { WebView } from 'react-native-webview';
 import Pdf from 'react-native-pdf';
 // Choose file
@@ -20,10 +20,12 @@ import RNFS from 'react-native-fs'
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { useAtom } from 'jotai';
 
 const { width, height } = Dimensions.get('window');
 
 export default function CompanyShift({ navigation }) {
+  const [facilityId, setFacilityId] = useAtom(facilityIdAtom);
   const [totalPages, setTotalPages] = useState(1);
   const [tableData, setTableData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -182,7 +184,7 @@ export default function CompanyShift({ navigation }) {
   };
 
   const getLocation = async () => {
-    const response = await getLocationList('location', 'Facilities', -3);
+    const response = await getLocationList('location', 'Facilities', facilityId);
     if (!response?.error) {
       let tempArr = [];
       response.data.map(item => {
@@ -330,7 +332,7 @@ export default function CompanyShift({ navigation }) {
   };
 
   const handleAddLocation = async () => {
-    let response = await addLocationItem({ item: locationItem, type: "Facilities", user_id: -3 }, 'location');
+    let response = await addLocationItem({ item: locationItem, type: "Facilities", user_id: facilityId }, 'location');
     if (!response?.error) {
       let tempArr = [];
       response.data.map(item => {
