@@ -43,7 +43,7 @@ const constStyles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'left',
         marginTop: RFValue(10),
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
     },
 
     loginTextInput : {
