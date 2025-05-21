@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Alert, Animated, Easing, StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, StatusBar, Image } from 'react-native';
 import { TextInput } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
@@ -26,6 +25,8 @@ export default function FacilitySignUp({ navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const [sending, setSending] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(true);
+  const [isShowCPassword, setIsShowCPassword] = useState(true);
 
   useEffect(() => {
     const increaseAnimation = Animated.timing(fadeAnim, {
@@ -266,32 +267,6 @@ export default function FacilitySignUp({ navigation }) {
   };
 
   const [confirmPassword, setConfirmPassword] = useState('');
-
-  //Alert
-  const showAlert = () => {
-    Alert.alert(
-      'Warning!',
-      "The Password doesn't matched. Please try again.",
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setConfirmPassword('');
-            console.log('OK pressed')
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
-  const handlePassword = () => {
-    if (credentials.password !== confirmPassword ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
  
   //------------------------------------------Phone Input----------------
   const formatPhoneNumber = (input) => {
@@ -413,7 +388,19 @@ export default function FacilitySignUp({ navigation }) {
       const response = await Signup(credentials, "facilities");
       if (!response?.error) {
         setSending(false);
-        navigation.navigate('FacilityFinishSignup');
+        Alert.alert(
+          "Registration Successful",
+          "Please check your email for the next steps.",
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                navigation.navigate('FacilityFinishSignup');
+              },
+            },
+          ],
+          { cancelable: false }
+        );
       } else {
         setIsSubmitting(false);
         setSending(false);
@@ -561,7 +548,7 @@ export default function FacilitySignUp({ navigation }) {
               </View>
             </View>
             <View style={styles.password}>
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{ flexDirection: 'row', marginTop: 20 }}>
                 <Text style={{
                   backgroundColor: 'yellow',
                   marginBottom: 10,
@@ -577,20 +564,34 @@ export default function FacilitySignUp({ navigation }) {
               <TextInput
                 autoCorrect={false}
                 autoCapitalize="none"
-                secureTextEntry={true}
                 style={[constStyles.signUpinput, { width: '100%' }]}
                 placeholder="Password"
                 onChangeText={e => handleCredentials('password', e)}
                 value={credentials.password || ''}
+                secureTextEntry={isShowPassword}
+                right={
+                  <TextInput.Icon
+                    icon={isShowPassword ? images.eye : images.eyeOff}
+                    onPress={() => setIsShowPassword(h => !h)}
+                    forceTextInputFocus={false}
+                  />
+                }
               />
               <TextInput
                 autoCorrect={false}
                 autoCapitalize="none"
-                secureTextEntry={true}
                 style={[constStyles.signUpinput, { width: '100%' }]}
                 placeholder="Confirm Password"
                 onChangeText={e => handleCredentials('confirmPassword', e)}
                 value={credentials.confirmPassword || ''}
+                secureTextEntry={isShowCPassword}
+                right={
+                  <TextInput.Icon
+                    icon={isShowCPassword ? images.eye : images.eyeOff}
+                    onPress={() => setIsShowCPassword(h => !h)}
+                    forceTextInputFocus={false}
+                  />
+                }
               />
               <Text style={[constStyles.signUpSubtitle, { fontStyle: 'italic', fontSize: RFValue(14), color: 'red' }]}>Create your password to access the platform</Text>
             </View>
@@ -727,27 +728,6 @@ export default function FacilitySignUp({ navigation }) {
     </View>
   );
 }
-
-// const pickerSelectStyles = StyleSheet.create({
-//   inputIOS: {
-//     fontSize: 16,
-//     borderRadius: 4,
-//     color: 'black',
-//     backgroundColor: 'white',
-//     borderWidth: 1,
-//     borderColor: 'hsl(0, 0%, 86%)',
-//     margin: 0,
-//   },
-//   inputAndroid: {
-//     fontSize: 8,
-//     margin: 0,
-//     borderRadius: 10,
-//     color: 'black',
-//     backgroundColor: 'white',
-//     borderWidth: 1,
-//     borderColor: 'hsl(0, 0%, 86%)',
-//   },
-// });
 
 const styles = StyleSheet.create({
   button: {

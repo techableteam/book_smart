@@ -34,7 +34,8 @@ export default function FacilityLogin({ navigation }) {
     contactEmail: '',
     password: '',
     userRole: 'Facilities',
-  })
+  });
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [checked, setChecked] = useState(false);
   const [request, setRequest] = useState(false);
 
@@ -250,7 +251,6 @@ export default function FacilityLogin({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.modal}>
-          {/* <View style={styles.topBar} /> */}
           <View style={styles.intro}>
             <Image
               source={images.admin}
@@ -258,15 +258,12 @@ export default function FacilityLogin({ navigation }) {
               style={styles.mark}
             />
             <Text style={constStyles.loginMainTitle1}>WHERE CARE MEETS CONNECTION</Text>
-            <HButton
-              style={constStyles.loginMainButton}>
-              FACILITIES
-            </HButton>
+            <Text style={{ fontSize: RFValue(16), fontWeight: '800', padding: RFValue(10), color: 'black'}}>FACILITIES</Text>
             <Text style={[constStyles.loginSubTitle, { color: '#2a53c1', width: '90%', textAlign: 'center', fontSize: RFValue(14)}]}>Register or Enter your email address and password to login.</Text>
           </View>
           <View style={styles.authInfo}>
             <View style={styles.email}>
-              <Text style={constStyles.loginSubTitle}> Email Address </Text>
+              <Text style={constStyles.loginSubTitle}>Email Address</Text>
               <TextInput
                 style={constStyles.loginTextInput}
                 placeholder=""
@@ -276,13 +273,13 @@ export default function FacilityLogin({ navigation }) {
             </View>
             <View style={styles.password}>
               <View style={{flexDirection: 'row', alignItems: 'bottom'}}>
-                <Text style={constStyles.loginSubTitle}> Password </Text>
+                <Text style={constStyles.loginSubTitle}>Password</Text>
                 <TouchableOpacity
                   onPress={() => console.log('Navigate to forget password')}>
                   <Text
                     style={[constStyles.loginSubTitle, { color: '#2a53c1'}]}
                     onPress={() => navigation.navigate('FacilityForgotPwd')}>
-                    {'('}forgot?{')'}
+                    {' ('}forgot?{')'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -290,8 +287,15 @@ export default function FacilityLogin({ navigation }) {
                 style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => handleCredentials('password', e)}
-                secureTextEntry={true}
                 value={credentials.password || ''}
+                secureTextEntry={isPasswordHidden}
+                right={
+                  <TextInput.Icon
+                    icon={isPasswordHidden ? images.eye : images.eyeOff}
+                    onPress={() => setIsPasswordHidden(h => !h)}
+                    forceTextInputFocus={false}
+                  />
+                }
               />
               <Pressable 
                 onPress={handleToggle}

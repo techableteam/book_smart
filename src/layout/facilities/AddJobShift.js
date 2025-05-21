@@ -193,7 +193,7 @@ export default function AddJobShift({ navigation }) {
   };
 
   const getLocation = async () => {
-    const response = await getLocationList('location', 'Facilities', -3);
+    const response = await getLocationList('location', 'Facilities', facilityId);
     if (!response?.error) {
       let tempArr = [];
       response.data.map(item => {
@@ -293,7 +293,7 @@ export default function AddJobShift({ navigation }) {
   };
 
   const handleAddLocation = async () => {
-    let response = await addLocationItem({ item: locationItem, type: 'Facilities', user_id: -3 }, 'location');
+    let response = await addLocationItem({ item: locationItem, type: 'Facilities', user_id: facilityId }, 'location');
     if (!response?.error) {
       let tempArr = [];
       response.data.map(item => {

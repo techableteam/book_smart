@@ -7,6 +7,7 @@ import { useAtom } from 'jotai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUniqueId } from 'react-native-device-info';
 import { useFocusEffect } from '@react-navigation/native';
+import { MaterialCommunityIcons } from 'react-native-vector-icons';
 import { 
   firstNameAtom, 
   lastNameAtom, 
@@ -46,6 +47,7 @@ export default function ClientSignIn({ navigation }) {
   const [checked, setChecked] = useState(false);
   const [request, setRequest] = useState(false);
   const [fToken, setFToken] = useState('');
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
 
   const fetchDeviceInfo = async () => {
     try {
@@ -162,7 +164,7 @@ export default function ClientSignIn({ navigation }) {
         if (response.error.status == 401) {
           Alert.alert(
             'Failed!',
-            "Sign in informaation is incorrect.",
+            "Sign in information is incorrect.",
             [
               {
                 text: 'OK',
@@ -248,9 +250,7 @@ export default function ClientSignIn({ navigation }) {
               and becoming a freelance clinician today!
             </Text> */}
 
-            <Text style={constStyles.loginSmallText}>Let your licensure and certifications pay off. {'\n'}
-              Get the money you deserve by signing up and becoming a freelance clinician today!
-            </Text>
+            <Text style={constStyles.loginSmallText}>Let your licensure and certifications pay off. Get the money you deserve by signing up and becoming a freelance clinician today!</Text>
 
           </View>
           <View style={styles.authInfo}>
@@ -275,12 +275,26 @@ export default function ClientSignIn({ navigation }) {
                   </Text>
                 </TouchableOpacity>
               </View>
-              <TextInput
+              {/* <TextInput
                 style={constStyles.loginTextInput}
                 placeholder=""
                 onChangeText={e => setLoginPW(e)}
                 secureTextEntry={true}
                 value={loginPW || ''}
+              /> */}
+              <TextInput
+                style={constStyles.loginTextInput}
+                placeholder=""
+                onChangeText={setLoginPW}
+                secureTextEntry={isPasswordHidden}
+                value={loginPW}
+                right={
+                  <TextInput.Icon
+                    icon={isPasswordHidden ? images.eye : images.eyeOff}
+                    onPress={() => setIsPasswordHidden(h => !h)}
+                    forceTextInputFocus={false}
+                  />
+                }
               />
               <Pressable 
                 onPress={handleToggle}
