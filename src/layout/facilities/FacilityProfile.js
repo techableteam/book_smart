@@ -51,7 +51,7 @@ export default function FacilityProfile ({ navigation }) {
             <ImageButton title={"POST SHIFT"} onPress={() => handleNavigate('AddJobShift')} />
             <ImageButton title={"VIEW / EDIT SHIFTS"} onPress={() => handleNavigate('CompanyShift')} />
             <ImageButton title={"APPROVE SHIFTS"} onPress={() => handleNavigate('CompanyShift')} />
-            <ImageButton title={"APPROVE TIMESHEETS"} onPress={() => handleNavigate('CompanyShift')} />
+            <ImageButton title={"Team Scheduling"} onPress={() => handleNavigate('CompanyShift')} />
           </View>
           <View style={styles.profile}>
             <View style={styles.profileTitleBg}>
