@@ -7,11 +7,16 @@ import { NavigationContainer } from '@react-navigation/native';
 import Layout from './src/layout/Layout';
 import BackgroundTask from './src/utils/backgroundTask.js';
 import notifee from '@notifee/react-native';
+import { requestTrackingPermission } from 'react-native-tracking-transparency';
+
 function App() {
   useEffect(() => {
     const initFCM = async () => {
       try {
         if (Platform.OS === 'ios') {
+          const status = await requestTrackingPermission();
+          console.log('ATT Permission Status:', status);
+          
           const authStatus = await messaging().requestPermission();
           const enabled =
             authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
