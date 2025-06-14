@@ -130,5 +130,7 @@
 		<string>MaterialIcons.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
 	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>We use your information to personalize your experience and provide relevant content.</string>
 </dict>
 </plist>
