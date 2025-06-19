@@ -1127,7 +1127,7 @@ export default function EditProfile({ navigation }) {
                 </TouchableOpacity>}
               </View>
               <Text style={[constStyles.signUpSubtitle, {lineHeight:30}]}> W - 9 {'\n'}
-                Standard State Criminal{'\n'}
+                Criminal Background Check{'\n'}
                 Drug Test{'\n'}
                 Hep B (shot or declination){'\n'}
                 Flu (shot or declination){'\n'}

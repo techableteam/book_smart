@@ -252,8 +252,13 @@ export default function FacilityLogin({ navigation }) {
       >
         <View style={styles.modal}>
           <View style={styles.intro}>
-            <Image
+            {/* <Image
               source={images.admin}
+              resizeMode="contain"
+              style={styles.mark}
+            /> */}
+            <Image
+              source={images.homepage}
               resizeMode="contain"
               style={styles.mark}
             />
@@ -324,11 +329,11 @@ export default function FacilityLogin({ navigation }) {
           </View>
         </View>
         <View style={styles.buttonWrapper}>
-          <HButton
+          {/* <HButton
             onPress={() => navigation.navigate('Home')}
             style={constStyles.loginMainButton}>
             Main Home
-          </HButton>
+          </HButton> */}
         </View>
       </ScrollView>
       {<Loader visible={request}/>}
