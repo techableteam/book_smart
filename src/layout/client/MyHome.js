@@ -49,10 +49,18 @@ export default function MyHome ({ navigation }) {
             </TouchableOpacity>
           </View>
           <View style={styles.imageButton}>
-            <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
-            <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
-            <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
-            <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
+            </View>
           </View>
           <View style={{ flex:1, justifyContent: 'center', width: '100%', alignItems: 'center' }}>
             <View style={styles.profile}>
@@ -68,11 +76,11 @@ export default function MyHome ({ navigation }) {
                 )
               }
             </View>
-            <Image
+            {/* <Image
               source={images.homepage}
               resizeMode="cover"
               style={styles.homepage}
-            />
+            /> */}
           </View>
         </ScrollView>
         <MFooter />
@@ -108,17 +116,31 @@ const styles = StyleSheet.create({
     width: '100%'
   },
  
+  // imageButton: {
+  //   width: '90%',
+  //   marginLeft: '5%',
+  //   justifyContent: 'center',
+  //   flexDirection: 'row',
+  //   flexWrap: 'wrap',
+  //   gap: RFValue(10),
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   marginTop: RFValue(30),
+  //   marginLeft: '5%'
+  // },
   imageButton: {
-    width: '90%',
-    marginLeft: '5%',
-    justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: RFValue(10),
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: RFValue(30),
-    marginLeft: '5%'
+    marginHorizontal: '14%',
+    marginTop: 30,
+  },
+  buttonWrapper: {
+    width: '45%',      
+    marginHorizontal: 5,  
+    marginVertical: 8,    
+    alignItems: 'center',
   },
   homepage: {
     width: RFValue(250),

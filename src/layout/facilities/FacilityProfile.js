@@ -48,35 +48,61 @@ export default function FacilityProfile ({ navigation }) {
             <View style={styles.bottomBar}/>
           </View>
           <View style={styles.imageButton}>
-            <ImageButton title={"POST SHIFT"} onPress={() => handleNavigate('AddJobShift')} />
-            <ImageButton title={"VIEW / EDIT SHIFTS"} onPress={() => handleNavigate('CompanyShift')} />
-            <ImageButton title={"APPROVE SHIFTS"} onPress={() => handleNavigate('CompanyShift')} />
-            <ImageButton title={"Team Scheduling"} onPress={() => handleNavigate('CompanyShift')} />
+            <View style={styles.buttonWrapper}>
+              <ImageButton title="POST SHIFT" onPress={() => handleNavigate('AddJobShift')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title="VIEW / EDIT SHIFTS" onPress={() => handleNavigate('CompanyShift')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title="APPROVE SHIFTS" onPress={() => handleNavigate('CompanyShift')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title="Team Scheduling" onPress={() => handleNavigate('CompanyShift')} />
+            </View>
           </View>
           <View style={styles.profile}>
             <View style={styles.profileTitleBg}>
               <Text style={styles.profileTitle}>FACILITY PROFILE</Text>
             </View>
-            {avatar.content && <Image
+            {/* {avatar.content && <Image
               source={{ uri: `${avatar.content}` }}
               resizeMode="cover"
               style={styles.nurse}
-            />}
-            <Text style={styles.name}>{firstName || "DaleWong"}</Text>
-            <TouchableOpacity style={styles.edit} onPress = {() => handleEdit()}>
-              <Text style={{color: 'white'}}> Edit Profile</Text>
-            </TouchableOpacity>
-            {
-              userInfo.map((item, index) => 
-                <View key={index} style={{flexDirection: 'column', width: '100%'}}>
-                  <Text style={styles.titles}>{item.title}</Text>
-                  <Text style={[
-                    styles.content, 
-                    item.title == "Phone" || item.title == "email" ? {color: '#2a53c1', textDecorationLine:'underline', width: '100%', fontSize: RFValue(15)} : {}
-                  ]}>{item.content}</Text>
+            />} */}
+            {avatar.content && avatar.content.startsWith("http") && (
+              <View style={styles.centered}>
+                <Image
+                  source={{ uri: avatar.content }}
+                  resizeMode="cover"
+                  style={styles.nurse}
+                />
+              </View>
+            )}
+            {/* <Text style={styles.name}>{firstName || "DaleWong"}</Text> */}
+            <View style={styles.centered}>
+              <TouchableOpacity style={styles.edit} onPress = {() => handleEdit()}>
+                <Text style={{color: 'white'}}> Edit Profile</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{height : 10}}/>
+            <View style={styles.centered}>
+              {userInfo.map((item, index) => (
+                <View key={index} style={styles.row}>
+                  <Text style={styles.titles}>
+                    {item.title.charAt(0).toUpperCase() + item.title.slice(1)}:
+                  </Text>
+                  <Text
+                    style={[
+                      styles.content,
+                      (item.title === "Phone" || item.title === "email") && styles.linkText
+                    ]}
+                  >
+                    {item.content}
+                  </Text>
                 </View>
-              )
-            }
+              ))}
+            </View>
           </View>
         </ScrollView>
         <MFooter />
@@ -85,6 +111,33 @@ export default function FacilityProfile ({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    width: '90%',
+  },
+  titles: {
+    fontWeight: 'bold',
+    fontSize: RFValue(16),
+    width: RFValue(110), // fixed width for alignment
+    marginRight: RFValue(5),
+  },
+  content: {
+    fontSize: RFValue(16),
+    flex: 1,
+    flexWrap: 'wrap',
+  },
+  linkText: {
+    color: '#2a53c1',
+    textDecorationLine: 'underline',
+    fontSize: RFValue(15),
+  },
   container: {
     height: '100%',
     flexDirection: 'column',
@@ -148,15 +201,18 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   imageButton: {
-    marginLeft: '5%',
-    width: '90%',
-    justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: '14%',
     marginTop: 30,
+  },
+  buttonWrapper: {
+    width: '45%',      
+    marginHorizontal: 5,  
+    marginVertical: 8,    
+    alignItems: 'center',
   },
   profile: {
     marginTop: 20,
@@ -168,21 +224,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#b0b0b0',
     marginBottom: 100
-    // elevation: 1,
-    // // shadowColor: 'rgba(0, 0, 0, 0.4)',
-    // // shadowOffset: { width: 1, height: 1 },
-    // shadowRadius: 0,
-  },
-  titles: {
-    fontWeight: 'bold',
-    fontSize: RFValue(16),
-    lineHeight: RFValue(40),
-    width: '100%'
-  },
-  content: {
-    fontSize: RFValue(16),
-    width: '100%',
-    lineHeight: RFValue(40),
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
