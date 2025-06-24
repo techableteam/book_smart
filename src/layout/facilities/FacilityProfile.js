@@ -24,8 +24,8 @@ export default function FacilityProfile ({ navigation }) {
   };
 
   const userInfo = [
-    {title: 'Contact Name', content: firstName + " " + lastName},
-    {title: 'email', content: contactEmail},
+    {title: 'Name', content: firstName + " " + lastName},
+    {title: 'Email', content: contactEmail},
     {title: 'Phone', content: contactPhone},
   ];
 
@@ -120,13 +120,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 4,
-    width: '90%',
+    width: '100%',
+    gap: RFValue(6),
   },
   titles: {
     fontWeight: 'bold',
     fontSize: RFValue(16),
-    width: RFValue(110), // fixed width for alignment
-    marginRight: RFValue(5),
+    width: RFValue(55),
+    marginLeft: RFValue(15),
   },
   content: {
     fontSize: RFValue(16),

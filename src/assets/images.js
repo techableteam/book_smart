@@ -14,7 +14,7 @@ const images = {
     homeIcon: require('./images/homeIcon.png'),
     post: require('./images/time.png'),
     view: require('./images/checklist2.png'),
-    approve: require('./images/Present.png'),
+    approve: require('./images/approve_btn.png'),
     approveTime: require('./images/Stopwatch.png'),
     plus: require("./images/plus.png"),
     folder: require("./images/folder.png"),

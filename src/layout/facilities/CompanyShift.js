@@ -117,22 +117,22 @@ export default function CompanyShift({ navigation }) {
     {label: 'Verified', value: 'Verified'},
     {label: 'Paid', value: 'Paid'},
   ];
-  const tableHead = [
-    'Degree/Discipline',
-    'Entry Date',
-    'Job ID',
-    'Job #',
-    'Location',
-    'Date',
-    'Shift',
-    'View Shift/Bids',
-    'Bids',
-    '✏️ Job Status',
-    'Hired',
-    'Verify TS',
-    'Rating',
-    'Delete',
-  ];
+  // const tableHead = [
+  //   'View Shift/Bids',
+  //   'Degree',
+  //   'Entry Date',
+  //   'Job ID',
+  //   'Job #',
+  //   'Location',
+  //   'Date',
+  //   'Shift',
+  //   'Bids',
+  //   '✏️ Job Status',
+  //   'Hired',
+  //   'Verify TS',
+  //   'Rating',
+  //   'Delete',
+  // ];
   const bidderTableHeader = [
     "Entry Date",
     "Caregiver",
@@ -160,9 +160,43 @@ export default function CompanyShift({ navigation }) {
         pageContent.push({ label: 'Page ' + i, value: i });
       }
       setPageList(pageContent);
+      // ✅ Reorder the columns in each row before adding the table head
+      result.dataArray = result.dataArray.map(row => {
+        return [
+          row[9],   // Job Status
+          row[7],   // View Shift/Bids
+          row[0],   // Degree/Discipline
+          row[1],   // Entry Date
+          row[2],   // Job ID
+          row[3],   // Job #
+          row[4],   // Location
+          row[5],   // Date
+          row[6],   // Shift
+          row[8],   // Bids
+          row[10],  // Hired
+          row[11],  // Verify TS
+          // row[12],  // Rating
+          row[13],  // Delete
+        ];
+      });
+      result.dataArray.unshift([
+        '✏️ Job Status',
+        'View Shift/Bids',
+        'Degree',
+        'Entry Date',
+        'Job ID',
+        'Job #',
+        'Location',
+        'Date',
+        'Shift',
+        'Bids',
+        'Hired',
+        'Verify TS',
+        // 'Rating',
+        'Delete',
+      ]);
       setData(result.dataArray);
       setFilteredData(result.dataArray);
-      result.dataArray.unshift(tableHead);
       setTableData(result.dataArray);
       setLoading(false);
     }
@@ -220,8 +254,8 @@ export default function CompanyShift({ navigation }) {
 
   const handleCellClick = async (data) => {
     console.log(data);
-    setSelectedJobId(data[2]);
-    setSelectedJobStatus(data[9]);
+    setSelectedJobId(data[4]);
+    setSelectedJobStatus(data[0]);
     toggleJobStatusModal();
   };
 
@@ -778,7 +812,7 @@ export default function CompanyShift({ navigation }) {
 
   const itemsToShow = getItemsForPage(currentPage);
 
-  const widths = [150, 120, 80, 150, 150, 150, 150, 150, 80, 150, 150, 100, 150, 120];
+  const widths = [130, 115, 80, 90, 80, 120, 150, 110, 150, 60, 150, 100, 120];
   const RenderItem = ({ item, index }) => (
     <View
       key={index}
@@ -788,14 +822,12 @@ export default function CompanyShift({ navigation }) {
       }}
     >
       {widths.map((width, idx) => {
-        if (idx === 7 && index > 0) {
+        if (idx === 1 && index > 0) {
+          // View Shift/Bids button
           return (
             <View
               key={idx}
-              style={[
-                styles.tableItemStyle,
-                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
-              ]}
+              style={[styles.tableItemStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', width }]}
             >
               <TouchableOpacity
                 style={{
@@ -807,32 +839,24 @@ export default function CompanyShift({ navigation }) {
                   borderRadius: 20,
                 }}
                 onPress={() => {
-                  handleShowJobDetailModal(item[2]);
+                  handleShowJobDetailModal(item[4]); // Job ID is now at index 3
                 }}
               >
                 <Text style={styles.profileTitle}>View</Text>
               </TouchableOpacity>
             </View>
           );
-        } else if (idx === 9 && index > 0) {
+        } else if (idx === 0 && index > 0) {
           return (
             <TouchableOpacity key={idx} onPress={() => handleCellClick(item)}>
-              <Text
-                style={[styles.tableItemStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', width }]}
-              >
+              <Text style={[styles.tableItemStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', width }]}>
                 {item[idx]}
               </Text>
             </TouchableOpacity>
           );
         } else if (idx === 11 && index > 0) {
           return (
-            <View
-              key={idx}
-              style={[
-                styles.tableItemStyle,
-                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
-              ]}
-            >
+            <View key={idx} style={[styles.tableItemStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', width }]}>
               <TouchableOpacity
                 style={{
                   alignItems: 'center',
@@ -843,53 +867,38 @@ export default function CompanyShift({ navigation }) {
                   borderRadius: 20,
                 }}
                 onPress={() => {
-                  handleShowJobTSVerifyModal(item[2]);
+                  handleShowJobTSVerifyModal(item[4]); // Job ID
                 }}
               >
                 <Text style={styles.profileTitle}>View</Text>
               </TouchableOpacity>
             </View>
           );
-        } else if (
-          idx === 12 &&
-          index > 0 &&
-          item[9] !== 'Available' &&
-          item[9] !== 'Awarded'
-        ) {
+        } 
+        // else if (idx === 12 && index > 0 && item[9] !== 'Available' && item[9] !== 'Awarded') {
+        //   return (
+        //     <View key={idx} style={[styles.tableItemStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', width }]}>
+        //       <TouchableOpacity
+        //         style={{
+        //           alignItems: 'center',
+        //           justifyContent: 'center',
+        //           paddingHorizontal: 20,
+        //           paddingVertical: 5,
+        //           backgroundColor: 'green',
+        //           borderRadius: 20,
+        //         }}
+        //         onPress={() => {
+        //           handleShowRatingModal(item[3], item[12]); // Job ID and Rating
+        //         }}
+        //       >
+        //         <Text style={styles.profileTitle}>Add / View</Text>
+        //       </TouchableOpacity>
+        //     </View>
+        //   );
+        // } 
+        else if (idx === 12 && index > 0) {
           return (
-            <View
-              key={idx}
-              style={[
-                styles.tableItemStyle,
-                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
-              ]}
-            >
-              <TouchableOpacity
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingHorizontal: 20,
-                  paddingVertical: 5,
-                  backgroundColor: 'green',
-                  borderRadius: 20,
-                }}
-                onPress={() => {
-                  handleShowRatingModal(item[2], item[12]);
-                }}
-              >
-                <Text style={styles.profileTitle}>Add / View</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        } else if (idx === 13 && index > 0) {
-          return (
-            <View
-              key={idx}
-              style={[
-                styles.tableItemStyle,
-                { flex: 1, justifyContent: 'center', alignItems: 'center', width },
-              ]}
-            >
+            <View key={idx} style={[styles.tableItemStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', width }]}>
               <TouchableOpacity
                 style={{
                   alignItems: 'center',
@@ -904,7 +913,7 @@ export default function CompanyShift({ navigation }) {
                     {
                       text: 'OK',
                       onPress: () => {
-                        handleRemove(item[2]);
+                        handleRemove(item[4]); // Job ID
                       },
                     },
                     { text: 'Cancel', style: 'cancel' },
@@ -928,7 +937,8 @@ export default function CompanyShift({ navigation }) {
         }
       })}
     </View>
-  );  
+  );
+  
 
   const bidderTableWidth = [150, 150, 140, 200, 150, 100];
   const RenderItem1 = ({ item, index }) => (
@@ -1037,19 +1047,13 @@ export default function CompanyShift({ navigation }) {
           <AnimatedHeader title="COMPANY JOBS / SHIFTS" />
           <View style={styles.bottomBar} />
         </View>
-        <View style={{ marginTop: RFValue(30), flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10, flexWrap: 'wrap' }}>
+        <View style={{ marginTop: RFValue(30), justifyContent: 'center', flexDirection: 'row', width: '90%', marginLeft: '5%', gap: 10, flexWrap: 'wrap' }}>
           <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => navigation.navigate('AddJobShift')}>
             <View style={{ backgroundColor: 'white', borderRadius: RFValue(10), width: RFValue(16), height: RFValue(16), justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
               <Text style={{ fontWeight: 'bold', color: '#194f69', textAlign: 'center', marginTop: 0, lineHeight: RFValue(16) }}>+</Text>
             </View>
             <Text style={[styles.profileTitle, { fontSize: RFValue(14) }]}>Add A New Job / Shift
             </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.subBtn, {}]} onPress={() => {
-            navigation.navigate('FacilityProfile')
-          }}>
-            <Text style={[styles.profileTitle, { fontSize: RFValue(14) }]}>🏚️ Facilities Home</Text>
           </TouchableOpacity>
         </View>
 
@@ -1080,7 +1084,7 @@ export default function CompanyShift({ navigation }) {
         
         <View>
           <View style={styles.body}>
-            <View style={styles.bottomBar} />
+            {/* <View style={styles.bottomBar} /> */}
             <View style={styles.modalBody}>
               <View style={[styles.profileTitleBg, { marginLeft: 0, marginTop: RFValue(30) }]}>
                 <Text style={styles.profileTitle}>🖥️ FACILITY / SHIFT LISTINGS</Text>
@@ -1932,12 +1936,12 @@ const styles = StyleSheet.create({
   },
   profile: {
     marginTop: 20,
-    width: '84%',
-    padding: 20,
-    backgroundColor: '#c2c3c42e',
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#b0b0b0',
+    width: '94%',
+    padding: 10,
+    // backgroundColor: '#c2c3c42e',
+    // borderRadius: 30,
+    // borderWidth: 2,
+    // borderColor: '#b0b0b0',
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',

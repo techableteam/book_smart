@@ -66,7 +66,10 @@ export default function MyHome ({ navigation }) {
             <View style={styles.profile}>
               {
                 userInfo.map((item, index) => 
-                  <View key={index} style={{flexDirection: 'row'}}>
+                  <View key={index} style={styles.row}>
+                    <Text style={styles.titles}>
+                      {item.title.charAt(0).toUpperCase() + item.title.slice(1)}:
+                    </Text>
                     <Text style={[
                       styles.content, 
                       item.title == "Name" ? {fontWeight: 'bold'} : 
@@ -158,9 +161,23 @@ const styles = StyleSheet.create({
     borderWidth: RFValue(2),
     borderColor: '#b0b0b0',
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    width: '100%',
+    gap: RFValue(6),
+  },
+  titles: {
+    fontWeight: 'bold',
+    fontSize: RFValue(16),
+    width: RFValue(90), // fixed width for alignment
+    marginLeft: RFValue(5),
+  },
   content: {
     fontSize: RFValue(16),
-    lineHeight: RFValue(30),
+    flex: 1,
+    flexWrap: 'wrap',
   },
   headBar: {
     textAlign: 'center',
