@@ -134,12 +134,12 @@ export default function CompanyShift({ navigation }) {
   //   'Delete',
   // ];
   const bidderTableHeader = [
+    "Award Job",
     "Entry Date",
     "Caregiver",
     "Details",
     "Message From Applicant",
     "Bid Status",
-    "Award Job",
     "",
     "",
     ""
@@ -163,8 +163,8 @@ export default function CompanyShift({ navigation }) {
       // ✅ Reorder the columns in each row before adding the table head
       result.dataArray = result.dataArray.map(row => {
         return [
-          row[9],   // Job Status
           row[7],   // View Shift/Bids
+          row[9],   // Job Status
           row[0],   // Degree/Discipline
           row[1],   // Entry Date
           row[2],   // Job ID
@@ -180,8 +180,8 @@ export default function CompanyShift({ navigation }) {
         ];
       });
       result.dataArray.unshift([
-        '✏️ Job Status',
         'View Shift/Bids',
+        '✏️ Job Status',
         'Degree',
         'Entry Date',
         'Job ID',
@@ -255,7 +255,7 @@ export default function CompanyShift({ navigation }) {
   const handleCellClick = async (data) => {
     console.log(data);
     setSelectedJobId(data[4]);
-    setSelectedJobStatus(data[0]);
+    setSelectedJobStatus(data[1]);
     toggleJobStatusModal();
   };
 
@@ -396,7 +396,17 @@ export default function CompanyShift({ navigation }) {
       setSelectedBidders([]);
       setLoading(false);
     } else {
-      let biddersList = data.bidders;
+      const updatedHeader = [...bidderTableHeader];
+      const awardJobHeader = updatedHeader.splice(5, 1)[0];
+      updatedHeader.unshift(awardJobHeader);
+
+      // Move content for each row too
+      let biddersList = data.bidders.map(row => {
+        const newRow = [...row];
+        const awardJob = newRow.splice(5, 1)[0]; // remove "Award Job"
+        newRow.unshift(awardJob); // put at beginning
+        return newRow;
+      });
       biddersList.unshift(bidderTableHeader);
       setCurJobId(id);
       setSelectedJob(data.jobData);
@@ -812,7 +822,7 @@ export default function CompanyShift({ navigation }) {
 
   const itemsToShow = getItemsForPage(currentPage);
 
-  const widths = [130, 115, 80, 90, 80, 120, 150, 110, 150, 60, 150, 100, 120];
+  const widths = [115, 130, 80, 90, 80, 120, 150, 110, 150, 60, 150, 100, 120];
   const RenderItem = ({ item, index }) => (
     <View
       key={index}
@@ -822,7 +832,7 @@ export default function CompanyShift({ navigation }) {
       }}
     >
       {widths.map((width, idx) => {
-        if (idx === 1 && index > 0) {
+        if (idx === 0 && index > 0) {
           // View Shift/Bids button
           return (
             <View
@@ -846,7 +856,7 @@ export default function CompanyShift({ navigation }) {
               </TouchableOpacity>
             </View>
           );
-        } else if (idx === 0 && index > 0) {
+        } else if (idx === 1 && index > 0) {
           return (
             <TouchableOpacity key={idx} onPress={() => handleCellClick(item)}>
               <Text style={[styles.tableItemStyle, { flex: 1, justifyContent: 'center', alignItems: 'center', width }]}>
@@ -940,7 +950,7 @@ export default function CompanyShift({ navigation }) {
   );
   
 
-  const bidderTableWidth = [150, 150, 140, 200, 150, 100];
+  const bidderTableWidth = [100, 100, 100, 150, 150, 90];
   const RenderItem1 = ({ item, index }) => (
     <View
       key={index}
@@ -977,7 +987,7 @@ export default function CompanyShift({ navigation }) {
               </TouchableOpacity>
             </View>
           );
-        } else if (idx === 5 && index > 0) {
+        } else if (idx === 0 && index > 0) {
           return (
             <View
               key={idx}

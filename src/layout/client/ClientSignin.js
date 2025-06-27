@@ -384,11 +384,6 @@ const styles = StyleSheet.create({
     height: height * 0.25,
     marginTop: 10,
   },
- 
-
-  
-
-  
   authInfo: {
     marginLeft: 20,
     marginRight: 20,
