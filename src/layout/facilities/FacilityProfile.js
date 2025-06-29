@@ -104,6 +104,7 @@ export default function FacilityProfile ({ navigation }) {
               ))}
             </View>
           </View>
+          <View style={{height : 30}}/>
         </ScrollView>
         <MFooter />
       </View>
@@ -121,13 +122,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
     width: '100%',
-    gap: RFValue(6),
+    gap: RFValue(2),
   },
   titles: {
     fontWeight: 'bold',
     fontSize: RFValue(16),
     width: RFValue(55),
-    marginLeft: RFValue(15),
+    marginLeft: RFValue(5),
   },
   content: {
     fontSize: RFValue(16),

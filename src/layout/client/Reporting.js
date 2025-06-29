@@ -170,10 +170,18 @@ export default function Reporting ({ navigation }) {
             <View style={styles.bottomBar}/>
           </View>
           <View style={styles.imageButton}>
-            <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
-            <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
-            <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
-            <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
+            </View>
           </View>
           <View style = {{ width:'100', flex : 1, justifyContent: 'center', alignItems:'center'}}>
             <View style={styles.profile}>
@@ -338,15 +346,18 @@ const styles = StyleSheet.create({
     marginLeft: '5%'
   },
   imageButton: {
-    width: '90%',
-    marginLeft: '5%',
-    justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: '14%',
     marginTop: 30,
+  },
+  buttonWrapper: {
+    width: '45%',      
+    marginHorizontal: 5,  
+    marginVertical: 5,    
+    alignItems: 'center',
   },
   profile: {
     marginTop: RFValue(20),

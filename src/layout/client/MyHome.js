@@ -27,7 +27,7 @@ export default function MyHome ({ navigation }) {
   const userInfo = [
     {title: 'Name', content: firstName + ' ' + lastName},
     {title: 'Email', content: email},
-    {title: 'User Roles', content: userRole},
+    {title: 'Roles', content: userRole},
     // {title: 'Caregiver', content: caregiver},
   ];
 
@@ -38,12 +38,6 @@ export default function MyHome ({ navigation }) {
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
         <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
           <View style={styles.topView}>
-            {/* <Image
-              source={images.mark}
-              resizeMode="contain"
-              style={styles.mark}
-            />
-            <View style={styles.bottomBar}/> */}
             <TouchableOpacity onPress={() => navigation.navigate("ShiftListing")}>
               <AnimatedHeader title="Book Shifts Now!" style={{ paddingHorizontal: 30 }} />
             </TouchableOpacity>
@@ -79,12 +73,8 @@ export default function MyHome ({ navigation }) {
                 )
               }
             </View>
-            {/* <Image
-              source={images.homepage}
-              resizeMode="cover"
-              style={styles.homepage}
-            /> */}
           </View>
+          <View style = {{height : 100}}/>
         </ScrollView>
         <MFooter />
       </View>
@@ -119,18 +109,6 @@ const styles = StyleSheet.create({
     width: '100%'
   },
  
-  // imageButton: {
-  //   width: '90%',
-  //   marginLeft: '5%',
-  //   justifyContent: 'center',
-  //   flexDirection: 'row',
-  //   flexWrap: 'wrap',
-  //   gap: RFValue(10),
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   marginTop: RFValue(30),
-  //   marginLeft: '5%'
-  // },
   imageButton: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -142,7 +120,7 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     width: '45%',      
     marginHorizontal: 5,  
-    marginVertical: 8,    
+    marginVertical: 5,    
     alignItems: 'center',
   },
   homepage: {
@@ -153,9 +131,9 @@ const styles = StyleSheet.create({
   },
   profile: {
     marginTop: RFValue(20),
-    width: '84%',
-    paddingHorizontal: RFValue(20),
-    paddingVertical: RFValue(5),
+    width: '92%',
+    paddingHorizontal: RFValue(10),
+    paddingVertical: RFValue(10),
     backgroundColor: '#c2c3c42e',
     borderRadius: RFValue(30),
     borderWidth: RFValue(2),
@@ -166,13 +144,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
     width: '100%',
-    gap: RFValue(6),
+    gap: RFValue(2),
   },
   titles: {
     fontWeight: 'bold',
     fontSize: RFValue(16),
-    width: RFValue(90), // fixed width for alignment
+    width: RFValue(50), 
     marginLeft: RFValue(5),
+    marginRight : RFValue(2)
   },
   content: {
     fontSize: RFValue(16),

@@ -560,10 +560,6 @@ export default function Shift ({ navigation }) {
         <MHeader navigation={navigation} back={true} />
         <SubNavbar navigation={navigation} name={'ClientSignIn'}/>
         <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
-          {/* <View style={styles.topView}>
-            <AnimatedHeader title="AWARDED & COMPLETED SHIFTS" />
-            <View style={styles.bottomBar}/>
-          </View> */}
           <Text style={styles.text}>All of your<Text style={{fontWeight: 'bold'}}>&nbsp;"AWARDED"&nbsp;</Text> shifts will appear below. Once you have completed a shift, upload your timesheet and the shift status will update to <Text style={{fontWeight: 'bold'}}>&nbsp;"PENDING VERIFICATION"&nbsp;</Text>.</Text>
           {downloading ? (
             <Text style={[styles.text, { marginTop: RFValue(15) }]}>Downloading...</Text>
@@ -573,10 +569,18 @@ export default function Shift ({ navigation }) {
             </TouchableOpacity>
           )}
           <View style={styles.imageButton}>
-            <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
-            <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
-            <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
-            <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
+            </View>
           </View>
           <View style={styles.profile}>
             <View style={styles.profileTitleBg}>
@@ -898,15 +902,18 @@ const styles = StyleSheet.create({
     marginLeft: '2%'
   },
   imageButton: {
-    width: '90%',
-    marginLeft: '5%',
-    justifyContent: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: '14%',
     marginTop: 30,
+  },
+  buttonWrapper: {
+    width: '45%',      
+    marginHorizontal: 5,  
+    marginVertical: 5,    
+    alignItems: 'center',
   },
   profile: {
     marginTop: 20,
