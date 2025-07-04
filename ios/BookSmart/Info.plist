@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.32</string>
+	<string>1.0.38</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -32,7 +32,7 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>3.17.178.130</key>
+			<key>18.222.27.220</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>

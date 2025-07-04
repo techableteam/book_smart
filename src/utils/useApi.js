@@ -14,6 +14,7 @@ export const Signup = async (userData, endpoint) => {
 
 export const Signin = async (credentials, endpoint) => {
   try {
+    console.log(credentials);
     const response = await axios.post(`api/${endpoint}/login`, credentials);
     console.log(response.data);
     if (response.data.token) {
@@ -21,6 +22,7 @@ export const Signin = async (credentials, endpoint) => {
     }
     return response.data;
   } catch (error) {
+    console.log(error)
     return {error: error};
   }
 }

@@ -23,6 +23,8 @@ const images = {
     back: require('./images/back.png'),
     checkedbtn: require('./images/checkedbtn.png'),
     uncheckedbtn: require('./images/uncheckedbtn.png'),
+    eye: require('./images/eye.png'),
+    eyeOff: require('./images/eye-off.png')
 };
   
   export default images;
