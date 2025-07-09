@@ -316,10 +316,17 @@ export default function ShiftListing ({ navigation }) {
                   {it.map((item, index) => 
                     <View key={index} style={{flexDirection: 'row', width: '100%'}}>
                       <Text style={[styles.titles, item.title=="JOB-ID" ? {backgroundColor: "#00ffff"} : {}]}>{item.title}</Text>
-                      <Text style={[
-                        styles.content, 
-                        item.title == "JOB-ID" || item.title == "Status" ? {fontWeight: 'bold'} : {}
-                      ]}>{item.content}</Text>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={[
+                          styles.content,
+                          item.title == "JOB-ID" || item.title == "Status" ? { fontWeight: 'bold' } : {}
+                        ]}
+                      >
+                        {item.content}
+                      </Text>
+
                     </View>
                   )}
                   <TouchableOpacity style={styles.edit} onPress = {() => handleEdit(idx + (currentPage-1) * itemsPerPage)}>
@@ -466,11 +473,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: RFValue(16),
     lineHeight: RFValue(30),
-    width: '40%'
+    width: '32%'
   },
   content: {
-    fontSize: RFValue(16),
+    fontSize: RFValue(15),
     lineHeight: RFValue(30),
+    width: '65%'
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
@@ -520,11 +528,12 @@ const styles = StyleSheet.create({
   subBar: {
     width: '100%',
     backgroundColor: "#dcd6fa",
-    paddingHorizontal: RFValue(20),
+    paddingHorizontal: RFValue(10),
     borderRadius: 20,
     borderWidth: 2,
     borderColor: "#c6c5c5",
     marginBottom: 10,
+    paddingTop : 10
   },
   modalContainer: {
     flex: 1,

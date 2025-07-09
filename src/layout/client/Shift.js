@@ -930,12 +930,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: RFValue(12),
     lineHeight: RFValue(24),
-    width: '35%'
+    width: '30%'
   },
   content: {
     fontSize: RFValue(12),
     lineHeight: RFValue(24),
-    width: '60%'
+    width: '68%'
   },
   profileTitleBg: {
     backgroundColor: '#BC222F',
