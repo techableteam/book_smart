@@ -87,7 +87,8 @@ export default function Shift ({ navigation }) {
       },
       {
         title: 'Shift',
-        content: item.shiftTime
+        // content: item.shiftTime
+        content: item.shiftTime.replace(/\s/g, '')
       },
       {
         title: 'Caregiver',
@@ -928,12 +929,12 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: RFValue(12),
+    fontSize: RFValue(15),
     lineHeight: RFValue(24),
-    width: '30%'
+    width: '35%'
   },
   content: {
-    fontSize: RFValue(12),
+    fontSize: RFValue(13),
     lineHeight: RFValue(24),
     width: '68%'
   },
