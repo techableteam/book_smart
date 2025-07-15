@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: RFValue(16),
         lineHeight: RFValue(30),
-        width: '40%'
+        width: '41%'
     },
     content: {
         fontSize: RFValue(16),

@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   titles: {
     fontWeight: 'bold',
     fontSize: RFValue(16),
-    width: RFValue(50), 
+    width: RFValue(55), 
     marginLeft: RFValue(5),
     marginRight : RFValue(2)
   },
