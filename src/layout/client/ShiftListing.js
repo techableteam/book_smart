@@ -61,7 +61,8 @@ export default function ShiftListing ({ navigation }) {
         content: item.shiftDate
       },{
         title: 'Shift',
-        content: item.shift
+        // content: item.shift
+        content: item.shift.replace(/\s/g, '') 
       },{
         title: 'Location',
         content: item.location
@@ -87,7 +88,8 @@ export default function ShiftListing ({ navigation }) {
         content: item.status
       },{
         title: 'Shift',
-        content: item.shift
+        // content: item.shift
+        content: item.shift.replace(/\s/g, '') 
       },{
         title: 'Date',
         content: item.shiftDate
@@ -411,20 +413,6 @@ const styles = StyleSheet.create({
     width: '80%',
     position: 'relative'
   },
-  backTitle: {
-    backgroundColor: 'black',
-    width: '90%',
-    height: '55',
-    marginLeft: '5%',
-    marginTop: 10,
-    borderRadius: 10,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 500,
-    color: 'black',
-    top: 10
-  },
   title: {
     fontSize: 18,
     color: 'white',
@@ -471,12 +459,12 @@ const styles = StyleSheet.create({
   },
   titles: {
     fontWeight: 'bold',
-    fontSize: RFValue(16),
+    fontSize: RFValue(14),
     lineHeight: RFValue(30),
     width: '35%'
   },
   content: {
-    fontSize: RFValue(15),
+    fontSize: RFValue(13),
     lineHeight: RFValue(30),
     width: '65%'
   },
@@ -494,10 +482,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     fontSize: RFValue(16)
-  },
-  nurse: {
-    width: 200,
-    height: 200
   },
   name: {
     fontSize: 14,
