@@ -4,7 +4,7 @@ import { Alert } from 'react-native';
 
 export const Signup = async (userData, endpoint) => {
   try {
-    console.log('success')
+    console.log(userData);
     const response = await axios.post(`api/${endpoint}/signup`, userData);
     return response.data;
   } catch (error) {
