@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, Dimensions, TouchableOpacity, Button } from 'react-native';
+import {
+  View, Text, StyleSheet, ScrollView, StatusBar, Image, Alert, Dimensions, Button
+} from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
-import { RadioButton } from 'react-native-paper';
 import { useAtom } from 'jotai';
 import Hyperlink from 'react-native-hyperlink';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -13,38 +14,50 @@ import HButton from '../../components/Hbutton';
 import { facilityAcknowledgementAtom } from '../../context/FacilityAuthProvider';
 import { Update } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
+
 const { width, height } = Dimensions.get('window');
 
-export default function FacilityPermission ({ navigation }) {
+export default function FacilityPermission({ navigation }) {
   const [facilityAcknowledgement, setFacilityAcknowledgement] = useAtom(facilityAcknowledgementAtom);
   const items = [
-    {label: 'Yes', value: 1},
-    {label: 'No', value: 2},
+    { label: 'Yes', value: 1 },
+    { label: 'No', value: 2 },
   ];
-  const [checked, setChecked] = React.useState('first');
+  const [checked, setChecked] = useState('first');
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [isSigned, setIsSigned] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [credentials, setCredentials] = useState({
     signature: '',
     facilityAcknowledgeTerm: facilityAcknowledgement,
     selectedoption: 'first'
   });
-  let signatureRef = useRef(null);
+  const signatureRef = useRef(null);
 
   const onSaveEvent = (result) => {
-    console.log('Saved Signature:', result.encoded);
-    setCredentials(prevCredentials => ({
-      ...prevCredentials, 
-      signature: result.encoded
+    setTimeout(() => {
+      setCredentials(prev => ({
+        ...prev,
+        signature: result.encoded
+      }));
+      setIsSigned(true);
+      setIsSaving(false);
+    }, 100); // Delay for iOS
+  };
+
+  const handleReset = () => {
+    signatureRef.current?.resetImage();
+    setIsSigned(false);
+    setIsSaving(false);
+    setCredentials(prev => ({
+      ...prev,
+      signature: ''
     }));
-    setIsSigned(true);
-  }
+  };
 
   const handlePreSubmit = () => {
-    if (value != 1) {
-      return;
-    }
+    if (value !== 1) return;
     if (!isSigned) {
       Alert.alert('Please sign and click Save button');
       return;
@@ -52,78 +65,35 @@ export default function FacilityPermission ({ navigation }) {
     handleUploadSubmit();
   };
 
-  const handleReset = () => {
-    signatureRef.current.resetImage();
-    setIsSigned(false);
-  }
-
   const handleUploadSubmit = async () => {
-    if (value != 1) {
+    if (value !== 1 || !isSigned) {
+      Alert.alert('Please sign and click Save button');
       return;
     }
-    if (!isSigned) {
-      Alert.alert('Please sign and click save button');
-      return;
-    }
+
     try {
       const response = await Update(credentials, 'facilities');
       if (!response?.error) {
-        Alert.alert(
-          'Success!',
-          "You're in",
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed')
-              },
-            },
-          ],
-          { cancelable: false }
-        );
-        setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
-        navigation.navigate("FacilityProfile")
+        Alert.alert('Success!', "You're in", [{ text: 'OK' }]);
+        setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm);
+        navigation.navigate("FacilityProfile");
       } else {
-        Alert.alert(
-          'Failed!',
-          "Network Error",
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('OK pressed')
-              },
-            },
-          ],
-          { cancelable: false }
-        );
+        Alert.alert('Failed!', "Network Error", [{ text: 'OK' }]);
       }
     } catch (error) {
-      Alert.alert(
-        'Failed!',
-        "Network Error",
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              console.log('OK pressed')
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      Alert.alert('Failed!', "Network Error", [{ text: 'OK' }]);
     }
-  }
+  };
 
   return (
-      <View style={styles.container}>
-        <StatusBar translucent backgroundColor="transparent" />
-        <MHeader navigation={navigation} back={true} />
-        <SubNavbar navigation={navigation} name={"FacilityLogin"} />
-        <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false}>
-          <Hyperlink linkDefault={true}>
-            <View style={styles.permission}>
-              <View style={styles.titleBar}>
+    <View style={styles.container}>
+      <StatusBar translucent backgroundColor="transparent" />
+      <MHeader navigation={navigation} back={true} />
+      <SubNavbar navigation={navigation} name={"FacilityLogin"} />
+      <ScrollView style={{ width: '100%', marginTop: height * 0.22 }} showsVerticalScrollIndicator={false}>
+        <Hyperlink linkDefault={true}>
+          <View style={styles.permission}>
+          <View style={styles.titleBar}>
                 <Text style={styles.title}>BOOKSMART™ TERMS OF USE</Text>
                 <Text style={styles.text}>The Terms of Use (“TERMS” or “Agreement”) established by BookSmart Technologies LLC, 
                   a New York Limited Liability Company, (hereinafter BOOKSMART™) and set forth below are agreed to by Client, such entity, 
@@ -211,7 +181,7 @@ export default function FacilityPermission ({ navigation }) {
               </View>
 
               <View style={styles.titleBar}>
-                <Text style={styles.subTitle}>9. Disclaimer of Warranties.</Text>
+                <Text style={[styles.subTitle, {marginTop: 25}]}>9. Disclaimer of Warranties.</Text>
                 <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>(a) Service Provided As-Is. </Text>YOUR USE OF BOOKSMART™ IS AT YOUR SOLE RISK. ALL PRODUCTS AND SERVICES PROVIDED UNDER THIS AGREEMENT ARE PROVIDED “AS IS,” “AS AVAILABLE” AND “WITH ALL FAULTS.”  BOOKSMART™, TO THE MAXIMUM EXTENT PERMITTED BY LAW, EXPRESSLY DISCLAIMS ALL WARRANTIES AND REPRESENTATIONS, EXPRESS OR IMPLIED, INCLUDING: (i) THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE; AND (ii) ANY WARRANTY WITH RESPECT TO THE QUALITY, ACCURACY, CURRENCY OR COMPLETENESS OF THE PRODUCTS AND SERVICES PROVIDED UNDER THIS AGREEMENT, OR THAT USE OF SUCH PRODUCTS AND SERVICES WILL BE ERROR-FREE, UNINTERRUPTED, FREE FROM OTHER FAILURES OR WILL MEET YOUR REQUIREMENTS.</Text>
                 <Text style={[styles.text, {marginTop: 0}]}>
                   <Text style={{fontWeight: 'bold'}}>(b) Interactions with Other Users. </Text>YOU ARE SOLELY RESPONSIBLE FOR YOUR INTERACTIONS AND TRANSACTIONS WITH OTHER USERS. YOU AGREE TO LOOK SOLELY TO SUCH OTHER USERS FOR ANY CLAIM, DAMAGE OR LIABILITY ASSOCIATED WITH ANY COMMUNICATION OR TRANSACTION VIA BOOKSMART™. YOU EXPRESSLY WAIVE AND RELEASE BOOKSMART™ FROM ANY AND ALL LEGAL RESPONSIBILITIES, CLAIMS, RIGHTS OF ACTION, CAUSES OF ACTION, SUITS, DEBTS, JUDGMENTS, DEMANDS, DAMAGES AND LIABILITIES ARISING OUT OF ANY ACT OR OMISSION OF ANY OTHER USER OR THIRD PARTY, INCLUDING DAMAGES RELATING TO MONETARY CLAIMS, PERSONAL INJURY OR DESTRUCTION OF PROPERTY, MENTAL ANGUISH, INTEREST, COSTS, ATTORNEY’S FEES, AND EXPENSES. YOUR SOLE REMEDIES WITH RESPECT THERETO SHALL BE BETWEEN YOU AND THE APPLICABLE USER OR OTHER THIRD-PARTY. BOOKSMART™ RESERVES THE RIGHT, BUT HAS NO OBLIGATION, TO MONITOR DISPUTES BETWEEN USERS. BOOKSMART™ IS A MARKETPLACE SERVICE FOR USERS TO CONNECT ONLINE. EACH USER IS SOLELY RESPONSIBLE FOR INTERACTING WITH AND SELECTING ANOTHER USER, CONDUCTING ALL NECESSARY DUE DILIGENCE, AND COMPLYING WITH ALL APPLICABLE LAWS.</Text>
@@ -226,75 +196,96 @@ export default function FacilityPermission ({ navigation }) {
               <View style={styles.titleBar}>
                 <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>IMPORTANT! BE SURE YOU HAVE SCROLLED THROUGH AND CAREFULLY READ ALL of the above Terms and Conditions of the Agreement before electronically signing and/or clicking “Agree” or similar button and/or USING THE SITE (“acceptance”). This Agreement is legally binding between you and BOOKSMART™. By electronically signing and/or clicking “Agree” or similar button and/or using the SITE, you AFFIRM THAT YOU ARE OF LEGAL AGE AND HAVE THE LEGAL CAPACITY TO ENTER INTO THE SERVICE AGREEMENT, AND YOU agree to abide by ALL of the Terms and Conditions stated or referenced herein. If you do not agree to abide by these Terms and Conditions, do NOT electronically sign and/or click an “Agree” or similar button and do not use the SITE. You must accept and abide by these Terms and Conditions in the Agreement as presented to you.</Text>
               </View>
-              <View style={styles.titleBar}>
-                <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>Facility Acknowledge Terms? Yes/No</Text>
-                <Dropdown
-                  style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  inputSearchStyle={styles.inputSearchStyle}
-                  itemTextStyle={styles.itemTextStyle}
-                  iconStyle={styles.iconStyle}
-                  data={items}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  placeholder={''}
-                  value={value ? value : items[1].value}
-                  onFocus={() => setIsFocus(true)}
-                  onBlur={() => setIsFocus(false)}
-                  onChange={item => {
-                    setValue(item.value);
-                    setIsFocus(false);
-                    if (item.value == 1) {
-                      setCredentials({...credentials, ["facilityAcknowledgeTerm"] : true, ["selectedoption"]: checked})
-                    } else 
-                      setCredentials({...credentials, ["facilityAcknowledgeTerm"] : false, ["selectedoption"]: checked})
-                  }}
-                  renderLeftIcon={() => (
-                    <View
-                      style={styles.icon}
-                      color={isFocus ? 'blue' : 'black'}
-                      name="Safety"
-                      size={20}
-                    />
-                  )}
-                />
-              </View>
-              <View style={styles.titleBar}>
-                <Text style={[styles.text, {fontSize: RFValue(12), fontWeight: 'bold', marginTop: 0}]}>Facility Acknowledge Terms Signature <Text style={{color: '#f00'}}>*</Text></Text>
-              
-                {value == 1 && <View style={styles.titleBar}>
-                  <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Signature <Text style={{color: '#f00'}}>*</Text></Text>
-                  <SignatureCapture
-                      style={styles.signature}
-                      ref={signatureRef}
-                      onSaveEvent={(result) => onSaveEvent(result)}
-                      saveImageFileInExtStorage={false}
-                      showNativeButtons={false}
-                  />
-                    <View style={styles.buttonContainer}>
-                      <Button title="Save" onPress={() => signatureRef.current.saveImage()} />
-                      <Button title="Reset" onPress={handleReset} />
-                    </View>
-                  </View>}
-              </View>
-              <View style={[styles.btn, {marginTop: 20, width: '90%'}]}>
-                <HButton style={styles.subBtn} onPress={ handlePreSubmit }>
-                  Submit
-                </HButton>
-              </View>
-              <Image
-                source={images.homepage}
-                resizeMode="cover"
-                style={styles.homepage}
+            {/* Dropdown */}
+            <View style={styles.titleBar}>
+              <Text style={[styles.text, { fontWeight: 'bold', marginTop: 0 }]}>Facility Acknowledge Terms? Yes/No</Text>
+              <Dropdown
+                style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={styles.itemTextStyle}
+                iconStyle={styles.iconStyle}
+                data={items}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={''}
+                value={value ?? items[1].value}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={item => {
+                  setValue(item.value);
+                  setIsFocus(false);
+                  setCredentials({
+                    ...credentials,
+                    facilityAcknowledgeTerm: item.value === 1,
+                    selectedoption: checked
+                  });
+                }}
               />
             </View>
-          </Hyperlink>
-        </ScrollView>
-        <MFooter />
-      </View>
-  )
+
+            {/* Signature Section */}
+            {value === 1 && (
+              <View style={styles.titleBar}>
+                <Text style={[styles.text, { fontSize: RFValue(12), fontWeight: 'bold', marginTop: 0 }]}>
+                  Facility Acknowledge Terms Signature <Text style={{ color: '#f00' }}>*</Text>
+                </Text>
+
+                {isSigned && credentials.signature ? (
+                  <>
+                    <Image
+                      source={{ uri: `data:image/png;base64,${credentials.signature}` }}
+                      style={styles.signaturePreview}
+                    />
+                    <View style={styles.buttonContainer}>
+                      <Button title="Reset" onPress={handleReset} />
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <SignatureCapture
+                      style={styles.signature}
+                      ref={signatureRef}
+                      onSaveEvent={onSaveEvent}
+                      saveImageFileInExtStorage={false}
+                      showNativeButtons={false}
+                      showTitleLabel={false}
+                      viewMode="portrait"
+                    />
+                    <View style={styles.buttonContainer}>
+                      <Button
+                        title={isSaving ? 'Saving...' : 'Save'}
+                        onPress={() => {
+                          if (!isSigned && signatureRef.current) {
+                            setIsSaving(true);
+                            signatureRef.current.saveImage();
+                          } else {
+                            Alert.alert("Already signed", "Reset to re-sign.");
+                          }
+                        }}
+                        disabled={isSaving || isSigned}
+                      />
+                      <Button title="Reset" onPress={handleReset} />
+                    </View>
+                  </>
+                )}
+              </View>
+            )}
+
+            {/* Submit Button */}
+            <View style={[styles.btn, { marginTop: 20, width: '90%' }]}>
+              <HButton style={styles.subBtn} onPress={handlePreSubmit}>Submit</HButton>
+            </View>
+
+            <Image source={images.homepage} resizeMode="cover" style={styles.homepage} />
+          </View>
+        </Hyperlink>
+      </ScrollView>
+      <MFooter />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -318,26 +309,12 @@ const styles = StyleSheet.create({
   dropdown: {
     height: 30,
     width: '25%',
-    color: 'black',
     backgroundColor: 'white',
     borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
-    marginBottom: 10,
-    color: 'black'
-  },
-  icon: {
-    marginRight: 5,
-  },
-  label: {
-    position: 'absolute',
-    backgroundColor: 'white',
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
+    marginBottom: 10
   },
   placeholderStyle: {
     color: 'black',
@@ -359,6 +336,63 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
+  text: {
+    fontSize: RFValue(14),
+    color: 'black',
+    fontWeight: 'normal',
+    marginVertical: RFValue(20),
+  },
+  signature: {
+    flex: 1,
+    width: '100%',
+    height: 150,
+    borderWidth: 1,
+    borderColor: '#ccc'
+  },
+  signaturePreview: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'contain',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+  },
+  homepage: {
+    width: 250,
+    height: 200,
+    marginTop: 30,
+    marginBottom: 100
+  },
+  btn: {
+    flexDirection: 'column',
+    gap: 20,
+    marginBottom: 30,
+  },
+  subBtn: {
+    marginTop: 0,
+    padding: 10,
+    backgroundColor: '#A020F0',
+    color: 'white',
+    fontSize: RFValue(17),
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
   title: {
     fontSize: RFValue(16),
     fontWeight: 'bold',
@@ -376,37 +410,4 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     marginVertical: RFValue(20),
   },
-  signature: {
-    flex: 1,
-    width: '100%',
-    height: 150,
-  },
-  homepage: {
-    width: 250,
-    height: 200,
-    marginTop: 30,
-    marginBottom: 100
-  },
-  btn: {flexDirection: 'column',
-    gap: 20,
-    marginBottom: 30,
-  },
-  subBtn: {
-    marginTop: 0,
-    padding: 10,
-    backgroundColor: '#A020F0',
-    color: 'white',
-    fontSize: RFValue(17),
-  },
-  checkboxWrapper: {
-    transform: [{ scale: 0.8}],
-    marginTop: -5
-  },
-  buttonContainer: {
-    flexDirection: 'row', // Buttons side by side
-    justifyContent: 'space-around', // Add spacing between buttons
-    alignItems: 'center', // Align buttons vertically
-    marginVertical: 10,
-  },
 });
-  

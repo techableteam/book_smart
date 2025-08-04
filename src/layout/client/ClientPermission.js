@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Dimensions, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Dimensions, Image, Alert, Button } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -20,6 +20,8 @@ export default function ClientPermission ({ navigation }) {
     ];
     const [value, setValue] = useState(2);
     const [isFocus, setIsFocus] = useState(false);
+    const [isSigned, setIsSigned] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [credentials, setCredentials] = useState({
         signature: '',
         clinicalAcknowledgeTerm: false
@@ -30,6 +32,18 @@ export default function ClientPermission ({ navigation }) {
         setCredentials(prevCredentials => ({
           ...prevCredentials, 
           signature: result.encoded
+        }));
+        setIsSigned(true);
+        setIsSaving(false);
+    };
+
+    const handleReset = () => {
+        signatureRef.current?.resetImage();
+        setIsSigned(false);
+        setIsSaving(false);
+        setCredentials(prev => ({
+            ...prev,
+            signature: ''
         }));
     };
 
@@ -234,13 +248,51 @@ export default function ClientPermission ({ navigation }) {
                         </View>
                         {value == 1 && <View style={styles.titleBar}>
                             <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Signature <Text style={{color: '#f00'}}>*</Text></Text>
-                            <SignatureCapture
+                            {/* <SignatureCapture
                                 style={styles.signature}
                                 ref={signatureRef}
                                 onSaveEvent={onSaveEvent}
                                 saveImageFileInExtStorage={false}
                                 showNativeButtons={true}
-                            />
+                            /> */}
+                            {isSigned && credentials.signature ? (
+                                <>
+                                    <Image
+                                    source={{ uri: `data:image/png;base64,${credentials.signature}` }}
+                                    style={styles.signaturePreview}
+                                    />
+                                    <View style={styles.buttonContainer}>
+                                    <Button title="Reset" onPress={handleReset} />
+                                    </View>
+                                </>
+                                ) : (
+                                <>
+                                    <SignatureCapture
+                                        style={styles.signature}
+                                        ref={signatureRef}
+                                        onSaveEvent={onSaveEvent}
+                                        saveImageFileInExtStorage={false}
+                                        showNativeButtons={false}
+                                        showTitleLabel={false}
+                                        viewMode="portrait"
+                                    />
+                                    <View style={styles.buttonContainer}>
+                                    <Button
+                                        title={isSaving ? 'Saving...' : 'Save'}
+                                        onPress={() => {
+                                        if (!isSigned && signatureRef.current) {
+                                            setIsSaving(true);
+                                            signatureRef.current.saveImage();
+                                        } else {
+                                            Alert.alert("Already signed", "Reset to re-sign.");
+                                        }
+                                        }}
+                                        disabled={isSaving || isSigned}
+                                    />
+                                    <Button title="Reset" onPress={handleReset} />
+                                    </View>
+                                </>
+                                )}
                         </View>}
                         <View style={[styles.btn, {marginTop: 20, width: '90%'}]}>
                             <HButton style={styles.subBtn} onPress={ handleUploadSubmit }>
@@ -290,6 +342,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'black'
   },
+  btn: {
+    flexDirection: 'column',
+    gap: 20,
+    marginBottom: 30,
+  },
+  subBtn: {
+    marginTop: 0,
+    padding: 10,
+    backgroundColor: '#A020F0',
+    color: 'white',
+    fontSize: RFValue(17),
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  
   icon: {
     marginRight: 5,
   },
@@ -342,7 +413,17 @@ const styles = StyleSheet.create({
   signature: {
     flex: 1,
     width: '100%',
-    height: 200,
+    height: 150,
+    borderWidth: 1,
+    borderColor: '#ccc'
+  },
+  signaturePreview: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'contain',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
   },
   homepage: {
     width: 250,

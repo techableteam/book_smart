@@ -54,6 +54,9 @@ export default function ClientSignUp({ navigation }) {
   const [isShowPassword, setIsShowPassword] = useState(true);
   const [isShowCPassword, setIsShowCPassword] = useState(true);
 
+  const [isSigned, setIsSigned] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     const isBirthdayValid = birthday instanceof Date && !isNaN(birthday.getTime());
     const areRequiredFieldsFilled =
@@ -95,6 +98,7 @@ export default function ClientSignUp({ navigation }) {
 
     Animated.loop(sequenceAnimation).start();
   }, [fadeAnim]);
+
   const [degrees, setDegree] = useState([]);
   const getDegree = async () => {
     const response = await getDegreeList('degree');
@@ -319,20 +323,20 @@ export default function ClientSignUp({ navigation }) {
   };
 
   const onSaveEvent = (result) => {
-    setSignature((prev) => ({...prev, content: result.encoded}));
+    setTimeout(() => {
+      setSignature({ content: result.encoded });
+      setIsSigned(true);
+      setIsSaving(false);
+    }, 100); // delay for iOS rendering
   };
-
-  // const getSignature = () => {
-  //   if (signatureRef.current) {
-  //     signatureRef.current.saveImage();
-  //   }
-  // };
-
-  // const resetSignature = () => {
-  //   if (signatureRef.current) {
-  //     signatureRef.current.resetImage();
-  //   }
-  // };
+  
+  const handleResetSignature = () => {
+    signatureRef.current?.resetImage();
+    setIsSigned(false);
+    setIsSaving(false);
+    setSignature({ content: '' });
+  };
+  
   
   const formatPhoneNumber = (input) => {
     const cleaned = input.replace(/\D/g, '');
@@ -849,15 +853,55 @@ export default function ClientSignUp({ navigation }) {
             </View>
             
             <View style={styles.password}>
-              <Text style={constStyles.signUpSubtitle}>Signature<Text style={{color: 'red'}}>*</Text> </Text>  
-              <SignatureCapture
-                style={styles.signature}
-                ref={signatureRef}
-                onSaveEvent={onSaveEvent}
-                saveImageFileInExtStorage={false}
-                showNativeButtons={true}
-              />
+              <Text style={constStyles.signUpSubtitle}>
+                Signature <Text style={{ color: 'red' }}>*</Text>
+              </Text>
+
+              {isSigned && signature.content ? (
+                <>
+                  <Image
+                    source={{ uri: `data:image/png;base64,${signature.content}` }}
+                    style={{
+                      width: '100%',
+                      height: 150,
+                      resizeMode: 'contain',
+                      borderWidth: 1,
+                      borderColor: '#ccc',
+                      marginBottom: 10,
+                    }}
+                  />
+                  <View style={styles.buttonWrapper}>
+                    <Button title="Reset" onPress={handleResetSignature} />
+                  </View>
+                </>
+              ) : (
+                <>
+                  <SignatureCapture
+                    style={styles.signature}
+                    ref={signatureRef}
+                    onSaveEvent={onSaveEvent}
+                    saveImageFileInExtStorage={false}
+                    showNativeButtons={false}
+                    showTitleLabel={false}
+                    viewMode="portrait"
+                  />
+                  <View style={styles.buttonWrapper}>
+                    <Button
+                      title={isSaving ? "Saving..." : "Save"}
+                      disabled={isSaving || isSigned}
+                      onPress={() => {
+                        if (!isSigned && signatureRef.current) {
+                          setIsSaving(true);
+                          signatureRef.current.saveImage();
+                        }
+                      }}
+                    />
+                    <Button title="Reset" onPress={handleResetSignature} />
+                  </View>
+                </>
+              )}
             </View>
+
             
             <View style = {{marginTop: RFValue(20)}}>
               <Text style={{fontWeight: '400', color: 'black', fontSize: RFValue(12)}}>
@@ -928,6 +972,23 @@ export default function ClientSignUp({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  signaturePreview: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'contain',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+  },
+  
+  buttonWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  
   button: {
     borderRadius: 10,
     backgroundColor: 'red',
@@ -1073,14 +1134,8 @@ const styles = StyleSheet.create({
   authInfo: {
     marginLeft: 20,
     marginRight: 20,
-
   },
-  buttonWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 10,
-    marginBottom: 130
-  },
+ 
   btn: {flexDirection: 'column',
     gap: 20,
     marginBottom: 30,
