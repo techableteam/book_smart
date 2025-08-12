@@ -156,8 +156,12 @@ export default function FacilityPermission({ navigation }) {
 
               <View style={styles.titleBar}>
                 <Text style={styles.subTitle}>3. Payment and Insurance Terms.</Text>
-                <Text style={[styles.text, { marginBottom: 20 }]}><Text style={{fontWeight: 'bold'}}>(a) Payment Terms. </Text>
-                  For each Completed Service that an I/C performs, BookSmart™ will receive from You the I/C's hourly rates plus applicable fees as such:</Text>
+                <Text style={[styles.text, { marginBottom: 20 }]}>
+                  <Text style={{fontWeight: 'bold'}}>(a) Payment Terms. </Text>
+                    For each Completed Service that an I/C performs, BookSmart™ will receive 
+                    from You the I/C's hourly rates plus applicable fees as such: 
+                </Text>
+
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                   <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 10 }} />
                   <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>If Client is a Staffing Agency or Managed Services Provider, the fee is $5/hour per I/C for use of BookSmart™ and related processing of payments and insurances (“Service Fee”). Payment Terms for this are due upon receipt (Net 0); </Text>
@@ -170,49 +174,156 @@ export default function FacilityPermission({ navigation }) {
                   <View style={{ backgroundColor: 'black', width: 4, height: 4, borderRadius: 2, marginHorizontal: 10, marginTop: 20 }} />
                   <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black', marginTop: 10 }}>If Client is a Facility or Community paying Net 30, the maximum bill rate is: $35/hour - CNA, $55/hour - LPN, $75/hour – RN, and $85/hour - Supervisor. </Text>
                 </View>
-                <Text style={[styles.text, { marginBottom: 0 }]}><Text style={{fontWeight: 'bold'}}>Hours Bonus. </Text>
+
+                <Text style={[styles.text, { marginBottom: 0 }]}>
+                  <Text style={{fontWeight: 'bold'}}>Hours Bonus. </Text>
                   A 50% Hourly Bill Rate adjustment shall be applied for all hours worked by I/Cs in excess of 40 hours in any given week. </Text>
-                <Text style={[styles.text, { marginBottom: 0 }]}><Text style={{fontWeight: 'bold'}}>Holiday Bonus. </Text>
+                <Text style={[styles.text, { marginBottom: 0 }]}>
+                  <Text style={{fontWeight: 'bold'}}>Holiday Bonus. </Text>
                   A 50% Hourly Bill Rate adjustment shall be applied for any I/C hours worked on: New Years Day, Easter Sunday, Memorial Day, Independence Day, Labor Day, Thanksgiving, and Christmas Day.  </Text>
-                <Text style={[styles.text, { marginBottom: 0 }]}><Text style={{fontWeight: 'bold'}}>Bonus Exclusivity. </Text>
+                <Text style={[styles.text, { marginBottom: 0 }]}>
+                  <Text style={{fontWeight: 'bold'}}>Bonus Exclusivity. </Text>
                   Under no circumstances shall the Hours Bonus or Holiday Bonus be cumulative for the same hours worked. In instances where hours may qualify for both, only one bonus shall be applied. </Text>
-                <Text style={[styles.text]}><Text style={{fontWeight: 'bold'}}>(b) Taxes. </Text>Users are solely responsible for all tax returns and payments required to be filed with or made to any federal, state, or local tax authority in connection with the performance of Services. Users of BOOKSMART™ are exclusively liable for complying with all applicable federal, state, and local laws, including laws governing self-employed individuals, if applicable. BOOKSMART™ will not withhold or make payments for taxes, social security, unemployment insurance or disability insurance contributions. BOOKSMART™ will not obtain workers’ compensation insurance (except as described below) on I/Cs behalf. Users hereby agree to indemnify and defend BOOKSMART™ against any and all such taxes or contributions, including penalties, interest, attorneys’ fees and expenses. BOOKSMART™ does not offer tax advice to Users.</Text>
+                
+                <Text style={[styles.text]}>
+                  <Text style={{fontWeight: 'bold'}}>(b) Taxes. </Text>
+                    Users are solely responsible for all tax returns and payments required to be filed with 
+                    or made to any federal, state, or local tax authority in connection with the performance of 
+                    Services. Users of BookSmart™ are exclusively liable for complying with all applicable federal, 
+                    state, and local laws, including laws governing self-employed individuals, if applicable. 
+                    Furthermore, users are exclusively liable for complying with all laws related to payment of taxes, 
+                    social security, disability, and other contributions based on fees paid to I/C by BookSmart™ in 
+                    connection with a Completed Service or otherwise received by I/C through the Service. 
+                    BookSmart™ will not withhold or make payments for taxes, social security, unemployment 
+                    insurance or disability insurance contributions. BookSmart™ will not obtain workers’ 
+                    compensation insurance (except as described below) on I/Cs behalf. Users hereby agree to 
+                    indemnify and defend BookSmart™ against any and all such taxes or contributions, including 
+                    penalties, interest, attorneys’ fees and expenses. BookSmart™ does not offer tax advice to 
+                    Users. 
+                
+                </Text>
                 <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>(c) Insurance. </Text>
                    I/Cs using BOOKSMART™ are required to carry Workplace Safety Insurance and Liability Insurance coverage in order to perform Services for any Client. BOOKSMART™ has Workplace Safety Insurance in place through accredited insurance carriers as well as Independent Contractor Liability Insurance (Collectively “Insurance”) for You to enroll in and take advantage of. Applicants enroll themselves with this Insurance coverage from the applicable BOOKSMART™ insurance carrier(s) prior to commencing any shifts. I/Cs using BookSmart™carry Workplace Safety Insurance and Liability Insurance coverage in order to perform Services for any Client. BookSmart™ has Workplace Safety Insurance in place through accredited insurance carriers as well as Independent Contractor Liability Insurance (Collectively “Insurance”). Further information about these insurances and carriers may be available on<Text style={{ color: 'blue', textDecorationLine: 'underline' }}>
                   {' '}www.WhyBookDumb.com </Text>or on this app from time to time. By accessing/using BookSmart™ you consent and agree to these Terms.</Text>
+                
                 <Text style={[styles.text, {marginTop: 0}]}>
                   <Text style={{fontWeight: 'bold'}}>4. Cancellation Terms. </Text>
                     In the event You should cancel any shift within two hours of the
                     scheduled start time of such shift, You will be billed two hours at the appropriate bill rate for the
                     I/C affected by such cancellation.
                 </Text>  
-                <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>5. HIPAA. </Text>Users expressly understand and acknowledge that, as a result of the provision of I/C Services using BOOKSMART™, you may be considered a covered entity under the Health Insurance Portability and Accountability Act (“HIPAA”). You expressly agree to observe the Privacy, Security, and Breach Notification Rules set forth under HIPAA. You understand that failure to adhere to any HIPAA Rules may result in the imposition of civil, or in some cases, criminal sanctions.</Text>
-                <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>6. Third-Party Beneficiaries. </Text>Users agree that the Terms of this Agreement shall apply only to you and are not for the benefit of any third-party beneficiaries.</Text>
+
+                <Text style={[styles.text, {marginTop: 0}]}>
+                  <Text style={{fontWeight: 'bold'}}>5. HIPAA. </Text>
+                  You expressly understand and acknowledge that, as a result of the provision of I/C 
+                  Services using BookSmart™, You may be considered a covered entity under the Health Insurance 
+                  Portability and Accountability Act (“HIPAA”). You expressly agree to observe the Privacy, 
+                  Security, and Breach Notification Rules set forth under HIPAA. You understand that failure to 
+                  adhere to these three HIPAA Rules may result in the imposition of civil, or some cases, criminal 
+                  sanctions.
+                </Text>
+                <Text style={[styles.text, {marginTop: 0}]}>
+                  <Text style={{fontWeight: 'bold'}}>6. Third-Party Beneficiaries. </Text>
+                  You agree that the Terms of this Agreement shall apply only to You 
+                  and are not for the benefit of any third-party beneficiaries. 
+                  </Text>
                 <Text style={[styles.text, {marginTop: 0}]}>
                   <Text style={{fontWeight: 'bold'}}>7. Attorney’s Fees. </Text>
                     In the event a court of competent jurisdiction determines that You have 
                     breached the Terms of this Agreement, BookSmart™ shall be entitled to an award of all costs, 
                     including all attorney’s fees, incurred by BookSmart™ as a result of such breach.
                 </Text>
-                <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>8. Governing Law. </Text>The Terms under this Agreement will be construed in accordance with and governed by the laws of the State of New York, without regard to conflicts of laws principles. You agree that the exclusive venue for resolving any dispute arising under Terms shall be in the state and federal courts located in the County Erie, State of New York, and you consent to the jurisdiction of the federal and state courts located in Erie County, New York. You hereby waive any objection to Erie County, New York as venue for the hearing of any dispute between you and BOOKSMART™ that is not compelled to arbitration for any reason, including but not limited to any objection based on convenience.</Text>
-                <Text style={[styles.text, {marginVertical: 0, padding: 0}]}><Text style={{fontWeight: 'bold'}}>9. Indemnification. </Text>BookSmart™ will have no liability and You agree to indemnify, defend and hold BookSmart™ harmless against any claim, loss, damage, cost, liability, and/or expenses (including all court costs and reasonable attorney’s fees incurred) arising from any action or claim resulting from: (i) Your content; (ii) Your violation of the Terms under this Agreement, any law or regulation, or any rights (including Intellectual Property) of another party; (iii) Your use of BookSmart™; and/or (iv) the employment classification of any I/C by You or BookSmart™.</Text>
+                <Text style={[styles.text, {marginTop: 0}]}>
+                  <Text style={{fontWeight: 'bold'}}>8. Governing Law. </Text>
+                    The Terms under this Agreement will be construed in accordance with and 
+                    governed by the laws of the State of New York without regard to conflicts of laws principles. You 
+                    agree that the exclusive venue for resolving any dispute arising under Terms shall be in the state 
+                    and federal courts located in the County of Erie, State of New York, and you consent to the 
+                    jurisdiction of such courts. You hereby waive any objection to Erie County, New York as venue 
+                    for the hearing of any dispute between You and BookSmart™ including but not limited to any 
+                    objection based on convenience. 
+                </Text>
+                <Text style={[styles.text, {marginVertical: 0, padding: 0}]}>
+                  <Text style={{fontWeight: 'bold'}}>9. Indemnification. </Text>
+                    BookSmart™ will have no liability and You agree to indemnify, defend and 
+                    hold BookSmart™ harmless against any claim, loss, damage, cost, liability, and/or expenses 
+                    (including all court costs and reasonable attorney’s fees incurred) arising from any action or 
+                    claim resulting from: (i) Your content; (ii) Your violation of the Terms under this Agreement, any 
+                    law or regulation, or any rights (including Intellectual Property) of another party; (iii) Your use of 
+                    BookSmart™; and/or (iv) the employment classification of any I/C by You or BookSmart™.
+                </Text>
               </View>
 
               <View style={styles.titleBar}>
                 <Text style={[styles.subTitle, {marginTop: 25}]}>10. Disclaimer of Warranties.</Text>
-                <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>(a) Service Provided As-Is. </Text>YOUR USE OF BOOKSMART™ IS AT YOUR SOLE RISK. ALL PRODUCTS AND SERVICES PROVIDED UNDER THIS AGREEMENT ARE PROVIDED “AS IS,” “AS AVAILABLE” AND “WITH ALL FAULTS.”  BOOKSMART™, TO THE MAXIMUM EXTENT PERMITTED BY LAW, EXPRESSLY DISCLAIMS ALL WARRANTIES AND REPRESENTATIONS, EXPRESS OR IMPLIED, INCLUDING: (i) THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE; AND (ii) ANY WARRANTY WITH RESPECT TO THE QUALITY, ACCURACY, CURRENCY OR COMPLETENESS OF THE PRODUCTS AND SERVICES PROVIDED UNDER THIS AGREEMENT, OR THAT USE OF SUCH PRODUCTS AND SERVICES WILL BE ERROR-FREE, UNINTERRUPTED, FREE FROM OTHER FAILURES OR WILL MEET YOUR REQUIREMENTS.</Text>
+                <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>(a) Service Provided As-Is. </Text>
+                  YOUR USE OF BookSmart™ IS AT YOUR SOLE RISK. ALL PRODUCTS 
+                  AND SERVICES PROVIDED UNDER THIS AGREEMENT ARE PROVIDED “AS IS,” “AS AVAILABLE” 
+                  AND “WITH ALL FAULTS.” BookSmart™, TO THE MAXIMUM EXTENT PERMITTED BY LAW,
+                  EXPRESSLY DISCLAIMS ALL WARRANTIES AND REPRESENTATIONS, EXPRESS OR IMPLIED, 
+                  INCLUDING: (i) THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+                  PARTICULAR PURPOSE; AND (ii) ANY WARRANTY WITH RESPECT TO THE QUALITY, ACCURACY, 
+                  CURRENCY OR COMPLETENESS OF THE PRODUCTS AND SERVICES PROVIDED UNDER THIS 
+                  AGREEMENT, OR THAT USE OF SUCH PRODUCTS AND SERVICES WILL BE ERROR-FREE, 
+                  UNINTERRUPTED, FREE FROM OTHER FAILURES OR WILL MEET YOUR REQUIREMENTS.
+                </Text>
                 <Text style={[styles.text, {marginTop: 0}]}>
-                  <Text style={{fontWeight: 'bold'}}>(b) Interactions with Other Users. </Text>YOU ARE SOLELY RESPONSIBLE FOR YOUR INTERACTIONS AND TRANSACTIONS WITH OTHER USERS. YOU AGREE TO LOOK SOLELY TO SUCH OTHER USERS FOR ANY CLAIM, DAMAGE OR LIABILITY ASSOCIATED WITH ANY COMMUNICATION OR TRANSACTION VIA BOOKSMART™. YOU EXPRESSLY WAIVE AND RELEASE BOOKSMART™ FROM ANY AND ALL LEGAL RESPONSIBILITIES, CLAIMS, RIGHTS OF ACTION, CAUSES OF ACTION, SUITS, DEBTS, JUDGMENTS, DEMANDS, DAMAGES AND LIABILITIES ARISING OUT OF ANY ACT OR OMISSION OF ANY OTHER USER OR THIRD PARTY, INCLUDING DAMAGES RELATING TO MONETARY CLAIMS, PERSONAL INJURY OR DESTRUCTION OF PROPERTY, MENTAL ANGUISH, INTEREST, COSTS, ATTORNEY’S FEES, AND EXPENSES. YOUR SOLE REMEDIES WITH RESPECT THERETO SHALL BE BETWEEN YOU AND THE APPLICABLE USER OR OTHER THIRD-PARTY. BOOKSMART™ RESERVES THE RIGHT, BUT HAS NO OBLIGATION, TO MONITOR DISPUTES BETWEEN USERS. BOOKSMART™ IS A MARKETPLACE SERVICE FOR USERS TO CONNECT ONLINE. EACH USER IS SOLELY RESPONSIBLE FOR INTERACTING WITH AND SELECTING ANOTHER USER, CONDUCTING ALL NECESSARY DUE DILIGENCE, AND COMPLYING WITH ALL APPLICABLE LAWS.</Text>
+                  <Text style={{fontWeight: 'bold'}}>(b) Interactions with Other Users. </Text>
+                    YOU ARE SOLELY RESPONSIBLE FOR YOUR INTERACTIONS 
+                    AND TRANSACTIONS WITH OTHER USERS. YOU AGREE TO LOOK SOLELY TO SUCH OTHER USERS 
+                    FOR ANY CLAIM, DAMAGE OR LIABILITY ASSOCIATED WITH ANY COMMUNICATION OR 
+                    TRANSACTION VIA BOOKSMART™. YOU EXPRESSLY WAIVE AND RELEASE BOOKSMART™ FROM 
+                    ANY AND ALL LEGAL RESPONSIBILITIES, CLAIMS, RIGHTS OF ACTION, CAUSES OF ACTION, SUITS, 
+                    DEBTS, JUDGMENTS, DEMANDS, DAMAGES AND LIABILITIES ARISING OUT OF ANY ACT OR 
+                    OMISSION OF ANY OTHER USER OR THIRD PARTY, INCLUDING DAMAGES RELATING TO 
+                    MONETARY CLAIMS, PERSONAL INJURY OR DESTRUCTION OF PROPERTY, MENTAL ANGUISH, 
+                    INTEREST, COSTS, ATTORNEY’S FEES, AND EXPENSES. YOUR SOLE REMEDIES WITH RESPECT 
+                    THERETO SHALL BE BETWEEN YOU AND THE APPLICABLE USER OR OTHER THIRD-PARTY. 
+                    BOOKSMART™ RESERVES THE RIGHT, BUT HAS NO OBLIGATION, TO MONITOR DISPUTES 
+                    BETWEEN USERS. BOOKSMART™ IS A MARKETPLACE SERVICE FOR USERS TO CONNECT ONLINE. 
+                    EACH USER IS SOLELY RESPONSIBLE FOR INTERACTING WITH AND SELECTING ANOTHER USER, 
+                    CONDUCTING ALL NECESSARY DUE DILIGENCE, AND COMPLYING WITH ALL APPLICABLE LAWS. 
+                  </Text>
               </View>
 
               <View style={styles.titleBar}>
                 <Text style={styles.subTitle}>11. Limitation of Liability.</Text>
-                <Text style={styles.text}><Text style={{fontWeight: 'bold'}}>(a) General. </Text>IN NO EVENT WILL BOOKSMART™ BE LIABLE TO YOU FOR ANY INCIDENTAL, INDIRECT, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR LOST PROFITS OR COSTS OF COVER, INCLUDING DAMAGES ARISING FROM ANY TYPE OR MANNER OF COMMERCIAL, BUSINESS OR FINANCIAL LOSS OCCASIONED BY OR RESULTING FROM ANY USE OF OR INABILITY TO USE BOOKSMART™, SUCH AS ANY MALFUNCTION, DEFECT OR FAILURE OF THE BOOKSMART™ PLATFORM VIA THE INTERNET, OR ANY INACCURACY, INCOMPLETENESS OR OTHER DEFECT IN ANY CONTENT ACCESSIBLE THROUGH BOOKSMART™, EVEN IF BOOKSMART™ HAD ACTUAL OR CONSTRUCTIVE KNOWLEDGE OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLESS OF WHETHER SUCH DAMAGES WERE FORESEEABLE. OTHER THAN WITH RESPECT TO GROSS NEGLIGENCE OR WILLFUL MISCONDUCT.</Text>
-                <Text style={[styles.text, {marginTop: 0}]}><Text style={{fontWeight: 'bold'}}>(b) Quality of I/C Services. </Text>THE QUALITY OF I/C SERVICES REQUESTED THROUGH THE USE OF BOOKSMART™ IS ENTIRELY THE RESPONSIBILITY OF THE I/Cs WHO PROVIDE SUCH SERVICES. YOU UNDERSTAND AND EXPRESSLY AGREE THAT BY USING BOOKSMART™, YOU MAY BE EXPOSED TO SERVICES THAT ARE POTENTIALLY HARMFUL, UNSAFE, OR OTHERWISE OBJECTIONABLE, AND THAT USE OF THE BOOKSMART™ SERVICES IS AT YOUR OWN RISK.</Text>
+                <Text style={styles.text}>
+                  <Text style={{fontWeight: 'bold'}}>(a) General. </Text>
+                  IN NO EVENT WILL BOOKSMART™ BE LIABLE TO YOU FOR ANY INCIDENTAL, 
+                  INDIRECT, SPECIAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR LOST PROFITS OR COSTS OF 
+                  COVER, INCLUDING DAMAGES ARISING FROM ANY TYPE OR MANNER OF COMMERCIAL, 
+                  BUSINESS OR FINANCIAL LOSS OCCASIONED BY OR RESULTING FROM ANY USE OF OR INABILITY 
+                  TO USE BOOKSMART™, SUCH AS ANY MALFUNCTION, DEFECT OR FAILURE OF THE 
+                  BOOKSMART™ PLATFORM VIA THE INTERNET, OR ANY INACCURACY, INCOMPLETENESS OR 
+                  OTHER DEFECT IN ANY CONTENT ACCESSIBLE THROUGH BOOKSMART™, EVEN IF BOOKSMART™ 
+                  HAD ACTUAL OR CONSTRUCTIVE KNOWLEDGE OF THE POSSIBILITY OF SUCH DAMAGES AND 
+                  REGARDLESS OF WHETHER SUCH DAMAGES WERE FORESEEABLE. OTHER THAN WITH RESPECT 
+                  TO GROSS NEGLIGENCE OR WILLFUL MISCONDUCT.
+                </Text>
+                <Text style={[styles.text, {marginTop: 0}]}>
+                  <Text style={{fontWeight: 'bold'}}>(b) Quality of I/C Services. </Text>
+                    THE QUALITY OF I/C SERVICES REQUESTED THROUGH THE USE OF 
+                    BOOKSMART™ IS ENTIRELY THE RESPONSIBILITY OF THE I/Cs WHO PROVIDE SUCH SERVICES. 
+                    YOU UNDERSTAND AND EXPRESSLY AGREE THAT BY USING BOOKSMART™, YOU MAY BE 
+                    EXPOSED TO SERVICES THAT ARE POTENTIALLY HARMFUL, UNSAFE, OR OTHERWISE 
+                    OBJECTIONABLE, AND THAT USE OF THE BOOKSMART™ SERVICES IS AT YOUR OWN RISK.
+                  </Text>
               </View>
 
               <View style={styles.titleBar}>
-                <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>IMPORTANT! BE SURE YOU HAVE SCROLLED THROUGH AND CAREFULLY READ ALL of the above Terms and Conditions of the Agreement before electronically signing and/or clicking “Agree” or similar button and/or USING THE SITE (“acceptance”). This Agreement is legally binding between you and BOOKSMART™. By electronically signing and/or clicking “Agree” or similar button and/or using the SITE, you AFFIRM THAT YOU ARE OF LEGAL AGE AND HAVE THE LEGAL CAPACITY TO ENTER INTO THE SERVICE AGREEMENT, AND YOU agree to abide by ALL of the Terms and Conditions stated or referenced herein. If you do not agree to abide by these Terms and Conditions, do NOT electronically sign and/or click an “Agree” or similar button and do not use the SITE. You must accept and abide by these Terms and Conditions in the Agreement as presented to you.</Text>
+                <Text style={[styles.text, {fontWeight: 'bold', marginTop: 0}]}>
+                  IMPORTANT! BE SURE YOU HAVE SCROLLED THROUGH AND CAREFULLY READ ALL of the 
+                  above Terms and Conditions of this Agreement before electronically signing and/or clicking an 
+                  “Agree” or similar button and/or using BookSmart™ (“acceptance”). This Agreement is legally 
+                  binding between you and BookSmart™. By electronically signing and/or clicking an “Agree” or 
+                  similar button and/or using the site, you affirm that you are of legal age and have the legal 
+                  capacity to enter into this Agreement, and you agree to abide by ALL of the Terms and 
+                  Conditions stated or referenced herein. If you do not agree to abide by these Terms and 
+                  Conditions, do NOT electronically sign and/or click an “Agree” or similar button and do not 
+                  use BookSmart™. You must accept and abide by these Terms and Conditions in the Agreement 
+                  as presented to you. 
+                </Text>
               </View>
             {/* Dropdown */}
             <View style={styles.titleBar}>
