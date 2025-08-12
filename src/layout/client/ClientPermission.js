@@ -126,7 +126,7 @@ export default function ClientPermission ({ navigation }) {
             <ScrollView style={{width: '100%', marginTop: height * 0.22}} showsVerticalScrollIndicator={false} >
                 <Hyperlink linkDefault={true}>
                     <View style={styles.permission}>
-                        {/* <View style={styles.titleBar}>
+                        <View style={styles.titleBar}>
                             <Text style={styles.title}>BOOKSMART™ TERMS OF USE</Text>
                             <Text style={styles.text}>
                                 The Terms of Use (“Terms” or “Agreement”) established by BookSmart Technologies 
@@ -173,9 +173,9 @@ export default function ClientPermission ({ navigation }) {
                                 perform to the satisfaction of the Client is hereinafter referred to as a “Completed 
                                 Service.” 
                                 </Text>
-                        </View> */}
+                        </View>
 
-                        {/* <View style={styles.titleBar}>
+                        <View style={styles.titleBar}>
                             <Text style={styles.subTitle}>2. No Control.</Text>
                             <Text style={styles.text}>
                                 <Text style={{fontWeight: 'bold'}}>(a) Use of This Service. </Text>
@@ -289,9 +289,9 @@ export default function ClientPermission ({ navigation }) {
                                     BookSmart™. You are solely responsible for any costs You incur when receiving text 
                                     messages, including any carrier charges that apply for receiving such text messages. 
                                 </Text>
-                        </View> */}
+                        </View>
 
-                        {/* <View style={styles.titleBar}>
+                        <View style={styles.titleBar}>
                             <Text style={styles.subTitle}>3. Registration Information.</Text>
                             <Text style={[styles.text, { marginBottom: 0 }]}>
                                 <Text style={{fontWeight: 'bold'}}>(a) Maintaining Accuracy. </Text>
@@ -330,9 +330,9 @@ export default function ClientPermission ({ navigation }) {
                                     background checks. Additional background checks may be required periodically to 
                                     maintain eligibility to provide Services Requested by the Client. 
                                 </Text>
-                        </View> */}
+                        </View>
 
-                        {/* <View style={styles.titleBar}>
+                        <View style={styles.titleBar}>
                             <Text style={styles.subTitle}>4. Payment and Insurance Terms.</Text>
                             <Text style={styles.text}>
                                 <Text style={{fontWeight: 'bold'}}>(a) Payment of Fees. </Text>
@@ -377,9 +377,9 @@ export default function ClientPermission ({ navigation }) {
                                     <Text style = {{color : "blue", textDecorationLine: 'underline' }}>{' '}WhyBookDumb.com/Insurance</Text>. By
                                     accessing/using BookSmart™ You consent and agree to these terms.
                             </Text>
-                        </View> */}
+                        </View>
 
-                        {/* <View style={styles.titleBar}>
+                        <View style={styles.titleBar}>
                             <Text style={styles.subTitle}>5. Safety & Work-Related Injury Policy. <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black' }}>Safety is a top priority. Each I/C is expected to obey general safety rules and exercise caution and common sense in all work activities.</Text></Text>
                             <Text style={{ textAlign: 'left', fontSize: RFValue(14), fontWeight: 'normal', color: 'black', marginTop : 10 }}>
                                 All Independent Contractors must agree to comply with the following safe working
@@ -410,7 +410,7 @@ export default function ClientPermission ({ navigation }) {
                                 Failure to follow the above procedures could result in expulsion from usage of
                                 BookSmart™ and potential loss of insurance claims.
                             </Text>
-                        </View> */}
+                        </View>
 
                         <View style={styles.titleBar}>
                             <Text style={[styles.text, { }]}>
