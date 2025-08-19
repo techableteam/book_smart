@@ -12,7 +12,7 @@ export default function MFooter(props) {
   return (
     <View style={styles.shadow}>
       <View style={styles.bottomStyle}></View>
-      <Text style={styles.text}>Support by Email: support@whybookdumb.com{'\n'}
+      <Text style={styles.text}>Support by Email: support@booksmart.app{'\n'}
         Support by Text: 844.558.BOOK
       </Text>
     </View>
