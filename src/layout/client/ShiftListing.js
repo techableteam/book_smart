@@ -38,85 +38,172 @@ export default function ShiftListing ({ navigation }) {
   const [pageItems, setPageItems] = useState([]);
   const [bidsubmit, setBidsubmit] = useState(false); 
 
+  // --- helper: parse "MM/DD/YYYY" to local midnight
+  const parseMDY = (s) => {
+    if (!s || typeof s !== 'string') return null;
+    const [m, d, y] = s.split('/').map(n => parseInt(n, 10));
+    if (!m || !d || !y) return null;
+    const dt = new Date(y, m - 1, d);
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+    dt.setHours(0, 0, 0, 0);
+    return dt;
+  };
+
+  const isOnOrAfterToday = (mdy) => {
+    const dt = parseMDY(mdy);
+    if (!dt) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return dt.getTime() >= today.getTime();
+  };
+
+
   const getData = async () => {
     setGettingData(true);
-    let data = await Jobs({}, 'jobs', 'Clinician');
-    console.log(data);
-    if(data?.error) {
+    const resp = await Jobs({}, 'jobs', 'Clinician');
+  
+    if (resp?.error) {
       setGettingData(false);
       setData(['No Data']);
-    } else {
-      setData(data.dataArray);
-      const transformedData = data.dataArray.map(item => [{
-        title: 'Job-ID',
-        content: item.jobId
-      },{
-        title: 'Job #',
-        content: item.jobNum
-      },{
-        title: 'Title',
-        content: item.degree
-      },{
-        title: 'Date',
-        content: item.shiftDate
-      },{
-        title: 'Shift',
-        // content: item.shift
-        content: item.shift.replace(/\s/g, '') 
-      },{
-        title: 'Location',
-        content: item.location
-      },{
-        title: 'Status',
-        content: item.status
-      }]);
-
-      const detailedData = data.dataArray.map(item => [{
-        title: 'Job-ID',
-        content: item.jobId
-      },{
-        title: 'Job #',
-        content: item.jobNum
-      },{
-        title: 'Title',
-        content: item.degree
-      },{
-        title: 'Hourly Rate',
-        content: item.payRate
-      },{
-        title: 'Status',
-        content: item.status
-      },{
-        title: 'Shift',
-        // content: item.shift
-        content: item.shift.replace(/\s/g, '') 
-      },{
-        title: 'Date',
-        content: item.shiftDate
-      },{
-        title: 'Location',
-        content: item.location
-      },{
-        title: 'Bonus',
-        content: item.bonus
-      }]);
-      
-      setUserInfo(transformedData);
-      setFilteredData(transformedData);
-      setTotalPages(page);
-      setDetailedInfo(detailedData);
-      setFilteredDetailData(detailedData);
-      const len = transformedData.length;
-      const page = Math.ceil(len / itemsPerPage);
-      const generatedPageArray = Array.from({ length: page}, (_, index) => ({
-        label: `Page ${index+1}`,
-        value: index + 1
-      }));
-      setPageItems(generatedPageArray);
-      setGettingData(false);
+      return;
     }
+  
+    // 1) keep raw data if you still need it
+    setData(resp.dataArray);
+  
+    // 2) filter to only today or future
+    const futureOrToday = resp.dataArray
+    .filter(item => isOnOrAfterToday(item.shiftDate))
+    .sort((a, b) => {
+      const da = parseMDY(a.shiftDate);
+      const db = parseMDY(b.shiftDate);
+      if (!da && !db) return 0;
+      if (!da) return 1; // invalid dates go to the end
+      if (!db) return -1;
+      return da - db;    // ascending (earliest first)
+    });
+  
+    // 3) build view models from the filtered list
+    const transformedData = futureOrToday.map(item => ([
+      { title: 'Job-ID',   content: item.jobId },
+      { title: 'Job #',    content: item.jobNum },
+      { title: 'Title',    content: item.degree },
+      { title: 'Date',     content: item.shiftDate },
+      { title: 'Shift',    content: (item.shift || '').replace(/\s/g, '') },
+      { title: 'Location', content: item.location },
+      { title: 'Status',   content: item.status },
+    ]));
+  
+    const detailedData = futureOrToday.map(item => ([
+      { title: 'Job-ID',      content: item.jobId },
+      { title: 'Job #',       content: item.jobNum },
+      { title: 'Title',       content: item.degree },
+      { title: 'Hourly Rate', content: item.payRate },
+      { title: 'Status',      content: item.status },
+      { title: 'Shift',       content: (item.shift || '').replace(/\s/g, '') },
+      { title: 'Date',        content: item.shiftDate },
+      { title: 'Location',    content: item.location },
+      { title: 'Bonus',       content: item.bonus },
+    ]));
+  
+    setUserInfo(transformedData);
+    setFilteredData(transformedData);
+    setDetailedInfo(detailedData);
+    setFilteredDetailData(detailedData);
+  
+    // 4) pagination (compute page count before setting)
+    const len  = transformedData.length;
+    const page = Math.ceil(len / itemsPerPage) || 1;
+    setTotalPages(page);
+  
+    const generatedPageArray = Array.from({ length: page }, (_, i) => ({
+      label: `Page ${i + 1}`,
+      value: i + 1,
+    }));
+    setPageItems(generatedPageArray);
+  
     setGettingData(false);
   };
+  
+  // const getData = async () => {
+  //   setGettingData(true);
+  //   let data = await Jobs({}, 'jobs', 'Clinician');
+  //   console.log(data);
+  //   if(data?.error) {
+  //     setGettingData(false);
+  //     setData(['No Data']);
+  //   } else {
+  //     setData(data.dataArray);
+  //     const transformedData = data.dataArray.map(item => [{
+  //       title: 'Job-ID',
+  //       content: item.jobId
+  //     },{
+  //       title: 'Job #',
+  //       content: item.jobNum
+  //     },{
+  //       title: 'Title',
+  //       content: item.degree
+  //     },{
+  //       title: 'Date',
+  //       content: item.shiftDate
+  //     },{
+  //       title: 'Shift',
+  //       // content: item.shift
+  //       content: item.shift.replace(/\s/g, '') 
+  //     },{
+  //       title: 'Location',
+  //       content: item.location
+  //     },{
+  //       title: 'Status',
+  //       content: item.status
+  //     }]);
+
+  //     const detailedData = data.dataArray.map(item => [{
+  //       title: 'Job-ID',
+  //       content: item.jobId
+  //     },{
+  //       title: 'Job #',
+  //       content: item.jobNum
+  //     },{
+  //       title: 'Title',
+  //       content: item.degree
+  //     },{
+  //       title: 'Hourly Rate',
+  //       content: item.payRate
+  //     },{
+  //       title: 'Status',
+  //       content: item.status
+  //     },{
+  //       title: 'Shift',
+  //       // content: item.shift
+  //       content: item.shift.replace(/\s/g, '') 
+  //     },{
+  //       title: 'Date',
+  //       content: item.shiftDate
+  //     },{
+  //       title: 'Location',
+  //       content: item.location
+  //     },{
+  //       title: 'Bonus',
+  //       content: item.bonus
+  //     }]);
+      
+  //     setUserInfo(transformedData);
+  //     setFilteredData(transformedData);
+  //     setTotalPages(page);
+  //     setDetailedInfo(detailedData);
+  //     setFilteredDetailData(detailedData);
+  //     const len = transformedData.length;
+  //     const page = Math.ceil(len / itemsPerPage);
+  //     const generatedPageArray = Array.from({ length: page}, (_, index) => ({
+  //       label: `Page ${index+1}`,
+  //       value: index + 1
+  //     }));
+  //     setPageItems(generatedPageArray);
+  //     setGettingData(false);
+  //   }
+  //   setGettingData(false);
+  // };
 
   useFocusEffect(
     React.useCallback(() => {
