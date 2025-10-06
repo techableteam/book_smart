@@ -30,6 +30,7 @@ import ClientFinishSignup from './client/ClientFinishSignUp';
 import FacilityFinishSignup from './facilities/FacilityFinishSignUp';
 import FacilityPermission from './facilities/FacilityPermission';
 import FacilityProfile from './facilities/FacilityProfile';
+import SchedulerScreen from './facilities/shedulerScreen.js';
 import FacilityEditProfile from './facilities/FacilityEditProfile';
 import AddJobShift from './facilities/AddJobShift';
 import CompanyShift from './facilities/CompanyShift';
@@ -232,6 +233,11 @@ function Layout() {
       <Stack.Screen 
         name= 'FacilityProfile'
         component = {FacilityProfile}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'SchedulerScreen'
+        component = {SchedulerScreen}
         options={{headerShown: false}}
       />
       <Stack.Screen 

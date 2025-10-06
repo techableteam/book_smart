@@ -1,0 +1,329 @@
+import React, { useEffect, useState } from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Alert 
+} from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { 
+  getShiftTypes, 
+  addShiftToStaff 
+} from '../../../utils/useApi';
+import moment from 'moment';
+
+export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refreshShiftData }) {
+  const [shiftTypes, setShiftTypes] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [selectedShifts, setSelectedShifts] = useState({});
+  const [employeeList, setEmployeeList] = useState([]);
+
+  const nextWeekDates = getNextWeekDates();
+  
+  const isSubmitDisabled =
+  !selectedEmployee || Object.values(selectedShifts).every((arr) => arr.length === 0);
+
+  useEffect(() => {
+    if (visible) {
+      fetchShiftTypes();
+      const formatted = staffList.map((emp) => ({
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: emp.id.toString(),
+      }));
+      setEmployeeList(formatted);
+      setSelectedShifts({});
+    }
+  }, [visible]);
+
+  const fetchShiftTypes = async () => {
+    try {
+      // Read once, in parallel
+      const [aicRaw, roleRaw] = await Promise.all([
+        AsyncStorage.getItem('aic'),
+        AsyncStorage.getItem('HireRole'),
+      ]);
+  
+      const aic = Number.parseInt((aicRaw || '').trim(), 10);
+      const role = (roleRaw || '').trim();
+  
+      // Map role -> endpoint used by your API
+      const endpointMap = {
+        restaurantManager: 'restau_manager',
+        hotelManager: 'hotel_manager',
+      };
+      const endpoint = endpointMap[role];
+  
+      if (!Number.isFinite(aic) || !endpoint) {
+        console.warn('fetchShiftTypes: missing aic or endpoint', { aic, role, endpoint });
+        setShiftTypes([]);
+        return;
+      }
+  
+      const res = await getShiftTypes({ aic }, endpoint);
+  
+      if (Array.isArray(res?.shiftType)) {
+        setShiftTypes(res.shiftType);
+      } else {
+        console.warn('fetchShiftTypes: unexpected payload', res);
+        setShiftTypes([]);
+      }
+    } catch (err) {
+      console.error('ShiftType Error:', err);
+      setShiftTypes([]); // fail safe
+    }
+  };
+  
+
+  const handleSelectShift = (day, shift) => {
+    setSelectedShifts((prev) => {
+      const current = prev[day] || [];
+      const exists = current.find((s) => s.id === shift.id);
+      const updated = exists
+        ? current.filter((s) => s.id !== shift.id)
+        : [...current, shift];
+      return { ...prev, [day]: updated };
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // Basic guards
+      if (!selectedEmployee) {
+        Alert.alert('Missing field', 'Please select an employee.');
+        return;
+      }
+      if (!selectedShifts || Object.keys(selectedShifts).length === 0) {
+        Alert.alert('No shifts selected', 'Please pick at least one shift.');
+        return;
+      }
+  
+      // Read AsyncStorage in parallel
+      const [aicRaw, roleRaw] = await Promise.all([
+        AsyncStorage.getItem('aic'),
+        AsyncStorage.getItem('HireRole'),
+      ]);
+  
+      const managerAic = Number.parseInt((aicRaw || '').trim(), 10);
+      const role = (roleRaw || '').trim();
+  
+      // Map role -> API endpoint
+      const endpointMap = {
+        restaurantManager: 'restau_manager',
+        hotelManager: 'hotel_manager',
+      };
+      const endpoint = endpointMap[role];
+  
+      if (!Number.isFinite(managerAic) || !endpoint) {
+        console.warn('handleSubmit: missing aic/endpoint', { managerAic, role, endpoint });
+        Alert.alert('Error', 'Unable to determine account/role. Please re-login.');
+        return;
+      }
+  
+      // Build payload
+      const shifts = [];
+      for (const [dayKey, shiftsArray] of Object.entries(selectedShifts)) {
+        const rawDate = nextWeekDates?.[dayKey];
+        if (!rawDate) continue; // skip unknown day keys
+  
+        const formattedDate = new Date(rawDate).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+  
+        (shiftsArray || []).forEach((s) => {
+          if (!s?.start || !s?.end) return;
+          shifts.push({
+            date: formattedDate,
+            time: `${s.start} ➔ ${s.end}`,
+          });
+        });
+      }
+  
+      if (shifts.length === 0) {
+        Alert.alert('No valid shifts', 'Please select valid shift times.');
+        return;
+      }
+  
+      // Call API
+      const result = await addShiftToStaff(endpoint, managerAic, selectedEmployee, shifts);
+  
+      if (result && !result.error) {
+        Alert.alert('Success', 'Shifts assigned successfully!');
+        await refreshShiftData?.();
+        onClose?.();
+      } else {
+        console.error(result?.error);
+        Alert.alert('Error', result?.message || 'Failed to assign shifts. Please try again.');
+      }
+    } catch (err) {
+      console.error('Submission error:', err);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    }
+  };
+  
+
+  return (
+    <Modal visible={visible} transparent animationType="slide">
+      <View style={styles.backdrop}>
+        <View style={styles.modalContent}>
+          <Text style={styles.title}>Add next week's Shifts</Text>
+
+          <Text style={styles.label}>Staff</Text>
+          <Dropdown
+            style={styles.dropdown}
+            data={employeeList}
+            labelField="label"
+            valueField="value"
+            placeholder="Select Staff"
+            value={selectedEmployee}
+            onChange={(item) => setSelectedEmployee(item.value)}
+          />
+
+          <ScrollView style={{ marginTop: 10 }}>
+            {Object.keys(nextWeekDates).map((day) => (
+              <View key={day} style={{ marginBottom: 12 }}>
+                <Text style={styles.label}>{day} ({moment(nextWeekDates[day]).format('MMM DD, YYYY')})</Text>
+                <View style={styles.shiftRow}>
+                  {shiftTypes.map((shift) => {
+                    const selected = (selectedShifts[day] || []).some((s) => s.id === shift.id);
+                    return (
+                      <TouchableOpacity
+                        key={shift.id}
+                        style={[styles.shiftButton, selected && styles.shiftButtonSelected]}
+                        onPress={() => handleSelectShift(day, shift)}
+                      >
+                        <Text style={[styles.shiftText, selected && styles.shiftTextSelected]}>
+                          {shift.start} ➔ {shift.end}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <TouchableOpacity
+                style={[
+                    styles.submitButton,
+                    isSubmitDisabled && { opacity: 0.5 } // Visually dimmed
+                ]}
+                onPress={handleSubmit}
+                disabled={isSubmitDisabled}
+            >
+                <Text style={styles.submitText}>Submit</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function getNextWeekDates() {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const today = new Date();
+  const nextWeekStart = new Date(today);
+  nextWeekStart.setDate(today.getDate() + (7 - today.getDay()));
+
+  const result = {};
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(nextWeekStart);
+    d.setDate(d.getDate() + i);
+    result[days[i]] = d.toISOString().split('T')[0];
+  }
+  return result;
+}
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    maxHeight: '90%',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: '#333',
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: '#C4C4C4',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 16,
+  },
+  shiftRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  shiftButton: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 6,
+    marginTop: 6,
+    backgroundColor: '#f9f9f9',
+  },
+  shiftButtonSelected: {
+    backgroundColor: '#290135',
+    borderColor: '#290135',
+  },
+  shiftText: {
+    color: '#333',
+  },
+  shiftTextSelected: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+    gap: 12,
+  },
+  submitButton: {
+    backgroundColor: '#290135',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  submitText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  cancelText: {
+    color: '#333',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+  },
+});

@@ -47,6 +47,7 @@ export default function FacilityProfile ({ navigation }) {
             />
             <View style={styles.bottomBar}/>
           </View>
+
           <View style={styles.imageButton}>
             <View style={styles.buttonWrapper}>
               <ImageButton title="POST SHIFT" onPress={() => handleNavigate('AddJobShift')} />
@@ -58,19 +59,15 @@ export default function FacilityProfile ({ navigation }) {
               <ImageButton title="APPROVE SHIFTS" onPress={() => handleNavigate('CompanyShift')} />
             </View>
             <View style={styles.buttonWrapper}>
-              <ImageButton title="Team Scheduling" onPress={() => handleNavigate('CompanyShift')} />
+              <ImageButton title="Team Scheduling" onPress={() => handleNavigate('SchedulerScreen')} />
             </View>
           </View>
+
           <View style={styles.profile}>
             <View style={styles.profileTitleBg}>
               <Text style={styles.profileTitle}>FACILITY PROFILE</Text>
             </View>
-            {/* {avatar.content && <Image
-              source={{ uri: `${avatar.content}` }}
-              resizeMode="cover"
-              style={styles.nurse}
-            />} */}
-            {avatar.content && avatar.content.startsWith("http") && (
+            {/* {avatar.content && avatar.content.startsWith("http") && (
               <View style={styles.centered}>
                 <Image
                   source={{ uri: avatar.content }}
@@ -78,14 +75,15 @@ export default function FacilityProfile ({ navigation }) {
                   style={styles.nurse}
                 />
               </View>
-            )}
-            {/* <Text style={styles.name}>{firstName || "DaleWong"}</Text> */}
+            )} */}
             <View style={styles.centered}>
               <TouchableOpacity style={styles.edit} onPress = {() => handleEdit()}>
                 <Text style={{color: 'white'}}> Edit Profile</Text>
               </TouchableOpacity>
             </View>
+
             <View style={{height : 10}}/>
+
             <View style={styles.centered}>
               {userInfo.map((item, index) => (
                 <View key={index} style={styles.row}>
