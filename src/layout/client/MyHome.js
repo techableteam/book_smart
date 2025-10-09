@@ -56,6 +56,13 @@ export default function MyHome ({ navigation }) {
               <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
             </View>
           </View>
+
+          <View style={styles.bottomView}>
+            <TouchableOpacity onPress={() => navigation.navigate("AssignedShift")}>
+              <AnimatedHeader title="Restaurant Assigned Shifts!" style={{ paddingHorizontal: 30 }} />
+            </TouchableOpacity>
+          </View>
+
           <View style={{ flex:1, justifyContent: 'center', width: '100%', alignItems: 'center' }}>
             <View style={styles.profile}>
               {
@@ -108,7 +115,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#C0D1DD',
     width: '100%'
   },
- 
+  bottomView: {
+    marginTop: RFValue(0),
+    width: '90%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom : RFValue(7)
+  },
   imageButton: {
     flexDirection: 'row',
     flexWrap: 'wrap',

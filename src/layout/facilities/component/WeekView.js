@@ -474,31 +474,7 @@ export default function WeekView({
 
                 return (
                   <View key={key} style={[styles.row]}>
-                    {/* <View
-                      style={[
-                        styles.dayLabelCell,
-                        {
-                          width: DAY_W,
-                          height: rowHeight,
-                          backgroundColor: isToday ? "#EFE9FF" : "#fff",
-                          borderColor: isToday ? "#EFE9FF" : "#ccc",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.dayLabelTop, { fontWeight: isToday ? "900" : "700" }]}
-                        numberOfLines={1}
-                        maxFontSizeMultiplier={FONT_CAP}
-                      >
-                        {dateObj.toLocaleDateString("en-US", { weekday: "short" })}
-                      </Text>
-                    </View> */}
-
                     <View style = {{ width: DAY_W,}}/>
-
                     <View
                       style={[
                         styles.timelineRow,

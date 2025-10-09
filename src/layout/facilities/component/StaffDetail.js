@@ -46,27 +46,17 @@ export default function StaffDetail({ route,  navigation}) {
                           style: 'destructive',
                           onPress: async () => {
                             try {
-                              const [aicRaw, roleRaw] = await Promise.all([
+                              const [aicRaw] = await Promise.all([
                                 AsyncStorage.getItem('aic'),
-                                AsyncStorage.getItem('HireRole'),
                               ]);
-                
                               const managerAic = Number.parseInt(aicRaw ?? '', 10);
-                              const role = (roleRaw ?? '').trim();
-                
-                              const roleToEndpoint = {
-                                restaurantManager: 'restau_manager',
-                                hotelManager: 'hotel_manager',
-                              };
-                              const endpoint = roleToEndpoint[role];
-                
-                              if (!endpoint || Number.isNaN(managerAic)) {
-                                Alert.alert('Unable to determine your role or account. Please re-login and try again.');
+                              if (Number.isNaN(managerAic)) {
+                                console.warn('fetchUsers: missing managerAic', { managerAic });
                                 return;
                               }
                 
                               const result = await deleteStaffFromManager(
-                                endpoint,
+                                "facilities",
                                 String(managerAic),
                                 staff.id
                               );
@@ -92,7 +82,7 @@ export default function StaffDetail({ route,  navigation}) {
 
 
             </View>
-            <Image source={require('../../../../../assets/images/default_avatar.png')} 
+            <Image source={require('../../../assets/images/default_avatar.png')} 
               style={styles.profileImage} />
             <Text style={styles.profileName}>{staff.name}</Text>
         </View>
@@ -172,7 +162,7 @@ const styles = StyleSheet.create({
     },
     editButton: {
       backgroundColor: '#290135',
-      paddingHorizontal: 16,
+      paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 16,
       marginTop: 8,

@@ -25,36 +25,21 @@ export default function ShiftTab() {
   
   const fetchShiftTypes = async () => {
     try {
-      // Grab both values in parallel
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-  
       const aic = Number.parseInt(aicRaw ?? '', 10);
-      const role = (roleRaw ?? '').trim();
-  
-      // Map role -> endpoint
-      const roleToEndpoint = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = roleToEndpoint[role];
-  
-      if (!endpoint || Number.isNaN(aic)) {
-        console.warn('fetchShiftTypes: missing endpoint or aic', { role, endpoint, aicRaw });
-        setShifts([]); // keep UI stable
+      if (Number.isNaN(aic)) {
+        console.warn('fetchShiftTypes: missing aic', {aicRaw });
+        setShifts([]);
         return;
       }
-  
-      const res = await getShiftTypes({ aic }, endpoint);
-  
+      const res = await getShiftTypes({ aic }, "facilities");
       if (res?.error) {
         console.warn('Failed to fetch shift types:', res.error);
         setShifts([]);
         return;
       }
-  
       const list = Array.isArray(res?.shiftType) ? res.shiftType : [];
       setShifts(list);
     } catch (err) {
@@ -96,7 +81,7 @@ export default function ShiftTab() {
       <AddShiftModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onReload={fetchShiftTypes} // 🔁 fetch updated list
+        onReload={fetchShiftTypes}
       />
 
     </View>

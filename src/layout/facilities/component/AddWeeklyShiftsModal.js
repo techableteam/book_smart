@@ -41,29 +41,18 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
 
   const fetchShiftTypes = async () => {
     try {
-      // Read once, in parallel
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-  
       const aic = Number.parseInt((aicRaw || '').trim(), 10);
-      const role = (roleRaw || '').trim();
   
-      // Map role -> endpoint used by your API
-      const endpointMap = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = endpointMap[role];
-  
-      if (!Number.isFinite(aic) || !endpoint) {
-        console.warn('fetchShiftTypes: missing aic or endpoint', { aic, role, endpoint });
+      if (!Number.isFinite(aic)) {
+        console.warn('fetchShiftTypes: missing aic', { aic });
         setShiftTypes([]);
         return;
       }
   
-      const res = await getShiftTypes({ aic }, endpoint);
+      const res = await getShiftTypes({ aic }, "facilities");
   
       if (Array.isArray(res?.shiftType)) {
         setShiftTypes(res.shiftType);
@@ -100,30 +89,15 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
         Alert.alert('No shifts selected', 'Please pick at least one shift.');
         return;
       }
-  
-      // Read AsyncStorage in parallel
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-  
       const managerAic = Number.parseInt((aicRaw || '').trim(), 10);
-      const role = (roleRaw || '').trim();
   
-      // Map role -> API endpoint
-      const endpointMap = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = endpointMap[role];
-  
-      if (!Number.isFinite(managerAic) || !endpoint) {
-        console.warn('handleSubmit: missing aic/endpoint', { managerAic, role, endpoint });
-        Alert.alert('Error', 'Unable to determine account/role. Please re-login.');
+      if (!Number.isFinite(managerAic)) {
+        console.warn('handleSubmit: missing aic', { managerAic });
         return;
       }
-  
-      // Build payload
       const shifts = [];
       for (const [dayKey, shiftsArray] of Object.entries(selectedShifts)) {
         const rawDate = nextWeekDates?.[dayKey];
@@ -149,9 +123,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
         return;
       }
   
-      // Call API
-      const result = await addShiftToStaff(endpoint, managerAic, selectedEmployee, shifts);
-  
+      const result = await addShiftToStaff("facilities", managerAic, selectedEmployee, shifts);
       if (result && !result.error) {
         Alert.alert('Success', 'Shifts assigned successfully!');
         await refreshShiftData?.();

@@ -79,16 +79,10 @@ export default function ShiftDetailScreen({ route, navigation }) {
   const [start, setStart] = useState(parseTime(shift.start));
   const [end, setEnd] = useState(parseTime(shift.end));
   const [currentShift, setCurrentShift] = useState(route.params.shift);
-
-  // Picker visibility
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-
-  // iOS drafts (commit on Done even if unchanged)
   const [draftStart, setDraftStart] = useState(start || new Date());
   const [draftEnd, setDraftEnd] = useState(end || new Date());
-
-  // Press feedback
   const [pressedStart, setPressedStart] = useState(false);
   const [pressedEnd, setPressedEnd] = useState(false);
 
@@ -117,22 +111,12 @@ export default function ShiftDetailScreen({ route, navigation }) {
 
   const saveChanges = async () => {
     try {
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-
       const aic = Number.parseInt(aicRaw ?? '', 10);
-      const role = (roleRaw ?? '').trim();
-
-      const roleToEndpoint = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = roleToEndpoint[role];
-
-      if (Number.isNaN(aic) || !endpoint) {
-        console.warn('saveChanges: invalid aic or unknown role', { aicRaw, role });
+      if (Number.isNaN(aic)) {
+        console.warn('saveChanges: invalid aic', { aicRaw});
         return;
       }
 
@@ -146,7 +130,7 @@ export default function ShiftDetailScreen({ route, navigation }) {
         },
       };
 
-      const res = await updateShiftType(body, endpoint);
+      const res = await updateShiftType(body, "facilities");
       if (res?.error) {
         console.warn('Update failed:', res.error);
         return;
@@ -174,30 +158,20 @@ export default function ShiftDetailScreen({ route, navigation }) {
         style: 'destructive',
         onPress: async () => {
           try {
-            const [aicRaw, roleRaw] = await Promise.all([
+            const [aicRaw] = await Promise.all([
               AsyncStorage.getItem('aic'),
-              AsyncStorage.getItem('HireRole'),
             ]);
-
             const aic = Number.parseInt(aicRaw ?? '', 10);
-            const role = (roleRaw ?? '').trim();
-
-            const roleToEndpoint = {
-              restaurantManager: 'restau_manager',
-              hotelManager: 'hotel_manager',
-            };
-            const endpoint = roleToEndpoint[role];
-
-            if (Number.isNaN(aic) || !endpoint) {
-              console.warn('deleteShift: invalid aic or unknown role', { aicRaw, role });
+            if (Number.isNaN(aic)) {
+              console.warn('deleteShift: invalid aic', { aicRaw });
               return;
             }
 
             const body = { aic, shiftId: shift.id };
-            const res = await deleteShiftType(body, endpoint);
+            const res = await deleteShiftType(body, "facilities");
 
             if (!res?.error) {
-              navigation.navigate('HospitalityRestaurantHireSchedulerScreen', {
+              navigation.navigate('SchedulerScreen', {
                 screen: 'ShiftTab',
               });
             } else {

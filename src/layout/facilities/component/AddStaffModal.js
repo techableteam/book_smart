@@ -30,7 +30,6 @@ export default function AddStaffModal({ visible, onClose, onSubmit  }) {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // Read required values in parallel
       const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
       ]);
@@ -89,7 +88,7 @@ export default function AddStaffModal({ visible, onClose, onSubmit  }) {
           {isSelected && <Text style={styles.checkmark}>✓</Text>}
         </View>
         <Text style={styles.userText}>
-          {item.firstName} {item.lastName} - {item.userRole}
+          {item.firstName} {item.lastName} - {item.title} - {item.userRole}
         </Text>
       </Pressable>
     );
@@ -101,13 +100,14 @@ export default function AddStaffModal({ visible, onClose, onSubmit  }) {
     ]);
 
     const aic = (aicRaw || '').trim();
-    if (!endpoint || !aic) {
+    if (!aic) {
       console.warn('loadShifts: missing aic', { aic });
       setStaffList([]);
       return;
     }
 
     const result = await addStaffToManager("facilities", aic, selectedUsers);
+    console.log()
     if (!result.error) {
       onSubmit(); 
     } else {

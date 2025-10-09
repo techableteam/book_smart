@@ -52,7 +52,6 @@ export default function AddShiftModal({ visible, onClose, onReload }) {
   };
 
   const commitStart = () => {
-    // If user didn't scroll, commit the current draft (initialized on open)
     setStartTime(draftStart || startTime || new Date());
     setShowStartPicker(false);
   };
@@ -78,23 +77,12 @@ export default function AddShiftModal({ visible, onClose, onReload }) {
     try {
       const [aicRaw, roleRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-
       const aic = Number.parseInt(aicRaw ?? '', 10);
-      const role = (roleRaw ?? '').trim();
-
-      const roleToEndpoint = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = roleToEndpoint[role];
-
-      if (!endpoint || Number.isNaN(aic)) {
-        setError('Unable to determine your role or account. Please re-login and try again.');
+      if (Number.isNaN(aic)) {
+        console.log('missing aic', {aicRaw });
         return;
       }
-
       const body = {
         aic,
         name: name.trim(),
@@ -102,13 +90,11 @@ export default function AddShiftModal({ visible, onClose, onReload }) {
         end: formatTime(endTime),
       };
       console.log(body);
-
-      const response = await addShiftType(body, endpoint);
+      const response = await addShiftType(body, "facilities");
       if (response?.error) {
         setError('Failed to add shift.');
         return;
       }
-
       onClose?.();
       onReload?.();
       setName('');

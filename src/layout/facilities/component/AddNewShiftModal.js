@@ -38,28 +38,18 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
 
   const fetchShiftTypes = async () => {
     try {
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-  
       const aic = Number.parseInt((aicRaw || '').trim(), 10);
-      const role = (roleRaw || '').trim();
-  
-      const endpointMap = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = endpointMap[role];
-  
-      if (!Number.isFinite(aic) || !endpoint) {
-        console.warn('fetchShiftTypes: missing/invalid aic or unsupported role', { aicRaw, role });
+      if (!Number.isFinite(aic)) {
+        console.warn('fetchShiftTypes: missing/invalid aic', { aicRaw });
         setShiftTypes([]);
         return;
       }
   
       const userData = { aic };
-      const response = await getShiftTypes(userData, endpoint);
+      const response = await getShiftTypes(userData, "facilities");
       const types = Array.isArray(response?.shiftType) ? response.shiftType : [];
       if (!types.length) {
         console.warn('ShiftTypes API returned empty or invalid list:', response);
@@ -88,22 +78,13 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
     }
   
     try {
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-  
       const aic = Number.parseInt((aicRaw || '').trim(), 10);
-      const role = (roleRaw || '').trim();
   
-      const endpointMap = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = endpointMap[role];
-  
-      if (!Number.isFinite(aic) || !endpoint) {
-        alert('Missing account info. Please re-login.');
+      if (!Number.isFinite(aic)) {
+        console.warn('Missing AIC:', { aic });
         return;
       }
   
@@ -122,8 +103,7 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
           time: formattedTime,
         },
       ];
-      // console.log(shiftPayload);
-      const result = await addShiftToStaff(endpoint, aic, selectedEmployee, shiftPayload);
+      const result = await addShiftToStaff("facilities", aic, selectedEmployee, shiftPayload);
   
       if (result?.success) {
         await refreshShiftData();

@@ -73,6 +73,7 @@ export const getShiftTypes = async (userData, endpoint) => {
 export const addShiftToStaff = async (endpoint, managerAic, staffId, shifts) => {
   try {
     const token = await AsyncStorage.getItem('token');
+    console.log(managerAic, staffId, shifts)
     const response = await axios.post(
       `/api/${endpoint}/addShiftToStaff`,
       {
@@ -121,13 +122,11 @@ export const addShiftType = async (body, endpoint) => {
 export const getAllUsersInRestau = async (endpoint) => {
   try {
     const token = await AsyncStorage.getItem('token');
-    console.log("token",token);
     const response = await axios.get(`/api/${endpoint}/acknowledgedUsers`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('✅ Users fetched:', response.data?.users);
     return response.data?.users || []; 
   } catch (error) {
     console.error('get all user error:', error.message || error);
@@ -138,7 +137,6 @@ export const getAllUsersInRestau = async (endpoint) => {
 export const getStaffShiftInfo = async (endpoint, managerAic) => {
   try {
     const token = await AsyncStorage.getItem('token');
-
     const response = await axios.post(
       `/api/${endpoint}/getAllStaffShiftInfo`,
       { managerAic },
@@ -280,6 +278,76 @@ export const deleteShiftFromStaff = async (endpoint, managerAic, staffId, shiftI
       console.error("❌ AXIOS SETUP ERROR:", error.message);
       return { success: false, message: 'Error setting up request.' };
     }
+  }
+};
+
+export const getAssignedShifts = async (endpoint) => {
+  try {
+    const aicStr = await AsyncStorage.getItem('aic');
+    console.log(aicStr);
+    console.log(endpoint);
+    if (!aicStr) throw new Error('Missing AIC in storage');
+    const userId = Number(aicStr);
+    const res = await axios.post(
+      `api/${endpoint}/getAssignedShift`,
+      { userId });
+
+    console.log("getAssignedShifts", res.data?.assignedShift);
+
+    const list = Array.isArray(res.data?.assignedShift)
+      ? res.data.assignedShift
+      : [];
+
+    return { ok: true, data: list };
+  } catch (err) {
+    return { ok: false, error: normalizeError(err) };
+  }
+};
+
+export const setStatusFromUser = async ({endpoint, assignedShiftId, status }) => {
+  try {
+    const aicStr = await AsyncStorage.getItem('aic');
+    const existingToken = await AsyncStorage.getItem('token');
+    if (!aicStr) throw new Error('Missing AIC in storage');
+
+    const payload = {
+      userAic: Number(aicStr),
+      assignedShiftId: Number(assignedShiftId),
+      status, // 'accept' | 'reject' | 'cancel'
+    };
+
+    const res = await axios.post(
+      `api/${endpoint}/setStatusFromUser`, 
+      payload,
+      { headers: {
+        Authorization: `Bearer ${existingToken}`,
+      }},
+    );
+
+    // Robust success check: message text + rows updated
+    const okByRows = typeof res.data?.adminRowsUpdated === 'number'
+      ? res.data.adminRowsUpdated > 0
+      : true; // if backend omits it, still treat 200 as success
+
+    const okByMessage = typeof res.data?.message === 'string'
+      ? /synchron/i.test(res.data.message) || /ok/i.test(res.data.message)
+      : true;
+
+    if (okByRows && okByMessage) {
+      return { ok: true, data: res.data };
+    }
+
+    // 200 but backend signals failure
+    return {
+      ok: false,
+      error: {
+        code: res.status,
+        message: res.data?.message || 'Update failed',
+        details: res.data,
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: normalizeError(err) };
   }
 };
 

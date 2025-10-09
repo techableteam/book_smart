@@ -148,31 +148,18 @@ const HomeTab = ({
   const fetchStaffInfo = async () => {
     try {
       // Read both keys in parallel for speed
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-  
       const aic = aicRaw?.trim();
-      const role = roleRaw?.trim();
-  
-      // Map app role to API endpoint
-      const endpointMap = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-  
-      const endpoint = endpointMap[role];
-  
-      if (!aic || !endpoint) {
-        console.warn('Missing AIC or unsupported role:', { aic, role });
+      if (!aic) {
+        console.warn('Missing AIC:', { aic });
         setStaffList([]);
         setShiftData({});
         return;
       }
   
-      const data = await getStaffShiftInfo(endpoint, aic);
-      // Be defensive about the API response
+      const data = await getStaffShiftInfo("facilities", aic);
       const list = Array.isArray(data) ? data : [];
       setStaffList(list);
       setShiftData(transformStaffListToMockEvents(list));
@@ -185,40 +172,22 @@ const HomeTab = ({
 
   const fetchShiftTypes = async () => {
     try {
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem("aic"),
-        AsyncStorage.getItem("HireRole"),
       ]);
-  
       const aic = Number.parseInt((aicRaw || "").trim(), 10);
-      const role = (roleRaw || "").trim();
-  
-      const endpointMap = {
-        restaurantManager: "restau_manager",
-        hotelManager: "hotel_manager",
-      };
-      const endpoint = endpointMap[role];
-  
-      if (!Number.isFinite(aic) || !endpoint) {
-        setShiftTypes([]); // just empty if invalid
+      if (!Number.isFinite(aic)) {
+        setShiftTypes([]);
         return;
       }
-  
-      const res = await getShiftTypes({ aic }, endpoint);
+      const res = await getShiftTypes({ aic }, "facilities");
       const types = Array.isArray(res?.shiftType) ? res.shiftType : [];
-  
-      // ✅ No warning — just set the array (empty or not)
       setShiftTypes(types);
-  
     } catch (err) {
       console.error("Failed to fetch shift types:", err);
       setShiftTypes([]);
     }
   };
-  
-  // useEffect(() => {
-  //   console.log('✅ staffList:', JSON.stringify(staffList, null, 2));
-  // }, [staffList]);
 
   const ensurePrereqs = async () => {
     let needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
@@ -311,30 +280,18 @@ const HomeTab = ({
       setBusyText('Deleting…');
       setDeleting(true);
   
-      const [aicRaw, roleRaw] = await Promise.all([
+      const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
       ]);
-  
       const aic = Number.parseInt((aicRaw || '').trim(), 10);
-      const role = (roleRaw || '').trim();
-  
-      // Map role -> endpoint
-      const endpointMap = {
-        restaurantManager: 'restau_manager',
-        hotelManager: 'hotel_manager',
-      };
-      const endpoint = endpointMap[role];
-  
-      if (!Number.isFinite(aic) || !endpoint) {
-        console.warn('Missing/invalid AIC or unsupported role:', { aicRaw, role });
-        Alert.alert('Unable to delete shift: account/role not set.');
+      if (!Number.isFinite(aic)) {
+        console.warn('Missing/invalid AIC:', { aicRaw});
         return;
       }
   
       // Call API
       const result = await deleteShiftFromStaff(
-        endpoint,
+        "facilities",
         aic,                    // or String(aic) if your API expects string
         selectedEvent.id,       // staffId
         selectedEvent.shiftId   // shiftId
@@ -412,11 +369,8 @@ const HomeTab = ({
         AsyncStorage.getItem('HireRole'),
       ]);
       const aic = Number.parseInt((aicRaw || '').trim(), 10);
-      const role = (roleRaw || '').trim();
-      const endpointMap = { restaurantManager: 'restau_manager', hotelManager: 'hotel_manager' };
-      const endpoint = endpointMap[role];
-  
-      if (!Number.isFinite(aic) || !endpoint) {
+ 
+      if (!Number.isFinite(aic) ) {
         Alert.alert('Account issue', 'Unable to determine your role/account. Please re-login.');
         return;
       }
@@ -427,7 +381,7 @@ const HomeTab = ({
       const shiftPayload = [{ date: formattedDate, time: timeStr }];
   
       const assignRes = await addShiftToStaff(
-        endpoint,
+        "facilities",
         aic,
         String(staffId),     
         shiftPayload         

@@ -19,6 +19,9 @@ import Shift from './client/Shift';
 import Reporting from './client/Reporting';
 import EditProfile from './client/EditProfile';
 import AccountSettings from './client/AccountSettings';
+
+import AssignedShift from './client/ClientAssignedShift.js';
+
 import AdminLogin from './admin/AdminLogin';
 import FacilityLogin from './facilities/FacilityLogin';
 import FacilitySignUp from './facilities/FacilitySignUp';
@@ -32,6 +35,10 @@ import FacilityPermission from './facilities/FacilityPermission';
 import FacilityProfile from './facilities/FacilityProfile';
 import SchedulerScreen from './facilities/shedulerScreen.js';
 import FacilityEditProfile from './facilities/FacilityEditProfile';
+
+import StaffDetail from './facilities/component/StaffDetail.js';
+import ShiftDetailScreen from './facilities/component/ShiftDetail.js';
+
 import AddJobShift from './facilities/AddJobShift';
 import CompanyShift from './facilities/CompanyShift';
 import AdminHome from './admin/AdminHome';
@@ -147,6 +154,21 @@ function Layout() {
       <Stack.Screen 
         name= 'ShiftListing'
         component = {ShiftListing}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'StaffDetail'
+        component = {StaffDetail}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AssignedShift'
+        component = {AssignedShift}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'ShiftDetailScreen'
+        component = {ShiftDetailScreen}
         options={{headerShown: false}}
       />
       <Stack.Screen 
