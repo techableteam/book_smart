@@ -20,7 +20,7 @@ export default function ImageButton({
     "POST SHIFT": images.post,
     "VIEW / EDIT SHIFTS": images.view,
     "APPROVE SHIFTS": images.approve,
-    "Team Scheduling": images.approveTime
+    "TEAM SCHEDULER": images.approveTime
   };
   return (
     <TouchableOpacity style={styles.button} {...props}>

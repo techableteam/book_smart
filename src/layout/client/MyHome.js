@@ -59,7 +59,7 @@ export default function MyHome ({ navigation }) {
 
           <View style={styles.bottomView}>
             <TouchableOpacity onPress={() => navigation.navigate("AssignedShift")}>
-              <AnimatedHeader title="Restaurant Assigned Shifts!" style={{ paddingHorizontal: 30 }} />
+              <AnimatedHeader title="Directly Assigned Shifts!" style={{ paddingHorizontal: 30 }} />
             </TouchableOpacity>
           </View>
 
