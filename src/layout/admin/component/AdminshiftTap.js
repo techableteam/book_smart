@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import AddShiftModal from './AddShiftModal';
+import AdminAddShiftModal from './AdminAddShiftModal';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getShiftTypes } from '../../../utils/useApi';
 
-export default function ShiftTab() {
+export default function AdminShiftTab() {
   const navigation = useNavigation();
   const [shifts, setShifts] = useState([]);
 
@@ -26,7 +26,7 @@ export default function ShiftTab() {
   const fetchShiftTypes = async () => {
     try {
       const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('aic'),
+        AsyncStorage.getItem('AId'),
       ]);
       const aic = Number.parseInt(aicRaw ?? '', 10);
       if (Number.isNaN(aic)) {
@@ -34,7 +34,8 @@ export default function ShiftTab() {
         setShifts([]);
         return;
       }
-      const res = await getShiftTypes({ aic }, "facilities");
+      const res = await getShiftTypes({ AId : aic }, "admin");
+      
       if (res?.error) {
         setShifts([]);
         return;
@@ -49,7 +50,7 @@ export default function ShiftTab() {
   
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate('ShiftDetailScreen', { shift: item })}>
+    <TouchableOpacity onPress={() => navigation.navigate('AdminShiftDetailScreen', { shift: item })}>
       <View style={styles.card}>
         <View>
           <Text style={styles.title}>{item.name}</Text>
@@ -77,7 +78,7 @@ export default function ShiftTab() {
 
       <View style = {{height: 70}}/>
 
-      <AddShiftModal
+      <AdminAddShiftModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onReload={fetchShiftTypes}

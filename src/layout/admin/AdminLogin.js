@@ -195,7 +195,6 @@ export default function AdminLogin({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.modal}>
-          <View style={styles.topBar} />
           <View style={styles.intro}>
             <Image
               source={images.admin}

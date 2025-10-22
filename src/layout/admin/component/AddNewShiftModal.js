@@ -10,20 +10,26 @@ import {
 } from 'react-native';
 import { 
   getShiftTypes, 
-  addShiftToStaff 
+  addShiftToStaff,
+  getDegreeListInAdmin,
+  getAllFacilitiesInAdmin,
+  createDJob,
+  getAllDjob, 
 } from '../../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInput } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
 
-export default function AddNewShiftModal({ visible, onClose, staffList, refreshShiftData  }) {
+export default function AddNewShiftModal({ visible, onClose, staffList, facilitieslist, degreelist, refreshShiftData  }) {
   const [shiftTypes, setShiftTypes] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [employeeList, setEmployeeList] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [facilities, setFacilities] = useState('');
+  const [degrees, setDegrees] = useState('');
 
   useEffect(() => {
     if (visible && staffList.length > 0) {
@@ -38,23 +44,21 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
 
   const fetchShiftTypes = async () => {
     try {
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('aic'),
+      const [AIdRaw] = await Promise.all([
+        AsyncStorage.getItem('AId'),
       ]);
-      const aic = Number.parseInt((aicRaw || '').trim(), 10);
-      if (!Number.isFinite(aic)) {
-        console.warn('fetchShiftTypes: missing/invalid aic', { aicRaw });
+      const AId = Number.parseInt((AIdRaw || '').trim(), 10);
+      if (!Number.isFinite(AId)) {
+        console.log('fetchShiftTypes: missing/invalid aic', { AId });
         setShiftTypes([]);
         return;
       }
-  
-      const userData = { aic };
-      const response = await getShiftTypes(userData, "facilities");
+      const userData = {AId};
+      const response = await getShiftTypes(userData, "admin");
       const types = Array.isArray(response?.shiftType) ? response.shiftType : [];
       if (!types.length) {
-        console.warn('ShiftTypes API returned empty or invalid list:', response);
+        console.log('ShiftTypes API returned empty or invalid list:', response);
       }
-  
       setShiftTypes(types);
     } catch (err) {
       setShiftTypes([]);
@@ -63,8 +67,8 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
   
 
   const handleSubmit = async () => {
-    if (!selectedEmployee || !selectedShift || !selectedDate) {
-      alert('Please select all fields');
+    if ( !selectedShift || !selectedDate || !degrees) {
+      alert('Please make sure all required fields are filled');
       return;
     }
   
@@ -77,13 +81,13 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
     }
   
     try {
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('aic'),
+      const [AIdRaw] = await Promise.all([
+        AsyncStorage.getItem('AId'),
       ]);
-      const aic = Number.parseInt((aicRaw || '').trim(), 10);
+      const AId = Number.parseInt((AIdRaw || '').trim(), 10);
   
-      if (!Number.isFinite(aic)) {
-        console.warn('Missing AIC:', { aic });
+      if (!Number.isFinite(AId)) {
+        console.warn('Missing AId:', {AId});
         return;
       }
   
@@ -102,11 +106,21 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
           time: formattedTime,
         },
       ];
-      const result = await addShiftToStaff("facilities", aic, selectedEmployee, shiftPayload);
-  
-      if (result?.success) {
+
+      const result = await createDJob({
+        shiftPayload,
+        degreeId: degrees,
+        facilityId: facilities,
+        staffId: selectedEmployee,
+        adminId: AId,
+        adminMade: true,
+      });
+
+      const jobId = result?.data?.DJobId ?? result?.data?.id;
+
+      if (jobId) {
         await refreshShiftData();
-        onClose(); // close modal
+        onClose();
       } else {
         const msg = result?.message || 'Failed to submit shift.';
         alert(msg);
@@ -122,6 +136,44 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
       <View style={styles.backdrop}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add New Shift</Text>
+
+          <Text style={styles.label}>Facility</Text>
+          <Dropdown
+            style={styles.dropdown}
+            containerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.dropdownPlaceholder}
+            selectedTextStyle={styles.dropdownSelectedText}
+            itemTextStyle={styles.dropdownItemText}
+            data={facilitieslist.map(facility => ({
+              label: facility.companyName,
+              value: facility.aic, // Assuming `aic` is the ID for the facility
+            }))}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select Facility"
+            value={facilities}
+            onChange={item => setFacilities(item.value)}
+          />
+
+          <Text style={styles.label}>Degree</Text>
+          <Dropdown
+            style={styles.dropdown}
+            containerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.dropdownPlaceholder}
+            selectedTextStyle={styles.dropdownSelectedText}
+            itemTextStyle={styles.dropdownItemText}
+            data={degreelist.map(degree => ({
+              label: degree.degreeName,
+              value: degree.Did, // Assuming `id` is the ID for the degree
+            }))}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select Degree"
+            value={degrees}
+            onChange={item => setDegrees(item.value)}
+          />
 
           <Text style={styles.label}>Staff</Text>
           <Dropdown

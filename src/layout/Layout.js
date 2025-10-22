@@ -44,6 +44,11 @@ import CompanyShift from './facilities/CompanyShift';
 import AdminHome from './admin/AdminHome';
 import AdminDashboard from './admin/AdminDashboard';
 import AllJobShiftListing from './admin/AllJobShiftListing.js';
+import AdminTeamScheduler from './admin/AdminTeamScheduler.js';
+import AdminShiftDetailScreen from './admin/component/ShiftDetail.js';
+import AdminStaffDetail from './admin/component/AdminStaffDetail.js';
+
+
 import AdminJobShift from './admin/AdminJobShift.js';
 import AdminCompany from './admin/AdminCompany.js';
 import AdminEditProfile from './admin/AdminEditProfile.js';
@@ -162,6 +167,11 @@ function Layout() {
         options={{headerShown: false}}
       />
       <Stack.Screen 
+        name= 'AdminStaffDetail'
+        component = {AdminStaffDetail}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
         name= 'AssignedShift'
         component = {AssignedShift}
         options={{headerShown: false}}
@@ -169,6 +179,11 @@ function Layout() {
       <Stack.Screen 
         name= 'ShiftDetailScreen'
         component = {ShiftDetailScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminShiftDetailScreen'
+        component = {AdminShiftDetailScreen}
         options={{headerShown: false}}
       />
       <Stack.Screen 
@@ -295,6 +310,11 @@ function Layout() {
       <Stack.Screen 
         name= 'AllJobShiftListing'
         component = {AllJobShiftListing}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminTeamScheduler'
+        component = {AdminTeamScheduler}
         options={{headerShown: false}}
       />
       <Stack.Screen 

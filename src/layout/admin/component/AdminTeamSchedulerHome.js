@@ -25,9 +25,16 @@ import {
   editShiftFromStaff,
   deleteShiftFromStaff,
   addShiftType,
-  addShiftToStaff
+  addShiftToStaff,
+  getDegreeListInAdmin,
+  getAllFacilitiesInAdmin,
+  createDJob,
+  getAllDjob,
+  deleteDjob
  } from '../../../utils/useApi';
 import { transformStaffListToMockEvents } from './transformStaffListToMockEvents';
+import { transformDjobListToMockEvents } from './transformDjobListToMockEvents';
+
 import { RFValue } from "react-native-responsive-fontsize";
 
 const BusyOverlay = ({ visible, text }) => {
@@ -55,7 +62,8 @@ const normalizeStatus = (s) => {
 
 const statusColors = (label) => {
   switch (label) {
-    case 'PENDING':   return { bg: '#FEF9C3', fg: '#A16207' };
+    case 'NOTSELECT':   return { bg: '#808080', fg: '#E5E7EB' };
+    case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
     case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
     case 'REJECTED':  return { bg: '#FEE2E2', fg: '#991B1B' };
     case 'CANCELLED': return { bg: '#E5E7EB', fg: '#374151' };
@@ -88,7 +96,7 @@ const formatWeekRange = (anchorDate = new Date()) => {
 };
 
 
-const HomeTab = ({
+const AdminHomeTab = ({
   navigation,
   month,
   year,
@@ -116,15 +124,16 @@ const HomeTab = ({
   const [selectedShift, setSelectedShift] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [shiftTypes, setShiftTypes] = useState([]);
-
   const [eventDate, setEventDate] = useState(null);
-
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-
   const [bootLoading, setBootLoading] = useState(false); 
   const [opLoading, setOpLoading] = useState(false);     
   const [busyText, setBusyText] = useState('');  
+  const [degrees, setDegrees] = useState([]);
+  const [facilities, setFacilities] = useState([]);
+  const [djobList, setDjobList] = useState([]);
+  const [transformedDjobList, setTransformedDjobList] = useState([]);
 
   const [startTime, endTime] = React.useMemo(() => {
     const raw = String(selectedEvent?.time || '');
@@ -137,7 +146,12 @@ const HomeTab = ({
       setBusyText('Loading…');
       setBootLoading(true);
       try {
-        await Promise.all([fetchStaffInfo(), fetchShiftTypes()]);
+        await Promise.all([
+          fetchStaffInfo(), 
+          fetchShiftTypes(), 
+          fetchDegrees(), 
+          fetchFacilities(),
+          fetchDjobList()]);
       } finally {
         setBootLoading(false);
         setBusyText('');
@@ -145,21 +159,68 @@ const HomeTab = ({
     })();
   }, []);
 
+  // useEffect(() => {
+  //   console.log("ShiftData updated:", ShiftData);
+  // }, [ShiftData]);
+
+  const fetchDegrees = async () => {
+    try {
+      const list = await getDegreeListInAdmin('degree');
+      setDegrees(Array.isArray(list) ? list : []);
+    } catch {
+      setDegrees([]);
+    }
+  };
+
+  const fetchDjobList = async () => {
+    try {
+      const [AIdRaw] = await Promise.all([
+        AsyncStorage.getItem('AId'),
+      ]);
+      const AId = AIdRaw?.trim();
+      const response = await getAllDjob(AId);
+      const list = Array.isArray(response?.data) ? response?.data : [];
+      console.log("DJob List:", list);
+      if (Array.isArray(list) && list.length > 0) {
+        const transformed = await transformDjobListToMockEvents(list);
+        console.log("Transformed DJob List:", transformed);
+        setDjobList(list); 
+        setTransformedDjobList(transformed);
+      } else {
+        console.error("djobList is not an array or is empty:", list);
+        setDjobList([]);
+        setTransformedDjobList({});
+      }
+    } catch (error) {
+      console.error("Error fetching djob list:", error);
+      setDjobList([]);
+      setTransformedDjobList({});
+    }
+  };
+
+  const fetchFacilities = async () => {
+    try {
+      const list = await getAllFacilitiesInAdmin();
+      setFacilities(Array.isArray(list) ? list : []);
+    } catch {
+      setFacilities([]);
+    }
+  };
+
   const fetchStaffInfo = async () => {
     try {
-      // Read both keys in parallel for speed
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('aic'),
+      const [AIdRaw] = await Promise.all([
+        AsyncStorage.getItem('AId'),
       ]);
-      const aic = aicRaw?.trim();
-      if (!aic) {
-        console.warn('Missing AIC:', { aic });
+      const AId = AIdRaw?.trim();
+      if (!AId) {
+        console.log('Missing AId:', {AId});
         setStaffList([]);
         setShiftData({});
         return;
       }
   
-      const data = await getStaffShiftInfo("facilities", aic);
+      const data = await getStaffShiftInfo("admin", AId);
       const list = Array.isArray(data) ? data : [];
       setStaffList(list);
       setShiftData(transformStaffListToMockEvents(list));
@@ -172,15 +233,15 @@ const HomeTab = ({
 
   const fetchShiftTypes = async () => {
     try {
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem("aic"),
+      const [AIdRaw] = await Promise.all([
+        AsyncStorage.getItem("AId"),
       ]);
-      const aic = Number.parseInt((aicRaw || "").trim(), 10);
-      if (!Number.isFinite(aic)) {
+      const AId = Number.parseInt((AIdRaw || "").trim(), 10);
+      if (!Number.isFinite(AId)) {
         setShiftTypes([]);
         return;
       }
-      const res = await getShiftTypes({ aic }, "facilities");
+      const res = await getShiftTypes({ AId }, "admin");
       const types = Array.isArray(res?.shiftType) ? res.shiftType : [];
       setShiftTypes(types);
     } catch (err) {
@@ -270,42 +331,23 @@ const HomeTab = ({
 
   const handleConfirmDelete = async () => {
     try {
-      // Guards
-      if (!selectedEvent?.id || !selectedEvent?.shiftId) {
-        Alert.alert('No event selected to delete.');
-        return;
-      }
-
       setBusyText('Deleting…');
       setDeleting(true);
-  
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('aic'),
-      ]);
-      const aic = Number.parseInt((aicRaw || '').trim(), 10);
-      if (!Number.isFinite(aic)) {
-        console.warn('Missing/invalid AIC:', { aicRaw});
-        return;
-      }
-  
-      // Call API
-      const result = await deleteShiftFromStaff(
-        "facilities",
-        aic,                    // or String(aic) if your API expects string
-        selectedEvent.id,       // staffId
-        selectedEvent.shiftId   // shiftId
+     
+      const result = await deleteDjob(
+        selectedEvent.DJobId,                    
       );
   
       // Handle response
       if (result?.success) {
-        await fetchStaffInfo();          
+        await fetchDjobList();          
         setShowConfirmDelete(false);
         setShowEventModal(false);
         setSelectedEvent(null);
         Alert.alert('Shift deleted.');
       } else {
         Alert.alert(`Delete failed: ${result?.message || 'Unknown error'}`);
-        await fetchStaffInfo();          // ensure UI not stale
+        await fetchDjobList();          // ensure UI not stale
         setShowConfirmDelete(false);
       }
     } catch (e) {
@@ -356,20 +398,21 @@ const HomeTab = ({
     startLabel,
     endLabel,
     staffId,
-    shiftText
+    shiftText,
+    facilityId,
+    degreeId
   }) => {
     try {
-      if (!date || !startLabel || !endLabel || !staffId) {
-        Alert.alert('Missing info', 'Please pick a staff and a valid time range.');
+      if (!date || !startLabel || !endLabel || !degreeId) {
+        Alert.alert('Missing info', 'Please pick a degree and a valid time range.');
         return;
       }
-      const [aicRaw, roleRaw] = await Promise.all([
-        AsyncStorage.getItem('aic'),
-        AsyncStorage.getItem('HireRole'),
+      const [AIdRaw] = await Promise.all([
+        AsyncStorage.getItem('AId'),
       ]);
-      const aic = Number.parseInt((aicRaw || '').trim(), 10);
+      const AId = Number.parseInt((AIdRaw || '').trim(), 10);
  
-      if (!Number.isFinite(aic) ) {
+      if (!Number.isFinite(AId) ) {
         Alert.alert('Account issue', 'Unable to determine your role/account. Please re-login.');
         return;
       }
@@ -378,22 +421,27 @@ const HomeTab = ({
       });
       const timeStr = `${startLabel} ➔ ${endLabel}`;
       const shiftPayload = [{ date: formattedDate, time: timeStr }];
-  
-      const assignRes = await addShiftToStaff(
-        "facilities",
-        aic,
-        String(staffId),     
-        shiftPayload         
-      );
-      if (assignRes?.success) {
-        await fetchStaffInfo();
+      
+      const result = await createDJob({
+        shiftPayload : shiftPayload,
+        degreeId : degreeId,
+        facilityId : facilityId,
+        staffId : staffId,
+        adminId: AId,
+        adminMade: true,
+      });
+      
+      const jobId = result?.data?.DJobId ?? result?.data?.id;
+
+      if (jobId) {
+        await fetchDjobList();
         Alert.alert('Shift created', `${formattedDate} • ${timeStr}`);
       } else {
-        Alert.alert('Assign failed', assignRes?.message || 'Please try again.');
+        Alert.alert('Create failed', result?.message || 'Unexpected response.');
       }
     } catch (err) {
       console.error('handleCreateShiftFromRange error:', err);
-      Alert.alert('Error', 'Could not create the shift. Please try again.');
+      Alert.alert('Create failed', err?.message || 'Please try again.');
     }
   };
   
@@ -486,7 +534,8 @@ const HomeTab = ({
       {viewMode === "Month" && (
         <MonthView
           calendarDays={calendarDays}
-          mockEvents={ShiftData}
+          // mockEvents={ShiftData}
+          mockEvents={transformedDjobList}
           setSelectedEvent={setSelectedEvent}
           setShowEventModal={setShowEventModal}
           setEventDate={setEventDate} 
@@ -497,12 +546,16 @@ const HomeTab = ({
 
       {viewMode === 'Week' && (
         <WeekView
-          startDate={weekStartDate}
-          mockEvents={ShiftData}
+          startDate={weekStartDate}l
+          // mockEvents={ShiftData}
+          mockEvents={transformedDjobList}
           onEventPress={handleMonthEventPress}
-          setSelectedEvent={setSelectedEvent}l
+          setSelectedEvent={setSelectedEvent}
           setShowEventModal={setShowEventModal}
           staffList={staffList}
+          degrees={degrees}         
+          facilities={facilities}
+          djobList={djobList}
           onTimeRangeSelected={handleCreateShiftFromRange}
         />
       )}
@@ -512,7 +565,8 @@ const HomeTab = ({
         <DayView
           date={dayDate}
           setDate={setDayDate}
-          mockEvents={ShiftData}
+          // mockEvents={ShiftData}
+          mockEvents={transformedDjobList}
           setSelectedEvent={setSelectedEvent}
           setShowEventModal={setShowEventModal}
         />
@@ -522,14 +576,18 @@ const HomeTab = ({
         visible={showAddShiftModal}
         onClose={() => setShowAddShiftModal(false)}
         staffList={staffList}
-        refreshShiftData={fetchStaffInfo}
+        facilitieslist={facilities}
+        degreelist={degrees}
+        refreshShiftData={fetchDjobList}
       />
 
       <AddWeeklyShiftsModal
         visible={showAddWeekModal}
         onClose={() => setShowAddWeekModal(false)}
         staffList={staffList}
-        refreshShiftData={fetchStaffInfo}
+        facilitieslist={facilities}
+        degreelist={degrees}
+        refreshShiftData={fetchDjobList}
       />
 
       <Modal visible={showEventModal} transparent animationType="fade">
@@ -541,6 +599,7 @@ const HomeTab = ({
               const label = normalizeStatus(
                 selectedEvent?.status ?? selectedEvent?.data?.status
               );
+              console.log("selectedEvent : ", selectedEvent);
               const colors = statusColors(label);
               return (
                 <View style={[styles.statusChip, { backgroundColor: colors.bg }]}>
@@ -578,13 +637,13 @@ const HomeTab = ({
                 editable={false}
                 style={styles.input}
               />
-              <Pressable
+              {/* <Pressable
                 onPress={() => setShowDatePicker(true)}
                 style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
-              />
+              /> */}
             </View>
 
-            <DatePicker
+            {/* <DatePicker
               modal
               open={showDatePicker}
               date={eventDate || new Date()}
@@ -595,13 +654,31 @@ const HomeTab = ({
                 setEventDate(date); 
               }}
               onCancel={() => setShowDatePicker(false)}
+            /> */}
+
+            <Text style={styles.label}>Facility</Text>
+            <TextInput
+              mode="outlined"
+              value={selectedEvent?.facilitiesCompanyName || ''}
+              editable={false}
+              style={styles.input}
+            />
+
+            <Text style={styles.label}>Degree</Text>
+            <TextInput
+              mode="outlined"
+              value={selectedEvent?.degreeName || ''}
+              editable={false}
+              style={styles.input}
             />
 
 
             <Text style={styles.label}>Staff</Text>
             <TextInput
               mode="outlined"
-              value={selectedEvent?.label || ''}
+              value={Array.isArray(selectedEvent?.clinicianslabel) 
+                ? (selectedEvent?.clinicianslabel.length ? selectedEvent.clinicianslabel.join(', ') : '') 
+                : (selectedEvent?.clinicianslabel === "Unknown Clinician" ? '' : selectedEvent?.clinicianslabel)}
               editable={false}
               style={styles.input}
             />
@@ -977,4 +1054,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeTab;
+export default AdminHomeTab;
