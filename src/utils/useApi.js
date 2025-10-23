@@ -330,6 +330,45 @@ export const deleteStaffFromManager = async (endpoint, managerAic, staffId) => {
   }
 };
 
+export const updateDjob = async ({
+  DJobId,
+  shift,
+  degree,
+  adminId,
+  adminMade,
+  facilitiesId,
+  clinicianId,
+  status,
+}) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const res = await axios.post(
+      `api/djobs/update`,
+      {
+        DJobId,
+        shift,
+        degree,
+        adminId,
+        adminMade,
+        facilitiesId,
+        clinicianId,
+        status,
+      },
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      }
+    );
+    console.log(res.data);
+    if (res.data?.message === 'Updated') {
+      return { ok: true, data: res.data.data };
+    } else {
+      return { ok: false, error: { message: res.data?.message || 'Update failed' } };
+    }
+  } catch (err) {
+    return { ok: false, error: normalizeError(err) };
+  }
+};
+
 export const deleteShiftFromStaff = async (endpoint, managerAic, staffId, shiftId) => {
   try {
     const token = await AsyncStorage.getItem('token');
@@ -396,6 +435,14 @@ export const deleteDjob = async (DjobId,) => {
   }
 };
 
+const normalizeError = (err) => {
+  if (err?.response?.data?.message)
+    return { message: err.response.data.message };
+  if (err?.message)
+    return { message: err.message };
+  return { message: 'Unknown error occurred' };
+};
+
 export const getAssignedShifts = async (endpoint) => {
   try {
     const aicStr = await AsyncStorage.getItem('aic');
@@ -415,6 +462,60 @@ export const getAssignedShifts = async (endpoint) => {
 
     return { ok: true, data: list };
   } catch (err) {
+    return { ok: false, error: normalizeError(err) };
+  }
+};
+
+export const getDjobForClinician = async () => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const aicStr = await AsyncStorage.getItem('aic');
+
+    if (!aicStr) throw new Error('Missing AIC in storage');
+    const aic = Number(aicStr);
+
+    const res = await axios.post(
+      `api/djobs/clinicianDjobs`,
+      { aic },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const list = Array.isArray(res.data?.data) ? res.data.data : [];
+
+    return { ok: true, data: list };
+  } catch (err) {
+    console.error('getDjobForClinician error:', err);
+    return { ok: false, error: normalizeError(err) };
+  }
+};
+
+export const getDjobForFacilities = async () => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const aicStr = await AsyncStorage.getItem('aic');
+
+    if (!aicStr) throw new Error('Missing AIC in storage');
+    const aic = Number(aicStr);
+
+    const res = await axios.post(
+      `api/djobs/getfacilitydjobs`,
+      { aic },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const list = Array.isArray(res.data?.data) ? res.data.data : [];
+
+    return { ok: true, data: list };
+  } catch (err) {
+    console.error('getDjobForFacilites error:', err);
     return { ok: false, error: normalizeError(err) };
   }
 };

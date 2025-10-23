@@ -75,7 +75,7 @@ export default function MonthView({
                       activeOpacity={0.8}
                     >
                       <Text numberOfLines={1} style={styles.eventText}>
-                        {event.label}
+                        {event.status}
                       </Text>
                     </TouchableOpacity>
                   );

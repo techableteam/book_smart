@@ -21,6 +21,7 @@ import EditProfile from './client/EditProfile';
 import AccountSettings from './client/AccountSettings';
 
 import AssignedShift from './client/ClientAssignedShift.js';
+import ClientGeneratedShift from './client/ClientGeneratedShifts.js';
 
 import AdminLogin from './admin/AdminLogin';
 import FacilityLogin from './facilities/FacilityLogin';
@@ -174,6 +175,12 @@ function Layout() {
       <Stack.Screen 
         name= 'AssignedShift'
         component = {AssignedShift}
+        options={{headerShown: false}}
+      />
+
+      <Stack.Screen 
+        name= 'ClientGeneratedShift'
+        component = {ClientGeneratedShift}
         options={{headerShown: false}}
       />
       <Stack.Screen 

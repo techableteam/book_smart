@@ -65,7 +65,7 @@ const statusColors = (label) => {
     case 'NOTSELECT':   return { bg: '#808080', fg: '#E5E7EB' };
     case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
     case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
-    case 'REJECTED':  return { bg: '#FEE2E2', fg: '#991B1B' };
+    case 'REJECTED':  return { bg: '#DC2626', fg: '#991B1B' };
     case 'CANCELLED': return { bg: '#E5E7EB', fg: '#374151' };
     default:          return { bg: '#EEE',    fg: '#000'     };
   }
@@ -180,10 +180,9 @@ const AdminHomeTab = ({
       const AId = AIdRaw?.trim();
       const response = await getAllDjob(AId);
       const list = Array.isArray(response?.data) ? response?.data : [];
-      console.log("DJob List:", list);
+      
       if (Array.isArray(list) && list.length > 0) {
         const transformed = await transformDjobListToMockEvents(list);
-        console.log("Transformed DJob List:", transformed);
         setDjobList(list); 
         setTransformedDjobList(transformed);
       } else {

@@ -171,7 +171,7 @@ export default function AssignedShift() {
   const ListHeader = useMemo(() => (
     <View style={styles.headerWrap}>
       <View style={styles.topView}>
-        <Text style={styles.title}>RESTAURANT ASSIGNED SHIFTS</Text>
+        <Text style={styles.title}>ASSIGNED SHIFTS</Text>
         <View style={styles.bottomBar} />
       </View>
       <Text style={styles.subtitle}>

@@ -240,6 +240,8 @@ export default function WeekView({
   staffList = [],
   shiftTypes = [],
   footerHeight = 110,
+  degrees = [],  
+  djobList = [],
 }) {
   const [sel, setSel] = useState(null);
   const [confirm, setConfirm] = useState(null);
@@ -252,6 +254,7 @@ export default function WeekView({
   const startHour = confirm ? Math.floor(confirm.startMin / 60) : 0;
   const endHour = confirm ? Math.floor(confirm.endMin / 60) : 0;
   const endMinuteChoices = endHour >= 24 ? [0] : minuteOptions;
+  const [degreeId, setDegreeId] = useState(null);
 
   const derivedStartMin = useMemo(
     () => (confirm ? startHour * 60 + startMinute : 0),
@@ -328,6 +331,7 @@ export default function WeekView({
     setShowModal(true);
     setStaffId(null);
     setShiftText("");
+    setDegreeId(null);
   };
 
   const pxFromMin = (m) =>
@@ -339,14 +343,18 @@ export default function WeekView({
     setSel(null);
     setStaffId(null);
     setShiftText("");
+    setDegreeId(null);
   };
 
   const timeOk = confirm ? derivedEndMin > derivedStartMin : true;
-  const canConfirm = staffId != null && shiftText.trim().length > 0 && timeOk;
+  const canConfirm = degreeId != null && timeOk; 
 
   const handleConfirmModal = () => {
     if (!confirm || !canConfirm) return;
     const { dateObj } = confirm;
+
+    const selectedDegree   = degrees.find(d => String(d.Did ?? d.id) === String(degreeId));
+    const selectedStaff    = staffList.find(s => String(s.aic) === String(staffId));
 
     onTimeRangeSelected?.({
       date: dateObj,
@@ -354,7 +362,8 @@ export default function WeekView({
       endLabel: minutesToLabel(derivedEndMin),
       startMin: derivedStartMin,
       endMin: derivedEndMin,
-      staffId,
+      staffId: Number(selectedStaff?.aic ?? 0),
+      degreeId: Number(selectedDegree?.Did ?? selectedDegree?.aic ?? selectedDegree?.id ?? 0),
       shiftText,
     });
 
@@ -362,8 +371,10 @@ export default function WeekView({
     setConfirm(null);
     setSel(null);
     setStaffId(null);
+    setDegreeId(null);
     setShiftText("");
   };
+
 
   return (
     <View style={{ width: "100%", zIndex:-1 }}>
@@ -530,7 +541,7 @@ export default function WeekView({
                               ]}
                             >
                               <Text numberOfLines={1} style={styles.eventText}>
-                                {ev.label} {ev.time}
+                                {ev.status} {ev.time}
                               </Text>
                             </TouchableOpacity>
                           );
@@ -631,6 +642,16 @@ export default function WeekView({
                     />
                   </View>
                 </View>
+
+                <SimpleSelect
+                  label="Degree"
+                  items={degrees}
+                  getKey={(d) => String(d.Did ?? d.id ?? d._id)}
+                  getLabel={(d) => d.degreeName || d.name || 'Unknown'}
+                  value={degreeId}
+                  onChange={setDegreeId}
+                />
+
 
                 <SimpleSelect
                   label="Staff"

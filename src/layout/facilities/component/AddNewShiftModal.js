@@ -10,20 +10,23 @@ import {
 } from 'react-native';
 import { 
   getShiftTypes, 
-  addShiftToStaff 
+  addShiftToStaff ,
+  createDJob,
 } from '../../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TextInput } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
 
-export default function AddNewShiftModal({ visible, onClose, staffList, refreshShiftData  }) {
+export default function AddNewShiftModal({ visible, onClose, 
+  staffList, degreelist, refreshShiftData  }) {
   const [shiftTypes, setShiftTypes] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [employeeList, setEmployeeList] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [degrees, setDegrees] = useState('');
 
   useEffect(() => {
     if (visible && staffList.length > 0) {
@@ -63,7 +66,7 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
   
 
   const handleSubmit = async () => {
-    if (!selectedEmployee || !selectedShift || !selectedDate) {
+    if (!degrees || !selectedShift || !selectedDate) {
       alert('Please select all fields');
       return;
     }
@@ -102,11 +105,20 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
           time: formattedTime,
         },
       ];
-      const result = await addShiftToStaff("facilities", aic, selectedEmployee, shiftPayload);
-  
-      if (result?.success) {
+      const result = await createDJob({
+        shiftPayload,
+        degreeId: degrees,
+        facilityId: aic,
+        staffId: selectedEmployee,
+        adminId: 0,
+        adminMade: false,
+      });
+
+      const jobId = result?.data?.DJobId ?? result?.data?.id;
+
+      if (jobId) {
         await refreshShiftData();
-        onClose(); // close modal
+        onClose();
       } else {
         const msg = result?.message || 'Failed to submit shift.';
         alert(msg);
@@ -122,6 +134,25 @@ export default function AddNewShiftModal({ visible, onClose, staffList, refreshS
       <View style={styles.backdrop}>
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add New Shift</Text>
+
+          <Text style={styles.label}>Degree</Text>
+          <Dropdown
+            style={styles.dropdown}
+            containerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.dropdownPlaceholder}
+            selectedTextStyle={styles.dropdownSelectedText}
+            itemTextStyle={styles.dropdownItemText}
+            data={degreelist.map(degree => ({
+              label: degree.degreeName,
+              value: degree.Did,
+            }))}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select Degree"
+            value={degrees}
+            onChange={item => setDegrees(item.value)}
+          />
 
           <Text style={styles.label}>Staff</Text>
           <Dropdown

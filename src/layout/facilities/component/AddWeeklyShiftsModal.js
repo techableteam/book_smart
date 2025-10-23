@@ -6,26 +6,32 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Alert 
+  Alert,
+  ActivityIndicator 
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
   getShiftTypes, 
-  addShiftToStaff 
+  addShiftToStaff,
+  createDJob
 } from '../../../utils/useApi';
 import moment from 'moment';
 
-export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refreshShiftData }) {
+export default function AddWeeklyShiftsModal({ visible, onClose, 
+  staffList, degreelist, refreshShiftData }) {
   const [shiftTypes, setShiftTypes] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedShifts, setSelectedShifts] = useState({});
   const [employeeList, setEmployeeList] = useState([]);
+  const [degrees, setDegrees] = useState('');
+  const [isLoading, setIsLoading] = useState(false);  
 
   const nextWeekDates = getNextWeekDates();
   
   const isSubmitDisabled =
-  !selectedEmployee || Object.values(selectedShifts).every((arr) => arr.length === 0);
+  !degrees || Object.keys(selectedShifts).length === 0 || Object.values(selectedShifts).every((shiftsArray) => shiftsArray.length === 0);
+
 
   useEffect(() => {
     if (visible) {
@@ -80,11 +86,6 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
 
   const handleSubmit = async () => {
     try {
-      // Basic guards
-      if (!selectedEmployee) {
-        Alert.alert('Missing field', 'Please select an employee.');
-        return;
-      }
       if (!selectedShifts || Object.keys(selectedShifts).length === 0) {
         Alert.alert('No shifts selected', 'Please pick at least one shift.');
         return;
@@ -122,15 +123,42 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
         Alert.alert('No valid shifts', 'Please select valid shift times.');
         return;
       }
+      let hasError = false;
+      const failedJobs = [];
+      
+      setIsLoading(true);
   
-      const result = await addShiftToStaff("facilities", managerAic, selectedEmployee, shifts);
-      if (result && !result.error) {
-        Alert.alert('Success', 'Shifts assigned successfully!');
+      for (const shift of shifts) {
+        try {
+          const result = await createDJob({
+            shiftPayload: shift,
+            degreeId: degrees,
+            facilityId: managerAic,
+            staffId: selectedEmployee,
+            adminId: 0,
+            adminMade: false, 
+          });
+  
+          const jobId = result?.data?.DJobId ?? result?.data?.id;
+          if (!jobId) {
+            throw new Error(result?.message || 'Failed to submit shift.');
+          }
+        } catch (err) {
+          console.error('Error creating job for shift:', shift, err);
+          failedJobs.push(shift); 
+          hasError = true;
+        }
+      }
+
+      setIsLoading(false);
+  
+      if (hasError) {
+        const msg = `Failed to create job(s) for ${failedJobs.length} shift(s).`;
+        Alert.alert('Error', msg);
+      } else {
         await refreshShiftData?.();
         onClose?.();
-      } else {
-        console.error(result?.error);
-        Alert.alert('Error', result?.message || 'Failed to assign shifts. Please try again.');
+        Alert.alert('Success', 'All shifts assigned successfully!');
       }
     } catch (err) {
       console.error('Submission error:', err);
@@ -145,6 +173,26 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add next week's Shifts</Text>
 
+          <Text style={styles.label}>Degree</Text>
+          <Dropdown
+            style={styles.dropdown}
+            containerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.dropdownPlaceholder}
+            selectedTextStyle={styles.dropdownSelectedText}
+            itemTextStyle={styles.dropdownItemText}
+            data={degreelist.map(degree => ({
+              label: degree.degreeName,
+              value: degree.Did, 
+            }))}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select Degree"
+            value={degrees}
+            onChange={item => setDegrees(item.value)}
+            disabled={isLoading}
+          />
+
           <Text style={styles.label}>Staff</Text>
           <Dropdown
             style={styles.dropdown}
@@ -154,7 +202,14 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
             placeholder="Select Staff"
             value={selectedEmployee}
             onChange={(item) => setSelectedEmployee(item.value)}
+            disabled={isLoading}
           />
+
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#290135" />
+            </View>
+          )}
 
           <ScrollView style={{ marginTop: 10 }}>
             {Object.keys(nextWeekDates).map((day) => (
@@ -184,7 +239,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, refr
             <TouchableOpacity
                 style={[
                     styles.submitButton,
-                    isSubmitDisabled && { opacity: 0.5 } // Visually dimmed
+                    isSubmitDisabled && { opacity: 0.5 }
                 ]}
                 onPress={handleSubmit}
                 disabled={isSubmitDisabled}

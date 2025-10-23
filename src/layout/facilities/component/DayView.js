@@ -127,7 +127,7 @@ export default function DayView({
               ]}
             >
               <Text numberOfLines={2} style={styles.eventText}>
-                {ev.label}
+              {ev.status} {ev.label}
                 {"\n"}
                 {normalize(ev.time)}
               </Text>

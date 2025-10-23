@@ -21,7 +21,8 @@ import { TextInput } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
 
-export default function AddNewShiftModal({ visible, onClose, staffList, facilitieslist, degreelist, refreshShiftData  }) {
+export default function AddNewShiftModal({ visible, onClose, 
+  staffList, facilitieslist, degreelist, refreshShiftData  }) {
   const [shiftTypes, setShiftTypes] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [employeeList, setEmployeeList] = useState([]);

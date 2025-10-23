@@ -21,8 +21,8 @@ export const transformDjobListToMockEvents = async (djobList = []) => {
     const statusColorMap = {
       'NOTSELECT': '#808080', 
       'PENDING': '#FFC107',   
-      'APPROVED': '#DCFCE7',  
-      'REJECTED': '#FEE2E2',  
+      'APPROVED': '#10B981',  
+      'REJECTED': '#DC2626',  
       'CANCELLED': '#E5E7EB', 
     };
 

@@ -57,9 +57,15 @@ export default function MyHome ({ navigation }) {
             </View>
           </View>
 
-          <View style={styles.bottomView}>
+          {/* <View style={styles.bottomView}>
             <TouchableOpacity onPress={() => navigation.navigate("AssignedShift")}>
               <AnimatedHeader title="Directly Assigned Shifts!" style={{ paddingHorizontal: 30 }} />
+            </TouchableOpacity>
+          </View> */}
+
+          <View style={styles.bottomView}>
+            <TouchableOpacity onPress={() => navigation.navigate("ClientGeneratedShift")}>
+              <AnimatedHeader title="Directly Generated Shifts!" style={{ paddingHorizontal: 30 }} />
             </TouchableOpacity>
           </View>
 
