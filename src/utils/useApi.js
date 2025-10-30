@@ -493,6 +493,30 @@ export const getDjobForClinician = async () => {
   }
 };
 
+export const getDjobForFacilitiesById = async (FAic) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    const aic = Number(FAic);
+
+    const res = await axios.post(
+      `api/djobs/getfacilitydjobs`,
+      { aic },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const list = Array.isArray(res.data?.data) ? res.data.data : [];
+
+    return { ok: true, data: list };
+  } catch (err) {
+    console.error('getDjobForFacilites error:', err);
+    return { ok: false, error: normalizeError(err) };
+  }
+};
+
 export const getDjobForFacilities = async () => {
   try {
     const token = await AsyncStorage.getItem('token');

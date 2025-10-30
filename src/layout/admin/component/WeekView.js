@@ -243,6 +243,8 @@ export default function WeekView({
   facilities = [],
   footerHeight = 110,
   djobList = [],
+  selectedFacilityId,
+  selectedFacilityCompanyName,
 }) {
   const [sel, setSel] = useState(null);
   const [confirm, setConfirm] = useState(null);

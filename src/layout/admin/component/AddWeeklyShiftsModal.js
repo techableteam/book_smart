@@ -7,7 +7,9 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput,
+  Dimensions 
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,7 +20,16 @@ import {
 } from '../../../utils/useApi';
 import moment from 'moment';
 
-export default function AddWeeklyShiftsModal({ visible, onClose, staffList, facilitieslist, degreelist, refreshShiftData }) {
+export default function AddWeeklyShiftsModal({ 
+  visible, 
+  onClose, 
+  staffList, 
+  facilitieslist, 
+  degreelist, 
+  refreshShiftData,
+  selectedFacilitiesId,
+  selectedFacilitiescompanyName
+}) {
   const [shiftTypes, setShiftTypes] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedShifts, setSelectedShifts] = useState({});
@@ -132,7 +143,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, faci
           const result = await createDJob({
             shiftPayload: shift,
             degreeId: degrees,
-            facilityId: facilities,
+            facilityId: selectedFacilitiesId,
             staffId: selectedEmployee,
             adminId: AId,
             adminMade: true, 
@@ -174,7 +185,20 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, faci
           <Text style={styles.title}>Add next week's Shifts</Text>
 
           <Text style={styles.label}>Facility</Text>
-          <Dropdown
+          <TextInput
+             style={[styles.inputBox, { 
+              fontSize: 16, 
+              color: 'black', 
+              backgroundColor: '#f4f4f4',
+              borderWidth: 1,
+              borderColor: '#ccc',
+              borderRadius: 6,
+            }]}
+            placeholder="No Selected Facility"
+            value = {selectedFacilitiescompanyName}
+            editable={false}
+          />
+          {/* <Dropdown
             style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
             placeholderStyle={styles.dropdownPlaceholder}
@@ -191,9 +215,11 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, faci
             value={facilities}
             onChange={item => setFacilities(item.value)}
             disabled={isLoading}
-          />
+          /> */}
 
-          <Text style={styles.label}>Degree</Text>
+          <Text style={styles.label}>
+            Degree <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <Dropdown
             style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
@@ -231,30 +257,37 @@ export default function AddWeeklyShiftsModal({ visible, onClose, staffList, faci
             </View>
           )}
 
-          <ScrollView style={{ marginTop: 10 }}>
-            {Object.keys(nextWeekDates).map((day) => (
-              <View key={day} style={{ marginBottom: 12 }}>
-                <Text style={styles.label}>{day} ({moment(nextWeekDates[day]).format('MMM DD, YYYY')})</Text>
-                <View style={styles.shiftRow}>
-                  {shiftTypes.map((shift) => {
-                    const selected = (selectedShifts[day] || []).some((s) => s.id === shift.id);
-                    return (
-                      <TouchableOpacity
-                        key={shift.id}
-                        style={[styles.shiftButton, selected && styles.shiftButtonSelected]}
-                        onPress={() => handleSelectShift(day, shift)}
-                        disabled={isLoading}
-                      >
-                        <Text style={[styles.shiftText, selected && styles.shiftTextSelected]}>
-                          {shift.start} ➔ {shift.end}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+          <Text style={styles.label}>
+            Shift <Text style={{ color: 'red' }}>*</Text>
+          </Text>
+          <View style={styles.shiftScrollBox}>
+            <ScrollView style={{ marginTop: 10, marginHorizontal: 10 }}>
+              {Object.keys(nextWeekDates).map((day) => (
+                <View key={day} style={{ marginBottom: 12 }}>
+                  <Text style={styles.label}>{day} ({moment(nextWeekDates[day]).format('MMM DD, YYYY')})</Text>
+                  <View style={styles.shiftRow}>
+                    {shiftTypes.map((shift) => {
+                      const selected = (selectedShifts[day] || []).some((s) => s.id === shift.id);
+                      return (
+                        <TouchableOpacity
+                          key={shift.id}
+                          style={[styles.shiftButton, selected && styles.shiftButtonSelected]}
+                          onPress={() => handleSelectShift(day, shift)}
+                          disabled={isLoading}
+                        >
+                          <Text style={[styles.shiftText, selected && styles.shiftTextSelected]}>
+                            {shift.start} ➔ {shift.end}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </View>
-              </View>
-            ))}
-          </ScrollView>
+              ))}
+            </ScrollView>
+          </View>
+
+         
 
           
 
@@ -307,6 +340,27 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     maxHeight: '90%',
+  },
+  inputBox: {
+    height: 45,
+    borderWidth: 1,
+    borderColor: '#C4C4C4',
+    borderRadius: 4,
+    paddingVertical: 0,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    color: '#000',
+    marginBottom: 16,
+    backgroundColor: '#fff',
+  },
+  shiftScrollBox: {
+    maxHeight: Math.floor(Dimensions.get('window').height * 0.3), 
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    marginBottom: 20,
   },
   title: {
     fontSize: 18,

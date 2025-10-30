@@ -21,8 +21,16 @@ import { TextInput } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import DatePicker from 'react-native-date-picker';
 
-export default function AddNewShiftModal({ visible, onClose, 
-  staffList, facilitieslist, degreelist, refreshShiftData  }) {
+export default function AddNewShiftModal({ 
+  visible, 
+  onClose, 
+  staffList, 
+  facilitieslist, 
+  degreelist, 
+  refreshShiftData,
+  selectedFacilitiesId,
+  selectedFacilitiescompanyName
+}) {
   const [shiftTypes, setShiftTypes] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
   const [employeeList, setEmployeeList] = useState([]);
@@ -111,7 +119,7 @@ export default function AddNewShiftModal({ visible, onClose,
       const result = await createDJob({
         shiftPayload,
         degreeId: degrees,
-        facilityId: facilities,
+        facilityId: selectedFacilitiesId,
         staffId: selectedEmployee,
         adminId: AId,
         adminMade: true,
@@ -139,7 +147,20 @@ export default function AddNewShiftModal({ visible, onClose,
           <Text style={styles.title}>Add New Shift</Text>
 
           <Text style={styles.label}>Facility</Text>
-          <Dropdown
+          <TextInput
+             style={[styles.inputBox, { 
+              fontSize: 16, 
+              color: 'black', 
+              backgroundColor: '#f4f4f4',
+              borderWidth: 1,
+              borderColor: '#ccc',
+              borderRadius: 6,
+            }]}
+            placeholder="No Selected Facility"
+            value = {selectedFacilitiescompanyName}
+            editable={false}
+          />
+          {/* <Dropdown
             style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
             placeholderStyle={styles.dropdownPlaceholder}
@@ -147,7 +168,7 @@ export default function AddNewShiftModal({ visible, onClose,
             itemTextStyle={styles.dropdownItemText}
             data={facilitieslist.map(facility => ({
               label: facility.companyName,
-              value: facility.aic, // Assuming `aic` is the ID for the facility
+              value: facility.aic, 
             }))}
             maxHeight={200}
             labelField="label"
@@ -155,9 +176,11 @@ export default function AddNewShiftModal({ visible, onClose,
             placeholder="Select Facility"
             value={facilities}
             onChange={item => setFacilities(item.value)}
-          />
+          /> */}
 
-          <Text style={styles.label}>Degree</Text>
+          <Text style={styles.label}>
+            Degree <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <Dropdown
             style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
@@ -216,10 +239,11 @@ export default function AddNewShiftModal({ visible, onClose,
               onCancel={() => setShowDatePicker(false)}
             />
 
-            <Text style={styles.label}>Shift</Text>
+            <Text style={styles.label}>
+              Shift <Text style={{ color: 'red' }}>*</Text>
+            </Text>
             <View style={styles.shiftScrollBox}>
               <ScrollView
-                style={styles.shiftScroll}
                 contentContainerStyle={styles.shiftListContent}
                 nestedScrollEnabled
                 keyboardShouldPersistTaps="handled"
@@ -251,8 +275,12 @@ export default function AddNewShiftModal({ visible, onClose,
 
 
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.submitButton}>
-              <Text style={styles.submitText} onPress={handleSubmit} >Submit</Text>
+            <TouchableOpacity 
+              style={[styles.submitButton, { backgroundColor: selectedShift && selectedDate && degrees ? '#290135' : '#ccc' }]} 
+              onPress={handleSubmit}
+              disabled={!selectedShift || !selectedDate || !degrees} // Disable button when any of the required fields are empty
+            >
+              <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>

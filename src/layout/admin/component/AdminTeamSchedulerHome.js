@@ -19,6 +19,7 @@ import DayView from "./DayView";
 import AddNewShiftModal from './AddNewShiftModal';
 import AddWeeklyShiftsModal from './AddWeeklyShiftsModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Dropdown } from 'react-native-element-dropdown';
 import {
   getStaffShiftInfo,
   getShiftTypes,
@@ -30,7 +31,8 @@ import {
   getAllFacilitiesInAdmin,
   createDJob,
   getAllDjob,
-  deleteDjob
+  deleteDjob,
+  getDjobForFacilitiesById
  } from '../../../utils/useApi';
 import { transformStaffListToMockEvents } from './transformStaffListToMockEvents';
 import { transformDjobListToMockEvents } from './transformDjobListToMockEvents';
@@ -135,6 +137,12 @@ const AdminHomeTab = ({
   const [djobList, setDjobList] = useState([]);
   const [transformedDjobList, setTransformedDjobList] = useState([]);
 
+  const [selectedFacilityId, setSelectedFacilityId] = useState(null);
+  const [selectedFacilityCompanyName, setSelectedFacilityCompanyName] = useState(null);
+  const [facilityDjobList, setFacilityDjobList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isValueOptionFocus, setIsValueOptionFocus] = useState(false);
+
   const [startTime, endTime] = React.useMemo(() => {
     const raw = String(selectedEvent?.time || '');
     const [s, e] = raw.split(/[➔➜→]/).map(t => t?.trim());
@@ -151,7 +159,8 @@ const AdminHomeTab = ({
           fetchShiftTypes(), 
           fetchDegrees(), 
           fetchFacilities(),
-          fetchDjobList()]);
+          // fetchDjobList()
+        ]);
       } finally {
         setBootLoading(false);
         setBusyText('');
@@ -160,8 +169,30 @@ const AdminHomeTab = ({
   }, []);
 
   // useEffect(() => {
-  //   console.log("ShiftData updated:", ShiftData);
-  // }, [ShiftData]);
+  //   console.log("selectedFacilityCompanyName:", selectedFacilityCompanyName);
+  // }, [selectedFacilityCompanyName]);  
+
+  const handleFacilitySelect = async (facilitiesList) => {
+    setSelectedFacilityId(facilitiesList.aic);
+    setSelectedFacilityCompanyName(facilitiesList.companyName);
+    setBusyText('Loading…');
+    setBootLoading(true);
+  
+    const result = await getDjobForFacilitiesById(facilitiesList.aic);
+    const list = Array.isArray(result?.data) ? result?.data : []
+    if (Array.isArray(list) && list.length > 0) {
+      const transformed = await transformDjobListToMockEvents(list);
+      setFacilityDjobList(list); 
+      setTransformedDjobList(transformed);
+    } else {
+      console.log("djobList is not an array or is empty:", list);
+      setFacilityDjobList([]);
+      setTransformedDjobList({});
+    }
+    setBootLoading(false);
+    setBusyText('');
+  };
+  
 
   const fetchDegrees = async () => {
     try {
@@ -186,7 +217,7 @@ const AdminHomeTab = ({
         setDjobList(list); 
         setTransformedDjobList(transformed);
       } else {
-        console.error("djobList is not an array or is empty:", list);
+        console.log("djobList is not an array or is empty:", list);
         setDjobList([]);
         setTransformedDjobList({});
       }
@@ -263,34 +294,53 @@ const AdminHomeTab = ({
   };
 
   const openCreateSingleShift = async () => {
+    if (!selectedFacilityId) {
+      Alert.alert('Select Facility', 'Please select a facility before proceeding.');
+      return;
+    }
+  
     const { needShiftTypes, needStaff } = await ensurePrereqs();
+  
     if (needShiftTypes || needStaff) {
       Alert.alert(
         "Missing data",
         `${[
           needShiftTypes ? "Shift types" : null,
           needStaff ? "Staff list" : null,
-        ].filter(Boolean).join(" and ")} not selected yet. Please make it first.`
+        ]
+          .filter(Boolean)
+          .join(" and ")} not selected yet. Please make it first.`
       );
       return;
     }
+  
     setShowAddShiftModal(true);
   };
-
+  
   const openCreateNextWeek = async () => {
+    if (!selectedFacilityId) {
+      Alert.alert('Select Facility', 'Please select a facility before proceeding.');
+      return;
+    }
+  
     const { needShiftTypes, needStaff } = await ensurePrereqs();
+  
     if (needShiftTypes || needStaff) {
       Alert.alert(
         "Missing data",
         `${[
           needShiftTypes ? "Shift types" : null,
           needStaff ? "Staff list" : null,
-        ].filter(Boolean).join(" and ")} not selected yet. Please make it first.`
+        ]
+          .filter(Boolean)
+          .join(" and ")} not selected yet. Please make it first.`
       );
       return;
     }
+  
     setShowAddWeekModal(true);
   };
+  
 
   const handlePrev = () => {
     if (viewMode === "Month") {
@@ -329,7 +379,7 @@ const AdminHomeTab = ({
   };
 
   const handleConfirmDelete = async () => {
-    try {
+     try {
       setBusyText('Deleting…');
       setDeleting(true);
      
@@ -337,16 +387,25 @@ const AdminHomeTab = ({
         selectedEvent.DJobId,                    
       );
   
-      // Handle response
       if (result?.success) {
-        await fetchDjobList();          
+        const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
+      
+        if (selectedFacility) {
+          await handleFacilitySelect(selectedFacility);
+        } else {
+          console.error('Selected facility not found');
+        }
         setShowConfirmDelete(false);
         setShowEventModal(false);
         setSelectedEvent(null);
-        Alert.alert('Shift deleted.');
       } else {
         Alert.alert(`Delete failed: ${result?.message || 'Unknown error'}`);
-        await fetchDjobList();          // ensure UI not stale
+        const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
+        if (selectedFacility) {
+          await handleFacilitySelect(selectedFacility);
+        } else {
+          console.error('Selected facility not found');
+        }
         setShowConfirmDelete(false);
       }
     } catch (e) {
@@ -362,9 +421,9 @@ const AdminHomeTab = ({
 
   const normalizeTime = (s = "") =>
     s
-      .replace(/\u202F/g, " ")         // narrow no-break space -> space
-      .replace(/\s+/g, " ")            // collapse whitespace
-      .replace(/[^\dAPMapm: ]/g, "")   // strip arrows/extra chars
+      .replace(/\u202F/g, " ")        
+      .replace(/\s+/g, " ")           
+      .replace(/[^\dAPMapm: ]/g, "")  
       .trim()
       .toUpperCase();
 
@@ -433,7 +492,10 @@ const AdminHomeTab = ({
       const jobId = result?.data?.DJobId ?? result?.data?.id;
 
       if (jobId) {
-        await fetchDjobList();
+        const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
+        if (selectedFacility) {
+          await handleFacilitySelect(selectedFacility);
+        }
         Alert.alert('Shift created', `${formattedDate} • ${timeStr}`);
       } else {
         Alert.alert('Create failed', result?.message || 'Unexpected response.');
@@ -446,6 +508,36 @@ const AdminHomeTab = ({
   
 
   return (
+    <View style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Dropdown
+          style={[
+            styles.dropdownFacilities,
+            { 
+              width: '80%', 
+              alignSelf: 'flex-end', 
+              marginTop: 10,         
+              height: 40, 
+            },
+            isValueOptionFocus && { borderColor: 'blue' },
+          ]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          itemTextStyle={styles.itemTextStyle}
+          iconStyle={styles.iconStyle}
+          data={facilities}
+          maxHeight={300}
+          labelField="companyName"
+          valueField="aic"
+          placeholder={"Select Facility"}
+          value={selectedFacilityId} 
+          onFocus={() => setIsValueOptionFocus(true)}
+          onBlur={() => setIsValueOptionFocus(false)}
+          onChange={(item) => handleFacilitySelect(item)}
+        />
+    </View>
+
     <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
       <View style={styles.topRightControls}>
         <View style={styles.shiftButtonGroup}>
@@ -533,7 +625,6 @@ const AdminHomeTab = ({
       {viewMode === "Month" && (
         <MonthView
           calendarDays={calendarDays}
-          // mockEvents={ShiftData}
           mockEvents={transformedDjobList}
           setSelectedEvent={setSelectedEvent}
           setShowEventModal={setShowEventModal}
@@ -546,7 +637,6 @@ const AdminHomeTab = ({
       {viewMode === 'Week' && (
         <WeekView
           startDate={weekStartDate}l
-          // mockEvents={ShiftData}
           mockEvents={transformedDjobList}
           onEventPress={handleMonthEventPress}
           setSelectedEvent={setSelectedEvent}
@@ -555,6 +645,8 @@ const AdminHomeTab = ({
           degrees={degrees}         
           facilities={facilities}
           djobList={djobList}
+          selectedFacilityId={selectedFacilityId}
+          selectedFacilityCompanyName={selectedFacilityCompanyName}
           onTimeRangeSelected={handleCreateShiftFromRange}
         />
       )}
@@ -564,7 +656,6 @@ const AdminHomeTab = ({
         <DayView
           date={dayDate}
           setDate={setDayDate}
-          // mockEvents={ShiftData}
           mockEvents={transformedDjobList}
           setSelectedEvent={setSelectedEvent}
           setShowEventModal={setShowEventModal}
@@ -577,7 +668,14 @@ const AdminHomeTab = ({
         staffList={staffList}
         facilitieslist={facilities}
         degreelist={degrees}
-        refreshShiftData={fetchDjobList}
+        selectedFacilitiesId={selectedFacilityId}
+        selectedFacilitiescompanyName={selectedFacilityCompanyName}
+        refreshShiftData={() => {
+          const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
+          if (selectedFacility) {
+            handleFacilitySelect(selectedFacility);
+          }
+        }}
       />
 
       <AddWeeklyShiftsModal
@@ -586,8 +684,16 @@ const AdminHomeTab = ({
         staffList={staffList}
         facilitieslist={facilities}
         degreelist={degrees}
-        refreshShiftData={fetchDjobList}
+        selectedFacilitiesId={selectedFacilityId}
+        selectedFacilitiescompanyName={selectedFacilityCompanyName}
+        refreshShiftData={() => {
+          const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
+          if (selectedFacility) {
+            handleFacilitySelect(selectedFacility);
+          }
+        }}
       />
+    </ScrollView>
 
       <Modal visible={showEventModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
@@ -598,7 +704,6 @@ const AdminHomeTab = ({
               const label = normalizeStatus(
                 selectedEvent?.status ?? selectedEvent?.data?.status
               );
-              console.log("selectedEvent : ", selectedEvent);
               const colors = statusColors(label);
               return (
                 <View style={[styles.statusChip, { backgroundColor: colors.bg }]}>
@@ -636,24 +741,7 @@ const AdminHomeTab = ({
                 editable={false}
                 style={styles.input}
               />
-              {/* <Pressable
-                onPress={() => setShowDatePicker(true)}
-                style={[StyleSheet.absoluteFill, { zIndex: 1 }]}
-              /> */}
             </View>
-
-            {/* <DatePicker
-              modal
-              open={showDatePicker}
-              date={eventDate || new Date()}
-              mode="date"
-              onConfirm={(date) => {
-                setShowDatePicker(false);
-                setSelectedDate(date);
-                setEventDate(date); 
-              }}
-              onCancel={() => setShowDatePicker(false)}
-            /> */}
 
             <Text style={styles.label}>Facility</Text>
             <TextInput
@@ -663,14 +751,15 @@ const AdminHomeTab = ({
               style={styles.input}
             />
 
-            <Text style={styles.label}>Degree</Text>
+            <Text style={styles.label}>
+              Degree <Text style={{ color: 'red' }}>*</Text>
+            </Text>
             <TextInput
               mode="outlined"
               value={selectedEvent?.degreeName || ''}
               editable={false}
               style={styles.input}
             />
-
 
             <Text style={styles.label}>Staff</Text>
             <TextInput
@@ -700,7 +789,6 @@ const AdminHomeTab = ({
               </ScrollView>
             </View>
 
-
             <View style={styles.buttonRow}>
               <TouchableOpacity onPress={() => setShowEventModal(false)}>
                 <Text style={styles.cancelText}>Cancel</Text>
@@ -714,12 +802,43 @@ const AdminHomeTab = ({
         visible={bootLoading || opLoading || deleting}
         text={busyText || (deleting ? 'Deleting…' : '')}
       />
+    </View>
 
-    </ScrollView>
+   
   );
 };
 
 const styles = StyleSheet.create({
+  
+  dropdownFacilities: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    paddingVertical: 2,
+    backgroundColor: '#f9f9f9',
+    paddingLeft : 15,
+    paddingRight : 10,
+    marginEnd : 10
+  },
+  placeholderStyle: {
+    color: 'gray',
+    fontSize: RFValue(14),
+  },
+  selectedTextStyle: {
+    color: 'black',
+    fontSize: RFValue(14),
+  },
+  itemTextStyle: {
+    color: 'black'
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: RFValue(16),
+  },
   busyBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.35)',
@@ -926,6 +1045,9 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#f9f9f9',
   },
+
+
+
   shiftOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
