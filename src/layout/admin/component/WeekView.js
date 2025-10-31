@@ -11,6 +11,7 @@ import {
   Pressable,
   PixelRatio,
   Platform,
+  TextInput
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -372,7 +373,7 @@ export default function WeekView({
       endMin: derivedEndMin,
       staffId: Number(selectedStaff?.aic ?? 0),
       degreeId: Number(selectedDegree?.Did ?? selectedDegree?.aic ?? selectedDegree?.id ?? 0),
-      facilityId: Number(selectedFacility?.aic ?? 0),
+      facilityId: Number(selectedFacilityId),
       shiftText,
     });
 
@@ -651,13 +652,28 @@ export default function WeekView({
                   </View>
                 </View>
 
-                <SimpleSelect
+                {/* <SimpleSelect
                   label="Facility"
                   items={facilities}
                   getKey={(f) => String(f.aic)} 
                   getLabel={(f) => f.companyName || f.name || 'Unknown'}
                   value={facilityId}
                   onChange={setFacilityId}
+                /> */}
+
+                <Text style={[styles.inputLabel, {marginTop : 16}]}>Facility</Text>
+                <TextInput
+                  style={[styles.inputBox, { 
+                    fontSize: 16, 
+                    color: 'black', 
+                    // backgroundColor: '#f4f4f4',
+                    borderWidth: 1,
+                    borderColor: '#ccc',
+                    borderRadius: 6,
+                  }]}
+                  placeholder="No Selected Facility"
+                  value = {selectedFacilityCompanyName}
+                  editable={false}
                 />
 
                 <SimpleSelect
@@ -713,6 +729,17 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
     marginHorizontal: 10,
     marginTop: 6,
+  },
+  inputBox: {
+    height: 45,
+    borderWidth: 1,
+    borderColor: '#C4C4C4',
+    borderRadius: 4,
+    paddingVertical: 0,
+    fontSize: 16,
+    color: '#000',
+    backgroundColor: '#fff',
+    paddingHorizontal : 10
   },
   dayLabelHeaderCell: {
     width: 35,
