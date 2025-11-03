@@ -15,7 +15,7 @@ import MFooter from '../../components/Mfooter';
 import CustomTopNav from '../../components/CustomTopNav';
 import AdminHomeTab from './component/AdminTeamSchedulerHome';
 import AdminStaffTab from './component/AdminTeamStaffTap';
-import ShiftTab from './component/AdminshiftTap';
+import AdminShiftTab from './component/AdminshiftTap';
 
 const months = [
   "January",
@@ -60,6 +60,8 @@ const AdminTeamScheduler = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState("Home");
   const [viewMode, setViewMode] = useState("Week");
   const years = generateYears(2000, 2030);
+  const [selectedFacilityId, setSelectedFacilityId] = useState(null);
+  const [selectedFacilityCompanyName, setSelectedFacilityCompanyName] = useState(null);
 
   const handlePrevMonth = () => {
     if (month === 0) {
@@ -139,13 +141,28 @@ const AdminTeamScheduler = ({ navigation }) => {
             showViewDropdown={showViewDropdown}
             setShowViewDropdown={setShowViewDropdown}
             calendarDays={calendarDays}
+            selectedFacilityId={selectedFacilityId}
+            selectedFacilityCompanyName={selectedFacilityCompanyName}
+            onFacilityChange={(id, name) => {
+              setSelectedFacilityId(id);
+              setSelectedFacilityCompanyName(name);
+            }}
           />
         )}
 
-        {selectedTab === "Staff" && <AdminStaffTab />}
-        {selectedTab === "Shifts" && <ShiftTab />}
+        {selectedTab === "Staff" && (
+          <AdminStaffTab
+            selectedFacilityId={selectedFacilityId}
+            selectedFacilityCompanyName={selectedFacilityCompanyName}
+          />
+        )}
 
-
+        {selectedTab === "Shifts" && (
+          <AdminShiftTab
+            selectedFacilityId={selectedFacilityId}
+            selectedFacilityCompanyName={selectedFacilityCompanyName}
+          />
+        )}
       <MFooter />
 
       {/* Month-Year Picker Modal */}

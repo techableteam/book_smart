@@ -17,29 +17,19 @@ import { addShiftType } from '../../../utils/useApi';
 const formatTime = (date) =>
   date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-export default function AdminAddShiftModal({ visible, onClose, onReload }) {
+export default function AdminAddShiftModal({ visible, onClose, onReload, selectedFacilityId }) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
-
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
-
-  // iOS picker visibility
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-
-  // iOS draft values (what the wheels currently show)
   const [draftStart, setDraftStart] = useState(new Date());
   const [draftEnd, setDraftEnd] = useState(new Date());
-
-  // Press feedback
   const [isPressedStart, setIsPressedStart] = useState(false);
   const [isPressedEnd, setIsPressedEnd] = useState(false);
 
   useEffect(() => {
-    // helpful during dev
-    // console.log('showStartPicker ->', showStartPicker);
-    // console.log('showEndPicker ->', showEndPicker);
   }, [showStartPicker, showEndPicker]);
 
   const openStartPicker = () => {
@@ -74,23 +64,17 @@ export default function AdminAddShiftModal({ visible, onClose, onReload }) {
       return;
     }
 
+    console.log(selectedFacilityId);
+
     try {
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('AId'),
-      ]);
-      const aic = Number.parseInt(aicRaw ?? '', 10);
-      if (Number.isNaN(aic)) {
-        console.log('missing aic', {aicRaw });
-        return;
-      }
       const body = {
-        AId : aic,
+        aic : selectedFacilityId,
         name: name.trim(),
         start: formatTime(startTime),
         end: formatTime(endTime),
       };
       console.log(body);
-      const response = await addShiftType(body, "admin");
+      const response = await addShiftType(body, "facilities");
       if (response?.error) {
         setError('Failed to add shift.');
         return;
@@ -115,7 +99,7 @@ export default function AdminAddShiftModal({ visible, onClose, onReload }) {
             placeholder="Shift name"
             value={name}
             onChangeText={setName}
-            style={styles.input}
+            style={styles.textInput}
           />
 
           {/* Start time (Pressable “fake input”) */}
@@ -267,11 +251,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   input: {
+    height: 40,
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 12,
-    marginBottom: 10,
+    padding: 10,
+    marginBottom: 12,
     borderRadius: 6,
+  },
+   textInput: {
+    height: 40,
+    paddingHorizontal: 12,
+    paddingVertical: 0,                // avoid growing on Android
+    color: '#111827',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    marginBottom: 12,
+    ...(Platform.OS === 'android' ? { textAlignVertical: 'center' } : null),
   },
   error: {
     color: 'red',

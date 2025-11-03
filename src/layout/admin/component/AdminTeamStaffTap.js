@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStaffShiftInfo, } from '../../../utils/useApi';
 
 
-export default function AdminStaffTab() {
+export default function AdminStaffTab({ selectedFacilityId, selectedFacilityCompanyName }) {
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
     const [staffList, setStaffList] = useState([]);
@@ -23,23 +23,23 @@ export default function AdminStaffTab() {
     useFocusEffect(
       useCallback(() => {
         console.log("admin staff tap page");
+        console.log("AdminStaffTab focused. Facility:", selectedFacilityId);
         loadShifts();
       }, [loadShifts])
     );
 
     const loadShifts = useCallback(async () => {
       try {
-        const [aicRaw] = await Promise.all([
-          AsyncStorage.getItem('AId'),
-        ]);
-        const aic = (aicRaw || '').trim();
-        if (!aic) {
-          console.warn('loadShifts: missing endpoint or aic', {aic});
-          setStaffList([]);
-          return;
-        }
-        
-        const data = await getStaffShiftInfo("admin", aic);
+        // const [aicRaw] = await Promise.all([
+        //   AsyncStorage.getItem('AId'),
+        // ]);
+        // const aic = (aicRaw || '').trim();
+        // if (!aic) {
+        //   console.warn('loadShifts: missing endpoint or aic', {aic});
+        //   setStaffList([]);
+        //   return;
+        // }
+        const data = await getStaffShiftInfo("facilities", selectedFacilityId);
         const list = (Array.isArray(data) ? data : []).map((user) => ({
           id: String(user?.id ?? ''),
           aic: String(user?.aic ?? aic),
@@ -93,7 +93,10 @@ export default function AdminStaffTab() {
           <View style={styles.row}>
             <TouchableOpacity
               style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}
-              onPress={() => navigation.navigate('AdminStaffDetail', { staff: item })}
+              onPress={() => navigation.navigate('AdminStaffDetail', { 
+                staff: item,
+                selectedFacilityId
+               })}
             >
               <Image
                 source={require('../../../assets/images/default_avatar.png')}
@@ -138,6 +141,7 @@ export default function AdminStaffTab() {
 
       <AddStaffModal
         visible={modalVisible}
+        selectedFacilityId = {selectedFacilityId}
         onClose={() => setModalVisible(false)}
         onSubmit={() => {
           setModalVisible(false);

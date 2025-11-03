@@ -16,7 +16,7 @@ import {
   getStaffShiftInfo
 } from '../../../utils/useApi';
 
-export default function AddStaffModal({ visible, onClose, onSubmit  }) {
+export default function AddStaffModal({ visible, onClose, onSubmit, selectedFacilityId }) {
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -30,20 +30,9 @@ export default function AddStaffModal({ visible, onClose, onSubmit  }) {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('aic'),
-      ]);
-  
-      const managerAic = (aicRaw || '').trim();
-
-      if (!managerAic) {
-        console.warn('fetchUsers: missing managerAic', { managerAic });
-        return;
-      }
-  
       const [allUsersRes, assignedUsersRes] = await Promise.all([
-        getAllUsersInRestau("admin"),
-        getStaffShiftInfo("admin", managerAic),
+        getAllUsersInRestau("facilities"),
+        getStaffShiftInfo("facilities", selectedFacilityId),
       ]);
   
       const allUsers = Array.isArray(allUsersRes) ? allUsersRes : [];
@@ -95,18 +84,7 @@ export default function AddStaffModal({ visible, onClose, onSubmit  }) {
   };
 
   const handleSubmit = async () => {
-    const [AIdRaw] = await Promise.all([
-      AsyncStorage.getItem('AId'),
-    ]);
-
-    const AId = (AIdRaw || '').trim();
-    if (!AId) {
-      console.warn('loadShifts: missing aic', { aic });
-      setStaffList([]);
-      return;
-    }
-
-    const result = await addStaffToManager("admin", AId, selectedUsers);
+    const result = await addStaffToManager("facilities", selectedFacilityId, selectedUsers);
     if (!result.error) {
       onSubmit(); 
     } else {

@@ -107,7 +107,6 @@ export default function AddStaffModal({ visible, onClose, onSubmit  }) {
     }
 
     const result = await addStaffToManager("facilities", aic, selectedUsers);
-    console.log()
     if (!result.error) {
       onSubmit(); 
     } else {

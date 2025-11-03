@@ -113,6 +113,9 @@ const AdminHomeTab = ({
   showViewDropdown,
   setShowViewDropdown,
   calendarDays,
+  selectedFacilityId,
+  selectedFacilityCompanyName,
+  onFacilityChange,
 }) => {
   const [weekStartDate, setWeekStartDate] = useState(new Date());
   const [dayDate, setDayDate] = useState(new Date());
@@ -137,8 +140,8 @@ const AdminHomeTab = ({
   const [djobList, setDjobList] = useState([]);
   const [transformedDjobList, setTransformedDjobList] = useState([]);
 
-  const [selectedFacilityId, setSelectedFacilityId] = useState(null);
-  const [selectedFacilityCompanyName, setSelectedFacilityCompanyName] = useState(null);
+  // const [selectedFacilityId, setSelectedFacilityId] = useState(null);
+  // const [selectedFacilityCompanyName, setSelectedFacilityCompanyName] = useState(null);
   const [facilityDjobList, setFacilityDjobList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isValueOptionFocus, setIsValueOptionFocus] = useState(false);
@@ -168,13 +171,23 @@ const AdminHomeTab = ({
     })();
   }, []);
 
+  useEffect(() => {
+    if (selectedFacilityId != null) {
+      const selectedFacility = facilities.find(
+        f => String(f.aic) === String(selectedFacilityId)
+      );
+      if (selectedFacility) {
+        handleFacilitySelect(selectedFacility);
+      }
+    }
+  }, [selectedFacilityId, facilities]);
+
   // useEffect(() => {
   //   console.log("selectedFacilityCompanyName:", selectedFacilityCompanyName);
   // }, [selectedFacilityCompanyName]);  
 
   const handleFacilitySelect = async (facilitiesList) => {
-    setSelectedFacilityId(facilitiesList.aic);
-    setSelectedFacilityCompanyName(facilitiesList.companyName);
+    onFacilityChange?.(facilitiesList.aic, facilitiesList.companyName);
     setBusyText('Loading…');
     setBootLoading(true);
   
@@ -203,30 +216,29 @@ const AdminHomeTab = ({
     }
   };
 
-  const fetchDjobList = async () => {
-    try {
-      const [AIdRaw] = await Promise.all([
-        AsyncStorage.getItem('AId'),
-      ]);
-      const AId = AIdRaw?.trim();
-      const response = await getAllDjob(AId);
-      const list = Array.isArray(response?.data) ? response?.data : [];
-      
-      if (Array.isArray(list) && list.length > 0) {
-        const transformed = await transformDjobListToMockEvents(list);
-        setDjobList(list); 
-        setTransformedDjobList(transformed);
-      } else {
-        console.log("djobList is not an array or is empty:", list);
-        setDjobList([]);
-        setTransformedDjobList({});
-      }
-    } catch (error) {
-      console.error("Error fetching djob list:", error);
-      setDjobList([]);
-      setTransformedDjobList({});
-    }
-  };
+  // const fetchDjobList = async () => {
+  //   try {
+  //     const [AIdRaw] = await Promise.all([
+  //       AsyncStorage.getItem('AId'),
+  //     ]);
+  //     const AId = AIdRaw?.trim();
+  //     const response = await getAllDjob(AId);
+  //     const list = Array.isArray(response?.data) ? response?.data : [];
+  //     if (Array.isArray(list) && list.length > 0) {
+  //       const transformed = await transformDjobListToMockEvents(list);
+  //       setDjobList(list); 
+  //       setTransformedDjobList(transformed);
+  //     } else {
+  //       console.log("djobList is not an array or is empty:", list);
+  //       setDjobList([]);
+  //       setTransformedDjobList({});
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching djob list:", error);
+  //     setDjobList([]);
+  //     setTransformedDjobList({});
+  //   }
+  // };
 
   const fetchFacilities = async () => {
     try {
@@ -238,45 +250,37 @@ const AdminHomeTab = ({
   };
 
   const fetchStaffInfo = async () => {
-    try {
-      const [AIdRaw] = await Promise.all([
-        AsyncStorage.getItem('AId'),
-      ]);
-      const AId = AIdRaw?.trim();
-      if (!AId) {
-        console.log('Missing AId:', {AId});
+    if(selectedFacilityId != null){
+      try {
+        const data = await getStaffShiftInfo("facilities", selectedFacilityId);
+        const list = Array.isArray(data) ? data : [];
+        setStaffList(list);
+        setShiftData(transformStaffListToMockEvents(list));
+      } catch (err) {
+        console.error('Error fetching staff list:', err);
         setStaffList([]);
         setShiftData({});
-        return;
       }
-  
-      const data = await getStaffShiftInfo("admin", AId);
-      const list = Array.isArray(data) ? data : [];
-      setStaffList(list);
-      setShiftData(transformStaffListToMockEvents(list));
-    } catch (err) {
-      console.error('Error fetching staff list:', err);
+    } else{
       setStaffList([]);
       setShiftData({});
     }
+   
   };
 
   const fetchShiftTypes = async () => {
-    try {
-      const [AIdRaw] = await Promise.all([
-        AsyncStorage.getItem("AId"),
-      ]);
-      const AId = Number.parseInt((AIdRaw || "").trim(), 10);
-      if (!Number.isFinite(AId)) {
+    if (selectedFacilityId != null ){
+      try {
+        const res = await getShiftTypes({ selectedFacilityId }, "facilities");
+        const types = Array.isArray(res?.shiftType) ? res.shiftType : [];
+        setShiftTypes(types);
+      } catch (err) {
         setShiftTypes([]);
-        return;
       }
-      const res = await getShiftTypes({ AId }, "admin");
-      const types = Array.isArray(res?.shiftType) ? res.shiftType : [];
-      setShiftTypes(types);
-    } catch (err) {
+    }else{
       setShiftTypes([]);
     }
+   
   };
 
   const ensurePrereqs = async () => {

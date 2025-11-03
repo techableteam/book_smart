@@ -72,7 +72,7 @@ const parseTime = (input) => {
 };
 
 export default function AdminShiftDetailScreen({ route, navigation }) {
-  const { shift } = route.params;
+  const { shift, selectedFacilityId } = route.params || {};
 
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState(shift.name);
@@ -111,17 +111,9 @@ export default function AdminShiftDetailScreen({ route, navigation }) {
 
   const saveChanges = async () => {
     try {
-      const [aicRaw] = await Promise.all([
-        AsyncStorage.getItem('AId'),
-      ]);
-      const aic = Number.parseInt(aicRaw ?? '', 10);
-      if (Number.isNaN(aic)) {
-        console.warn('saveChanges: invalid aic', { aicRaw});
-        return;
-      }
-
+ 
       const body = {
-        AId : aic,
+        aic : selectedFacilityId,
         shiftId: shift.id,
         updatedShift: {
           name,
@@ -130,7 +122,7 @@ export default function AdminShiftDetailScreen({ route, navigation }) {
         },
       };
 
-      const res = await updateShiftType(body, "admin");
+      const res = await updateShiftType(body, "facilities");
       if (res?.error) {
         console.warn('Update failed:', res.error);
         return;
@@ -158,20 +150,11 @@ export default function AdminShiftDetailScreen({ route, navigation }) {
         style: 'destructive',
         onPress: async () => {
           try {
-            const [aicRaw] = await Promise.all([
-              AsyncStorage.getItem('AId'),
-            ]);
-            const aic = Number.parseInt(aicRaw ?? '', 10);
-            if (Number.isNaN(aic)) {
-              console.warn('deleteShift: invalid aic', { aicRaw });
-              return;
-            }
-
-            const body = { AId : aic, shiftId: shift.id };
-            const res = await deleteShiftType(body, "admin");
+            const body = { aic : selectedFacilityId, shiftId: shift.id };
+            const res = await deleteShiftType(body, "facilities");
 
             if (!res?.error) {
-              navigation.navigate('SchedulerScreen', {
+              navigation.navigate('AdminTeamScheduler', {
                 screen: 'ShiftTab',
               });
             } else {

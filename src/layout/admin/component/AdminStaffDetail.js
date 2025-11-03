@@ -18,8 +18,8 @@ import { deleteStaffFromManager } from '../../../utils/useApi';
 
 const { width, height } = Dimensions.get('window');
 
-export default function AdminStaffDetail({ route,  navigation}) {
-  const { staff } = route.params;
+export default function AdminStaffDetail({ route,  navigation, }) {
+  const { staff, selectedFacilityId } = route.params;
 
   return (
     <View style={styles.container}>
@@ -46,18 +46,9 @@ export default function AdminStaffDetail({ route,  navigation}) {
                           style: 'destructive',
                           onPress: async () => {
                             try {
-                              const [aicRaw] = await Promise.all([
-                                AsyncStorage.getItem('AId'),
-                              ]);
-                              const managerAic = Number.parseInt(aicRaw ?? '', 10);
-                              if (Number.isNaN(managerAic)) {
-                                console.warn('fetchUsers: missing managerAic', { managerAic });
-                                return;
-                              }
-                
                               const result = await deleteStaffFromManager(
-                                "admin",
-                                String(managerAic),
+                                "facilities",
+                                String(selectedFacilityId),
                                 staff.id
                               );
                 
