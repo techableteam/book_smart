@@ -53,17 +53,7 @@ export default function AddNewShiftModal({
 
   const fetchShiftTypes = async () => {
     try {
-      const [AIdRaw] = await Promise.all([
-        AsyncStorage.getItem('AId'),
-      ]);
-      const AId = Number.parseInt((AIdRaw || '').trim(), 10);
-      if (!Number.isFinite(AId)) {
-        console.log('fetchShiftTypes: missing/invalid aic', { AId });
-        setShiftTypes([]);
-        return;
-      }
-      const userData = {AId};
-      const response = await getShiftTypes(userData, "admin");
+      const response = await getShiftTypes({ aic : selectedFacilitiesId }, "facilities");
       const types = Array.isArray(response?.shiftType) ? response.shiftType : [];
       if (!types.length) {
         console.log('ShiftTypes API returned empty or invalid list:', response);

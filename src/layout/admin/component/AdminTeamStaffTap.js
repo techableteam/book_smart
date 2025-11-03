@@ -53,7 +53,7 @@ export default function AdminStaffTab({ selectedFacilityId, selectedFacilityComp
           shifts: Array.isArray(user?.shifts) ? user.shifts : [],
           active: Boolean(user?.active ?? true),
         }));
-    
+     
         setStaffList(list);
       } catch (err) {
         console.error('Failed to fetch staff shift info:', err);

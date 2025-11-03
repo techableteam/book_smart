@@ -225,7 +225,6 @@ export const getStaffShiftInfo = async (endpoint, managerAic) => {
         },
       }
     );
-
     if (response.data && response.data.staffInfo) {
       return response.data.staffInfo;
     } else {
@@ -240,8 +239,6 @@ export const getStaffShiftInfo = async (endpoint, managerAic) => {
 export const addStaffToManager = async (endpoint, managerAic, staffList) => {
   try {
     const token = await AsyncStorage.getItem('token');
-    console.log(managerAic);
-    console.log(staffList);
     const response = await axios.post(
       `/api/${endpoint}/addStaffToManager`, {
       managerAic,
@@ -259,7 +256,6 @@ export const addStaffToManager = async (endpoint, managerAic, staffList) => {
 };
 
 export const deleteShiftType = async (body, endpoint) => {
-  console.log(body);
   try {
     const token = await AsyncStorage.getItem('token');
     const response = await axios.post(`/api/${endpoint}/deleteShiftType`, body, {

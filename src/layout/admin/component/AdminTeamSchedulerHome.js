@@ -152,6 +152,8 @@ const AdminHomeTab = ({
     return [s || '', e || ''];
   }, [selectedEvent?.time]);
 
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
   useEffect(() => {
     (async () => {
       setBusyText('Loading…');
@@ -164,6 +166,7 @@ const AdminHomeTab = ({
           fetchFacilities(),
           // fetchDjobList()
         ]);
+        setIsDataLoaded(true);
       } finally {
         setBootLoading(false);
         setBusyText('');
@@ -182,31 +185,51 @@ const AdminHomeTab = ({
     }
   }, [selectedFacilityId, facilities]);
 
-  // useEffect(() => {
-  //   console.log("selectedFacilityCompanyName:", selectedFacilityCompanyName);
-  // }, [selectedFacilityCompanyName]);  
-
-  const handleFacilitySelect = async (facilitiesList) => {
-    onFacilityChange?.(facilitiesList.aic, facilitiesList.companyName);
-    setBusyText('Loading…');
-    setBootLoading(true);
-  
-    const result = await getDjobForFacilitiesById(facilitiesList.aic);
-    const list = Array.isArray(result?.data) ? result?.data : []
-    if (Array.isArray(list) && list.length > 0) {
-      const transformed = await transformDjobListToMockEvents(list);
-      setFacilityDjobList(list); 
-      setTransformedDjobList(transformed);
-    } else {
-      console.log("djobList is not an array or is empty:", list);
-      setFacilityDjobList([]);
-      setTransformedDjobList({});
+  const handleFacilitySelect = async (selectedFacility) => {
+    // Early exit if no valid facility is selected
+    if (!selectedFacility || !selectedFacility.aic) {
+      console.error('Invalid facility selected');
+      return;
     }
-    setBootLoading(false);
-    setBusyText('');
+  
+    try {
+      onFacilityChange?.(selectedFacility.aic, selectedFacility.companyName);
+  
+      // Set loading state
+      setBusyText('Loading…');
+      setBootLoading(true);
+  
+      const djobResult = await getDjobForFacilitiesById(selectedFacility.aic);
+      if (Array.isArray(djobResult?.data) && djobResult?.data.length > 0) {
+        const transformedDjobList = await transformDjobListToMockEvents(djobResult.data);
+        setFacilityDjobList(djobResult.data);
+        setTransformedDjobList(transformedDjobList);
+      } else {
+        console.log("Djob list is empty or not in the expected format");
+        setFacilityDjobList([]);
+        setTransformedDjobList([]);
+      }
+
+      const data = await getStaffShiftInfo("facilities", selectedFacility.aic);
+      const list = Array.isArray(data) ? data : [];
+      setStaffList(list);
+
+      const res = await getShiftTypes({ aic : selectedFacility.aic }, "facilities");
+      const types = Array.isArray(res?.shiftType) ? res.shiftType : [];
+      setShiftTypes(types);
+
+     
+    } catch (error) {
+      // Improved error handling
+      console.error('Error handling facility select:', error);
+      Alert.alert('Error', 'Failed to load facility data. Please try again.');
+    } finally {
+      // Reset loading state
+      setBootLoading(false);
+      setBusyText('');
+    }
   };
   
-
   const fetchDegrees = async () => {
     try {
       const list = await getDegreeListInAdmin('degree');
@@ -215,30 +238,6 @@ const AdminHomeTab = ({
       setDegrees([]);
     }
   };
-
-  // const fetchDjobList = async () => {
-  //   try {
-  //     const [AIdRaw] = await Promise.all([
-  //       AsyncStorage.getItem('AId'),
-  //     ]);
-  //     const AId = AIdRaw?.trim();
-  //     const response = await getAllDjob(AId);
-  //     const list = Array.isArray(response?.data) ? response?.data : [];
-  //     if (Array.isArray(list) && list.length > 0) {
-  //       const transformed = await transformDjobListToMockEvents(list);
-  //       setDjobList(list); 
-  //       setTransformedDjobList(transformed);
-  //     } else {
-  //       console.log("djobList is not an array or is empty:", list);
-  //       setDjobList([]);
-  //       setTransformedDjobList({});
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching djob list:", error);
-  //     setDjobList([]);
-  //     setTransformedDjobList({});
-  //   }
-  // };
 
   const fetchFacilities = async () => {
     try {
@@ -271,7 +270,7 @@ const AdminHomeTab = ({
   const fetchShiftTypes = async () => {
     if (selectedFacilityId != null ){
       try {
-        const res = await getShiftTypes({ selectedFacilityId }, "facilities");
+        const res = await getShiftTypes({ aic : selectedFacilityId }, "facilities");
         const types = Array.isArray(res?.shiftType) ? res.shiftType : [];
         setShiftTypes(types);
       } catch (err) {
@@ -283,17 +282,43 @@ const AdminHomeTab = ({
    
   };
 
+  // const ensurePrereqs = async () => {
+  //   if (!isDataLoaded) {
+  //     console.log("Waiting for data to load...");
+  //     return { needShiftTypes: true, needStaff: true }; 
+  //   }
+  //   setBusyText('Loading…');
+  //   setBootLoading(true);
+  //   try {
+  //     await Promise.all([
+  //       fetchStaffInfo(), 
+  //       fetchShiftTypes(), 
+  //     ]);
+  //   } finally {
+  //     setBootLoading(false);
+  //     setBusyText('');
+  //   }
+
+  //   console.log(shiftTypes);
+  //   console.log(staffList);
+
+  //   let needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
+  //   let needStaff      = !Array.isArray(staffList)  || staffList.length === 0;
+
+  //   return { needShiftTypes, needStaff };
+  // };
+
+
   const ensurePrereqs = async () => {
-    let needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
-    let needStaff      = !Array.isArray(staffList)  || staffList.length === 0;
-    if (needShiftTypes) {
-      await fetchShiftTypes();
-      needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
+    if (!isDataLoaded) {
+      return { needShiftTypes: true, needStaff: true }; // do not proceed if data is not loaded
     }
-    if (needStaff) {
-      await fetchStaffInfo();
-      needStaff = !Array.isArray(staffList) || staffList.length === 0;
-    }
+    console.log(shiftTypes);
+    console.log(staffList);
+
+    const needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
+    const needStaff = !Array.isArray(staffList) || staffList.length === 0;
+
     return { needShiftTypes, needStaff };
   };
 
