@@ -32,18 +32,43 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
   const isSubmitDisabled =
   !degrees || Object.keys(selectedShifts).length === 0 || Object.values(selectedShifts).every((shiftsArray) => shiftsArray.length === 0);
 
+  // --- NEW: helper to get selected degree name (used for filtering staff)
+  const selectedDegreeName = React.useMemo(() => {
+    if (!degrees) return '';
+    const found = degreelist?.find(d => String(d.Did) === String(degrees));
+    return (found?.degreeName || '').trim();
+  }, [degrees, degreelist]);
 
   useEffect(() => {
     if (visible) {
       fetchShiftTypes();
-      const formatted = staffList.map((emp) => ({
-        label: `${emp.firstName} ${emp.lastName}`,
-        value: emp.id.toString(),
-      }));
-      setEmployeeList(formatted);
+      // When opening, don't pre-populate staff until a degree is chosen
+      setSelectedEmployee('');
+      setEmployeeList([]);
       setSelectedShifts({});
     }
   }, [visible]);
+
+  // --- NEW: whenever degree changes, (1) reset selected staff, (2) filter staff by userRole
+  useEffect(() => {
+    // Clear any previously selected staff when degree changes
+    setSelectedEmployee('');
+
+    if (!degrees || !selectedDegreeName) {
+      setEmployeeList([]);
+      return;
+    }
+
+    // Filter staff by userRole matching degreeName (case-insensitive)
+    const filtered = (staffList || [])
+      .filter(emp => (emp?.userRole || '').trim().toLowerCase() === selectedDegreeName.toLowerCase())
+      .map(emp => ({
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: String(emp.id),
+      }));
+
+    setEmployeeList(filtered);
+  }, [degrees, selectedDegreeName, staffList]);
 
   const fetchShiftTypes = async () => {
     try {
@@ -173,7 +198,9 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add next week's Shifts</Text>
 
-          <Text style={styles.label}>Degree</Text>
+          <Text style={styles.label}>
+            Degree <Text style={{ color: 'red' }}>*</Text>
+          </Text>
           <Dropdown
             style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
@@ -189,20 +216,32 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
             valueField="value"
             placeholder="Select Degree"
             value={degrees}
-            onChange={item => setDegrees(item.value)}
+            onChange={item => {
+              setDegrees(item.value);
+              // selectedEmployee will be reset and list recalculated in useEffect
+            }}
             disabled={isLoading}
           />
 
           <Text style={styles.label}>Staff</Text>
           <Dropdown
-            style={styles.dropdown}
+            style={[
+              styles.dropdown,
+              !degrees && { backgroundColor: '#f2f2f2' },
+            ]}
+            containerStyle={styles.dropdownContainer}
+            placeholderStyle={styles.dropdownPlaceholder}
+            selectedTextStyle={styles.dropdownSelectedText}
+            itemTextStyle={styles.dropdownItemText}
             data={employeeList}
+            maxHeight={200}
             labelField="label"
             valueField="value"
-            placeholder="Select Staff"
+            placeholder={degrees ? (employeeList.length ? 'Select Staff' : 'No matching staff') : 'Select Degree first'}
             value={selectedEmployee}
             onChange={(item) => setSelectedEmployee(item.value)}
-            disabled={isLoading}
+            // react-native-element-dropdown uses "disable" prop (not "disabled")
+            disable={!degrees || isLoading}
           />
 
           {isLoading && (
@@ -305,6 +344,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 16,
+  },
+  dropdownContainer: {
+    borderRadius: 4,
+    borderColor: '#C4C4C4',
+  },
+  dropdownPlaceholder: {
+    color: '#999',
+    fontSize: 16,
+  },
+  dropdownSelectedText: {
+    color: '#000',
+    fontSize: 16,
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    color: '#000',
   },
   shiftRow: {
     flexDirection: 'row',

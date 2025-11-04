@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   View,
@@ -38,21 +38,49 @@ export default function AddWeeklyShiftsModal({
   const [degrees, setDegrees] = useState('');
   const [isLoading, setIsLoading] = useState(false);  
   const nextWeekDates = getNextWeekDates();
+
+  // --- NEW: resolve selected degree's name for filtering staff
+  const selectedDegreeName = useMemo(() => {
+    if (!degrees) return '';
+    const found = (degreelist || []).find(d => String(d.Did) === String(degrees));
+    return (found?.degreeName || '').trim();
+  }, [degrees, degreelist]);
   
+  // --- UPDATED: Submit requires degree, at least one shift, and staff
   const isSubmitDisabled =
-  !degrees || Object.keys(selectedShifts).length === 0 || Object.values(selectedShifts).every((shiftsArray) => shiftsArray.length === 0);
+    !degrees ||
+    !selectedEmployee ||
+    Object.keys(selectedShifts).length === 0 ||
+    Object.values(selectedShifts).every((arr) => (arr || []).length === 0);
 
   useEffect(() => {
     if (visible) {
       fetchShiftTypes();
-      const formatted = staffList.map((emp) => ({
-        label: `${emp.firstName} ${emp.lastName}`,
-        value: emp.id.toString(),
-      }));
-      setEmployeeList(formatted);
+      // reset weekly selection
       setSelectedShifts({});
+      // reset staff gating each time modal opens
+      setSelectedEmployee('');
+      setEmployeeList([]);
     }
   }, [visible]);
+
+  // --- NEW: when degree changes, reset selected staff and filter by userRole
+  useEffect(() => {
+    setSelectedEmployee('');
+    if (!degrees || !selectedDegreeName) {
+      setEmployeeList([]);
+      return;
+    }
+
+    const filtered = (staffList || [])
+      .filter(emp => (emp?.userRole || '').trim().toLowerCase() === selectedDegreeName.toLowerCase())
+      .map(emp => ({
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: String(emp.id),
+      }));
+
+    setEmployeeList(filtered);
+  }, [degrees, selectedDegreeName, staffList]);
 
   const fetchShiftTypes = async () => {
     try {
@@ -94,6 +122,14 @@ export default function AddWeeklyShiftsModal({
 
   const handleSubmit = async () => {
     try {
+      if (!degrees) {
+        Alert.alert('Missing degree', 'Please select a degree first.');
+        return;
+      }
+      if (!selectedEmployee) {
+        Alert.alert('Missing staff', 'Please select a staff member.');
+        return;
+      }
       if (!selectedShifts || Object.keys(selectedShifts).length === 0) {
         Alert.alert('No shifts selected', 'Please pick at least one shift.');
         return;
@@ -141,7 +177,7 @@ export default function AddWeeklyShiftsModal({
       for (const shift of shifts) {
         try {
           const result = await createDJob({
-            shiftPayload: shift,
+            shiftPayload: shift, // keeping your existing API shape
             degreeId: degrees,
             facilityId: selectedFacilitiesId,
             staffId: selectedEmployee,
@@ -195,27 +231,9 @@ export default function AddWeeklyShiftsModal({
               borderRadius: 6,
             }]}
             placeholder="No Selected Facility"
-            value = {selectedFacilitiescompanyName}
+            value={selectedFacilitiescompanyName}
             editable={false}
           />
-          {/* <Dropdown
-            style={styles.dropdown}
-            containerStyle={styles.dropdownContainer}
-            placeholderStyle={styles.dropdownPlaceholder}
-            selectedTextStyle={styles.dropdownSelectedText}
-            itemTextStyle={styles.dropdownItemText}
-            data={facilitieslist.map(facility => ({
-              label: facility.companyName,
-              value: facility.aic, 
-            }))}
-            maxHeight={200}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Facility"
-            value={facilities}
-            onChange={item => setFacilities(item.value)}
-            disabled={isLoading}
-          /> */}
 
           <Text style={styles.label}>
             Degree <Text style={{ color: 'red' }}>*</Text>
@@ -226,7 +244,7 @@ export default function AddWeeklyShiftsModal({
             placeholderStyle={styles.dropdownPlaceholder}
             selectedTextStyle={styles.dropdownSelectedText}
             itemTextStyle={styles.dropdownItemText}
-            data={degreelist.map(degree => ({
+            data={(degreelist || []).map(degree => ({
               label: degree.degreeName,
               value: degree.Did, 
             }))}
@@ -236,19 +254,27 @@ export default function AddWeeklyShiftsModal({
             placeholder="Select Degree"
             value={degrees}
             onChange={item => setDegrees(item.value)}
-            disabled={isLoading}
+            disable={isLoading}
           />
 
           <Text style={styles.label}>Staff</Text>
           <Dropdown
-            style={styles.dropdown}
+            style={[
+              styles.dropdown,
+              (!degrees || isLoading) && { backgroundColor: '#f2f2f2' },
+            ]}
             data={employeeList}
             labelField="label"
             valueField="value"
-            placeholder="Select Staff"
+            placeholder={
+              !degrees
+                ? 'Select Degree first'
+                : (employeeList.length ? 'Select Staff' : 'No matching staff')
+            }
             value={selectedEmployee}
             onChange={(item) => setSelectedEmployee(item.value)}
-            disabled={isLoading}
+            // element-dropdown prop is "disable"
+            disable={isLoading || !degrees}
           />
 
           {isLoading && (
@@ -287,20 +313,16 @@ export default function AddWeeklyShiftsModal({
             </ScrollView>
           </View>
 
-         
-
-          
-
           <View style={styles.footer}>
             <TouchableOpacity
-                style={[
-                    styles.submitButton,
-                    isSubmitDisabled && { opacity: 0.5 }
-                ]}
-                onPress={handleSubmit}
-                disabled={isSubmitDisabled}
+              style={[
+                styles.submitButton,
+                isSubmitDisabled && { opacity: 0.5 }
+              ]}
+              onPress={handleSubmit}
+              disabled={isSubmitDisabled}
             >
-                <Text style={styles.submitText}>Submit</Text>
+              <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={onClose}>

@@ -33,23 +33,55 @@ export default function AddNewShiftModal({
 }) {
   const [shiftTypes, setShiftTypes] = useState([]);
   const [selectedShift, setSelectedShift] = useState(null);
+
+  // Staff-related state
   const [employeeList, setEmployeeList] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
+
+  // Date + pickers
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Facility + Degree
   const [facilities, setFacilities] = useState('');
   const [degrees, setDegrees] = useState('');
 
+  // --- NEW: helper to get selected degree name (used for filtering staff)
+  const selectedDegreeName = React.useMemo(() => {
+    if (!degrees) return '';
+    const found = degreelist?.find(d => String(d.Did) === String(degrees));
+    return (found?.degreeName || '').trim();
+  }, [degrees, degreelist]);
+
   useEffect(() => {
-    if (visible && staffList.length > 0) {
-      const formatted = staffList.map((emp) => ({
-        label: `${emp.firstName} ${emp.lastName}`,
-        value: emp.id.toString(),
-      }));
-      setEmployeeList(formatted);
+    if (visible) {
+      fetchShiftTypes();
+      // When opening, don't pre-populate staff until a degree is chosen
+      setSelectedEmployee('');
+      setEmployeeList([]);
     }
-    fetchShiftTypes();
-  }, [visible, staffList]);
+  }, [visible]);
+
+  // --- NEW: whenever degree changes, (1) reset selected staff, (2) filter staff by userRole
+  useEffect(() => {
+    // Clear any previously selected staff when degree changes
+    setSelectedEmployee('');
+
+    if (!degrees || !selectedDegreeName) {
+      setEmployeeList([]);
+      return;
+    }
+
+    // Filter staff by userRole matching degreeName (case-insensitive)
+    const filtered = (staffList || [])
+      .filter(emp => (emp?.userRole || '').trim().toLowerCase() === selectedDegreeName.toLowerCase())
+      .map(emp => ({
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: String(emp.id),
+      }));
+
+    setEmployeeList(filtered);
+  }, [degrees, selectedDegreeName, staffList]);
 
   const fetchShiftTypes = async () => {
     try {
@@ -63,14 +95,13 @@ export default function AddNewShiftModal({
       setShiftTypes([]);
     }
   };
-  
 
   const handleSubmit = async () => {
-    if ( !selectedShift || !selectedDate || !degrees) {
+    if (!selectedShift || !selectedDate || !degrees) {
       alert('Please make sure all required fields are filled');
       return;
     }
-  
+
     const selectedShiftObj = shiftTypes.find(
       (s) => String(s.id) === String(selectedShift)
     );
@@ -78,27 +109,27 @@ export default function AddNewShiftModal({
       alert('Invalid shift selected');
       return;
     }
-  
+
     try {
       const [AIdRaw] = await Promise.all([
         AsyncStorage.getItem('AId'),
       ]);
       const AId = Number.parseInt((AIdRaw || '').trim(), 10);
-  
+
       if (!Number.isFinite(AId)) {
         console.warn('Missing AId:', {AId});
         return;
       }
-  
+
       const d = selectedDate instanceof Date ? selectedDate : new Date(selectedDate);
       const formattedDate = d.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
-  
+
       const formattedTime = `${selectedShiftObj.start} ➔ ${selectedShiftObj.end}`;
-  
+
       const shiftPayload = [
         {
           date: formattedDate,
@@ -129,7 +160,7 @@ export default function AddNewShiftModal({
       alert('Failed to submit shift. Please try again.');
     }
   };
-  
+
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.backdrop}>
@@ -138,7 +169,7 @@ export default function AddNewShiftModal({
 
           <Text style={styles.label}>Facility</Text>
           <TextInput
-             style={[styles.inputBox, { 
+            style={[styles.inputBox, { 
               fontSize: 16, 
               color: 'black', 
               backgroundColor: '#f4f4f4',
@@ -147,26 +178,9 @@ export default function AddNewShiftModal({
               borderRadius: 6,
             }]}
             placeholder="No Selected Facility"
-            value = {selectedFacilitiescompanyName}
+            value={selectedFacilitiescompanyName}
             editable={false}
           />
-          {/* <Dropdown
-            style={styles.dropdown}
-            containerStyle={styles.dropdownContainer}
-            placeholderStyle={styles.dropdownPlaceholder}
-            selectedTextStyle={styles.dropdownSelectedText}
-            itemTextStyle={styles.dropdownItemText}
-            data={facilitieslist.map(facility => ({
-              label: facility.companyName,
-              value: facility.aic, 
-            }))}
-            maxHeight={200}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Facility"
-            value={facilities}
-            onChange={item => setFacilities(item.value)}
-          /> */}
 
           <Text style={styles.label}>
             Degree <Text style={{ color: 'red' }}>*</Text>
@@ -179,19 +193,25 @@ export default function AddNewShiftModal({
             itemTextStyle={styles.dropdownItemText}
             data={degreelist.map(degree => ({
               label: degree.degreeName,
-              value: degree.Did, // Assuming `id` is the ID for the degree
+              value: degree.Did,
             }))}
             maxHeight={200}
             labelField="label"
             valueField="value"
             placeholder="Select Degree"
             value={degrees}
-            onChange={item => setDegrees(item.value)}
+            onChange={item => {
+              setDegrees(item.value);
+              // selectedEmployee will be reset and list recalculated in useEffect
+            }}
           />
 
           <Text style={styles.label}>Staff</Text>
           <Dropdown
-            style={styles.dropdown}
+            style={[
+              styles.dropdown,
+              !degrees && { backgroundColor: '#f2f2f2' },
+            ]}
             containerStyle={styles.dropdownContainer}
             placeholderStyle={styles.dropdownPlaceholder}
             selectedTextStyle={styles.dropdownSelectedText}
@@ -200,75 +220,79 @@ export default function AddNewShiftModal({
             maxHeight={200}
             labelField="label"
             valueField="value"
-            placeholder="Select Staff"
+            placeholder={degrees ? (employeeList.length ? 'Select Staff' : 'No matching staff') : 'Select Degree first'}
             value={selectedEmployee}
             onChange={item => setSelectedEmployee(item.value)}
+            // react-native-element-dropdown uses "disable" prop (not "disabled")
+            disable={!degrees}
           />
 
           <Text style={styles.label}>Day</Text>
           <TouchableOpacity onPress={() => setShowDatePicker(true)}>
             <TextInput
-                mode="outlined"
-                placeholder="mm/dd/yyyy"
-                value={selectedDate.toLocaleDateString()}
-                editable={false}
-                pointerEvents="none"
-                style={styles.inputBox}
+              mode="outlined"
+              placeholder="mm/dd/yyyy"
+              value={selectedDate.toLocaleDateString()}
+              editable={false}
+              pointerEvents="none"
+              style={styles.inputBox}
             />
-            </TouchableOpacity>
+          </TouchableOpacity>
 
-            <DatePicker
-              modal
-              open={showDatePicker}
-              date={selectedDate}
-              mode="date"
-              onConfirm={(date) => {
-                  setShowDatePicker(false);
-                  setSelectedDate(date);
-              }}
-              onCancel={() => setShowDatePicker(false)}
-            />
+          <DatePicker
+            modal
+            open={showDatePicker}
+            date={selectedDate}
+            mode="date"
+            onConfirm={(date) => {
+              setShowDatePicker(false);
+              setSelectedDate(date);
+            }}
+            onCancel={() => setShowDatePicker(false)}
+          />
 
-            <Text style={styles.label}>
-              Shift <Text style={{ color: 'red' }}>*</Text>
-            </Text>
-            <View style={styles.shiftScrollBox}>
-              <ScrollView
-                contentContainerStyle={styles.shiftListContent}
-                nestedScrollEnabled
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator
-              >
-                <View style={styles.shiftOptions}>
-                  {shiftTypes.map((shift) => (
-                    <TouchableOpacity
-                      key={shift.id}
+          <Text style={styles.label}>
+            Shift <Text style={{ color: 'red' }}>*</Text>
+          </Text>
+          <View style={styles.shiftScrollBox}>
+            <ScrollView
+              contentContainerStyle={styles.shiftListContent}
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator
+            >
+              <View style={styles.shiftOptions}>
+                {shiftTypes.map((shift) => (
+                  <TouchableOpacity
+                    key={shift.id}
+                    style={[
+                      styles.shiftButton,
+                      selectedShift === shift.id && styles.shiftButtonSelected,
+                    ]}
+                    onPress={() => setSelectedShift(shift.id)}
+                  >
+                    <Text
                       style={[
-                        styles.shiftButton,
-                        selectedShift === shift.id && styles.shiftButtonSelected,
+                        styles.shiftText,
+                        selectedShift === shift.id && styles.shiftTextSelected,
                       ]}
-                      onPress={() => setSelectedShift(shift.id)}
                     >
-                      <Text
-                        style={[
-                          styles.shiftText,
-                          selectedShift === shift.id && styles.shiftTextSelected,
-                        ]}
-                      >
-                        {shift.start} ➔ {shift.end}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-
+                      {shift.start} ➔ {shift.end}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
 
           <View style={styles.footer}>
             <TouchableOpacity 
-              style={[styles.submitButton, { backgroundColor: selectedShift && selectedDate && degrees ? '#290135' : '#ccc' }]} 
+              style={[
+                styles.submitButton, 
+                { backgroundColor: selectedShift && selectedDate && degrees ? '#290135' : '#ccc' }
+              ]} 
               onPress={handleSubmit}
-              disabled={!selectedShift || !selectedDate || !degrees} // Disable button when any of the required fields are empty
+              disabled={!selectedShift || !selectedDate || !degrees || !selectedEmployee}
             >
               <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
@@ -366,27 +390,22 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 16,
   },
-  
   dropdownContainer: {
     borderRadius: 4,
     borderColor: '#C4C4C4',
   },
-  
   dropdownPlaceholder: {
     color: '#999',
     fontSize: 16,
   },
-  
   dropdownSelectedText: {
     color: '#000',
     fontSize: 16,
   },
-  
   dropdownItemText: {
     fontSize: 16,
     color: '#000',
   },
-
   inputBox: {
     height: 45,
     borderWidth: 1,
@@ -407,14 +426,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 20,
   },
-
   shiftListContent: {
     padding: 10,
-  },
-
-  shiftOptions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
   },
 });
