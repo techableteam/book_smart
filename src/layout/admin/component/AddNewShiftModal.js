@@ -89,7 +89,7 @@ export default function AddNewShiftModal({
       })
       .map(emp => ({
         label: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
-        value: String(emp.id),
+        value: String(emp.aic),
       }));
 
     setEmployeeList(filtered);

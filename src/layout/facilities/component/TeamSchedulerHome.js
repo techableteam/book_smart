@@ -51,21 +51,23 @@ const BusyOverlay = ({ visible, text }) => {
 
 const normalizeStatus = (s) => {
   const v = (s || '').toLowerCase();
+  if (v === 'applied') return 'APPLIED';
   if (v === 'pending') return 'PENDING';
   if (v === 'accept' || v === 'approved' || v === 'approve') return 'APPROVED';
   if (v === 'reject' || v === 'rejected') return 'REJECTED';
   if (v === 'cancel' || v === 'cancelled') return 'CANCELLED';
-  return v ? v.toUpperCase() : 'PENDING';
+  return v ? v.toUpperCase() : 'APPLIED';
 };
 
 const statusColors = (label) => {
   switch (label) {
     case 'NOTSELECT':   return { bg: '#808080', fg: '#E5E7EB' };
-    case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
-    case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
-    case 'REJECTED':  return { bg: '#DC2626', fg: '#991B1B' };
-    case 'CANCELLED': return { bg: '#E5E7EB', fg: '#374151' };
-    default:          return { bg: '#EEE',    fg: '#000'     };
+    case 'APPLIED':     return { bg: '#DBEAFE', fg: '#1E40AF' };
+    case 'PENDING':     return { bg: '#FFC107', fg: '#A16207' };
+    case 'APPROVED':    return { bg: '#DCFCE7', fg: '#166534' };
+    case 'REJECTED':    return { bg: '#DC2626', fg: '#991B1B' };
+    case 'CANCELLED':   return { bg: '#E5E7EB', fg: '#374151' };
+    default:            return { bg: '#EEE',    fg: '#000'     };
   }
 };
 

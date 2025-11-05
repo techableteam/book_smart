@@ -21,7 +21,8 @@ const FOOTER_HEIGHT = RFValue(130);
 
 const statusStyle = (status) => {
   switch (status) {
-    case 'PENDING':   return { bg: '#FEF9C3', fg: '#A16207' };
+    case 'APPLIED':   return { bg: '#DBEAFE', fg: '#1E40AF' };
+    case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
     case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
     case 'REJECTED':  return { bg: '#FEE2E2', fg: '#991B1B' };
     case 'CANCELLED': return { bg: '#E5E7EB', fg: '#374151' };
@@ -31,11 +32,12 @@ const statusStyle = (status) => {
 
 const normalizeStatus = (s) => {
   const v = (s || '').toLowerCase();
+  if (v === 'applied') return 'APPLIED';
   if (v === 'pending') return 'PENDING';
   if (v === 'accept' || v === 'approved' || v === 'approve') return 'APPROVED';
   if (v === 'reject' || v === 'rejected') return 'REJECTED';
   if (v === 'cancel' || v === 'cancelled') return 'CANCELLED';
-  return 'PENDING';
+  return 'APPLIED';
 };
 
 const mapApiItem = (api) => ({

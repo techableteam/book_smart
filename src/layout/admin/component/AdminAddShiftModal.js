@@ -64,7 +64,6 @@ export default function AdminAddShiftModal({ visible, onClose, onReload, selecte
       return;
     }
 
-    console.log(selectedFacilityId);
 
     try {
       const body = {
@@ -73,7 +72,6 @@ export default function AdminAddShiftModal({ visible, onClose, onReload, selecte
         start: formatTime(startTime),
         end: formatTime(endTime),
       };
-      console.log(body);
       const response = await addShiftType(body, "facilities");
       if (response?.error) {
         setError('Failed to add shift.');

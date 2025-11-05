@@ -24,6 +24,7 @@ const FOOTER_HEIGHT = RFValue(130);
 const statusStyle = (status) => {
   switch ((status || '').toUpperCase()) {
     case 'NOTSELECT': return { bg: '#808080', fg: '#E5E7EB' };
+    case 'APPLIED':   return { bg: '#DBEAFE', fg: '#1E40AF' };
     case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
     case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
     case 'REJECTED':  return { bg: '#FEE2E2', fg: '#991B1B' };
@@ -36,11 +37,12 @@ const statusStyle = (status) => {
 const normalizeStatus = (s) => {
   const v = (s || '').toLowerCase();
   if (v === 'notselect') return 'NOTSELECT';
+  if (v === 'applied') return 'APPLIED';
   if (v === 'pending') return 'PENDING';
   if (['accept', 'approved', 'approve'].includes(v)) return 'APPROVED';
   if (['reject', 'rejected'].includes(v)) return 'REJECTED';
   if (['cancel', 'cancelled'].includes(v)) return 'CANCELLED';
-  return 'PENDING';
+  return 'APPLIED';
 };
 
 // 🟣 map API data → UI format
@@ -116,7 +118,8 @@ export default function ClientGeneratedShift() {
 
       // map UI actions to backend values
       let mappedStatus = next;
-      if (next === 'request') mappedStatus = 'pending';
+      if (next === 'apply') mappedStatus = 'pending';
+      else if (next === 'close') mappedStatus = 'reject';
       else if (next === 'accept') mappedStatus = 'accept';
       else if (next === 'reject') mappedStatus = 'reject';
       else if (next === 'cancel') mappedStatus = 'cancel';
@@ -159,14 +162,14 @@ export default function ClientGeneratedShift() {
       statusU === 'REJECTED' ||
       statusU === 'CANCELLED';
 
-    // 👇 Treat NOTSELECT like unassigned → show Request button
-    const canRequest = (isUnassigned || statusU === 'NOTSELECT') && !isFinal;
+    // Show "Apply" button for NOTSELECT status
+    const canApply = statusU === 'NOTSELECT' && !isFinal;
 
-    // 👇 Accept/Reject only when assigned to me & still pending
-    const canAct =
-    isMine &&
-    statusU === 'PENDING' &&
-    !isFinal;
+    // Show "Close" button for APPLIED status (assigned to me)
+    const canClose = isMine && statusU === 'APPLIED' && !isFinal;
+
+    // Don't show buttons for PENDING status
+    const isPending = statusU === 'PENDING';
     
     return (
       <View style={styles.card}>
@@ -181,17 +184,27 @@ export default function ClientGeneratedShift() {
         <Row label="Time :" value={item.time} />
 
         {/* action buttons */}
-        {canRequest ? (
+        {canApply ? (
           <View style={styles.actionCRow}>
             <TouchableOpacity
               disabled={isBusy}
-              style={[styles.actionBtn, styles.requestBtn, isBusy && styles.disabledBtn]}
-              onPress={() => sendStatus(item, 'request')}
+              style={[styles.actionBtn, styles.applyBtn, isBusy && styles.disabledBtn]}
+              onPress={() => sendStatus(item, 'apply')}
             >
-              {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Request</Text>}
+              {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Apply</Text>}
             </TouchableOpacity>
           </View>
-        ) : canAct ? (
+        ) : canClose ? (
+          <View style={styles.actionCRow}>
+            <TouchableOpacity
+              disabled={isBusy}
+              style={[styles.actionBtn, styles.closeBtn, isBusy && styles.disabledBtn]}
+              onPress={() => sendStatus(item, 'close')}
+            >
+              {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Close</Text>}
+            </TouchableOpacity>
+          </View>
+        ) : isPending ? null : !isFinal ? (
           <View style={styles.actionRow}>
             <TouchableOpacity
               disabled={isBusy}
@@ -220,10 +233,9 @@ export default function ClientGeneratedShift() {
         <View style={styles.bottomBar} />
       </View>
       <Text style={styles.subtitle}>
-        These jobs are created by managers. If a job is unassigned you can
-        <Text style={{ fontWeight: 'bold' }}> request</Text> it. If it’s already
-        assigned to you, you can <Text style={{ fontWeight: 'bold' }}>accept</Text> or
-        <Text style={{ fontWeight: 'bold' }}> reject</Text>.
+        Jobs created by managers. Unassigned jobs can be
+        <Text style={{ fontWeight: 'bold' }}> Applied</Text>. Applied jobs can be
+        <Text style={{ fontWeight: 'bold' }}> Closed</Text>. Pending jobs are awaiting review.
       </Text>
     </View>
   ), []);
@@ -357,7 +369,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   disabledBtn: { opacity: 0.6 },
-  requestBtn: { backgroundColor: '#6B7280' },
+  applyBtn: { backgroundColor: '#3B82F6' },
+  closeBtn: { backgroundColor: '#DC2626' },
   acceptBtn: { backgroundColor: '#A020F0' },
   rejectBtn: { backgroundColor: '#991B1B' },
   actionText: { color: '#fff', fontWeight: '700', fontSize: RFValue(12) },

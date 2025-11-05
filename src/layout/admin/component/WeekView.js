@@ -297,7 +297,6 @@ export default function WeekView({
   }, [startDate]);
 
   const rowHeights = useMemo(() => {
-    // console.log(staffList);
     return weekDays.reduce((acc, dateObj) => {
       const key = toDateKey(dateObj);
       const events = Array.isArray(mockEvents[key]) ? mockEvents[key] : [];
