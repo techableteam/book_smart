@@ -168,10 +168,8 @@ export const createDJob = async ({
     adminId: adminId ? Number(adminId) : 0,
     adminMade: Boolean(adminMade),
     facilitiesId: facilityId ? Number(facilityId) : 0,
-    clinicianId: staffId ? Number(staffId) : 0,
+    clinicianId: Number(staffId) || 0,
   };
-
-  console.log(body);
 
   try {
     const token = await AsyncStorage.getItem('token');

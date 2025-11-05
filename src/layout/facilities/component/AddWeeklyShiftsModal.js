@@ -39,19 +39,23 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
     return (found?.degreeName || '').trim();
   }, [degrees, degreelist]);
 
+  // Reset all form fields
+  const resetForm = () => {
+    setDegrees('');
+    setSelectedEmployee('');
+    setEmployeeList([]);
+    setSelectedShifts({});
+  };
+
   useEffect(() => {
     if (visible) {
       fetchShiftTypes();
-      // When opening, don't pre-populate staff until a degree is chosen
-      setSelectedEmployee('');
-      setEmployeeList([]);
-      setSelectedShifts({});
+      resetForm();
     }
   }, [visible]);
 
   // --- NEW: whenever degree changes, (1) reset selected staff, (2) filter staff by userRole
   useEffect(() => {
-    // Clear any previously selected staff when degree changes
     setSelectedEmployee('');
 
     if (!degrees || !selectedDegreeName) {
@@ -59,11 +63,15 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
       return;
     }
 
-    // Filter staff by userRole matching degreeName (case-insensitive)
+    // Filter staff by userRole matching degreeName (case-insensitive, trimmed, and normalized)
+    const normalizedDegreeName = selectedDegreeName.toLowerCase().trim();
     const filtered = (staffList || [])
-      .filter(emp => (emp?.userRole || '').trim().toLowerCase() === selectedDegreeName.toLowerCase())
+      .filter(emp => {
+        const userRole = (emp?.userRole || '').toLowerCase().trim();
+        return userRole === normalizedDegreeName;
+      })
       .map(emp => ({
-        label: `${emp.firstName} ${emp.lastName}`,
+        label: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
         value: String(emp.id),
       }));
 
@@ -93,7 +101,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
       }
     } catch (err) {
       console.error('ShiftType Error:', err);
-      setShiftTypes([]); // fail safe
+      setShiftTypes([]);
     }
   };
   
@@ -110,11 +118,20 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
   };
 
   const handleSubmit = async () => {
+    if (isLoading) return;
+
     try {
+      if (!degrees) {
+        Alert.alert('Missing degree', 'Please select a degree first.');
+        return;
+      }
       if (!selectedShifts || Object.keys(selectedShifts).length === 0) {
         Alert.alert('No shifts selected', 'Please pick at least one shift.');
         return;
       }
+
+      setIsLoading(true);
+
       const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
       ]);
@@ -122,12 +139,13 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
   
       if (!Number.isFinite(managerAic)) {
         console.warn('handleSubmit: missing aic', { managerAic });
+        Alert.alert('Error', 'Invalid facility ID.');
         return;
       }
       const shifts = [];
       for (const [dayKey, shiftsArray] of Object.entries(selectedShifts)) {
         const rawDate = nextWeekDates?.[dayKey];
-        if (!rawDate) continue; // skip unknown day keys
+        if (!rawDate) continue;
   
         const formattedDate = new Date(rawDate).toLocaleDateString('en-US', {
           year: 'numeric',
@@ -148,10 +166,9 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
         Alert.alert('No valid shifts', 'Please select valid shift times.');
         return;
       }
+
       let hasError = false;
       const failedJobs = [];
-      
-      setIsLoading(true);
   
       for (const shift of shifts) {
         try {
@@ -159,7 +176,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
             shiftPayload: shift,
             degreeId: degrees,
             facilityId: managerAic,
-            staffId: selectedEmployee,
+            staffId: selectedEmployee || '',
             adminId: 0,
             adminMade: false, 
           });
@@ -174,20 +191,21 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
           hasError = true;
         }
       }
-
-      setIsLoading(false);
   
       if (hasError) {
         const msg = `Failed to create job(s) for ${failedJobs.length} shift(s).`;
         Alert.alert('Error', msg);
       } else {
         await refreshShiftData?.();
+        resetForm();
         onClose?.();
         Alert.alert('Success', 'All shifts assigned successfully!');
       }
     } catch (err) {
       console.error('Submission error:', err);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      Alert.alert('Error', err?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -286,7 +304,15 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
                 <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity 
+              onPress={() => {
+                if (!isLoading) {
+                  resetForm();
+                  onClose();
+                }
+              }}
+              disabled={isLoading}
+            >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>

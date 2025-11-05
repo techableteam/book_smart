@@ -282,39 +282,10 @@ const AdminHomeTab = ({
    
   };
 
-  // const ensurePrereqs = async () => {
-  //   if (!isDataLoaded) {
-  //     console.log("Waiting for data to load...");
-  //     return { needShiftTypes: true, needStaff: true }; 
-  //   }
-  //   setBusyText('Loading…');
-  //   setBootLoading(true);
-  //   try {
-  //     await Promise.all([
-  //       fetchStaffInfo(), 
-  //       fetchShiftTypes(), 
-  //     ]);
-  //   } finally {
-  //     setBootLoading(false);
-  //     setBusyText('');
-  //   }
-
-  //   console.log(shiftTypes);
-  //   console.log(staffList);
-
-  //   let needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
-  //   let needStaff      = !Array.isArray(staffList)  || staffList.length === 0;
-
-  //   return { needShiftTypes, needStaff };
-  // };
-
-
   const ensurePrereqs = async () => {
     if (!isDataLoaded) {
       return { needShiftTypes: true, needStaff: true }; // do not proceed if data is not loaded
     }
-    console.log(shiftTypes);
-    console.log(staffList);
 
     const needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
     const needStaff = !Array.isArray(staffList) || staffList.length === 0;

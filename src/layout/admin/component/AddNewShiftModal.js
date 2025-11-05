@@ -45,6 +45,7 @@ export default function AddNewShiftModal({
   // Facility + Degree
   const [facilities, setFacilities] = useState('');
   const [degrees, setDegrees] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // --- NEW: helper to get selected degree name (used for filtering staff)
   const selectedDegreeName = React.useMemo(() => {
@@ -53,18 +54,25 @@ export default function AddNewShiftModal({
     return (found?.degreeName || '').trim();
   }, [degrees, degreelist]);
 
+  // Reset all form fields
+  const resetForm = React.useCallback(() => {
+    setDegrees('');
+    setSelectedEmployee('');
+    setEmployeeList([]);
+    setSelectedShift(null);
+    setSelectedDate(new Date());
+    setIsSubmitting(false);
+  }, []);
+
   useEffect(() => {
     if (visible) {
       fetchShiftTypes();
-      // When opening, don't pre-populate staff until a degree is chosen
-      setSelectedEmployee('');
-      setEmployeeList([]);
+      resetForm();
     }
-  }, [visible]);
+  }, [visible, resetForm]);
 
   // --- NEW: whenever degree changes, (1) reset selected staff, (2) filter staff by userRole
   useEffect(() => {
-    // Clear any previously selected staff when degree changes
     setSelectedEmployee('');
 
     if (!degrees || !selectedDegreeName) {
@@ -72,11 +80,15 @@ export default function AddNewShiftModal({
       return;
     }
 
-    // Filter staff by userRole matching degreeName (case-insensitive)
+    // Filter staff by userRole matching degreeName (case-insensitive, trimmed, and normalized)
+    const normalizedDegreeName = selectedDegreeName.toLowerCase().trim();
     const filtered = (staffList || [])
-      .filter(emp => (emp?.userRole || '').trim().toLowerCase() === selectedDegreeName.toLowerCase())
+      .filter(emp => {
+        const userRole = (emp?.userRole || '').toLowerCase().trim();
+        return userRole === normalizedDegreeName;
+      })
       .map(emp => ({
-        label: `${emp.firstName} ${emp.lastName}`,
+        label: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
         value: String(emp.id),
       }));
 
@@ -87,9 +99,6 @@ export default function AddNewShiftModal({
     try {
       const response = await getShiftTypes({ aic : selectedFacilitiesId }, "facilities");
       const types = Array.isArray(response?.shiftType) ? response.shiftType : [];
-      if (!types.length) {
-        console.log('ShiftTypes API returned empty or invalid list:', response);
-      }
       setShiftTypes(types);
     } catch (err) {
       setShiftTypes([]);
@@ -102,6 +111,8 @@ export default function AddNewShiftModal({
       return;
     }
 
+    if (isSubmitting) return;
+
     const selectedShiftObj = shiftTypes.find(
       (s) => String(s.id) === String(selectedShift)
     );
@@ -110,6 +121,7 @@ export default function AddNewShiftModal({
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const [AIdRaw] = await Promise.all([
         AsyncStorage.getItem('AId'),
@@ -118,6 +130,7 @@ export default function AddNewShiftModal({
 
       if (!Number.isFinite(AId)) {
         console.warn('Missing AId:', {AId});
+        alert('Invalid admin ID. Please try again.');
         return;
       }
 
@@ -141,7 +154,7 @@ export default function AddNewShiftModal({
         shiftPayload,
         degreeId: degrees,
         facilityId: selectedFacilitiesId,
-        staffId: selectedEmployee,
+        staffId: selectedEmployee || '',
         adminId: AId,
         adminMade: true,
       });
@@ -150,6 +163,7 @@ export default function AddNewShiftModal({
 
       if (jobId) {
         await refreshShiftData();
+        resetForm();
         onClose();
       } else {
         const msg = result?.message || 'Failed to submit shift.';
@@ -157,7 +171,9 @@ export default function AddNewShiftModal({
       }
     } catch (err) {
       console.error('Error submitting shift:', err);
-      alert('Failed to submit shift. Please try again.');
+      alert(err?.message || 'Failed to submit shift. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -289,14 +305,22 @@ export default function AddNewShiftModal({
             <TouchableOpacity 
               style={[
                 styles.submitButton, 
-                { backgroundColor: selectedShift && selectedDate && degrees ? '#290135' : '#ccc' }
+                { backgroundColor: (selectedShift && selectedDate && degrees && !isSubmitting) ? '#290135' : '#ccc' }
               ]} 
               onPress={handleSubmit}
-              disabled={!selectedShift || !selectedDate || !degrees || !selectedEmployee}
+              disabled={!selectedShift || !selectedDate || !degrees || isSubmitting}
             >
-              <Text style={styles.submitText}>Submit</Text>
+              <Text style={styles.submitText}>{isSubmitting ? 'Submitting...' : 'Submit'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity 
+              onPress={() => {
+                if (!isSubmitting) {
+                  resetForm();
+                  onClose();
+                }
+              }}
+              disabled={isSubmitting}
+            >
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
