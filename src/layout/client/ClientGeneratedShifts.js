@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { getDjobForClinician, updateDjob } from '../../utils/useApi';
+import { getDjobForClinician, updateDjob, applyForShift } from '../../utils/useApi';
 
 const { height } = Dimensions.get('window');
 const FOOTER_HEIGHT = RFValue(130);
@@ -112,14 +112,26 @@ export default function ClientGeneratedShift() {
     setBusyKey(item.key);
 
     try {
+      // Handle "Apply" action differently - use new applyForShift endpoint
+      if (next === 'apply') {
+        const res = await applyForShift(item.djobId, aic);
+        if (!res.ok) {
+          Alert.alert('Apply failed', res.error?.message || 'Please try again.');
+          return;
+        }
+        await load();
+        Alert.alert('Success', 'Successfully applied for this shift!');
+        return;
+      }
+
+      // For other actions, use the existing updateDjob
       const shiftData = Array.isArray(item.__raw?.shift)
         ? item.__raw.shift
         : [item.__raw?.shift];
 
       // map UI actions to backend values
       let mappedStatus = next;
-      if (next === 'apply') mappedStatus = 'pending';
-      else if (next === 'close') mappedStatus = 'reject';
+      if (next === 'close') mappedStatus = 'reject';
       else if (next === 'accept') mappedStatus = 'accept';
       else if (next === 'reject') mappedStatus = 'reject';
       else if (next === 'cancel') mappedStatus = 'cancel';
@@ -157,18 +169,21 @@ export default function ClientGeneratedShift() {
     const isUnassigned = item.clinicianId === 0;
     const isBusy = busyKey === item.key;
 
+    // Check if I've applied to this job
+    const hasApplied = item.__raw?.applicants?.some(app => app.clinicianId === aic);
+
     const isFinal =
       statusU === 'APPROVED' ||
       statusU === 'REJECTED' ||
       statusU === 'CANCELLED';
 
-    // Show "Apply" button for NOTSELECT status
-    const canApply = statusU === 'NOTSELECT' && !isFinal;
+    // Show "Apply" button for NOTSELECT status only (and haven't applied yet)
+    const canApply = statusU === 'NOTSELECT' && !hasApplied && !isFinal;
 
-    // Show "Close" button for APPLIED status (assigned to me)
+    // Show "Close" button for APPLIED status (assigned to me by admin)
     const canClose = isMine && statusU === 'APPLIED' && !isFinal;
 
-    // Don't show buttons for PENDING status
+    // Don't show buttons for PENDING status (application under review)
     const isPending = statusU === 'PENDING';
     
     return (
@@ -182,9 +197,16 @@ export default function ClientGeneratedShift() {
         <Row label="Degree :" value={item.degreeName} />
         <Row label="Date :" value={item.date} />
         <Row label="Time :" value={item.time} />
+        
+        {/* Show message if they've applied (for any status) */}
+        {hasApplied && statusU === 'NOTSELECT' && (
+          <View style={styles.appliedBanner}>
+            <Text style={styles.appliedText}>✓ You have applied - Awaiting facility review</Text>
+          </View>
+        )}
 
-        {/* action buttons */}
-        {canApply ? (
+        {/* action buttons - don't show any buttons if already applied */}
+        {hasApplied && statusU === 'NOTSELECT' ? null : canApply ? (
           <View style={styles.actionCRow}>
             <TouchableOpacity
               disabled={isBusy}
@@ -233,9 +255,9 @@ export default function ClientGeneratedShift() {
         <View style={styles.bottomBar} />
       </View>
       <Text style={styles.subtitle}>
-        Jobs created by managers. Unassigned jobs can be
-        <Text style={{ fontWeight: 'bold' }}> Applied</Text>. Applied jobs can be
-        <Text style={{ fontWeight: 'bold' }}> Closed</Text>. Pending jobs are awaiting review.
+        Jobs created by managers. <Text style={{ fontWeight: 'bold' }}>NOTSELECT</Text> jobs are open - multiple clinicians can apply.
+        <Text style={{ fontWeight: 'bold' }}> APPLIED</Text> means admin selected you - you can Close to decline.
+        <Text style={{ fontWeight: 'bold' }}> APPROVED</Text> means accepted and scheduled.
       </Text>
     </View>
   ), []);
@@ -374,4 +396,19 @@ const styles = StyleSheet.create({
   acceptBtn: { backgroundColor: '#A020F0' },
   rejectBtn: { backgroundColor: '#991B1B' },
   actionText: { color: '#fff', fontWeight: '700', fontSize: RFValue(12) },
+  appliedBanner: {
+    backgroundColor: '#DBEAFE',
+    paddingVertical: RFValue(8),
+    paddingHorizontal: RFValue(12),
+    borderRadius: RFValue(8),
+    marginTop: RFValue(8),
+    borderWidth: 1,
+    borderColor: '#3B82F6',
+  },
+  appliedText: {
+    color: '#1E40AF',
+    fontWeight: '600',
+    fontSize: RFValue(13),
+    textAlign: 'center',
+  },
 });

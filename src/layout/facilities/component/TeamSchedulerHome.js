@@ -18,6 +18,7 @@ import WeekView from "./WeekView";
 import DayView from "./DayView";
 import AddNewShiftModal from './AddNewShiftModal';
 import AddWeeklyShiftsModal from './AddWeeklyShiftsModal';
+import ApplicantsModal from './ApplicantsModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   getStaffShiftInfo,
@@ -133,6 +134,8 @@ const HomeTab = ({
   const [degrees, setDegrees] = useState([]);
   const [djobList, setDjobList] = useState([]);
   const [transformedDjobList, setTransformedDjobList] = useState([]);
+  const [showApplicantsModal, setShowApplicantsModal] = useState(false);
+  const [selectedJobForApplicants, setSelectedJobForApplicants] = useState(null);
 
   const [startTime, endTime] = React.useMemo(() => {
     const raw = String(selectedEvent?.time || '');
@@ -652,6 +655,21 @@ const HomeTab = ({
               style={styles.input}
             />
 
+            {/* Show applicants button if there are pending applicants */}
+            {selectedEvent?.data?.job?.applicants?.filter(a => a.status === 'pending').length > 0 && (
+              <TouchableOpacity
+                style={styles.viewApplicantsBtn}
+                onPress={() => {
+                  setSelectedJobForApplicants(selectedEvent.data.job);
+                  setShowApplicantsModal(true);
+                }}
+              >
+                <Text style={styles.viewApplicantsText}>
+                  👥 View {selectedEvent.data.job.applicants.filter(a => a.status === 'pending').length} Applicant(s)
+                </Text>
+              </TouchableOpacity>
+            )}
+
             <Text style={styles.label}>Shift</Text>
             <View style={styles.shiftScrollBox}>
               <ScrollView
@@ -679,6 +697,16 @@ const HomeTab = ({
           </View>
         </View>
       </Modal>
+
+      <ApplicantsModal
+        visible={showApplicantsModal}
+        onClose={() => setShowApplicantsModal(false)}
+        djobData={selectedJobForApplicants}
+        onApplicantReviewed={async () => {
+          await fetchDjobList();
+          setShowEventModal(false);
+        }}
+      />
 
       <BusyOverlay
         visible={bootLoading || opLoading || deleting}
@@ -1020,6 +1048,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
+  },
+  viewApplicantsBtn: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  viewApplicantsText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
 

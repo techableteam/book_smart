@@ -487,6 +487,48 @@ export const getDjobForClinician = async () => {
   }
 };
 
+export const applyForShift = async (DJobId, clinicianId) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+
+    const res = await axios.post(
+      'api/djobs/apply',
+      { DJobId, clinicianId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { ok: true, data: res.data };
+  } catch (err) {
+    console.error('applyForShift error:', err);
+    return { ok: false, error: normalizeError(err) };
+  }
+};
+
+export const reviewApplicant = async (DJobId, clinicianId, action) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+
+    const res = await axios.post(
+      'api/djobs/reviewapplicant',
+      { DJobId, clinicianId, action },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { ok: true, data: res.data };
+  } catch (err) {
+    console.error('reviewApplicant error:', err);
+    return { ok: false, error: normalizeError(err) };
+  }
+};
+
 export const getDjobForFacilitiesById = async (FAic) => {
   try {
     const token = await AsyncStorage.getItem('token');
