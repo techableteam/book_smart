@@ -12,7 +12,7 @@ export default function TimesheetForm({ navigation }) {
             <View style={styles.webViewContainer}>
                 <WebView
                     originWhitelist={['*']}
-                    source={{ uri: 'https://form.jotform.com/243451561784057' }}
+                    source={{ uri: 'https://form.jotform.com/BookSmartApp/SmartPay' }}
                     style={styles.webView}
                 />
             </View>
