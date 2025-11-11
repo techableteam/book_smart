@@ -334,21 +334,29 @@ export const updateDjob = async ({
   facilitiesId,
   clinicianId,
   status,
+  applicants,
 }) => {
   try {
     const token = await AsyncStorage.getItem('token');
+    const payload = {
+      DJobId,
+      shift,
+      degree,
+      adminId,
+      adminMade,
+      facilitiesId,
+      clinicianId,
+      status,
+    };
+    
+    // Only include applicants if provided
+    if (applicants !== undefined) {
+      payload.applicants = applicants;
+    }
+
     const res = await axios.post(
       `api/djobs/update`,
-      {
-        DJobId,
-        shift,
-        degree,
-        adminId,
-        adminMade,
-        facilitiesId,
-        clinicianId,
-        status,
-      },
+      payload,
       {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       }

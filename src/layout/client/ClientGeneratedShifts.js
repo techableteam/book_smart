@@ -132,6 +132,42 @@ export default function ClientGeneratedShift() {
         return;
       }
 
+      // Handle "Cancel Application" - remove from applicants array
+      if (next === 'cancelApplication') {
+        Alert.alert(
+          'Cancel Application',
+          'Are you sure you want to cancel your application for this shift?',
+          [
+            { text: 'No', style: 'cancel' },
+            { 
+              text: 'Yes, Cancel', 
+              style: 'destructive',
+              onPress: async () => {
+                try {
+                  const currentApplicants = item.__raw?.applicants || [];
+                  const updatedApplicants = currentApplicants.filter(app => app.clinicianId !== aic);
+                  
+                  const res = await updateDjob({
+                    DJobId: item.djobId,
+                    applicants: updatedApplicants,
+                  });
+
+                  if (!res.ok) {
+                    Alert.alert('Cancel failed', res.error?.message || 'Please try again.');
+                    return;
+                  }
+                  await load();
+                } catch (err) {
+                  console.error('Cancel application error:', err);
+                  Alert.alert('Error', 'Failed to cancel application.');
+                }
+              }
+            }
+          ]
+        );
+        return;
+      }
+
       // For other actions, use the existing updateDjob
       const shiftData = Array.isArray(item.__raw?.shift)
         ? item.__raw.shift
@@ -187,6 +223,9 @@ export default function ClientGeneratedShift() {
     // Show "Apply" button for AVAILABLE status only (and haven't applied yet)
     const canApply = statusU === 'AVAILABLE' && !hasApplied && !isFinal;
 
+    // Show "Cancel" button for AVAILABLE status if already applied
+    const canCancelApplication = statusU === 'AVAILABLE' && hasApplied && !isFinal;
+
     // Show "Approve/Reject" buttons for ASSIGNED-PENDING status (admin assigned to me)
     const canRespondToAssignment = isMine && statusU === 'ASSIGNED-PENDING' && !isFinal;
 
@@ -233,6 +272,16 @@ export default function ClientGeneratedShift() {
               }}
             >
               {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Apply</Text>}
+            </TouchableOpacity>
+          </View>
+        ) : canCancelApplication ? (
+          <View style={styles.actionCRow}>
+            <TouchableOpacity
+              disabled={isBusy}
+              style={[styles.actionBtn, styles.cancelBtn, styles.wideBtn, isBusy && styles.disabledBtn]}
+              onPress={() => sendStatus(item, 'cancelApplication')}
+            >
+              {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Cancel Application</Text>}
             </TouchableOpacity>
           </View>
         ) : canRespondToAssignment ? (
