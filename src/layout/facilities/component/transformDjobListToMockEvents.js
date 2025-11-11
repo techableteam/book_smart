@@ -19,8 +19,9 @@ export const transformDjobListToMockEvents = async (djobList = []) => {
       const facilitiesId = job.facilitiesId;
   
     const statusColorMap = {
-      'NOTSELECT': '#808080', 
-      'APPLIED': '#60A5FA',
+      'AVAILABLE': '#808080',
+      'ASSIGNED-PENDING': '#60A5FA',
+      'ASSIGNED-APPROVED': '#34D399',
       'PENDING': '#FFC107',   
       'APPROVED': '#10B981',  
       'REJECTED': '#DC2626',  
@@ -78,13 +79,14 @@ export const transformDjobListToMockEvents = async (djobList = []) => {
   }
   
   const normalizeStatus = (s) => {
-    const v = (s || '').toLowerCase();
-    if (v === 'notselect') return 'NOTSELECT'; 
-    if (v === 'applied') return 'APPLIED';
+    const v = (s || '').toLowerCase().trim();
+    if (v === 'notselect') return 'AVAILABLE'; 
+    if (v === 'assigned-pending') return 'ASSIGNED-PENDING';
+    if (v === 'assigned-approved') return 'ASSIGNED-APPROVED';
     if (v === 'pending') return 'PENDING';
-    if (v === 'accept' || v === 'approved' || v === 'approve') return 'APPROVED';
-    if (v === 'reject' || v === 'rejected') return 'REJECTED';
-    if (v === 'cancel' || v === 'cancelled') return 'CANCELLED';
-    return v ? v.toUpperCase() : 'APPLIED'; 
+    if (v === 'approved' || v === 'approve' || v === 'accept') return 'APPROVED';
+    if (v === 'rejected' || v === 'reject') return 'REJECTED';
+    if (v === 'cancelled' || v === 'cancel') return 'CANCELLED';
+    return v ? v.toUpperCase() : 'AVAILABLE'; 
   };
   

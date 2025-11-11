@@ -21,23 +21,27 @@ const FOOTER_HEIGHT = RFValue(130);
 
 const statusStyle = (status) => {
   switch (status) {
-    case 'APPLIED':   return { bg: '#DBEAFE', fg: '#1E40AF' };
-    case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
-    case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
-    case 'REJECTED':  return { bg: '#FEE2E2', fg: '#991B1B' };
-    case 'CANCELLED': return { bg: '#E5E7EB', fg: '#374151' };
-    default:          return { bg: '#EEE',    fg: '#000'     };
+    case 'AVAILABLE':         return { bg: '#808080', fg: '#E5E7EB' };
+    case 'ASSIGNED-PENDING':  return { bg: '#DBEAFE', fg: '#1E40AF' };
+    case 'ASSIGNED-APPROVED': return { bg: '#A7F3D0', fg: '#065F46' };
+    case 'PENDING':           return { bg: '#FFC107', fg: '#A16207' };
+    case 'APPROVED':          return { bg: '#DCFCE7', fg: '#166534' };
+    case 'REJECTED':          return { bg: '#FEE2E2', fg: '#991B1B' };
+    case 'CANCELLED':         return { bg: '#E5E7EB', fg: '#374151' };
+    default:                  return { bg: '#EEE',    fg: '#000'     };
   }
 };
 
 const normalizeStatus = (s) => {
-  const v = (s || '').toLowerCase();
-  if (v === 'applied') return 'APPLIED';
+  const v = (s || '').toLowerCase().trim();
+  if (v === 'notselect') return 'AVAILABLE';
+  if (v === 'assigned-pending') return 'ASSIGNED-PENDING';
+  if (v === 'assigned-approved') return 'ASSIGNED-APPROVED';
   if (v === 'pending') return 'PENDING';
-  if (v === 'accept' || v === 'approved' || v === 'approve') return 'APPROVED';
-  if (v === 'reject' || v === 'rejected') return 'REJECTED';
-  if (v === 'cancel' || v === 'cancelled') return 'CANCELLED';
-  return 'APPLIED';
+  if (v === 'approved' || v === 'approve' || v === 'accept') return 'APPROVED';
+  if (v === 'rejected' || v === 'reject') return 'REJECTED';
+  if (v === 'cancelled' || v === 'cancel') return 'CANCELLED';
+  return v ? v.toUpperCase() : 'AVAILABLE';
 };
 
 const mapApiItem = (api) => ({

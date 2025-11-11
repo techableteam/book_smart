@@ -23,26 +23,28 @@ const FOOTER_HEIGHT = RFValue(130);
 // 🟣 status color mapping
 const statusStyle = (status) => {
   switch ((status || '').toUpperCase()) {
-    case 'NOTSELECT': return { bg: '#808080', fg: '#E5E7EB' };
-    case 'APPLIED':   return { bg: '#DBEAFE', fg: '#1E40AF' };
-    case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
-    case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
-    case 'REJECTED':  return { bg: '#FEE2E2', fg: '#991B1B' };
-    case 'CANCELLED': return { bg: '#E5E7EB', fg: '#374151' };
-    default:          return { bg: '#EEE', fg: '#000' };
+    case 'AVAILABLE':         return { bg: '#808080', fg: '#E5E7EB' };
+    case 'ASSIGNED-PENDING':  return { bg: '#DBEAFE', fg: '#1E40AF' };
+    case 'ASSIGNED-APPROVED': return { bg: '#A7F3D0', fg: '#065F46' };
+    case 'PENDING':           return { bg: '#FFC107', fg: '#A16207' };
+    case 'APPROVED':          return { bg: '#DCFCE7', fg: '#166534' };
+    case 'REJECTED':          return { bg: '#FEE2E2', fg: '#991B1B' };
+    case 'CANCELLED':         return { bg: '#E5E7EB', fg: '#374151' };
+    default:                  return { bg: '#EEE', fg: '#000' };
   }
 };
 
 // 🟣 normalize status values
 const normalizeStatus = (s) => {
-  const v = (s || '').toLowerCase();
-  if (v === 'notselect') return 'NOTSELECT';
-  if (v === 'applied') return 'APPLIED';
+  const v = (s || '').toLowerCase().trim();
+  if (v === 'notselect') return 'AVAILABLE';
+  if (v === 'assigned-pending') return 'ASSIGNED-PENDING';
+  if (v === 'assigned-approved') return 'ASSIGNED-APPROVED';
   if (v === 'pending') return 'PENDING';
-  if (['accept', 'approved', 'approve'].includes(v)) return 'APPROVED';
-  if (['reject', 'rejected'].includes(v)) return 'REJECTED';
-  if (['cancel', 'cancelled'].includes(v)) return 'CANCELLED';
-  return 'APPLIED';
+  if (v === 'approved' || v === 'approve' || v === 'accept') return 'APPROVED';
+  if (v === 'rejected' || v === 'reject') return 'REJECTED';
+  if (v === 'cancelled' || v === 'cancel') return 'CANCELLED';
+  return v ? v.toUpperCase() : 'AVAILABLE';
 };
 
 // 🟣 map API data → UI format
@@ -83,12 +85,18 @@ export default function ClientGeneratedShift() {
       setAic(aicNum);
 
       const res = await getDjobForClinician();
+      console.log('[ClientGeneratedShifts] Response:', res);
+      
       if (!res.ok) {
-        console.error(res.error);
+        console.error('[ClientGeneratedShifts] Error:', res.error);
         Alert.alert('Error', res.error?.message || 'Failed to load jobs.');
         setItems([]);
       } else {
-        setItems(res.data.map(mapApiItem));
+        console.log('[ClientGeneratedShifts] Received jobs:', res.data.length);
+        console.log('[ClientGeneratedShifts] Raw jobs:', JSON.stringify(res.data, null, 2));
+        const mapped = res.data.map(mapApiItem);
+        console.log('[ClientGeneratedShifts] Mapped jobs:', mapped.length);
+        setItems(mapped);
       }
     } catch (e) {
       console.error(e);
@@ -112,7 +120,7 @@ export default function ClientGeneratedShift() {
     setBusyKey(item.key);
 
     try {
-      // Handle "Apply" action differently - use new applyForShift endpoint
+      // Handle "Apply" action - use new applyForShift endpoint
       if (next === 'apply') {
         const res = await applyForShift(item.djobId, aic);
         if (!res.ok) {
@@ -131,8 +139,7 @@ export default function ClientGeneratedShift() {
 
       // map UI actions to backend values
       let mappedStatus = next;
-      if (next === 'close') mappedStatus = 'reject';
-      else if (next === 'accept') mappedStatus = 'accept';
+      if (next === 'accept') mappedStatus = 'accept';
       else if (next === 'reject') mappedStatus = 'reject';
       else if (next === 'cancel') mappedStatus = 'cancel';
 
@@ -177,14 +184,17 @@ export default function ClientGeneratedShift() {
       statusU === 'REJECTED' ||
       statusU === 'CANCELLED';
 
-    // Show "Apply" button for NOTSELECT status only (and haven't applied yet)
-    const canApply = statusU === 'NOTSELECT' && !hasApplied && !isFinal;
+    // Show "Apply" button for AVAILABLE status only (and haven't applied yet)
+    const canApply = statusU === 'AVAILABLE' && !hasApplied && !isFinal;
 
-    // Show "Close" button for APPLIED status (assigned to me by admin)
-    const canClose = isMine && statusU === 'APPLIED' && !isFinal;
+    // Show "Approve/Reject" buttons for ASSIGNED-PENDING status (admin assigned to me)
+    const canRespondToAssignment = isMine && statusU === 'ASSIGNED-PENDING' && !isFinal;
 
     // Don't show buttons for PENDING status (application under review)
     const isPending = statusU === 'PENDING';
+    
+    // Don't show buttons for ASSIGNED-APPROVED (already accepted)
+    const isAssignedApproved = statusU === 'ASSIGNED-APPROVED';
     
     return (
       <View style={styles.card}>
@@ -199,41 +209,40 @@ export default function ClientGeneratedShift() {
         <Row label="Time :" value={item.time} />
         
         {/* Show message if they've applied (for any status) */}
-        {hasApplied && statusU === 'NOTSELECT' && (
+        {hasApplied && statusU === 'AVAILABLE' && (
           <View style={styles.appliedBanner}>
             <Text style={styles.appliedText}>✓ You have applied - Awaiting facility review</Text>
           </View>
         )}
 
-        {/* action buttons - don't show any buttons if already applied */}
-        {hasApplied && statusU === 'NOTSELECT' ? null : canApply ? (
+        {/* action buttons */}
+        {canApply ? (
           <View style={styles.actionCRow}>
             <TouchableOpacity
               disabled={isBusy}
               style={[styles.actionBtn, styles.applyBtn, isBusy && styles.disabledBtn]}
-              onPress={() => sendStatus(item, 'apply')}
+              onPress={() => {
+                Alert.alert(
+                  'Apply for Shift',
+                  `Do you want to apply for this shift on ${item.date}?`,
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Apply', onPress: () => sendStatus(item, 'apply') }
+                  ]
+                );
+              }}
             >
               {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Apply</Text>}
             </TouchableOpacity>
           </View>
-        ) : canClose ? (
-          <View style={styles.actionCRow}>
-            <TouchableOpacity
-              disabled={isBusy}
-              style={[styles.actionBtn, styles.closeBtn, isBusy && styles.disabledBtn]}
-              onPress={() => sendStatus(item, 'close')}
-            >
-              {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Close</Text>}
-            </TouchableOpacity>
-          </View>
-        ) : isPending ? null : !isFinal ? (
+        ) : canRespondToAssignment ? (
           <View style={styles.actionRow}>
             <TouchableOpacity
               disabled={isBusy}
               style={[styles.actionBtn, styles.acceptBtn, isBusy && styles.disabledBtn]}
               onPress={() => sendStatus(item, 'accept')}
             >
-              {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Accept</Text>}
+              {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Approve</Text>}
             </TouchableOpacity>
             <TouchableOpacity
               disabled={isBusy}
@@ -243,7 +252,7 @@ export default function ClientGeneratedShift() {
               {isBusy ? <ActivityIndicator /> : <Text style={styles.actionText}>Reject</Text>}
             </TouchableOpacity>
           </View>
-        ) : null}
+        ) : isPending || isAssignedApproved ? null : null}
       </View>
     );
   };
@@ -255,9 +264,9 @@ export default function ClientGeneratedShift() {
         <View style={styles.bottomBar} />
       </View>
       <Text style={styles.subtitle}>
-        Jobs created by managers. <Text style={{ fontWeight: 'bold' }}>NOTSELECT</Text> jobs are open - multiple clinicians can apply.
-        <Text style={{ fontWeight: 'bold' }}> APPLIED</Text> means admin selected you - you can Close to decline.
-        <Text style={{ fontWeight: 'bold' }}> APPROVED</Text> means accepted and scheduled.
+        <Text style={{ fontWeight: 'bold' }}>AVAILABLE</Text> jobs are open - multiple clinicians can apply.
+        <Text style={{ fontWeight: 'bold' }}> ASSIGNED-PENDING</Text> means admin selected you - Approve or Reject.
+        <Text style={{ fontWeight: 'bold' }}> ASSIGNED-APPROVED</Text> means you approved and it's confirmed!
       </Text>
     </View>
   ), []);
@@ -390,11 +399,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  wideBtn: {
+    width: 180,
+  },
   disabledBtn: { opacity: 0.6 },
   applyBtn: { backgroundColor: '#3B82F6' },
-  closeBtn: { backgroundColor: '#DC2626' },
-  acceptBtn: { backgroundColor: '#A020F0' },
-  rejectBtn: { backgroundColor: '#991B1B' },
+  cancelBtn: { backgroundColor: '#6B7280' },
+  acceptBtn: { backgroundColor: '#10B981' },
+  rejectBtn: { backgroundColor: '#DC2626' },
   actionText: { color: '#fff', fontWeight: '700', fontSize: RFValue(12) },
   appliedBanner: {
     backgroundColor: '#DBEAFE',

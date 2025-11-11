@@ -85,7 +85,9 @@ export default function ApplicantsModal({ visible, onClose, djobData, onApplican
     );
   };
 
-  const pendingApplicants = djobData?.applicants?.filter(a => a.status === 'pending') || [];
+  const pendingApplicants = (djobData?.applicants || []).filter(a => a && a.status === 'pending');
+
+  if (!visible) return null;
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -94,9 +96,9 @@ export default function ApplicantsModal({ visible, onClose, djobData, onApplican
           <Text style={styles.title}>Applicants for Shift</Text>
           
           <View style={styles.shiftInfo}>
-            <Text style={styles.infoText}>Date: {djobData?.shift?.date}</Text>
-            <Text style={styles.infoText}>Time: {djobData?.shift?.time}</Text>
-            <Text style={styles.infoText}>Degree: {djobData?.degreeName}</Text>
+            <Text style={styles.infoText}>Date: {djobData?.shift?.date || 'N/A'}</Text>
+            <Text style={styles.infoText}>Time: {djobData?.shift?.time || 'N/A'}</Text>
+            <Text style={styles.infoText}>Degree: {djobData?.degreeName || 'N/A'}</Text>
           </View>
 
           {pendingApplicants.length === 0 ? (
@@ -104,7 +106,7 @@ export default function ApplicantsModal({ visible, onClose, djobData, onApplican
           ) : (
             <FlatList
               data={pendingApplicants}
-              keyExtractor={(item) => String(item.clinicianId)}
+              keyExtractor={(item, index) => `${item.clinicianId}-${index}`}
               renderItem={renderApplicant}
               style={styles.list}
             />
