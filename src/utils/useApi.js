@@ -170,6 +170,7 @@ export const createDJob = async ({
     facilitiesId: facilityId ? Number(facilityId) : 0,
     clinicianId: Number(staffId) || 0,
   };
+  console.log(body);
 
   try {
     const token = await AsyncStorage.getItem('token');
