@@ -669,7 +669,8 @@ const HomeTab = ({
                     style={styles.viewApplicantsBtn}
                     onPress={() => {
                       setSelectedJobForApplicants(selectedEvent.data.job);
-                      setShowApplicantsModal(true);
+                      setShowEventModal(false);
+                      setTimeout(() => setShowApplicantsModal(true), 300);
                     }}
                   >
                     <Text style={styles.viewApplicantsText}>
@@ -711,11 +712,15 @@ const HomeTab = ({
 
       <ApplicantsModal
         visible={showApplicantsModal}
-        onClose={() => setShowApplicantsModal(false)}
+        onClose={() => {
+          setShowApplicantsModal(false);
+          setSelectedJobForApplicants(null);
+        }}
         djobData={selectedJobForApplicants}
         onApplicantReviewed={async () => {
+          setShowApplicantsModal(false);
+          setSelectedJobForApplicants(null);
           await fetchDjobList();
-          setShowEventModal(false);
         }}
       />
 

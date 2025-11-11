@@ -792,7 +792,8 @@ const AdminHomeTab = ({
                     style={styles.viewApplicantsBtn}
                     onPress={() => {
                       setSelectedJobForApplicants(selectedEvent.data.job);
-                      setShowApplicantsModal(true);
+                      setShowEventModal(false);
+                      setTimeout(() => setShowApplicantsModal(true), 300);
                     }}
                   >
                     <Text style={styles.viewApplicantsText}>
@@ -833,14 +834,18 @@ const AdminHomeTab = ({
 
       <ApplicantsModal
         visible={showApplicantsModal}
-        onClose={() => setShowApplicantsModal(false)}
+        onClose={() => {
+          setShowApplicantsModal(false);
+          setSelectedJobForApplicants(null);
+        }}
         djobData={selectedJobForApplicants}
         onApplicantReviewed={async () => {
+          setShowApplicantsModal(false);
+          setSelectedJobForApplicants(null);
           const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
           if (selectedFacility) {
             await handleFacilitySelect(selectedFacility);
           }
-          setShowEventModal(false);
         }}
       />
 
