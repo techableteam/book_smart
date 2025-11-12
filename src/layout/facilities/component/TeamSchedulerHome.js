@@ -718,9 +718,18 @@ const HomeTab = ({
         }}
         djobData={selectedJobForApplicants}
         onApplicantReviewed={async () => {
-          setShowApplicantsModal(false);
-          setSelectedJobForApplicants(null);
-          await fetchDjobList();
+          try {
+            setShowApplicantsModal(false);
+            setSelectedJobForApplicants(null);
+            setBootLoading(true);
+            setBusyText('Updating...');
+            await fetchDjobList();
+          } catch (error) {
+            console.error('Error refreshing after applicant review:', error);
+          } finally {
+            setBootLoading(false);
+            setBusyText('');
+          }
         }}
       />
 

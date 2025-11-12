@@ -840,11 +840,17 @@ const AdminHomeTab = ({
         }}
         djobData={selectedJobForApplicants}
         onApplicantReviewed={async () => {
-          setShowApplicantsModal(false);
-          setSelectedJobForApplicants(null);
-          const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
-          if (selectedFacility) {
-            await handleFacilitySelect(selectedFacility);
+          try {
+            setShowApplicantsModal(false);
+            setSelectedJobForApplicants(null);
+            const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
+            if (selectedFacility) {
+              await handleFacilitySelect(selectedFacility);
+            }
+          } catch (error) {
+            console.error('Error refreshing after applicant review:', error);
+            setBootLoading(false);
+            setBusyText('');
           }
         }}
       />
