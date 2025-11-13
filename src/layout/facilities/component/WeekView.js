@@ -256,6 +256,21 @@ export default function WeekView({
   const endMinuteChoices = endHour >= 24 ? [0] : minuteOptions;
   const [degreeId, setDegreeId] = useState(null);
 
+  // Filter staff by selected degree
+  const filteredStaffList = useMemo(() => {
+    if (!degreeId) return staffList;
+    
+    const selectedDegree = degrees.find(d => String(d.Did ?? d.id) === String(degreeId));
+    if (!selectedDegree) return staffList;
+    
+    const degreeName = (selectedDegree.degreeName || '').toLowerCase().trim();
+    
+    return staffList.filter(staff => {
+      const userRole = (staff.userRole || '').toLowerCase().trim();
+      return userRole === degreeName;
+    });
+  }, [degreeId, staffList, degrees]);
+
   const derivedStartMin = useMemo(
     () => (confirm ? startHour * 60 + startMinute : 0),
     [confirm, startHour, startMinute]
@@ -649,14 +664,17 @@ export default function WeekView({
                   getKey={(d) => String(d.Did ?? d.id ?? d._id)}
                   getLabel={(d) => d.degreeName || d.name || 'Unknown'}
                   value={degreeId}
-                  onChange={setDegreeId}
+                  onChange={(newDegreeId) => {
+                    setDegreeId(newDegreeId);
+                    setStaffId(null);
+                  }}
                 />
 
 
                 <SimpleSelect
                   label="Staff"
-                  items={staffList}
-                  getKey={(s) => String(s.id ?? s._id ?? s.aic)}
+                  items={filteredStaffList}
+                  getKey={(s) => String(s.aic ?? s.id ?? s._id)}
                   getLabel={(s) =>
                     [s.firstName, s.lastName].filter(Boolean).join(" ") || s.email || "Unknown"
                   }
