@@ -192,21 +192,25 @@ function PillRangeOverlay({ leftPx, rightPx, top, height }) {
   );
 }
 
-function SimpleSelect({ label, items, getKey, getLabel, value, onChange }) {
+function SimpleSelect({ label, items, getKey, getLabel, value, onChange, emptyMessage }) {
   const [open, setOpen] = useState(false);
+  const displayText = value == null 
+    ? (emptyMessage || "Select…") 
+    : getLabel(items.find((it) => getKey(it) === value));
+    
   return (
     <View style={{ marginTop: 10 }}>
       <Text style={styles.inputLabel}>{label}</Text>
       <Pressable
-        onPress={() => setOpen((v) => !v)}
-        style={[styles.selectBox, open && { borderColor: "#5B61FF" }]}
+        onPress={() => items.length > 0 && setOpen((v) => !v)}
+        style={[styles.selectBox, open && { borderColor: "#5B61FF" }, items.length === 0 && { backgroundColor: "#f5f5f5" }]}
       >
         <Text style={{ color: value == null ? "#999" : "#000", fontWeight: "600" }}>
-          {value == null ? "Select…" : getLabel(items.find((it) => getKey(it) === value))}
+          {displayText}
         </Text>
       </Pressable>
 
-      {open && (
+      {open && items.length > 0 && (
         <View style={styles.dropdownMenu}>
           <ScrollView style={{ maxHeight: 180 }}>
             {items.map((it) => {
@@ -702,9 +706,8 @@ export default function WeekView({
                   }}
                 />
 
-                <Text style={styles.inputLabel}>Staff {filteredStaffList.length === 0 && degreeId ? '(No matching staff)' : ''}</Text>
                 <SimpleSelect
-                  label=""
+                  label="Staff"
                   items={filteredStaffList}
                   getKey={(s) => String(s.aic)} 
                   getLabel={(s) =>
@@ -712,6 +715,7 @@ export default function WeekView({
                   }
                   value={staffId}
                   onChange={setStaffId}
+                  emptyMessage={degreeId && filteredStaffList.length === 0 ? "No matching staff" : null}
                 />
 
                 {!timeOk && (
