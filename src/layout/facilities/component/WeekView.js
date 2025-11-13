@@ -670,9 +670,9 @@ export default function WeekView({
                   }}
                 />
 
-
+                <Text style={styles.inputLabel}>Staff {filteredStaffList.length === 0 && degreeId ? '(No matching staff)' : ''}</Text>
                 <SimpleSelect
-                  label="Staff"
+                  label=""
                   items={filteredStaffList}
                   getKey={(s) => String(s.aic ?? s.id ?? s._id)}
                   getLabel={(s) =>
