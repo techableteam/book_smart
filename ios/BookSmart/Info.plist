@@ -130,5 +130,9 @@
 	</array>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>We use your information to personalize your experience and provide relevant content.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mailto</string>
+	</array>
 </dict>
 </plist>
