@@ -520,7 +520,7 @@ export const applyForShift = async (DJobId, clinicianId) => {
 export const reviewApplicant = async (DJobId, clinicianId, action) => {
   try {
     const token = await AsyncStorage.getItem('token');
-
+    // console.log("reviewApplicant", DJobId, clinicianId, action);
     const res = await axios.post(
       'api/djobs/reviewapplicant',
       { DJobId, clinicianId, action },
