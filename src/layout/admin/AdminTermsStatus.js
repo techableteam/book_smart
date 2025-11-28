@@ -97,8 +97,9 @@ export default function AdminTermsStatus({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topView}>
-          <AnimatedHeader title="Terms Status" />
-          <View style={styles.bottomBar} />
+          <View style={styles.animatedHeaderContainer}>
+            <AnimatedHeader title="Terms Status" style={styles.animatedHeader} />
+          </View>
         </View>
 
         {/* Latest Terms Info */}
@@ -207,6 +208,14 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginBottom: 20
+  },
+  animatedHeaderContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  animatedHeader: {
+    width: '80%'
   },
   bottomBar: {
     width: '90%',
