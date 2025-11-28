@@ -41,7 +41,7 @@ export default function AdminTermsStatus({ navigation }) {
   );
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return '';
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', {
@@ -52,25 +52,32 @@ export default function AdminTermsStatus({ navigation }) {
         minute: '2-digit'
       });
     } catch (error) {
-      return 'Invalid Date';
+      return '';
     }
   };
 
-  const getStatusColor = (hasAccepted, isUpToDate) => {
+  const getStatusColor = (hasAccepted) => {
     if (!hasAccepted) return '#ff4444'; // Red - not accepted
-    if (!isUpToDate) return '#ffaa00'; // Orange - accepted but outdated
-    return '#00aa00'; // Green - accepted and up to date
+    return '#00aa00'; // Green - accepted
   };
 
-  const getStatusText = (hasAccepted, isUpToDate, latestVersion) => {
-    if (!hasAccepted) return 'Not Accepted';
-    if (!isUpToDate) return `Outdated (Latest: ${latestVersion})`;
-    return 'Up to Date';
+  const getStatusText = (hasAccepted) => {
+    if (!hasAccepted) return 'Not Accept';
+    return 'Accept';
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  const getDisplayVersion = (item, latestTerms) => {
+    // If user has accepted and has a version, show their accepted version
+    if (item.hasAccepted && item.termsVersion && item.termsVersion.trim() !== '') {
+      return item.termsVersion;
+    }
+    // If no version but latest exists, show latest version
+    if (latestTerms && latestTerms.version) {
+      return latestTerms.version;
+    }
+    // Otherwise show empty
+    return '';
+  };
 
   const currentData = activeTab === 'clinicians' 
     ? (termsData?.clinicians || [])
@@ -129,11 +136,12 @@ export default function AdminTermsStatus({ navigation }) {
 
         {/* Table Header */}
         <View style={styles.tableHeader}>
-          <Text style={[styles.headerCell, { flex: 2 }]}>Name</Text>
+          {activeTab === 'clinicians' && (
+            <Text style={[styles.headerCell, { flex: 2 }]}>Name</Text>
+          )}
           {activeTab === 'facilities' && (
             <Text style={[styles.headerCell, { flex: 2 }]}>Company</Text>
           )}
-          <Text style={[styles.headerCell, { flex: 2 }]}>Contact</Text>
           <Text style={[styles.headerCell, { flex: 1.5 }]}>Status</Text>
           <Text style={[styles.headerCell, { flex: 1.5 }]}>Version</Text>
           <Text style={[styles.headerCell, { flex: 2 }]}>Signed Date</Text>
@@ -147,40 +155,39 @@ export default function AdminTermsStatus({ navigation }) {
         ) : (
           currentData.map((item, index) => (
             <View key={index} style={styles.tableRow}>
-              <Text style={[styles.cell, { flex: 2 }]}>
-                {item.firstName} {item.lastName}
-              </Text>
-              {activeTab === 'facilities' && (
+              {activeTab === 'clinicians' && (
                 <Text style={[styles.cell, { flex: 2 }]}>
-                  {item.companyName || 'N/A'}
+                  {item.firstName} {item.lastName}
                 </Text>
               )}
-              <View style={[styles.cell, { flex: 2 }]}>
-                <Text style={styles.contactText}>{activeTab === 'clinicians' ? item.email : item.contactEmail}</Text>
-                <Text style={styles.contactText}>{activeTab === 'clinicians' ? item.phoneNumber : item.contactPhone}</Text>
-              </View>
+              {activeTab === 'facilities' && (
+                <Text style={[styles.cell, { flex: 2 }]}>
+                  {item.companyName || ''}
+                </Text>
+              )}
               <View style={[styles.cell, { flex: 1.5 }]}>
                 <View
                   style={[
                     styles.statusBadge,
-                    { backgroundColor: getStatusColor(item.hasAccepted, item.isUpToDate) }
+                    { backgroundColor: getStatusColor(item.hasAccepted) }
                   ]}
                 >
                   <Text style={styles.statusText}>
-                    {getStatusText(item.hasAccepted, item.isUpToDate, latestTerms?.version || '')}
+                    {getStatusText(item.hasAccepted)}
                   </Text>
                 </View>
               </View>
               <Text style={[styles.cell, { flex: 1.5 }]}>
-                {item.termsVersion || 'N/A'}
+                {getDisplayVersion(item, latestTerms)}
               </Text>
               <Text style={[styles.cell, { flex: 2 }]}>
-                {formatDate(item.termsSignedDate)}
+                {item.termsSignedDate ? formatDate(item.termsSignedDate) : ''}
               </Text>
             </View>
           ))
         )}
       </ScrollView>
+      <Loader visible={loading} />
       <MFooter />
     </View>
   );
