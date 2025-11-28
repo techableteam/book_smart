@@ -59,9 +59,22 @@ export default function ClientSignIn({ navigation }) {
   };
   
   const getFCMMsgToken = async () => {
-    const token = await messaging().getToken();
-    console.log("This is FCM Token => ", token);
-    setFToken(token);
+    try {
+      const token = await messaging().getToken();
+      if (token) {
+        console.log("This is FCM Token => ", token);
+        setFToken(token);
+      } else {
+        console.warn("FCM Token is null or undefined");
+      }
+    } catch (error) {
+      console.error('Error getting FCM token:', error);
+      console.error('Error details:', error.message);
+      // FCM might not work in emulators without Google Play Services
+      if (error.message?.includes('SERVICE_NOT_AVAILABLE') || error.message?.includes('Google Play')) {
+        console.warn('FCM may not be available in this emulator. Google Play Services may be required.');
+      }
+    }
   };
   
   useFocusEffect(
@@ -157,7 +170,8 @@ export default function ClientSignIn({ navigation }) {
         if (response.user.clinicalAcknowledgeTerm) {
           handleSignInNavigate('MyHome');
         } else {
-          handleSignInNavigate('ClientPermission');
+          // Navigate to new terms page that fetches from API
+          handleSignInNavigate('ClientNewTerms');
         }
       } else {
         setRequest(false);

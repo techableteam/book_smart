@@ -1805,3 +1805,25 @@ export const acknowledgeNewTerms = async (termsType) => {
     return { error: error.response?.data?.error || error.message };
   }
 };
+
+// Get terms status for all users (admin only)
+export const getTermsStatus = async () => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    if (!existingToken) {
+      return { error: 'No authentication token found' };
+    }
+    const response = await axios.get(
+      'api/terms/status',
+      {
+        headers: {
+          Authorization: `Bearer ${existingToken}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching terms status:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};

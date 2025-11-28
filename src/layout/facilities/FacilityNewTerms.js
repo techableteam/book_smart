@@ -1,0 +1,401 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Dimensions, Image, Alert, Button } from 'react-native';
+import MFooter from '../../components/Mfooter';
+import MHeader from '../../components/Mheader';
+import SubNavbar from '../../components/SubNavbar';
+import Hyperlink from 'react-native-hyperlink';
+import { Dropdown } from 'react-native-element-dropdown';
+import SignatureCapture from 'react-native-signature-capture';
+import images from '../../assets/images';
+import HButton from '../../components/Hbutton';
+import { Update, getPublishedTerms } from '../../utils/useApi';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { useAtom } from 'jotai';
+import { facilityIdAtom, contactEmailAtom, facilityAcknowledgementAtom } from '../../context/FacilityAuthProvider';
+import Loader from '../Loader';
+
+const { width, height } = Dimensions.get('window');
+
+export default function FacilityNewTerms({ navigation }) {
+  const [facilityId] = useAtom(facilityIdAtom);
+  const [contactEmail] = useAtom(contactEmailAtom);
+  const [facilityAcknowledgement, setFacilityAcknowledgement] = useAtom(facilityAcknowledgementAtom);
+  
+  const items = [
+    { label: 'Yes', value: 1 },
+    { label: 'No', value: 2 },
+  ];
+  const [checked, setChecked] = useState('first');
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+  const [isSigned, setIsSigned] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [termsContent, setTermsContent] = useState('');
+  const [termsVersion, setTermsVersion] = useState('');
+  const [termsPublishedDate, setTermsPublishedDate] = useState('');
+  
+  const [credentials, setCredentials] = useState({
+    signature: '',
+    facilityAcknowledgeTerm: facilityAcknowledgement,
+    selectedoption: 'first'
+  });
+  const signatureRef = useRef(null);
+
+  // Load published terms from API
+  useEffect(() => {
+    const loadTerms = async () => {
+      try {
+        setLoading(true);
+        const response = await getPublishedTerms('facility');
+        if (response.error) {
+          Alert.alert('Error', 'Failed to load terms. Please try again.');
+          console.error('Error loading terms:', response.error);
+        } else if (response.terms) {
+          setTermsContent(response.terms.content || '');
+          setTermsVersion(response.terms.version || '');
+          setTermsPublishedDate(response.terms.publishedDate || '');
+        }
+      } catch (error) {
+        console.error('Error loading terms:', error);
+        Alert.alert('Error', 'Failed to load terms. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTerms();
+  }, []);
+
+  const onSaveEvent = (result) => {
+    setTimeout(() => {
+      setCredentials(prev => ({
+        ...prev,
+        signature: result.encoded
+      }));
+      setIsSigned(true);
+      setIsSaving(false);
+    }, 100);
+  };
+
+  const handleReset = () => {
+    signatureRef.current?.resetImage();
+    setIsSigned(false);
+    setIsSaving(false);
+    setCredentials(prev => ({
+      ...prev,
+      signature: ''
+    }));
+  };
+
+  const handlePreSubmit = () => {
+    if (value !== 1) return;
+    if (!isSigned) {
+      Alert.alert('Please sign and click Save button');
+      return;
+    }
+    handleUploadSubmit();
+  };
+
+  const handleUploadSubmit = async () => {
+    setIsSaving(true);
+    try {
+      const updateData = {
+        aic: facilityId,
+        signature: credentials.signature,
+        facilityAcknowledgeTerm: value === 1,
+        selectedoption: checked
+      };
+
+      const response = await Update(updateData, 'facilities');
+      
+      if (!response.error) {
+        setFacilityAcknowledgement(value === 1);
+        Alert.alert(
+          'Success!',
+          value === 1 ? 'Terms accepted successfully!' : 'Terms declined.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                if (value === 1) {
+                  navigation.navigate('FacilityProfile');
+                } else {
+                  navigation.navigate('FacilityLogin');
+                }
+              }
+            }
+          ],
+          { cancelable: false }
+        );
+      } else {
+        Alert.alert('Error', response.error || 'Failed to update. Please try again.');
+        setIsSaving(false);
+      }
+    } catch (error) {
+      console.error('Error updating terms:', error);
+      Alert.alert('Error', 'Failed to update. Please try again.');
+      setIsSaving(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return '';
+    }
+  };
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  return (
+    <View style={styles.container}>
+      <StatusBar translucent backgroundColor="transparent" />
+      <MHeader navigation={navigation} back={true} />
+      <SubNavbar navigation={navigation} name={"FacilityLogin"} />
+      <ScrollView style={{ width: '100%', marginTop: height * 0.22 }} showsVerticalScrollIndicator={false}>
+        <Hyperlink linkDefault={true}>
+          <View style={styles.permission}>
+            <View style={styles.titleBar}>
+              <Text style={styles.title}>BOOKSMART™ TERMS OF USE</Text>
+              {termsVersion && (
+                <Text style={styles.versionText}>Version {termsVersion}</Text>
+              )}
+              {termsPublishedDate && (
+                <Text style={styles.dateText}>Published: {formatDate(termsPublishedDate)}</Text>
+              )}
+              <Text style={styles.text}>
+                {termsContent || 'Loading terms...'}
+              </Text>
+            </View>
+
+            {/* Dropdown */}
+            <View style={styles.titleBar}>
+              <Text style={[styles.text, { fontWeight: 'bold', marginTop: 0 }]}>Facility Acknowledge Terms? Yes/No</Text>
+              <Dropdown
+                style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                itemTextStyle={styles.itemTextStyle}
+                iconStyle={styles.iconStyle}
+                data={items}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                placeholder={''}
+                value={value ?? items[1]?.value}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+                onChange={item => {
+                  setValue(item.value);
+                  setIsFocus(false);
+                  setCredentials({
+                    ...credentials,
+                    facilityAcknowledgeTerm: item.value === 1,
+                    selectedoption: checked
+                  });
+                }}
+              />
+            </View>
+
+            {/* Signature Section */}
+            {value === 1 && (
+              <View style={styles.titleBar}>
+                <Text style={[styles.text, { fontSize: RFValue(12), fontWeight: 'bold', marginTop: 0 }]}>
+                  Facility Acknowledge Terms Signature <Text style={{ color: '#f00' }}>*</Text>
+                </Text>
+
+                {isSigned && credentials.signature ? (
+                  <>
+                    <Image
+                      source={{ uri: `data:image/png;base64,${credentials.signature}` }}
+                      style={styles.signaturePreview}
+                    />
+                    <View style={styles.buttonContainer}>
+                      <Button title="Reset" onPress={handleReset} />
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <SignatureCapture
+                      style={styles.signature}
+                      ref={signatureRef}
+                      onSaveEvent={onSaveEvent}
+                      saveImageFileInExtStorage={false}
+                      showNativeButtons={false}
+                      showTitleLabel={false}
+                      viewMode="portrait"
+                    />
+                    <View style={styles.buttonContainer}>
+                      <Button
+                        title={isSaving ? 'Saving...' : 'Save'}
+                        onPress={() => {
+                          if (!isSigned && signatureRef.current) {
+                            setIsSaving(true);
+                            signatureRef.current.saveImage();
+                          } else {
+                            Alert.alert("Already signed", "Reset to re-sign.");
+                          }
+                        }}
+                        disabled={isSaving || isSigned}
+                      />
+                      <Button title="Reset" onPress={handleReset} />
+                    </View>
+                  </>
+                )}
+              </View>
+            )}
+
+            {/* Submit Button */}
+            <View style={[styles.btn, { marginTop: 20, width: '90%' }]}>
+              <HButton style={styles.subBtn} onPress={handlePreSubmit}>Submit</HButton>
+            </View>
+
+            <Image source={images.homepage} resizeMode="cover" style={styles.homepage} />
+          </View>
+        </Hyperlink>
+      </ScrollView>
+      <MFooter />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    position: 'relative'
+  },
+  permission: {
+    display: 'flex',
+    alignItems: 'center',
+    paddingTop: 30,
+    paddingHorizontal: 10
+  },
+  titleBar: {
+    width: '90%'
+  },
+  dropdown: {
+    height: 30,
+    width: '25%',
+    backgroundColor: 'white',
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    marginBottom: 10
+  },
+  placeholderStyle: {
+    color: 'black',
+    fontSize: RFValue(16),
+  },
+  selectedTextStyle: {
+    color: 'black',
+    fontSize: RFValue(16),
+  },
+  itemTextStyle: {
+    color: 'black',
+    fontSize: RFValue(16),
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  text: {
+    fontSize: RFValue(14),
+    color: 'black',
+    fontWeight: 'normal',
+    marginVertical: RFValue(20),
+  },
+  signature: {
+    flex: 1,
+    width: '100%',
+    height: 150,
+    borderWidth: 1,
+    borderColor: '#ccc'
+  },
+  signaturePreview: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'contain',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 10,
+  },
+  homepage: {
+    width: 250,
+    height: 200,
+    marginTop: 30,
+    marginBottom: 100
+  },
+  btn: {
+    flexDirection: 'column',
+    gap: 20,
+    marginBottom: 30,
+  },
+  subBtn: {
+    marginTop: 0,
+    padding: 10,
+    backgroundColor: '#A020F0',
+    color: 'white',
+    fontSize: RFValue(17),
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  title: {
+    fontSize: RFValue(16),
+    fontWeight: 'bold',
+    color: '#2a53c1',
+    textDecorationLine: 'underline'
+  },
+  versionText: {
+    fontSize: RFValue(14),
+    fontWeight: '600',
+    marginBottom: 5,
+    marginTop: 10,
+    color: '#666'
+  },
+  dateText: {
+    fontSize: RFValue(12),
+    marginBottom: 15,
+    color: '#999'
+  },
+  subTitle: {
+    fontSize: RFValue(15),
+    fontWeight: 'bold',
+    color: 'black'
+  },
+});
+
