@@ -81,6 +81,7 @@ import AdminFileViewer from './AdminFileViewer.js';
 import BookShiftsNow from './client/BookShiftsNow.js';
 import ImageFileViewer from './ImageFileViewer.js';
 import AdminMessage from './admin/AdminMessage.js';
+import AdminTerms from './admin/AdminTerms.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -362,6 +363,11 @@ function Layout() {
       <Stack.Screen 
         name= 'CaregiverTimeSheet'
         component = {CaregiverTimeSheet}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name= 'AdminTerms'
+        component = {AdminTerms}
         options={{headerShown: false}}
       />
       <Stack.Screen 

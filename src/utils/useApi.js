@@ -1,7 +1,6 @@
 import axios from './axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
-import EditProfile from '../layout/client/EditProfile';
 
 export const Signup = async (userData, endpoint) => {
   try {
@@ -1550,5 +1549,259 @@ export const sendInvoice = async (facilityId, email) => {
   } catch (error) {
       console.error('Error generating invoice:', error);
       return {error: error.response.data.message}
+  }
+};
+
+// ========== Terms API Functions ==========
+
+// Get published Terms (public - for clinicians or facilities)
+export const getPublishedTerms = async (type) => {
+  try {
+    const response = await axios.get(`api/terms/published?type=${type}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting published terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Get all Terms (admin only)
+export const getAllTerms = async () => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get('api/terms/all', {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error getting all terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Get Terms Overview (admin only) - returns published and drafts separately
+export const getTermsOverview = async () => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get('api/terms/overview', {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error getting terms overview:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Get draft Terms (admin only)
+export const getDraftTerms = async () => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get('api/terms/draft', {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error getting draft terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Get Terms by ID (admin only)
+export const getTermsById = async (id) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.get(`api/terms/${id}`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error getting terms by ID:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Save Terms as Draft (admin only)
+export const saveDraftTerms = async (content, version, type) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const AId = await AsyncStorage.getItem('AId');
+    
+    const payload = { content, version, type };
+    if (AId) {
+      payload.adminId = Number(AId);
+    }
+    
+    const response = await axios.post(
+      'api/terms/save-draft',
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${existingToken}`
+        }
+      }
+    );
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error saving draft terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Publish Terms (admin only)
+export const publishTerms = async (id, content, version, type) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const AId = await AsyncStorage.getItem('AId');
+    
+    const payload = { id };
+    if (content !== undefined) payload.content = content;
+    if (version !== undefined) payload.version = version;
+    if (type !== undefined) payload.type = type;
+    if (AId) {
+      payload.adminId = Number(AId);
+    }
+    
+    const response = await axios.post(
+      'api/terms/publish',
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${existingToken}`
+        }
+      }
+    );
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error publishing terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Create new Terms (admin only)
+export const createTerms = async (content, version, type) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const AId = await AsyncStorage.getItem('AId');
+    
+    const payload = { content, version, type };
+    if (AId) {
+      payload.adminId = Number(AId);
+    }
+    
+    const response = await axios.post(
+      'api/terms/create',
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${existingToken}`
+        }
+      }
+    );
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error creating terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Update Terms (admin only)
+export const updateTerms = async (id, content, version) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const AId = await AsyncStorage.getItem('AId');
+    
+    const payload = { content, version };
+    if (AId) {
+      payload.adminId = Number(AId);
+    }
+    
+    const response = await axios.put(
+      `api/terms/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${existingToken}`
+        }
+      }
+    );
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error updating terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Delete Terms (admin only)
+export const deleteTerms = async (id) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.delete(`api/terms/${id}`, {
+      headers: {
+        Authorization: `Bearer ${existingToken}`
+      }
+    });
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting terms:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};
+
+// Acknowledge new terms (admin only) - resets acknowledge flags and logs out users
+export const acknowledgeNewTerms = async (termsType) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    const response = await axios.post(
+      'api/terms/acknowledge',
+      { termsType },
+      {
+        headers: {
+          Authorization: `Bearer ${existingToken}`
+        }
+      }
+    );
+    if (response.data.token) {
+      await AsyncStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Error acknowledging new terms:', error);
+    return { error: error.response?.data?.error || error.message };
   }
 };
