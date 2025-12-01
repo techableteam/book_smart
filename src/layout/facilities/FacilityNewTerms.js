@@ -49,16 +49,56 @@ export default function FacilityNewTerms({ navigation }) {
         setLoading(true);
         const response = await getPublishedTerms('facility');
         if (response.error) {
-          Alert.alert('Error', 'Failed to load terms. Please try again.');
+          // No terms available - show alert and go back to login
+          Alert.alert(
+            'No Terms Available',
+            'There are no terms of service available at this time. Please wait for the administrator to publish terms.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  navigation.navigate('FacilityLogin');
+                }
+              }
+            ],
+            { cancelable: false }
+          );
           console.error('Error loading terms:', response.error);
         } else if (response.terms) {
           setTermsContent(response.terms.content || '');
           setTermsVersion(response.terms.version || '');
           setTermsPublishedDate(response.terms.publishedDate || '');
+        } else {
+          // No terms found - show alert and go back to login
+          Alert.alert(
+            'No Terms Available',
+            'There are no terms of service available at this time. Please wait for the administrator to publish terms.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  navigation.navigate('FacilityLogin');
+                }
+              }
+            ],
+            { cancelable: false }
+          );
         }
       } catch (error) {
         console.error('Error loading terms:', error);
-        Alert.alert('Error', 'Failed to load terms. Please try again.');
+        Alert.alert(
+          'No Terms Available',
+          'There are no terms of service available at this time. Please wait for the administrator to publish terms.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                navigation.navigate('FacilityLogin');
+              }
+            }
+          ],
+          { cancelable: false }
+        );
       } finally {
         setLoading(false);
       }
