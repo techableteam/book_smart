@@ -161,9 +161,11 @@ export default function ClientSignIn({ navigation }) {
         await sendFCMToken({ email: response.user.email, token: fToken }, 'clinical');
         
         await AsyncStorage.setItem('clinicalPhoneNumber', response.user.phoneNumber);
+        // Always save email for terms fetching (even if not checked)
+        await AsyncStorage.setItem('clinicalEmail', loginEmail);
+        await AsyncStorage.setItem('email', loginEmail); // Also save as generic email
 
         if (checked) {
-          await AsyncStorage.setItem('clinicalEmail', loginEmail);
           await AsyncStorage.setItem('clinicalPassword', loginPW);
         }
 

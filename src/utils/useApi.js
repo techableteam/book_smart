@@ -770,7 +770,9 @@ export const ResetPassword = async (credentials, endpoint) => {
 export const Update = async (updateData, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
-    console.log(existingToken);
+    const isTest = await AsyncStorage.getItem('isTest');
+    console.log('Update API call:', { endpoint, isTest, hasToken: !!existingToken });
+    
     const response = await axios.post(`api/${endpoint}/update`, updateData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
@@ -782,7 +784,10 @@ export const Update = async (updateData, endpoint) => {
     }
     return response.data;
   } catch (error) {
-    return {error: error}
+    console.error('Update API error:', error);
+    // Return a more user-friendly error message
+    const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Network error. Please check your connection.';
+    return {error: errorMessage, fullError: error}
   }
 }
 
@@ -1558,9 +1563,25 @@ export const sendInvoice = async (facilityId, email) => {
 // ========== Terms API Functions ==========
 
 // Get published Terms (public - for clinicians or facilities)
-export const getPublishedTerms = async (type) => {
+export const getPublishedTerms = async (type, email = null) => {
   try {
-    const response = await axios.get(`api/terms/published?type=${type}`);
+    // Get email from AsyncStorage if not provided
+    let userEmail = email;
+    if (!userEmail) {
+      if (type === 'clinician') {
+        userEmail = await AsyncStorage.getItem('clinicalEmail') || await AsyncStorage.getItem('email');
+      } else if (type === 'facility') {
+        userEmail = await AsyncStorage.getItem('facilityEmail') || await AsyncStorage.getItem('contactEmail');
+      }
+    }
+    
+    // Build query string with email if available
+    let queryString = `type=${type}`;
+    if (userEmail) {
+      queryString += `&email=${encodeURIComponent(userEmail)}`;
+    }
+    
+    const response = await axios.get(`api/terms/published?${queryString}`);
     return response.data;
   } catch (error) {
     console.error('Error getting published terms:', error);

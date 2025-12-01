@@ -8,11 +8,12 @@ import { Dropdown } from 'react-native-element-dropdown';
 import SignatureCapture from 'react-native-signature-capture';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
-import { Update, getPublishedTerms } from '../../utils/useApi';
+import { Update, getPublishedTerms, sendFCMToken } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useAtom } from 'jotai';
 import { facilityIdAtom, contactEmailAtom, facilityAcknowledgementAtom } from '../../context/FacilityAuthProvider';
 import Loader from '../Loader';
+import messaging from '@react-native-firebase/messaging';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,14 +41,32 @@ export default function FacilityNewTerms({ navigation }) {
     facilityAcknowledgeTerm: facilityAcknowledgement,
     selectedoption: 'first'
   });
+  const [fToken, setFToken] = useState('');
   const signatureRef = useRef(null);
+
+  // Get FCM token on component mount
+  useEffect(() => {
+    const getFCMMsgToken = async () => {
+      try {
+        const token = await messaging().getToken();
+        if (token) {
+          console.log("FCM Token in FacilityNewTerms:", token);
+          setFToken(token);
+        }
+      } catch (error) {
+        console.error('Error getting FCM token:', error);
+      }
+    };
+    getFCMMsgToken();
+  }, []);
 
   // Load published terms from API
   useEffect(() => {
     const loadTerms = async () => {
       try {
         setLoading(true);
-        const response = await getPublishedTerms('facility');
+        // Pass email to ensure correct database is used
+        const response = await getPublishedTerms('facility', contactEmail);
         if (response.error) {
           // No terms available - show alert and go back to login
           Alert.alert(
@@ -149,6 +168,17 @@ export default function FacilityNewTerms({ navigation }) {
       const response = await Update(updateData, 'facilities');
       
       if (!response.error) {
+        // Save FCM token after successful terms acceptance
+        if (fToken && contactEmail && value === 1) {
+          try {
+            await sendFCMToken({ email: contactEmail, token: fToken }, 'facilities');
+            console.log('FCM token saved after terms acceptance');
+          } catch (fcmError) {
+            console.error('Error saving FCM token:', fcmError);
+            // Don't fail the terms acceptance if FCM token save fails
+          }
+        }
+        
         setFacilityAcknowledgement(value === 1);
         Alert.alert(
           'Success!',

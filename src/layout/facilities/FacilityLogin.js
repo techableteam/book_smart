@@ -160,8 +160,11 @@ export default function FacilityLogin({ navigation }) {
           await sendFCMToken({ email: response.user.contactEmail, token: fToken }, 'facilities');
         }
 
+        // Always save email for terms fetching (even if not checked)
+        await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
+        await AsyncStorage.setItem('contactEmail', credentials.contactEmail); // Also save as generic contactEmail
+
         if (checked) {
-          await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
           await AsyncStorage.setItem('facilityPassword', credentials.password);
         }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, Dimensions, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, Dimensions, Image, Alert, Button } from 'react-native';
 import MFooter from '../../components/Mfooter';
 import MHeader from '../../components/Mheader';
 import SubNavbar from '../../components/SubNavbar';
@@ -8,11 +8,13 @@ import { Dropdown } from 'react-native-element-dropdown';
 import SignatureCapture from 'react-native-signature-capture';
 import images from '../../assets/images';
 import HButton from '../../components/Hbutton';
-import { Update, getPublishedTerms } from '../../utils/useApi';
+import { Update, getPublishedTerms, sendFCMToken } from '../../utils/useApi';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useAtom } from 'jotai';
 import { aicAtom, emailAtom, clinicalAcknowledgeTerm } from '../../context/ClinicalAuthProvider';
 import Loader from '../Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,9 +24,10 @@ export default function ClientNewTerms({ navigation }) {
     const [clinicalAcknowledgement, setClinicalAcknowledgement] = useAtom(clinicalAcknowledgeTerm);
     
     const items = [
-        { label: 'Yes', value: 1 }
+        { label: 'Yes', value: 1 },
+        { label: 'No', value: 2 }
     ];
-    const [value, setValue] = useState(2);
+    const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
     const [isSigned, setIsSigned] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -32,6 +35,7 @@ export default function ClientNewTerms({ navigation }) {
     const [termsContent, setTermsContent] = useState('');
     const [termsVersion, setTermsVersion] = useState('');
     const [termsPublishedDate, setTermsPublishedDate] = useState('');
+    const [fToken, setFToken] = useState('');
     
     const [credentials, setCredentials] = useState({
         signature: '',
@@ -39,12 +43,29 @@ export default function ClientNewTerms({ navigation }) {
     });
     let signatureRef = useRef(null);
 
+    // Get FCM token on component mount
+    useEffect(() => {
+        const getFCMMsgToken = async () => {
+            try {
+                const token = await messaging().getToken();
+                if (token) {
+                    console.log("FCM Token in ClientNewTerms:", token);
+                    setFToken(token);
+                }
+            } catch (error) {
+                console.error('Error getting FCM token:', error);
+            }
+        };
+        getFCMMsgToken();
+    }, []);
+
     // Load published terms from API
     useEffect(() => {
         const loadTerms = async () => {
             try {
                 setLoading(true);
-                const response = await getPublishedTerms('clinician');
+                // Pass email to ensure correct database is used
+                const response = await getPublishedTerms('clinician', email);
                 if (response.error) {
                     // No terms available - show alert and go back to login
                     Alert.alert(
@@ -135,6 +156,10 @@ export default function ClientNewTerms({ navigation }) {
 
         setIsSaving(true);
         try {
+            // Get isTest flag to ensure we're using the correct database
+            const isTest = await AsyncStorage.getItem('isTest');
+            console.log('Submitting terms acceptance:', { aic, isTest: isTest === 'true' });
+            
             const updateData = {
                 aic: aic,
                 signature: credentials.signature,
@@ -144,6 +169,17 @@ export default function ClientNewTerms({ navigation }) {
             const response = await Update(updateData, 'clinical');
             
             if (!response.error) {
+                // Save FCM token after successful terms acceptance
+                if (fToken && email) {
+                    try {
+                        await sendFCMToken({ email: email, token: fToken }, 'clinical');
+                        console.log('FCM token saved after terms acceptance');
+                    } catch (fcmError) {
+                        console.error('Error saving FCM token:', fcmError);
+                        // Don't fail the terms acceptance if FCM token save fails
+                    }
+                }
+                
                 setClinicalAcknowledgement(true);
                 Alert.alert(
                     'Success!',
@@ -159,12 +195,16 @@ export default function ClientNewTerms({ navigation }) {
                     { cancelable: false }
                 );
             } else {
-                Alert.alert('Error', response.error || 'Failed to update. Please try again.');
+                console.error('Update response error:', response.error);
+                const errorMsg = typeof response.error === 'string' 
+                    ? response.error 
+                    : (response.error?.message || 'Failed to update. Please try again.');
+                Alert.alert('Error', errorMsg);
                 setIsSaving(false);
             }
         } catch (error) {
             console.error('Error updating terms:', error);
-            Alert.alert('Error', 'Failed to update. Please try again.');
+            Alert.alert('Error', error.message || 'Failed to update. Please try again.');
             setIsSaving(false);
         }
     };
@@ -220,24 +260,17 @@ export default function ClientNewTerms({ navigation }) {
                                 maxHeight={300}
                                 labelField="label"
                                 valueField="value"
-                                placeholder={'100 per page'}
-                                value={value ? value : items[1]?.value}
+                                placeholder={'Select Yes/No'}
+                                value={value}
                                 onFocus={() => setIsFocus(true)}
                                 onBlur={() => setIsFocus(false)}
                                 onChange={item => {
                                     setValue(item.value);
                                     setIsFocus(false);
-                                    if (item.value == 1) {
-                                        setCredentials(prevCredentials => ({
-                                            ...prevCredentials, 
-                                            clinicalAcknowledgeTerm: true
-                                        }));
-                                    } else  {
-                                        setCredentials(prevCredentials => ({
-                                            ...prevCredentials, 
-                                            clinicalAcknowledgeTerm: false
-                                        }));
-                                    }
+                                    setCredentials(prevCredentials => ({
+                                        ...prevCredentials, 
+                                        clinicalAcknowledgeTerm: item.value === 1
+                                    }));
                                 }}
                             />
                         </View>
