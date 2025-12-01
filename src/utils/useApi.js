@@ -18,6 +18,7 @@ export const Signin = async (credentials, endpoint) => {
     const response = await axios.post(`api/${endpoint}/login`, credentials);
     const aic = response.data.user?.aic;
     const AId = response.data.user?.AId;
+    const isTest = response.data.user?.isTest || false;
     // console.log("login response:", response.data.user);
     if (aic !== undefined && aic !== null) {
       await AsyncStorage.setItem('aic', aic.toString());
@@ -29,6 +30,8 @@ export const Signin = async (credentials, endpoint) => {
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
+    // Store test mode flag
+    await AsyncStorage.setItem('isTest', isTest.toString());
     return response.data;
   } catch (error) {
     console.log(error)
