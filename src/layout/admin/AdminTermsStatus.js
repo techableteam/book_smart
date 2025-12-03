@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TouchableOpacity, Text, Modal } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -7,7 +7,7 @@ import AHeader from '../../components/Aheader';
 import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { getTermsStatus } from '../../utils/useApi';
+import { getTermsStatus, getSignatureHistory } from '../../utils/useApi';
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,6 +15,10 @@ export default function AdminTermsStatus({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('clinicians'); // 'clinicians' or 'facilities'
   const [termsData, setTermsData] = useState(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [signatureHistory, setSignatureHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const loadTermsStatus = async () => {
     setLoading(true);
@@ -62,8 +66,8 @@ export default function AdminTermsStatus({ navigation }) {
   };
 
   const getStatusText = (hasAccepted) => {
-    if (!hasAccepted) return 'Not Accept';
-    return 'Accept';
+    if (!hasAccepted) return 'Not Signed';
+    return 'Signed';
   };
 
   const getDisplayVersion = (item, latestTerms) => {
@@ -77,6 +81,33 @@ export default function AdminTermsStatus({ navigation }) {
     }
     // Otherwise show empty
     return '';
+  };
+
+  const handleViewHistory = async (user, type) => {
+    setSelectedUser(user);
+    setShowHistoryModal(true);
+    setLoadingHistory(true);
+    
+    try {
+      const response = await getSignatureHistory(user.aic, type);
+      if (response.error) {
+        console.error('Error loading signature history:', response.error);
+        setSignatureHistory([]);
+      } else {
+        setSignatureHistory(response.history || []);
+      }
+    } catch (error) {
+      console.error('Error loading signature history:', error);
+      setSignatureHistory([]);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const closeHistoryModal = () => {
+    setShowHistoryModal(false);
+    setSelectedUser(null);
+    setSignatureHistory([]);
   };
 
   const currentData = activeTab === 'clinicians' 
@@ -157,14 +188,24 @@ export default function AdminTermsStatus({ navigation }) {
           currentData.map((item, index) => (
             <View key={index} style={styles.tableRow}>
               {activeTab === 'clinicians' && (
-                <Text style={[styles.cell, { flex: 2 }]}>
-                  {item.firstName} {item.lastName}
-                </Text>
+                <TouchableOpacity 
+                  style={[styles.cell, { flex: 2 }]}
+                  onPress={() => handleViewHistory(item, 'clinician')}
+                >
+                  <Text style={styles.clickableName}>
+                    {item.firstName} {item.lastName}
+                  </Text>
+                </TouchableOpacity>
               )}
               {activeTab === 'facilities' && (
-                <Text style={[styles.cell, { flex: 2 }]}>
-                  {item.companyName || ''}
-                </Text>
+                <TouchableOpacity 
+                  style={[styles.cell, { flex: 2 }]}
+                  onPress={() => handleViewHistory(item, 'facility')}
+                >
+                  <Text style={styles.clickableName}>
+                    {item.companyName || ''}
+                  </Text>
+                </TouchableOpacity>
               )}
               <View style={[styles.cell, { flex: 1.5 }]}>
                 <View
@@ -189,6 +230,63 @@ export default function AdminTermsStatus({ navigation }) {
         )}
       </ScrollView>
       <Loader visible={loading} />
+      
+      {/* Signature History Modal */}
+      <Modal
+        visible={showHistoryModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={closeHistoryModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                Signature History
+                {selectedUser && (
+                  <Text style={styles.modalSubtitle}>
+                    {'\n'}
+                    {activeTab === 'clinicians' 
+                      ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                      : selectedUser.companyName}
+                  </Text>
+                )}
+              </Text>
+              <TouchableOpacity onPress={closeHistoryModal} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {loadingHistory ? (
+              <View style={styles.loadingContainer}>
+                <Text>Loading history...</Text>
+              </View>
+            ) : signatureHistory.length === 0 ? (
+              <View style={styles.emptyHistoryContainer}>
+                <Text style={styles.emptyHistoryText}>No signature history found</Text>
+              </View>
+            ) : (
+              <ScrollView style={styles.historyScrollView}>
+                <View style={styles.historyTableHeader}>
+                  <Text style={[styles.historyHeaderCell, { flex: 1 }]}>Version</Text>
+                  <Text style={[styles.historyHeaderCell, { flex: 2 }]}>Signed Date</Text>
+                </View>
+                {signatureHistory.map((record, index) => (
+                  <View key={index} style={styles.historyTableRow}>
+                    <Text style={[styles.historyCell, { flex: 1 }]}>
+                      {record.version || ''}
+                    </Text>
+                    <Text style={[styles.historyCell, { flex: 2 }]}>
+                      {formatDate(record.signedDate)}
+                    </Text>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+      
       <MFooter />
     </View>
   );
@@ -328,6 +426,98 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: RFValue(14),
     color: '#999'
+  },
+  clickableName: {
+    fontSize: RFValue(11),
+    color: '#0066cc',
+    textDecorationLine: 'underline',
+    textAlign: 'center'
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingBottom: 15
+  },
+  modalTitle: {
+    fontSize: RFValue(18),
+    fontWeight: 'bold',
+    color: '#333'
+  },
+  modalSubtitle: {
+    fontSize: RFValue(14),
+    fontWeight: 'normal',
+    color: '#666'
+  },
+  closeButton: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+    backgroundColor: '#f0f0f0'
+  },
+  closeButtonText: {
+    fontSize: RFValue(18),
+    color: '#666'
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center'
+  },
+  emptyHistoryContainer: {
+    padding: 40,
+    alignItems: 'center'
+  },
+  emptyHistoryText: {
+    fontSize: RFValue(14),
+    color: '#999'
+  },
+  historyScrollView: {
+    maxHeight: 400
+  },
+  historyTableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#A020F0',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 5,
+    marginBottom: 5
+  },
+  historyHeaderCell: {
+    fontSize: RFValue(12),
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center'
+  },
+  historyTableRow: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0'
+  },
+  historyCell: {
+    fontSize: RFValue(11),
+    color: '#333',
+    textAlign: 'center'
   }
 });
 

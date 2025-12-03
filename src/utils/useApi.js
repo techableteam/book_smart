@@ -1851,3 +1851,25 @@ export const getTermsStatus = async () => {
     return { error: error.response?.data?.error || error.message };
   }
 };
+
+// Get signature history for a user (admin only)
+export const getSignatureHistory = async (aic, type) => {
+  try {
+    const existingToken = await AsyncStorage.getItem('token');
+    if (!existingToken) {
+      return { error: 'No authentication token found' };
+    }
+    const response = await axios.get(
+      `api/terms/signature-history?aic=${aic}&type=${type}`,
+      {
+        headers: {
+          Authorization: `Bearer ${existingToken}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching signature history:', error);
+    return { error: error.response?.data?.error || error.message };
+  }
+};

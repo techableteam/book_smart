@@ -32,23 +32,23 @@ export default function FacilityEditProfile({ navigation }) {
   const [loading, setLoading] = useState(false);
   //--------------------------------------------Credentials-----------------------------
   const [ credentials, setCredentials ] = useState({
-    firstName: firstName,
-    lastName: lastName,
-    contactEmail: contactEmail,
-    contactPassword: contactPassword,
-    contactPhone: contactPhone,
-    companyName: companyName,
+    firstName: firstName || '',
+    lastName: lastName || '',
+    contactEmail: contactEmail || '',
+    contactPassword: contactPassword || '',
+    contactPhone: contactPhone || '',
+    companyName: companyName || '',
     birthday: Date("07/24/2024"),
     socialSecurityNumber: '123123123',
-    address: address,
-    avatar: avatar,
+    address: address || {},
+    avatar: avatar || {},
   })
 
   const handleCredentials = (target, e) => {
     if (target !== "street" && target !== "street2" && target !== "city" && target !== "state" && target !== "zip") {
       setCredentials({...credentials, [target]: e});
     } else {
-      setCredentials({...credentials, address: {...credentials.address, [target]: e}})
+      setCredentials({...credentials, address: {...(credentials.address || {}), [target]: e}})
     }
   }
 
@@ -422,7 +422,7 @@ export default function FacilityEditProfile({ navigation }) {
             </View>
             <View>
               <Text style={styles.subtitle}> Logo / Pic </Text>
-              {credentials.avatar.name &&
+              {credentials.avatar?.name &&
               <View style={{marginBottom: 10}}>
                 <Text style={{ color: 'blue', fontSize: RFValue(14) }}>{credentials.avatar.name}</Text>
                 <Text style={{color: '#0000ff', textDecorationLine: 'underline', fontSize: RFValue(14)}}
@@ -439,7 +439,7 @@ export default function FacilityEditProfile({ navigation }) {
                   placeholder=""
                   autoCorrect={false}
                   autoCapitalize="none"
-                  value={credentials.avatar.name || ''}
+                  value={credentials.avatar?.name || ''}
                 />
               </View>
             </View>
