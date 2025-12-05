@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TouchableOpacity, Text, Modal } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TouchableOpacity, Text, Modal, Image } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
 import SubNavbar from '../../components/SubNavbar';
@@ -169,14 +169,15 @@ export default function AdminTermsStatus({ navigation }) {
         {/* Table Header */}
         <View style={styles.tableHeader}>
           {activeTab === 'clinicians' && (
-            <Text style={[styles.headerCell, { flex: 2 }]}>Name</Text>
+            <Text style={[styles.headerCell, { flex: 1.5 }]}>Name</Text>
           )}
           {activeTab === 'facilities' && (
-            <Text style={[styles.headerCell, { flex: 2 }]}>Company</Text>
+            <Text style={[styles.headerCell, { flex: 1.5 }]}>Company</Text>
           )}
-          <Text style={[styles.headerCell, { flex: 1.5 }]}>Status</Text>
-          <Text style={[styles.headerCell, { flex: 1.5 }]}>Version</Text>
-          <Text style={[styles.headerCell, { flex: 2 }]}>Signed Date</Text>
+          <Text style={[styles.headerCell, { flex: 1 }]}>Status</Text>
+          <Text style={[styles.headerCell, { flex: 1 }]}>Version</Text>
+          <Text style={[styles.headerCell, { flex: 1.5 }]}>Signed Date</Text>
+          <Text style={[styles.headerCell, { flex: 1.5 }]}>Signature</Text>
         </View>
 
         {/* Table Rows */}
@@ -189,7 +190,7 @@ export default function AdminTermsStatus({ navigation }) {
             <View key={index} style={styles.tableRow}>
               {activeTab === 'clinicians' && (
                 <TouchableOpacity 
-                  style={[styles.cell, { flex: 2 }]}
+                  style={[styles.cell, { flex: 1.5 }]}
                   onPress={() => handleViewHistory(item, 'clinician')}
                 >
                   <Text style={styles.clickableName}>
@@ -199,7 +200,7 @@ export default function AdminTermsStatus({ navigation }) {
               )}
               {activeTab === 'facilities' && (
                 <TouchableOpacity 
-                  style={[styles.cell, { flex: 2 }]}
+                  style={[styles.cell, { flex: 1.5 }]}
                   onPress={() => handleViewHistory(item, 'facility')}
                 >
                   <Text style={styles.clickableName}>
@@ -207,7 +208,7 @@ export default function AdminTermsStatus({ navigation }) {
                   </Text>
                 </TouchableOpacity>
               )}
-              <View style={[styles.cell, { flex: 1.5 }]}>
+              <View style={[styles.cell, { flex: 1 }]}>
                 <View
                   style={[
                     styles.statusBadge,
@@ -219,12 +220,23 @@ export default function AdminTermsStatus({ navigation }) {
                   </Text>
                 </View>
               </View>
-              <Text style={[styles.cell, { flex: 1.5 }]}>
+              <Text style={[styles.cell, { flex: 1 }]}>
                 {getDisplayVersion(item, latestTerms)}
               </Text>
-              <Text style={[styles.cell, { flex: 2 }]}>
+              <Text style={[styles.cell, { flex: 1.5 }]}>
                 {item.termsSignedDate ? formatDate(item.termsSignedDate) : ''}
               </Text>
+              <View style={[styles.cell, { flex: 1.5, alignItems: 'center', justifyContent: 'center' }]}>
+                {item.signature && item.signature.trim() !== '' ? (
+                  <Image
+                    source={{ uri: `data:image/png;base64,${item.signature}` }}
+                    style={styles.dashboardSignatureImage}
+                    resizeMode="contain"
+                  />
+                ) : (
+                  <Text style={[styles.cell, { color: '#999', fontStyle: 'italic', fontSize: RFValue(9) }]}>No signature</Text>
+                )}
+              </View>
             </View>
           ))
         )}
@@ -269,16 +281,28 @@ export default function AdminTermsStatus({ navigation }) {
               <ScrollView style={styles.historyScrollView}>
                 <View style={styles.historyTableHeader}>
                   <Text style={[styles.historyHeaderCell, { flex: 1 }]}>Version</Text>
-                  <Text style={[styles.historyHeaderCell, { flex: 2 }]}>Signed Date</Text>
+                  <Text style={[styles.historyHeaderCell, { flex: 1.5 }]}>Signed Date</Text>
+                  <Text style={[styles.historyHeaderCell, { flex: 1.5 }]}>Signature</Text>
                 </View>
                 {signatureHistory.map((record, index) => (
                   <View key={index} style={styles.historyTableRow}>
                     <Text style={[styles.historyCell, { flex: 1 }]}>
                       {record.version || ''}
                     </Text>
-                    <Text style={[styles.historyCell, { flex: 2 }]}>
+                    <Text style={[styles.historyCell, { flex: 1.5 }]}>
                       {formatDate(record.signedDate)}
                     </Text>
+                    <View style={[styles.historyCell, { flex: 1.5, alignItems: 'center', justifyContent: 'center' }]}>
+                      {record.signature && record.signature.trim() !== '' ? (
+                        <Image
+                          source={{ uri: `data:image/png;base64,${record.signature}` }}
+                          style={styles.signatureImage}
+                          resizeMode="contain"
+                        />
+                      ) : (
+                        <Text style={[styles.historyCell, { color: '#999', fontStyle: 'italic' }]}>No signature</Text>
+                      )}
+                    </View>
                   </View>
                 ))}
               </ScrollView>
@@ -518,6 +542,20 @@ const styles = StyleSheet.create({
     fontSize: RFValue(11),
     color: '#333',
     textAlign: 'center'
+  },
+  signatureImage: {
+    width: 100,
+    height: 60,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4
+  },
+  dashboardSignatureImage: {
+    width: 60,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4
   }
 });
 
