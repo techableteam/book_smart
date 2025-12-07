@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TextInput, TouchableOpacity, Alert, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
@@ -251,10 +251,17 @@ export default function AdminTerms({ navigation }) {
       <StatusBar translucent backgroundColor="transparent" />
       <AHeader navigation={navigation} currentPage={9} />
       <SubNavbar navigation={navigation} name={"AdminLogin"} />
-      <ScrollView
-        style={{ width: '100%', marginTop: height * 0.22 }}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        style={{ flex: 1, width: '100%' }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
+        <ScrollView
+          style={{ width: '100%', marginTop: height * 0.22 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
         <View style={styles.topView}>
           <AnimatedHeader title="TERMS MANAGEMENT" />
           <View style={styles.bottomBar} />
@@ -475,6 +482,7 @@ export default function AdminTerms({ navigation }) {
           )}
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Published Terms Modal */}
       <Modal

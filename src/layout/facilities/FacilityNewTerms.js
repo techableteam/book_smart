@@ -147,20 +147,41 @@ export default function FacilityNewTerms({ navigation }) {
   };
 
   const handlePreSubmit = () => {
-    if (value !== 1) return;
-    if (!isSigned) {
-      Alert.alert('Please sign and click Save button');
+    if (value === null || value === undefined) {
+      Alert.alert('Warning!', 'Please select "Yes" or "No" to acknowledge the terms.');
       return;
     }
+    
+    if (value !== 1) {
+      Alert.alert('Warning!', 'Please select "Yes" to accept the terms.');
+      return;
+    }
+    
+    if (!isSigned) {
+      Alert.alert('Warning!', 'Please sign and click Save button');
+      return;
+    }
+    
     handleUploadSubmit();
   };
 
   const handleUploadSubmit = async () => {
+    if (value === null || value === undefined) {
+      Alert.alert('Error', 'Please select an acknowledgment option.');
+      return;
+    }
+    
+    if (value === 1 && !credentials.signature) {
+      Alert.alert('Error', 'Please provide a signature.');
+      setIsSaving(false);
+      return;
+    }
+    
     setIsSaving(true);
     try {
       const updateData = {
         aic: facilityId,
-        signature: credentials.signature,
+        signature: credentials.signature || '',
         facilityAcknowledgeTerm: value === 1,
         selectedoption: checked
       };
@@ -261,18 +282,19 @@ export default function FacilityNewTerms({ navigation }) {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={''}
-                value={value ?? items[1]?.value}
+                placeholder={'Select Yes/No'}
+                value={value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={item => {
+                  if (!item || item.value === undefined) return;
                   setValue(item.value);
                   setIsFocus(false);
-                  setCredentials({
-                    ...credentials,
+                  setCredentials(prev => ({
+                    ...prev,
                     facilityAcknowledgeTerm: item.value === 1,
                     selectedoption: checked
-                  });
+                  }));
                 }}
               />
             </View>

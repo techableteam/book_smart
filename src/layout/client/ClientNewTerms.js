@@ -144,12 +144,17 @@ export default function ClientNewTerms({ navigation }) {
     };
 
     const handleUploadSubmit = async () => {
+        if (value === null || value === undefined) {
+            Alert.alert('Warning!', 'Please select "Yes" or "No" to acknowledge the terms.');
+            return;
+        }
+        
         if (value !== 1) {
             Alert.alert('Warning!', 'Please select "Yes" to accept the terms.');
             return;
         }
 
-        if (!isSigned) {
+        if (!isSigned || !credentials.signature) {
             Alert.alert('Warning!', 'Please sign and click Save button');
             return;
         }
@@ -160,9 +165,15 @@ export default function ClientNewTerms({ navigation }) {
             const isTest = await AsyncStorage.getItem('isTest');
             console.log('Submitting terms acceptance:', { aic, isTest: isTest === 'true' });
             
+            if (!aic) {
+                Alert.alert('Error', 'User ID not found. Please log in again.');
+                setIsSaving(false);
+                return;
+            }
+            
             const updateData = {
                 aic: aic,
-                signature: credentials.signature,
+                signature: credentials.signature || '',
                 clinicalAcknowledgeTerm: true
             };
 
@@ -265,6 +276,7 @@ export default function ClientNewTerms({ navigation }) {
                                 onFocus={() => setIsFocus(true)}
                                 onBlur={() => setIsFocus(false)}
                                 onChange={item => {
+                                    if (!item || item.value === undefined) return;
                                     setValue(item.value);
                                     setIsFocus(false);
                                     setCredentials(prevCredentials => ({
@@ -274,7 +286,7 @@ export default function ClientNewTerms({ navigation }) {
                                 }}
                             />
                         </View>
-                        {value == 1 && <View style={styles.titleBar}>
+                        {value === 1 && <View style={styles.titleBar}>
                             <Text style={[styles.text, {fontWeight: 'bold', marginBottom: 5}]}>Signature <Text style={{color: '#f00'}}>*</Text></Text>
                             {isSigned && credentials.signature ? (
                                 <>
