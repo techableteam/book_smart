@@ -282,7 +282,7 @@ export default function FacilityNewTerms({ navigation }) {
                 maxHeight={300}
                 labelField="label"
                 valueField="value"
-                placeholder={'Select Yes/No'}
+                placeholder={'Yes/No'}
                 value={value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
