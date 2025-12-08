@@ -36,8 +36,8 @@ export default function AHeader({currentPage, navigation}) {
 
   return (
     <Card style={styles.shadow}>
-      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: height * 0.143,}}>
-        <TouchableOpacity style={{width: 40, height: 70, flexDirection: 'column', justifyContent:'space-between', paddingTop: 50, paddingLeft: 20, zIndex: 0}} onPress={toggleModal}>
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: height * 0.143, zIndex: 1000}}>
+        <TouchableOpacity style={{width: 40, height: 70, flexDirection: 'column', justifyContent:'space-between', paddingTop: 50, paddingLeft: 20, zIndex: 1001}} onPress={toggleModal}>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
@@ -105,6 +105,8 @@ const styles = StyleSheet.create({
     minHeight: height * 0.15,
     top: 0,
     position:'absolute',
+    zIndex: 1000,
+    elevation: 1000,
   },
   text: {
     display: 'flex',

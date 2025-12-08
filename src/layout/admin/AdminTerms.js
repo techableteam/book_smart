@@ -251,17 +251,18 @@ export default function AdminTerms({ navigation }) {
       <StatusBar translucent backgroundColor="transparent" />
       <AHeader navigation={navigation} currentPage={9} />
       <SubNavbar navigation={navigation} name={"AdminLogin"} />
-      <KeyboardAvoidingView
-        style={{ flex: 1, width: '100%' }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-      >
-        <ScrollView
-          style={{ width: '100%', marginTop: height * 0.22 }}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 100 }}
+      <View style={{ flex: 1, width: '100%', marginTop: height * 0.22 }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1, width: '100%' }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
+          <ScrollView
+            style={{ width: '100%' }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingBottom: 100 }}
+          >
         <View style={styles.topView}>
           <AnimatedHeader title="TERMS MANAGEMENT" />
           <View style={styles.bottomBar} />
@@ -483,6 +484,7 @@ export default function AdminTerms({ navigation }) {
         </View>
       </ScrollView>
       </KeyboardAvoidingView>
+      </View>
 
       {/* Published Terms Modal */}
       <Modal
