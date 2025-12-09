@@ -134,28 +134,22 @@ export default function AdminTerms({ navigation }) {
 
   // Handle Return/Enter key press to insert newline
   const handleKeyPress = (event) => {
+    // For multiline TextInput, Return key automatically inserts newline
+    // We just need to track that a Return was pressed to prevent auto-scroll
     if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === '\n') {
+      // Mark that we're handling a Return key press
       if (contentInputRef.current) {
-        const currentText = content;
-        const selection = contentInputRef.current._lastSelection || { start: currentText.length, end: currentText.length };
-        const newText = 
-          currentText.substring(0, selection.start) + 
-          '\n' + 
-          currentText.substring(selection.end);
-        setContent(newText);
-        // Restore cursor position after newline
-        setTimeout(() => {
-          if (contentInputRef.current) {
-            const newSelection = { 
-              start: selection.start + 1, 
-              end: selection.start + 1 
-            };
-            contentInputRef.current.setNativeProps({
-              selection: newSelection
-            });
-            contentInputRef.current._lastSelection = newSelection;
-          }
-        }, 10);
+        contentInputRef.current._isReturnKey = true;
+        // Store current selection before newline is added
+        const currentSelection = contentInputRef.current._lastSelection || { 
+          start: content.length, 
+          end: content.length 
+        };
+        // Calculate where cursor will be after newline
+        contentInputRef.current._pendingSelection = {
+          start: currentSelection.start + 1,
+          end: currentSelection.start + 1
+        };
       }
     }
   };
@@ -483,24 +477,71 @@ export default function AdminTerms({ navigation }) {
                   value={content}
                   onChangeText={(text) => {
                     setContent(text);
+                    // If Return key was pressed, restore selection to prevent auto-scroll
+                    if (contentInputRef.current?._isReturnKey && contentInputRef.current?._pendingSelection) {
+                      const selection = contentInputRef.current._pendingSelection;
+                      const textBeforeCursor = text.substring(0, selection.start);
+                      const lines = textBeforeCursor.split('\n').length;
+                      
+                      // Only prevent scroll if editing in first 20 lines
+                      if (lines < 20) {
+                        setTimeout(() => {
+                          if (contentInputRef.current) {
+                            contentInputRef.current.setNativeProps({
+                              selection: selection
+                            });
+                            contentInputRef.current._lastSelection = selection;
+                          }
+                        }, 0);
+                      }
+                      // Clear the flag
+                      contentInputRef.current._isReturnKey = false;
+                    }
                   }}
                   onKeyPress={handleKeyPress}
                   onSelectionChange={(event) => {
                     // Store selection to prevent auto-scroll
                     const { start, end } = event.nativeEvent.selection;
                     if (contentInputRef.current) {
+                      const textBeforeCursor = content.substring(0, start);
+                      const lines = textBeforeCursor.split('\n').length;
+                      
+                      // If we're in the first 20 lines and selection jumped unexpectedly, restore it
+                      if (lines < 20 && contentInputRef.current._lastSelection) {
+                        const lastStart = contentInputRef.current._lastSelection.start;
+                        const lastLines = content.substring(0, lastStart).split('\n').length;
+                        
+                        // If cursor jumped to a much later position, restore previous position
+                        if (start > lastStart + 5 && lastLines < 20) {
+                          setTimeout(() => {
+                            if (contentInputRef.current) {
+                              const expectedSelection = {
+                                start: lastStart + 1, // After newline
+                                end: lastStart + 1
+                              };
+                              contentInputRef.current.setNativeProps({
+                                selection: expectedSelection
+                              });
+                              contentInputRef.current._lastSelection = expectedSelection;
+                              return;
+                            }
+                          }, 0);
+                        }
+                      }
+                      
                       contentInputRef.current._lastSelection = { start, end };
                     }
                   }}
                   onContentSizeChange={(event) => {
                     // Prevent auto-scroll to bottom when editing at top
+                    // This handles cases where content changes (not just Return key)
                     if (contentInputRef.current && contentInputRef.current._lastSelection) {
                       const selection = contentInputRef.current._lastSelection;
                       const textBeforeCursor = content.substring(0, selection.start);
                       const lines = textBeforeCursor.split('\n').length;
                       
-                      // Don't auto-scroll if editing in first 15 lines
-                      if (lines < 15) {
+                      // Don't auto-scroll if editing in first 20 lines
+                      if (lines < 20 && !contentInputRef.current._isReturnKey) {
                         // Maintain scroll position by restoring selection
                         setTimeout(() => {
                           if (contentInputRef.current) {
