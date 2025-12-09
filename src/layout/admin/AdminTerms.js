@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TextInput, TouchableOpacity, Alert, Modal, KeyboardAvoidingView, Platform, Keyboard, InputAccessoryView } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, StyleSheet, ScrollView, StatusBar, Dimensions, TextInput, TouchableOpacity, Alert, Modal, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import MFooter from '../../components/Mfooter';
@@ -31,9 +31,6 @@ export default function AdminTerms({ navigation }) {
   const [viewingPublishedTerms, setViewingPublishedTerms] = useState(null);
   const contentInputRef = useRef(null);
   const scrollViewRef = useRef(null);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const inputAccessoryViewID = 'contentInputAccessory';
 
   // Load terms overview
   const loadTermsOverview = async () => {
@@ -134,80 +131,34 @@ export default function AdminTerms({ navigation }) {
     }, [])
   );
 
-  // Track keyboard visibility
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      (event) => {
-        setIsKeyboardVisible(true);
-        if (Platform.OS === 'android') {
-          setKeyboardHeight(event.endCoordinates.height);
-        }
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => {
-        setIsKeyboardVisible(false);
-        if (Platform.OS === 'android') {
-          setKeyboardHeight(0);
-        }
-      }
-    );
 
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
-
-  // Keyboard accessory functions
-  const handleEnterPress = () => {
-    if (contentInputRef.current) {
-      const currentText = content;
-      const selection = contentInputRef.current._lastSelection || { start: currentText.length, end: currentText.length };
-      const newText = 
-        currentText.substring(0, selection.start) + 
-        '\n' + 
-        currentText.substring(selection.end);
-      setContent(newText);
-      // Restore cursor position after newline
-      setTimeout(() => {
-        if (contentInputRef.current) {
-          const newSelection = { 
-            start: selection.start + 1, 
-            end: selection.start + 1 
-          };
-          contentInputRef.current.setNativeProps({
-            selection: newSelection
-          });
-          contentInputRef.current._lastSelection = newSelection;
-        }
-      }, 10);
+  // Handle Return/Enter key press to insert newline
+  const handleKeyPress = (event) => {
+    if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === '\n') {
+      if (contentInputRef.current) {
+        const currentText = content;
+        const selection = contentInputRef.current._lastSelection || { start: currentText.length, end: currentText.length };
+        const newText = 
+          currentText.substring(0, selection.start) + 
+          '\n' + 
+          currentText.substring(selection.end);
+        setContent(newText);
+        // Restore cursor position after newline
+        setTimeout(() => {
+          if (contentInputRef.current) {
+            const newSelection = { 
+              start: selection.start + 1, 
+              end: selection.start + 1 
+            };
+            contentInputRef.current.setNativeProps({
+              selection: newSelection
+            });
+            contentInputRef.current._lastSelection = newSelection;
+          }
+        }, 10);
+      }
     }
   };
-
-  const handleBackPress = () => {
-    Keyboard.dismiss();
-  };
-
-  // Keyboard Accessory View Component
-  const KeyboardAccessory = () => (
-    <View style={styles.keyboardAccessory}>
-      <TouchableOpacity
-        style={styles.keyboardButton}
-        onPress={handleEnterPress}
-      >
-        <Text style={styles.keyboardButtonText}>Enter</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.keyboardButton}
-        onPress={handleBackPress}
-      >
-        <Text style={styles.keyboardButtonText}>Back</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   // Save as Draft
   const handleSaveDraft = async () => {
@@ -342,6 +293,10 @@ export default function AdminTerms({ navigation }) {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ paddingBottom: 100 }}
+            onScrollBeginDrag={() => {
+              // Dismiss keyboard when user starts scrolling
+              Keyboard.dismiss();
+            }}
           >
         <View style={styles.topView}>
           <AnimatedHeader title="TERMS MANAGEMENT" />
@@ -522,13 +477,6 @@ export default function AdminTerms({ navigation }) {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Content:</Text>
                 
-                {/* iOS Input Accessory View */}
-                {Platform.OS === 'ios' && (
-                  <InputAccessoryView nativeID={inputAccessoryViewID}>
-                    <KeyboardAccessory />
-                  </InputAccessoryView>
-                )}
-                
                 <TextInput
                   ref={contentInputRef}
                   style={styles.contentInput}
@@ -536,6 +484,7 @@ export default function AdminTerms({ navigation }) {
                   onChangeText={(text) => {
                     setContent(text);
                   }}
+                  onKeyPress={handleKeyPress}
                   onSelectionChange={(event) => {
                     // Store selection to prevent auto-scroll
                     const { start, end } = event.nativeEvent.selection;
@@ -570,7 +519,6 @@ export default function AdminTerms({ navigation }) {
                   returnKeyType="default"
                   blurOnSubmit={false}
                   scrollEnabled={true}
-                  inputAccessoryViewID={Platform.OS === 'ios' ? inputAccessoryViewID : undefined}
                 />
                 
               </View>
@@ -646,13 +594,6 @@ export default function AdminTerms({ navigation }) {
           </View>
         </View>
       </Modal>
-
-      {/* Android Keyboard Toolbar - positioned at root level */}
-      {Platform.OS === 'android' && isKeyboardVisible && (
-        <View style={[styles.androidKeyboardToolbar, { bottom: keyboardHeight }]}>
-          <KeyboardAccessory />
-        </View>
-      )}
 
       <Loader visible={loading} />
       <MFooter />
