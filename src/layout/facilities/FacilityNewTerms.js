@@ -15,6 +15,7 @@ import { facilityIdAtom, contactEmailAtom, facilityAcknowledgementAtom } from '.
 import Loader from '../Loader';
 import messaging from '@react-native-firebase/messaging';
 import { WebView } from 'react-native-webview';
+import { formatTermsContent } from '../../utils/formatTermsContent';
 
 const { width, height } = Dimensions.get('window');
 
@@ -290,7 +291,7 @@ export default function FacilityNewTerms({ navigation }) {
                       </style>
                     </head>
                     <body>
-                      ${termsContent || '<p>Loading terms...</p>'}
+                      ${formatTermsContent(termsContent || 'Loading terms...')}
                     </body>
                     </html>
                   ` }}

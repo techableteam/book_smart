@@ -11,6 +11,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { getTermsOverview, saveDraftTerms, publishTerms, getTermsById } from '../../utils/useApi';
 import RichTextEditor from '../../components/RichTextEditor';
 import { WebView } from 'react-native-webview';
+import { formatTermsContent } from '../../utils/formatTermsContent';
 
 const { width, height } = Dimensions.get('window');
 
@@ -544,7 +545,7 @@ export default function AdminTerms({ navigation }) {
                       </style>
                     </head>
                     <body>
-                      ${viewingPublishedTerms?.content || '<p>No content available</p>'}
+                      ${formatTermsContent(viewingPublishedTerms?.content || 'No content available')}
                     </body>
                     </html>
                   ` }}

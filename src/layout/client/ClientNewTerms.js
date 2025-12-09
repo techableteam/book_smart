@@ -16,6 +16,7 @@ import Loader from '../Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import { WebView } from 'react-native-webview';
+import { formatTermsContent } from '../../utils/formatTermsContent';
 
 const { width, height } = Dimensions.get('window');
 
@@ -281,7 +282,7 @@ export default function ClientNewTerms({ navigation }) {
                                             </style>
                                         </head>
                                         <body>
-                                            ${termsContent || '<p>Loading terms...</p>'}
+                                            ${formatTermsContent(termsContent || 'Loading terms...')}
                                         </body>
                                         </html>
                                     ` }}
