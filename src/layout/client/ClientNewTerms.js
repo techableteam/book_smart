@@ -15,6 +15,7 @@ import { aicAtom, emailAtom, clinicalAcknowledgeTerm } from '../../context/Clini
 import Loader from '../Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
+import { WebView } from 'react-native-webview';
 
 const { width, height } = Dimensions.get('window');
 
@@ -254,9 +255,41 @@ export default function ClientNewTerms({ navigation }) {
                             {termsPublishedDate && (
                                 <Text style={styles.dateText}>Published: {formatDate(termsPublishedDate)}</Text>
                             )}
-                            <Text style={styles.text}>
-                                {termsContent || 'Loading terms...'}
-                            </Text>
+                            <View style={styles.termsContentWrapper}>
+                                <WebView
+                                    source={{ html: `
+                                        <!DOCTYPE html>
+                                        <html>
+                                        <head>
+                                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                            <style>
+                                                body {
+                                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                                    font-size: ${RFValue(14)}px;
+                                                    line-height: 1.6;
+                                                    color: #424242;
+                                                    padding: 10px;
+                                                    margin: 0;
+                                                }
+                                                p { margin: 10px 0; }
+                                                strong, b { font-weight: bold; }
+                                                em, i { font-style: italic; }
+                                                u { text-decoration: underline; }
+                                                ul, ol { margin: 10px 0; padding-left: 20px; }
+                                                li { margin: 5px 0; }
+                                                h1, h2, h3, h4, h5, h6 { margin: 15px 0 10px 0; font-weight: bold; }
+                                            </style>
+                                        </head>
+                                        <body>
+                                            ${termsContent || '<p>Loading terms...</p>'}
+                                        </body>
+                                        </html>
+                                    ` }}
+                                    style={styles.termsWebView}
+                                    scrollEnabled={true}
+                                    showsVerticalScrollIndicator={false}
+                                />
+                            </View>
                         </View>
 
                         <View style={styles.titleBar}>
@@ -453,6 +486,20 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'normal',
     marginVertical: 20,
+  },
+  termsContentWrapper: {
+    width: '100%',
+    minHeight: 200,
+    maxHeight: 600,
+    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  termsWebView: {
+    backgroundColor: 'transparent',
+    flex: 1,
   },
   signature: {
     flex: 1,

@@ -9,6 +9,8 @@ import AnimatedHeader from '../AnimatedHeader';
 import Loader from '../Loader';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { getTermsOverview, saveDraftTerms, publishTerms, getTermsById } from '../../utils/useApi';
+import RichTextEditor from '../../components/RichTextEditor';
+import { WebView } from 'react-native-webview';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,8 +31,6 @@ export default function AdminTerms({ navigation }) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showPublishedModal, setShowPublishedModal] = useState(false);
   const [viewingPublishedTerms, setViewingPublishedTerms] = useState(null);
-  const contentInputRef = useRef(null);
-  const scrollViewRef = useRef(null);
 
   // Load terms overview
   const loadTermsOverview = async () => {
@@ -130,29 +130,6 @@ export default function AdminTerms({ navigation }) {
       loadTermsOverview();
     }, [])
   );
-
-
-  // Handle Return/Enter key press to insert newline
-  const handleKeyPress = (event) => {
-    // For multiline TextInput, Return key automatically inserts newline
-    // We just need to track that a Return was pressed to prevent auto-scroll
-    if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === '\n') {
-      // Mark that we're handling a Return key press
-      if (contentInputRef.current) {
-        contentInputRef.current._isReturnKey = true;
-        // Store current selection before newline is added
-        const currentSelection = contentInputRef.current._lastSelection || { 
-          start: content.length, 
-          end: content.length 
-        };
-        // Calculate where cursor will be after newline
-        contentInputRef.current._pendingSelection = {
-          start: currentSelection.start + 1,
-          end: currentSelection.start + 1
-        };
-      }
-    }
-  };
 
   // Save as Draft
   const handleSaveDraft = async () => {
@@ -470,98 +447,12 @@ export default function AdminTerms({ navigation }) {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Content:</Text>
-                
-                <TextInput
-                  ref={contentInputRef}
-                  style={styles.contentInput}
+                <RichTextEditor
                   value={content}
-                  onChangeText={(text) => {
-                    setContent(text);
-                    // If Return key was pressed, restore selection to prevent auto-scroll
-                    if (contentInputRef.current?._isReturnKey && contentInputRef.current?._pendingSelection) {
-                      const selection = contentInputRef.current._pendingSelection;
-                      const textBeforeCursor = text.substring(0, selection.start);
-                      const lines = textBeforeCursor.split('\n').length;
-                      
-                      // Only prevent scroll if editing in first 20 lines
-                      if (lines < 20) {
-                        setTimeout(() => {
-                          if (contentInputRef.current) {
-                            contentInputRef.current.setNativeProps({
-                              selection: selection
-                            });
-                            contentInputRef.current._lastSelection = selection;
-                          }
-                        }, 0);
-                      }
-                      // Clear the flag
-                      contentInputRef.current._isReturnKey = false;
-                    }
-                  }}
-                  onKeyPress={handleKeyPress}
-                  onSelectionChange={(event) => {
-                    // Store selection to prevent auto-scroll
-                    const { start, end } = event.nativeEvent.selection;
-                    if (contentInputRef.current) {
-                      const textBeforeCursor = content.substring(0, start);
-                      const lines = textBeforeCursor.split('\n').length;
-                      
-                      // If we're in the first 20 lines and selection jumped unexpectedly, restore it
-                      if (lines < 20 && contentInputRef.current._lastSelection) {
-                        const lastStart = contentInputRef.current._lastSelection.start;
-                        const lastLines = content.substring(0, lastStart).split('\n').length;
-                        
-                        // If cursor jumped to a much later position, restore previous position
-                        if (start > lastStart + 5 && lastLines < 20) {
-                          setTimeout(() => {
-                            if (contentInputRef.current) {
-                              const expectedSelection = {
-                                start: lastStart + 1, // After newline
-                                end: lastStart + 1
-                              };
-                              contentInputRef.current.setNativeProps({
-                                selection: expectedSelection
-                              });
-                              contentInputRef.current._lastSelection = expectedSelection;
-                              return;
-                            }
-                          }, 0);
-                        }
-                      }
-                      
-                      contentInputRef.current._lastSelection = { start, end };
-                    }
-                  }}
-                  onContentSizeChange={(event) => {
-                    // Prevent auto-scroll to bottom when editing at top
-                    // This handles cases where content changes (not just Return key)
-                    if (contentInputRef.current && contentInputRef.current._lastSelection) {
-                      const selection = contentInputRef.current._lastSelection;
-                      const textBeforeCursor = content.substring(0, selection.start);
-                      const lines = textBeforeCursor.split('\n').length;
-                      
-                      // Don't auto-scroll if editing in first 20 lines
-                      if (lines < 20 && !contentInputRef.current._isReturnKey) {
-                        // Maintain scroll position by restoring selection
-                        setTimeout(() => {
-                          if (contentInputRef.current) {
-                            contentInputRef.current.setNativeProps({
-                              selection: selection
-                            });
-                          }
-                        }, 0);
-                      }
-                    }
-                  }}
+                  onChange={setContent}
                   placeholder="Enter Terms content here..."
-                  placeholderTextColor="#999"
-                  multiline
-                  textAlignVertical="top"
-                  returnKeyType="default"
-                  blurOnSubmit={false}
-                  scrollEnabled={true}
+                  style={styles.richTextEditor}
                 />
-                
               </View>
 
               {lastSaved && (
@@ -628,9 +519,40 @@ export default function AdminTerms({ navigation }) {
                   </Text>
                 )}
               </View>
-              <Text style={styles.modalText}>
-                {viewingPublishedTerms?.content || 'No content available'}
-              </Text>
+              <View style={styles.modalContentWrapper}>
+                <WebView
+                  source={{ html: `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <style>
+                        body {
+                          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                          font-size: 14px;
+                          line-height: 1.6;
+                          color: #424242;
+                          padding: 10px;
+                          margin: 0;
+                        }
+                        p { margin: 10px 0; }
+                        strong, b { font-weight: bold; }
+                        em, i { font-style: italic; }
+                        u { text-decoration: underline; }
+                        ul, ol { margin: 10px 0; padding-left: 20px; }
+                        li { margin: 5px 0; }
+                      </style>
+                    </head>
+                    <body>
+                      ${viewingPublishedTerms?.content || '<p>No content available</p>'}
+                    </body>
+                    </html>
+                  ` }}
+                  style={styles.modalWebView}
+                  scrollEnabled={true}
+                  showsVerticalScrollIndicator={false}
+                />
+              </View>
             </ScrollView>
           </View>
         </View>
@@ -910,6 +832,18 @@ const styles = StyleSheet.create({
     color: '#424242',
     minHeight: 300,
     maxHeight: 600
+  },
+  richTextEditor: {
+    minHeight: 300,
+    maxHeight: 600
+  },
+  modalContentWrapper: {
+    height: height * 0.5,
+    marginTop: 10
+  },
+  modalWebView: {
+    backgroundColor: 'transparent',
+    flex: 1
   },
   lastSavedText: {
     fontSize: RFValue(12),
