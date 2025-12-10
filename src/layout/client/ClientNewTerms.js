@@ -38,6 +38,7 @@ export default function ClientNewTerms({ navigation }) {
     const [termsVersion, setTermsVersion] = useState('');
     const [termsPublishedDate, setTermsPublishedDate] = useState('');
     const [fToken, setFToken] = useState('');
+    const [webViewHeight, setWebViewHeight] = useState(200);
     
     const [credentials, setCredentials] = useState({
         signature: '',
@@ -264,31 +265,95 @@ export default function ClientNewTerms({ navigation }) {
                                         <head>
                                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
                                             <style>
+                                                * {
+                                                    margin: 0;
+                                                    padding: 0;
+                                                    box-sizing: border-box;
+                                                }
                                                 body {
                                                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                                                     font-size: ${RFValue(14)}px;
                                                     line-height: 1.6;
-                                                    color: #424242;
-                                                    padding: 10px;
+                                                    color: black;
+                                                    padding: 0;
                                                     margin: 0;
+                                                    width: 100%;
                                                 }
-                                                p { margin: 10px 0; }
-                                                strong, b { font-weight: bold; }
-                                                em, i { font-style: italic; }
-                                                u { text-decoration: underline; }
-                                                ul, ol { margin: 10px 0; padding-left: 20px; }
-                                                li { margin: 5px 0; }
-                                                h1, h2, h3, h4, h5, h6 { margin: 15px 0 10px 0; font-weight: bold; }
+                                                p { 
+                                                    margin: 0;
+                                                    margin-bottom: 20px;
+                                                    font-size: ${RFValue(14)}px;
+                                                }
+                                                div {
+                                                    font-size: ${RFValue(14)}px;
+                                                }
+                                                strong, b { 
+                                                    font-weight: bold;
+                                                    font-size: ${RFValue(14)}px;
+                                                }
+                                                em, i { 
+                                                    font-style: italic;
+                                                    font-size: ${RFValue(14)}px;
+                                                }
+                                                u { 
+                                                    text-decoration: underline;
+                                                    font-size: ${RFValue(14)}px;
+                                                }
+                                                ul, ol { 
+                                                    margin: 10px 0; 
+                                                    padding-left: 20px;
+                                                    font-size: ${RFValue(14)}px;
+                                                }
+                                                li { 
+                                                    margin: 5px 0;
+                                                    font-size: ${RFValue(14)}px;
+                                                }
+                                                h1, h2, h3, h4, h5, h6 { 
+                                                    margin: 15px 0 10px 0; 
+                                                    font-weight: bold;
+                                                    font-size: ${RFValue(14)}px;
+                                                }
                                             </style>
                                         </head>
                                         <body>
-                                            ${formatTermsContent(termsContent || 'Loading terms...')}
+                                            ${formatTermsContent(termsContent || 'Loading terms...', RFValue(14))}
                                         </body>
                                         </html>
                                     ` }}
-                                    style={styles.termsWebView}
-                                    scrollEnabled={true}
+                                    style={[styles.termsWebView, { height: webViewHeight }]}
+                                    scrollEnabled={false}
                                     showsVerticalScrollIndicator={false}
+                                    nestedScrollEnabled={false}
+                                    onMessage={(event) => {
+                                        try {
+                                            const data = JSON.parse(event.nativeEvent.data);
+                                            if (data.type === 'content-height') {
+                                                setWebViewHeight(data.height);
+                                            }
+                                        } catch (e) {
+                                            console.error('Error parsing WebView message:', e);
+                                        }
+                                    }}
+                                    injectedJavaScript={`
+                                        (function() {
+                                            function updateHeight() {
+                                                const height = Math.max(
+                                                    document.body.scrollHeight,
+                                                    document.body.offsetHeight,
+                                                    document.documentElement.clientHeight,
+                                                    document.documentElement.scrollHeight,
+                                                    document.documentElement.offsetHeight
+                                                );
+                                                window.ReactNativeWebView.postMessage(JSON.stringify({
+                                                    type: 'content-height',
+                                                    height: height
+                                                }));
+                                            }
+                                            updateHeight();
+                                            setTimeout(updateHeight, 500);
+                                            window.addEventListener('load', updateHeight);
+                                        })();
+                                    `}
                                 />
                             </View>
                         </View>
@@ -490,17 +555,11 @@ const styles = StyleSheet.create({
   },
   termsContentWrapper: {
     width: '100%',
-    minHeight: 200,
-    maxHeight: 600,
-    marginVertical: 10,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    overflow: 'hidden',
+    marginVertical: 0,
   },
   termsWebView: {
     backgroundColor: 'transparent',
-    flex: 1,
+    width: '100%',
   },
   signature: {
     flex: 1,
