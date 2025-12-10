@@ -52,7 +52,6 @@ export default function AdminTerms({ navigation }) {
         setShowCreateForm(false);
       }
     } catch (error) {
-      console.error('Error loading terms overview:', error);
       Alert.alert('Error', 'Failed to load terms');
     } finally {
       setLoading(false);
@@ -66,16 +65,20 @@ export default function AdminTerms({ navigation }) {
       if (response.error) {
         Alert.alert('Error', 'Failed to load draft');
       } else if (response.terms) {
+        const loadedContent = response.terms.content || '';
+        
+        // Set ALL state FIRST before showing form
         setSelectedDraft(draft);
-        setContent(response.terms.content || '');
+        setContent(loadedContent); // Set content FIRST
         setVersion(response.terms.version || '1.0.0');
         setType(response.terms.type || 'clinician');
         setDraftId(response.terms.id);
         setLastSaved(response.terms.lastModifiedDate || response.terms.updatedAt);
+        
+        // THEN show form - this ensures content is already in state when editor mounts
         setShowCreateForm(true);
       }
     } catch (error) {
-      console.error('Error loading draft:', error);
       Alert.alert('Error', 'Failed to load draft');
     }
   };
@@ -134,7 +137,9 @@ export default function AdminTerms({ navigation }) {
 
   // Save as Draft
   const handleSaveDraft = async () => {
-    if (!content.trim()) {
+    // Check if content is empty (handle HTML content)
+    const textContent = content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+    if (!textContent) {
       Alert.alert('Validation', 'Please enter some content before saving.');
       return;
     }
@@ -151,18 +156,29 @@ export default function AdminTerms({ navigation }) {
 
     setSaving(true);
     try {
-      const response = await saveDraftTerms(content, version, type);
+      // Ensure we have actual content
+      const contentToSave = content || '';
+      
+      if (!contentToSave || contentToSave.trim().length === 0) {
+        Alert.alert('Error', 'Content is empty. Please enter some content before saving.');
+        setSaving(false);
+        return;
+      }
+      
+      const response = await saveDraftTerms(contentToSave, version, type);
+      
       if (response.error) {
         Alert.alert('Error', response.error || 'Failed to save draft');
       } else {
-        setDraftId(response.terms?.id);
+        const savedId = response.terms?.id;
+        setDraftId(savedId);
         setLastSaved(new Date().toISOString());
         Alert.alert('Success', 'Draft saved successfully!');
-        loadTermsOverview();
+        // Reload to refresh the draft list
+        await loadTermsOverview();
       }
     } catch (error) {
-      console.error('Error saving draft:', error);
-      Alert.alert('Error', 'Failed to save draft');
+      Alert.alert('Error', 'Failed to save draft: ' + (error.message || 'Unknown error'));
     } finally {
       setSaving(false);
     }
@@ -222,7 +238,6 @@ export default function AdminTerms({ navigation }) {
                 setShowCreateForm(false);
               }
             } catch (error) {
-              console.error('Error publishing terms:', error);
               Alert.alert('Error', 'Failed to publish terms');
             } finally {
               setPublishing(false);
@@ -449,8 +464,11 @@ export default function AdminTerms({ navigation }) {
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Content:</Text>
                 <RichTextEditor
+                  key={`editor-${draftId || 'new'}-${showCreateForm ? 'visible' : 'hidden'}`}
                   value={content}
-                  onChange={setContent}
+                  onChange={(newContent) => {
+                    setContent(newContent || '');
+                  }}
                   placeholder="Enter Terms content here..."
                   style={styles.richTextEditor}
                 />

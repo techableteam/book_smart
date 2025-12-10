@@ -1671,10 +1671,24 @@ export const saveDraftTerms = async (content, version, type) => {
     const existingToken = await AsyncStorage.getItem('token');
     const AId = await AsyncStorage.getItem('AId');
     
+    console.log('=== saveDraftTerms API Call ===');
+    console.log('Content length:', content?.length || 0);
+    console.log('Version:', version);
+    console.log('Type:', type);
+    console.log('AId:', AId);
+    console.log('Token exists:', !!existingToken);
+    
     const payload = { content, version, type };
     if (AId) {
       payload.adminId = Number(AId);
     }
+    
+    console.log('Payload:', {
+      contentLength: payload.content?.length || 0,
+      version: payload.version,
+      type: payload.type,
+      adminId: payload.adminId
+    });
     
     const response = await axios.post(
       'api/terms/save-draft',
@@ -1685,13 +1699,19 @@ export const saveDraftTerms = async (content, version, type) => {
         }
       }
     );
+    
+    console.log('API Response status:', response.status);
+    console.log('API Response data:', response.data);
+    
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
     return response.data;
   } catch (error) {
     console.error('Error saving draft terms:', error);
-    return { error: error.response?.data?.error || error.message };
+    console.error('Error response:', error.response?.data);
+    console.error('Error status:', error.response?.status);
+    return { error: error.response?.data?.error || error.message || 'Unknown error' };
   }
 };
 

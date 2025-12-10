@@ -43,6 +43,11 @@ const RichTextEditor = ({ value, onChange, placeholder, style }) => {
         #editor:empty:before {
           content: "${placeholder || 'Enter text here...'}";
           color: #999;
+          pointer-events: none;
+        }
+        #editor:not(:empty):before {
+          content: none !important;
+          display: none !important;
         }
         #toolbar {
           background-color: #e0e0e0;
@@ -110,7 +115,7 @@ const RichTextEditor = ({ value, onChange, placeholder, style }) => {
           <option value="24">24</option>
         </select>
       </div>
-      <div id="editor" contenteditable="true"></div>
+      <div id="editor" contenteditable="true" style="min-height: 300px; max-height: 600px; background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 12px; overflow-y: auto; outline: none;"></div>
       <script>
         let editor = document.getElementById('editor');
         let isReady = false;
@@ -272,16 +277,20 @@ const RichTextEditor = ({ value, onChange, placeholder, style }) => {
         function updateContent() {
           if (isReady) {
             const content = editor.innerHTML;
+            // Ensure content is sent even if it's empty HTML
             window.ReactNativeWebView.postMessage(JSON.stringify({
               type: 'content-change',
-              content: content
+              content: content || ''
             }));
           }
         }
 
-        editor.addEventListener('input', function() {
-          updateButtonStates();
-          updateContent();
+        editor.addEventListener('input', function(e) {
+          // Don't update if content was just set programmatically
+          if (!editor._isSettingContent) {
+            updateButtonStates();
+            updateContent();
+          }
         });
         
         // Update button states when selection changes
@@ -407,27 +416,82 @@ const RichTextEditor = ({ value, onChange, placeholder, style }) => {
 
         // Set initial content
         function setContent(html) {
-          editor.innerHTML = html || '';
+          const contentToSet = html || '';
+          editor.innerHTML = contentToSet;
           isReady = true;
           setTimeout(updateButtonStates, 100);
+          setTimeout(updateFontSizeDropdown, 100);
           window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'editor-ready'
+            type: 'editor-ready',
+            content: contentToSet
           }));
         }
 
         // Listen for messages from React Native
         window.addEventListener('message', function(event) {
-          if (event.data && event.data.type === 'set-content') {
-            setContent(event.data.content);
+          if (event.data) {
+            let data;
+            try {
+              data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+            } catch (e) {
+              data = event.data;
+            }
+            if (data && data.type === 'set-content') {
+              let contentToSet = data.content || '';
+              
+              // If content is plain text without HTML tags, wrap it in a div
+              if (contentToSet && contentToSet.trim() && !contentToSet.trim().startsWith('<')) {
+                contentToSet = '<div>' + contentToSet + '</div>';
+              }
+              
+              if (editor) {
+                // Mark that we're setting content programmatically
+                editor._isSettingContent = true;
+                // Set content directly - don't clear first
+                editor.innerHTML = contentToSet;
+                isReady = true;
+                
+                // Force a re-render by focusing
+                editor.focus();
+                // Blur and focus again to trigger rendering
+                setTimeout(() => {
+                  editor.blur();
+                  setTimeout(() => {
+                    editor.focus();
+                  }, 10);
+                }, 10);
+                
+                setTimeout(() => {
+                  editor._isSettingContent = false;
+                  updateButtonStates();
+                  updateFontSizeDropdown();
+                  // Verify content is still there
+                  const currentContent = editor.innerHTML;
+                  if (currentContent.length === 0 && contentToSet.length > 0) {
+                    editor.innerHTML = contentToSet;
+                    editor.focus();
+                  }
+                  // Trigger a content update to notify React Native
+                  updateContent();
+                }, 150);
+              }
+            }
           }
         });
 
         // Initialize
         window.addEventListener('load', function() {
           isReady = true;
+          // Send ready message
           window.ReactNativeWebView.postMessage(JSON.stringify({
             type: 'editor-ready'
           }));
+          // Also set initial content if provided via data attribute or global
+          if (window.initialContent) {
+            setTimeout(() => {
+              editor.innerHTML = window.initialContent;
+            }, 100);
+          }
         });
       </script>
     </body>
@@ -436,13 +500,45 @@ const RichTextEditor = ({ value, onChange, placeholder, style }) => {
 
   useEffect(() => {
     if (editorReady && webViewRef.current && value !== undefined) {
-      // Send content to editor
-      webViewRef.current.postMessage(
-        JSON.stringify({
-          type: 'set-content',
-          content: value || ''
-        })
-      );
+      // Send content to editor whenever value changes using injectedJavaScript
+      const contentToSend = value || '';
+      
+      // Escape content for JavaScript injection
+      const escapedContent = contentToSend
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r');
+      
+      // Use injectedJavaScript to set content directly
+      const script = `
+        (function() {
+          const editor = document.getElementById('editor');
+          if (editor) {
+            let contentToSet = '${escapedContent}';
+            // If content is plain text without HTML tags, wrap it
+            if (contentToSet && contentToSet.trim() && !contentToSet.trim().startsWith('<')) {
+              contentToSet = '<div>' + contentToSet + '</div>';
+            }
+            editor._isSettingContent = true;
+            editor.innerHTML = contentToSet;
+            editor.focus();
+            setTimeout(() => {
+              editor._isSettingContent = false;
+              if (typeof updateButtonStates === 'function') updateButtonStates();
+              if (typeof updateFontSizeDropdown === 'function') updateFontSizeDropdown();
+            }, 50);
+          }
+        })();
+        true; // Required for injectedJavaScript
+      `;
+      
+      const timeoutId = setTimeout(() => {
+        if (webViewRef.current) {
+          webViewRef.current.injectJavaScript(script);
+        }
+      }, 100);
+      return () => clearTimeout(timeoutId);
     }
   }, [value, editorReady]);
 
@@ -452,24 +548,61 @@ const RichTextEditor = ({ value, onChange, placeholder, style }) => {
       
       if (data.type === 'editor-ready') {
         setEditorReady(true);
-        // Set initial content
-        if (value) {
+        // Set initial content immediately when editor is ready using injectJavaScript
+        const contentToSet = value || '';
+        
+        if (webViewRef.current && contentToSet) {
+          // Escape content for JavaScript injection
+          const escapedContent = contentToSet
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r');
+          
+          const script = `
+            (function() {
+              const editor = document.getElementById('editor');
+              if (editor) {
+                let contentToSet = '${escapedContent}';
+                if (contentToSet && contentToSet.trim() && !contentToSet.trim().startsWith('<')) {
+                  contentToSet = '<div>' + contentToSet + '</div>';
+                }
+                editor._isSettingContent = true;
+                editor.innerHTML = contentToSet;
+                editor.focus();
+                setTimeout(() => {
+                  editor._isSettingContent = false;
+                  if (typeof updateButtonStates === 'function') updateButtonStates();
+                  if (typeof updateFontSizeDropdown === 'function') updateFontSizeDropdown();
+                }, 50);
+              }
+            })();
+            true;
+          `;
+          
+          // Immediate injection
           setTimeout(() => {
-            webViewRef.current?.postMessage(
-              JSON.stringify({
-                type: 'set-content',
-                content: value
-              })
-            );
-          }, 100);
+            if (webViewRef.current) {
+              webViewRef.current.injectJavaScript(script);
+            }
+          }, 50);
+          
+          // Delayed attempts
+          setTimeout(() => {
+            if (webViewRef.current) {
+              webViewRef.current.injectJavaScript(script);
+            }
+          }, 200);
         }
       } else if (data.type === 'content-change') {
         if (onChange) {
-          onChange(data.content);
+          // Ensure content is always a string, even if empty
+          const content = data.content || '';
+          onChange(content);
         }
       }
     } catch (error) {
-      console.error('Error parsing message from WebView:', error);
+      // Silently handle errors
     }
   };
 
