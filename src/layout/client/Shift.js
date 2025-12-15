@@ -75,7 +75,7 @@ export default function Shift ({ navigation }) {
         title: 'Location',
         content: item.location
       },{
-        title: 'Rate',
+        title: 'Contracted Base Rate',
         content: item.payRate
       },{
         title: 'Status',
@@ -577,7 +577,7 @@ export default function Shift ({ navigation }) {
               <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
             </View>
             <View style={styles.buttonWrapper}>
-              <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
+              <ImageButton title={"Contractor Invoicing Module"} onPress={() => handleNavigate('TimesheetForm')} />
             </View>
             <View style={styles.buttonWrapper}>
               <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />

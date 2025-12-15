@@ -45,7 +45,7 @@ export default function MyProfile ({ navigation }) {
           </View>
           <View style={styles.imageButton}>
             <ImageButton title={"My Home"} onPress={() => handleNavigate('MyHome')} />
-            <ImageButton title={"Electronic Timesheet"} onPress={() => handleNavigate('TimesheetForm')} />
+            <ImageButton title={"Contractor Invoicing Module"} onPress={() => handleNavigate('TimesheetForm')} />
             <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
             <ImageButton title={"My Reporting"} onPress={() => handleNavigate('Reporting')} />
           </View>

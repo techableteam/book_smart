@@ -14,6 +14,7 @@ export default function ImageButton({
   const image = {
     "My Profile": images.profile,
     "Electronic Timesheet": images.checkList,
+    "Contractor Invoicing Module": images.checkList,
     "My Shifts": images.shift,
     "My Reporting": images.reporting,
     "My Home": images.home,
@@ -35,7 +36,7 @@ export default function ImageButton({
 const styles = StyleSheet.create({
   button: {
     width: RFValue(105),
-    height: RFValue(105),
+    height: RFValue(115),
     borderRadius: RFValue(20),
     backgroundColor: "#A020F0",
     borderColor: 'white',

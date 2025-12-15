@@ -704,7 +704,7 @@ export default function AdminJobShift({ navigation }) {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.subtitle}> Pay Rate </Text>
+              <Text style={styles.subtitle}> Contracted Base Rate </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""
@@ -713,7 +713,7 @@ export default function AdminJobShift({ navigation }) {
               />
             </View>
             <View>
-              <Text style={styles.subtitle}> Bonus </Text>
+              <Text style={styles.subtitle}> Conditional Premium </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""

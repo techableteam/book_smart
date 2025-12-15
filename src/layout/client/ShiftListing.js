@@ -98,12 +98,12 @@ export default function ShiftListing ({ navigation }) {
       { title: 'Job-ID',      content: item.jobId },
       { title: 'Job #',       content: item.jobNum },
       { title: 'Title',       content: item.degree },
-      { title: 'Hourly Rate', content: item.payRate },
+      { title: 'Contracted Base Rate', content: item.payRate },
       { title: 'Status',      content: item.status },
       { title: 'Shift',       content: (item.shift || '').replace(/\s/g, '') },
       { title: 'Date',        content: item.shiftDate },
       { title: 'Location',    content: item.location },
-      { title: 'Bonus',       content: item.bonus },
+      { title: 'Conditional Premium',       content: item.bonus },
     ]));
   
     setUserInfo(transformedData);

@@ -1239,7 +1239,7 @@ export default function CompanyShift({ navigation }) {
                       <Text style={styles.content}>{selectedJob?.shiftDate}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Pay Rate</Text>
+                      <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Contracted Base Rate</Text>
                       <Text style={styles.content}>{selectedJob?.payRate}</Text>
                     </View>
                     <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
@@ -1631,7 +1631,7 @@ export default function CompanyShift({ navigation }) {
                       </TouchableOpacity>
                     </View>
                     <View>
-                      <Text style={styles.subtitle}>Pay Rate</Text>
+                      <Text style={styles.subtitle}>Contracted Base Rate</Text>
                       <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                         <TextInput
                           style={[styles.input, { width: '90%', color: 'black' }]}
@@ -1642,7 +1642,7 @@ export default function CompanyShift({ navigation }) {
                       </View>
                     </View>
                     <View>
-                      <Text style={styles.subtitle}>Bonus</Text>
+                      <Text style={styles.subtitle}>Conditional Premium</Text>
                       <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                         <TextInput
                           style={[styles.input, { width: '90%', color: 'black' }]}
