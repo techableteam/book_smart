@@ -75,7 +75,7 @@ export default function Shift ({ navigation }) {
         title: 'Location',
         content: item.location
       },{
-        title: 'Contracted Base Rate',
+        title: 'Contractor Base Rate',
         content: item.payRate
       },{
         title: 'Status',

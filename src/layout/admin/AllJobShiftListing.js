@@ -1613,7 +1613,7 @@ export default function AllJobShiftListing({ navigation }) {
                         <Text style={styles.content}>{selectedJob?.shiftDate}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Contracted Base Rate</Text>
+                        <Text style={[styles.titles, {backgroundColor: '#f2f2f2', marginBottom: 5, paddingLeft: 2}]}>Contractor Base Rate</Text>
                         <Text style={styles.content}>{selectedJob?.payRate}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>

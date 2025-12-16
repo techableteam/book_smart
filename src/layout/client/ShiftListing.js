@@ -98,7 +98,7 @@ export default function ShiftListing ({ navigation }) {
       { title: 'Job-ID',      content: item.jobId },
       { title: 'Job #',       content: item.jobNum },
       { title: 'Title',       content: item.degree },
-      { title: 'Contracted Base Rate', content: item.payRate },
+      { title: 'Contractor Base Rate', content: item.payRate },
       { title: 'Status',      content: item.status },
       { title: 'Shift',       content: (item.shift || '').replace(/\s/g, '') },
       { title: 'Date',        content: item.shiftDate },
