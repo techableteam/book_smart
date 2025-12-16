@@ -14,7 +14,7 @@ export default function ImageButton({
   const image = {
     "My Profile": images.profile,
     "Electronic Timesheet": images.checkList,
-    "Contractor Invoicing Module": images.checkList,
+    "Contractor Invoice": images.checkList,
     "My Shifts": images.shift,
     "My Reporting": images.reporting,
     "My Home": images.home,

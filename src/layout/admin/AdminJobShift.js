@@ -713,7 +713,7 @@ export default function AdminJobShift({ navigation }) {
               />
             </View>
             <View>
-              <Text style={styles.subtitle}> Conditional Premium </Text>
+              <Text style={styles.subtitle}> Flex Rate </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""

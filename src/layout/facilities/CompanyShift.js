@@ -1642,7 +1642,7 @@ export default function CompanyShift({ navigation }) {
                       </View>
                     </View>
                     <View>
-                      <Text style={styles.subtitle}>Conditional Premium</Text>
+                      <Text style={styles.subtitle}>Flex Rate</Text>
                       <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                         <TextInput
                           style={[styles.input, { width: '90%', color: 'black' }]}

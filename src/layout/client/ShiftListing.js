@@ -103,7 +103,7 @@ export default function ShiftListing ({ navigation }) {
       { title: 'Shift',       content: (item.shift || '').replace(/\s/g, '') },
       { title: 'Date',        content: item.shiftDate },
       { title: 'Location',    content: item.location },
-      { title: 'Conditional Premium',       content: item.bonus },
+      { title: 'Flex Rate',       content: item.bonus },
     ]));
   
     setUserInfo(transformedData);

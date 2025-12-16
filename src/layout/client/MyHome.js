@@ -47,7 +47,7 @@ export default function MyHome ({ navigation }) {
               <ImageButton title={"My Profile"} onPress={() => handleNavigate('EditProfile')} />
             </View>
             <View style={styles.buttonWrapper}>
-              <ImageButton title={"Contractor Invoicing Module"} onPress={() => handleNavigate('TimesheetForm')} />
+              <ImageButton title={"Contractor Invoice"} onPress={() => handleNavigate('TimesheetForm')} />
             </View>
             <View style={styles.buttonWrapper}>
               <ImageButton title={"My Shifts"} onPress={() => handleNavigate('Shift')} />
