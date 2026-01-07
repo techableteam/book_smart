@@ -343,20 +343,82 @@ export default function WeekView({
     const key = toDateKey(dateObj);
     const minute = clamp(hourIndex * 60, 0, 24 * 60);
 
-    if (!sel || sel.key !== key || (confirm && confirm.key === key)) {
+    // If no selection exists, or clicking on a different day (for cross-day selection), start new selection
+    if (!sel) {
       setSel({ key, dateObj, startMin: minute });
       setConfirm(null);
       return;
     }
-    const startMin = Math.min(sel.startMin, minute);
-    const endMin = Math.max(sel.startMin, minute);
-    setSel(null);
-    setConfirm({ key, dateObj, startMin, endMin });
-    setShowModal(true);
-    setStaffId(null);
-    setShiftText("");
-    setDegreeId(null);
-    setFacilityId(null);  
+
+    // Check if clicking on the same day again (same day selection)
+    if (sel.key === key) {
+      if (confirm && confirm.key === key) {
+        // Already confirmed on this day, start new selection
+        setSel({ key, dateObj, startMin: minute });
+        setConfirm(null);
+        return;
+      }
+      
+      // Same day: handle regular or overnight shift on same day
+      let startMin, endMin;
+      if (minute < sel.startMin) {
+        // Overnight shift on same day: start is later (e.g., 10 PM = 1320), end is earlier (e.g., 4 AM = 240)
+        startMin = sel.startMin;
+        endMin = minute;
+      } else {
+        // Regular shift: start is earlier, end is later
+        startMin = sel.startMin;
+        endMin = minute;
+      }
+      
+      setSel(null);
+      setConfirm({ key, dateObj, startDateObj: sel.dateObj, endDateObj: dateObj, startMin, endMin });
+      setShowModal(true);
+      setStaffId(null);
+      setShiftText("");
+      setDegreeId(null);
+      return;
+    }
+
+    // Different day: check if it's the next day for overnight shift
+    const selDate = new Date(sel.dateObj);
+    const tapDate = new Date(dateObj);
+    const nextDay = new Date(selDate);
+    nextDay.setDate(selDate.getDate() + 1);
+    
+    // Check if tapDate is the next day after selDate
+    const isNextDay = tapDate.getDate() === nextDay.getDate() && 
+                      tapDate.getMonth() === nextDay.getMonth() && 
+                      tapDate.getFullYear() === nextDay.getFullYear();
+
+    if (isNextDay) {
+      // Cross-day overnight shift: start on first day, end on next day
+      // For overnight shifts, start time should be later in the day (e.g., 10 PM) and end time earlier (e.g., 4 AM)
+      // If minute (end time) is less than sel.startMin (start time), it's a valid overnight shift
+      if (minute < sel.startMin || sel.startMin >= 12 * 60) { // Start time is PM (>= 12:00) or end is earlier
+        const startMin = sel.startMin;
+        const endMin = minute;
+        
+        setSel(null);
+        setConfirm({ 
+          key: sel.key, // Use start day's key for the confirm
+          dateObj: sel.dateObj, // Start date
+          startDateObj: sel.dateObj,
+          endDateObj: dateObj, // End date (next day)
+          startMin, 
+          endMin 
+        });
+        setShowModal(true);
+        setStaffId(null);
+        setShiftText("");
+        setDegreeId(null);
+        return;
+      }
+    }
+
+    // If not a valid cross-day selection, start new selection on the tapped day
+    setSel({ key, dateObj, startMin: minute });
+    setConfirm(null);
   };
 
   const pxFromMin = (m) =>
@@ -372,12 +434,15 @@ export default function WeekView({
     setFacilityId(null); 
   };
 
-  const timeOk = confirm ? derivedEndMin > derivedStartMin : true;
+  // Allow overnight shifts (end time can be less than start time, e.g., 11pm to 7am)
+  // Only prevent if times are exactly equal
+  const timeOk = confirm ? derivedEndMin !== derivedStartMin : true;
   const canConfirm = degreeId != null && timeOk; 
 
   const handleConfirmModal = () => {
     if (!confirm || !canConfirm) return;
-    const { dateObj } = confirm;
+    // Use startDateObj if available (for cross-day shifts), otherwise use dateObj
+    const dateObj = confirm.startDateObj || confirm.dateObj;
 
     const selectedDegree   = degrees.find(d => String(d.Did ?? d.id) === String(degreeId));
     const selectedFacility = facilities.find(f => String(f.aic) === String(facilityId));
@@ -720,7 +785,7 @@ export default function WeekView({
 
                 {!timeOk && (
                   <Text style={{ color: "#b00020", marginTop: 6, fontWeight: "700" }}>
-                    End time must be after start time.
+                    Start and end time cannot be the same.
                   </Text>
                 )}
               </>

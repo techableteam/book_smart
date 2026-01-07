@@ -8,6 +8,8 @@ import {
   ScrollView, 
   Dimensions 
 } from 'react-native';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 import { 
   getShiftTypes, 
   addShiftToStaff,
@@ -341,7 +343,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
-    maxHeight: '90%',
+    maxHeight: SCREEN_HEIGHT * 0.9,
     elevation: 5,
   },
   title: {
@@ -442,7 +444,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   shiftScrollBox: {
-    maxHeight: Math.floor(Dimensions.get('window').height * 0.3), 
+    maxHeight: Math.floor(Dimensions.get('window').height * 0.2), 
     borderWidth: 1,
     borderColor: '#eee',
     borderRadius: 10,

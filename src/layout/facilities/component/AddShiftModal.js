@@ -69,8 +69,10 @@ export default function AddShiftModal({ visible, onClose, onReload }) {
       setError('Start and end time must be selected.');
       return;
     }
-    if (endTime <= startTime) {
-      setError('End time must be later than start time.');
+    // Allow overnight shifts (end time can be earlier than start time, e.g., 11pm to 7am)
+    // Only prevent if times are exactly equal
+    if (endTime.getTime() === startTime.getTime()) {
+      setError('Start and end time cannot be the same.');
       return;
     }
 

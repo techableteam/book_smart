@@ -141,10 +141,11 @@ const HomeTab = ({
   const [selectedJobForApplicants, setSelectedJobForApplicants] = useState(null);
 
   const [startTime, endTime] = React.useMemo(() => {
-    const raw = String(selectedEvent?.time || '');
+    // Use originalTime if available (for overnight shifts that were split), otherwise use time
+    const raw = String(selectedEvent?.originalTime || selectedEvent?.time || '');
     const [s, e] = raw.split(/[➔➜→]/).map(t => t?.trim());
     return [s || '', e || ''];
-  }, [selectedEvent?.time]);
+  }, [selectedEvent?.time, selectedEvent?.originalTime]);
 
   useEffect(() => {
     (async () => {

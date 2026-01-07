@@ -8,6 +8,8 @@ import {
   ScrollView, 
   Dimensions 
 } from 'react-native';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 import { 
   getShiftTypes, 
   addShiftToStaff ,
@@ -282,7 +284,6 @@ export default function AddNewShiftModal({ visible, onClose,
               </ScrollView>
             </View>
 
-
           <View style={styles.footer}>
             <TouchableOpacity 
               style={[
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
-    maxHeight: '90%',
+    maxHeight: SCREEN_HEIGHT * 0.9,
     elevation: 5,
   },
   title: {
@@ -429,7 +430,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   shiftScrollBox: {
-    maxHeight: Math.floor(Dimensions.get('window').height * 0.3), 
+    maxHeight: Math.floor(Dimensions.get('window').height * 0.2), 
     borderWidth: 1,
     borderColor: '#eee',
     borderRadius: 10,
@@ -437,7 +438,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 20,
   },
-
+  shiftScroll: {
+    flexGrow: 0,
+  },
   shiftListContent: {
     padding: 10,
   },
