@@ -8,8 +8,6 @@ import {
   ScrollView, 
   Dimensions 
 } from 'react-native';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 import { 
   getShiftTypes, 
   addShiftToStaff ,
@@ -29,55 +27,17 @@ export default function AddNewShiftModal({ visible, onClose,
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [degrees, setDegrees] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // --- NEW: helper to get selected degree name (used for filtering staff)
-  const selectedDegreeName = React.useMemo(() => {
-    if (!degrees) return '';
-    const found = degreelist?.find(d => String(d.Did) === String(degrees));
-    return (found?.degreeName || '').trim();
-  }, [degrees, degreelist]);
-
-  // Reset all form fields
-  const resetForm = React.useCallback(() => {
-    setDegrees('');
-    setSelectedEmployee('');
-    setEmployeeList([]);
-    setSelectedShift(null);
-    setSelectedDate(new Date());
-    setIsSubmitting(false);
-  }, []);
 
   useEffect(() => {
-    if (visible) {
-      fetchShiftTypes();
-      resetForm();
-    }
-  }, [visible, resetForm]);
-
-  // --- NEW: whenever degree changes, (1) reset selected staff, (2) filter staff by userRole
-  useEffect(() => {
-    setSelectedEmployee('');
-
-    if (!degrees || !selectedDegreeName) {
-      setEmployeeList([]);
-      return;
-    }
-
-    // Filter staff by userRole matching degreeName (case-insensitive, trimmed, and normalized)
-    const normalizedDegreeName = selectedDegreeName.toLowerCase().trim();
-    const filtered = (staffList || [])
-      .filter(emp => {
-        const userRole = (emp?.userRole || '').toLowerCase().trim();
-        return userRole === normalizedDegreeName;
-      })
-      .map(emp => ({
-        label: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
-        value: String(emp.aic),
+    if (visible && staffList.length > 0) {
+      const formatted = staffList.map((emp) => ({
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: emp.id.toString(),
       }));
-
-    setEmployeeList(filtered);
-  }, [degrees, selectedDegreeName, staffList]);
+      setEmployeeList(formatted);
+    }
+    fetchShiftTypes();
+  }, [visible, staffList]);
 
   const fetchShiftTypes = async () => {
     try {
@@ -107,11 +67,9 @@ export default function AddNewShiftModal({ visible, onClose,
 
   const handleSubmit = async () => {
     if (!degrees || !selectedShift || !selectedDate) {
-      alert('Please make sure all required fields are filled');
+      alert('Please select all fields');
       return;
     }
-
-    if (isSubmitting) return;
   
     const selectedShiftObj = shiftTypes.find(
       (s) => String(s.id) === String(selectedShift)
@@ -121,7 +79,6 @@ export default function AddNewShiftModal({ visible, onClose,
       return;
     }
   
-    setIsSubmitting(true);
     try {
       const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
@@ -130,7 +87,6 @@ export default function AddNewShiftModal({ visible, onClose,
   
       if (!Number.isFinite(aic)) {
         console.warn('Missing AIC:', { aic });
-        alert('Invalid facility ID. Please try again.');
         return;
       }
   
@@ -153,7 +109,7 @@ export default function AddNewShiftModal({ visible, onClose,
         shiftPayload,
         degreeId: degrees,
         facilityId: aic,
-        staffId: selectedEmployee || '',
+        staffId: selectedEmployee,
         adminId: 0,
         adminMade: false,
       });
@@ -162,7 +118,6 @@ export default function AddNewShiftModal({ visible, onClose,
 
       if (jobId) {
         await refreshShiftData();
-        resetForm();
         onClose();
       } else {
         const msg = result?.message || 'Failed to submit shift.';
@@ -170,9 +125,7 @@ export default function AddNewShiftModal({ visible, onClose,
       }
     } catch (err) {
       console.error('Error submitting shift:', err);
-      alert(err?.message || 'Failed to submit shift. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      alert('Failed to submit shift. Please try again.');
     }
   };
   
@@ -182,9 +135,7 @@ export default function AddNewShiftModal({ visible, onClose,
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add New Shift</Text>
 
-          <Text style={styles.label}>
-            Degree <Text style={{ color: 'red' }}>*</Text>
-          </Text>
+          <Text style={styles.label}>Degree</Text>
           <Dropdown
             style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
@@ -200,18 +151,12 @@ export default function AddNewShiftModal({ visible, onClose,
             valueField="value"
             placeholder="Select Degree"
             value={degrees}
-            onChange={item => {
-              setDegrees(item.value);
-              // selectedEmployee will be reset and list recalculated in useEffect
-            }}
+            onChange={item => setDegrees(item.value)}
           />
 
           <Text style={styles.label}>Staff</Text>
           <Dropdown
-            style={[
-              styles.dropdown,
-              !degrees && { backgroundColor: '#f2f2f2' },
-            ]}
+            style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
             placeholderStyle={styles.dropdownPlaceholder}
             selectedTextStyle={styles.dropdownSelectedText}
@@ -220,11 +165,9 @@ export default function AddNewShiftModal({ visible, onClose,
             maxHeight={200}
             labelField="label"
             valueField="value"
-            placeholder={degrees ? (employeeList.length ? 'Select Staff' : 'No matching staff') : 'Select Degree first'}
+            placeholder="Select Staff"
             value={selectedEmployee}
             onChange={item => setSelectedEmployee(item.value)}
-            // react-native-element-dropdown uses "disable" prop (not "disabled")
-            disable={!degrees}
           />
 
           <Text style={styles.label}>Day</Text>
@@ -284,26 +227,12 @@ export default function AddNewShiftModal({ visible, onClose,
               </ScrollView>
             </View>
 
+
           <View style={styles.footer}>
-            <TouchableOpacity 
-              style={[
-                styles.submitButton, 
-                { backgroundColor: (selectedShift && selectedDate && degrees && !isSubmitting) ? '#290135' : '#ccc' }
-              ]} 
-              onPress={handleSubmit}
-              disabled={!selectedShift || !selectedDate || !degrees || isSubmitting}
-            >
-              <Text style={styles.submitText}>{isSubmitting ? 'Submitting...' : 'Submit'}</Text>
+            <TouchableOpacity style={styles.submitButton}>
+              <Text style={styles.submitText} onPress={handleSubmit} >Submit</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => {
-                if (!isSubmitting) {
-                  resetForm();
-                  onClose();
-                }
-              }}
-              disabled={isSubmitting}
-            >
+            <TouchableOpacity onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -324,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
-    maxHeight: SCREEN_HEIGHT * 0.9,
+    maxHeight: '90%',
     elevation: 5,
   },
   title: {
@@ -430,7 +359,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   shiftScrollBox: {
-    maxHeight: Math.floor(Dimensions.get('window').height * 0.2), 
+    maxHeight: Math.floor(Dimensions.get('window').height * 0.3), 
     borderWidth: 1,
     borderColor: '#eee',
     borderRadius: 10,
@@ -438,9 +367,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 20,
   },
-  shiftScroll: {
-    flexGrow: 0,
-  },
+
   shiftListContent: {
     padding: 10,
   },

@@ -1,6 +1,7 @@
 import axios from './axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
+import EditProfile from '../layout/client/EditProfile';
 
 export const Signup = async (userData, endpoint) => {
   try {
@@ -18,7 +19,6 @@ export const Signin = async (credentials, endpoint) => {
     const response = await axios.post(`api/${endpoint}/login`, credentials);
     const aic = response.data.user?.aic;
     const AId = response.data.user?.AId;
-    const isTest = response.data.user?.isTest || false;
     // console.log("login response:", response.data.user);
     if (aic !== undefined && aic !== null) {
       await AsyncStorage.setItem('aic', aic.toString());
@@ -30,8 +30,6 @@ export const Signin = async (credentials, endpoint) => {
     if (response.data.token) {
       await AsyncStorage.setItem('token', response.data.token);
     }
-    // Store test mode flag
-    await AsyncStorage.setItem('isTest', isTest.toString());
     return response.data;
   } catch (error) {
     console.log(error)
@@ -170,8 +168,9 @@ export const createDJob = async ({
     adminId: adminId ? Number(adminId) : 0,
     adminMade: Boolean(adminMade),
     facilitiesId: facilityId ? Number(facilityId) : 0,
-    clinicianId: Number(staffId) || 0,
+    clinicianId: staffId ? Number(staffId) : 0,
   };
+
   console.log(body);
 
   try {
@@ -336,29 +335,21 @@ export const updateDjob = async ({
   facilitiesId,
   clinicianId,
   status,
-  applicants,
 }) => {
   try {
     const token = await AsyncStorage.getItem('token');
-    const payload = {
-      DJobId,
-      shift,
-      degree,
-      adminId,
-      adminMade,
-      facilitiesId,
-      clinicianId,
-      status,
-    };
-    
-    // Only include applicants if provided
-    if (applicants !== undefined) {
-      payload.applicants = applicants;
-    }
-
     const res = await axios.post(
       `api/djobs/update`,
-      payload,
+      {
+        DJobId,
+        shift,
+        degree,
+        adminId,
+        adminMade,
+        facilitiesId,
+        clinicianId,
+        status,
+      },
       {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       }
@@ -494,48 +485,6 @@ export const getDjobForClinician = async () => {
     return { ok: true, data: list };
   } catch (err) {
     console.error('getDjobForClinician error:', err);
-    return { ok: false, error: normalizeError(err) };
-  }
-};
-
-export const applyForShift = async (DJobId, clinicianId) => {
-  try {
-    const token = await AsyncStorage.getItem('token');
-
-    const res = await axios.post(
-      'api/djobs/apply',
-      { DJobId, clinicianId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { ok: true, data: res.data };
-  } catch (err) {
-    console.error('applyForShift error:', err);
-    return { ok: false, error: normalizeError(err) };
-  }
-};
-
-export const reviewApplicant = async (DJobId, clinicianId, action) => {
-  try {
-    const token = await AsyncStorage.getItem('token');
-    // console.log("reviewApplicant", DJobId, clinicianId, action);
-    const res = await axios.post(
-      'api/djobs/reviewapplicant',
-      { DJobId, clinicianId, action },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    return { ok: true, data: res.data };
-  } catch (err) {
-    console.error('reviewApplicant error:', err);
     return { ok: false, error: normalizeError(err) };
   }
 };
@@ -770,9 +719,7 @@ export const ResetPassword = async (credentials, endpoint) => {
 export const Update = async (updateData, endpoint) => {
   try {
     const existingToken = await AsyncStorage.getItem('token');
-    const isTest = await AsyncStorage.getItem('isTest');
-    console.log('Update API call:', { endpoint, isTest, hasToken: !!existingToken });
-    
+    console.log(existingToken);
     const response = await axios.post(`api/${endpoint}/update`, updateData, {
       headers: {
         Authorization: `Bearer ${existingToken}`
@@ -784,10 +731,7 @@ export const Update = async (updateData, endpoint) => {
     }
     return response.data;
   } catch (error) {
-    console.error('Update API error:', error);
-    // Return a more user-friendly error message
-    const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Network error. Please check your connection.';
-    return {error: errorMessage, fullError: error}
+    return {error: error}
   }
 }
 
@@ -1557,339 +1501,5 @@ export const sendInvoice = async (facilityId, email) => {
   } catch (error) {
       console.error('Error generating invoice:', error);
       return {error: error.response.data.message}
-  }
-};
-
-// ========== Terms API Functions ==========
-
-// Get published Terms (public - for clinicians or facilities)
-export const getPublishedTerms = async (type, email = null) => {
-  try {
-    // Get email from AsyncStorage if not provided
-    let userEmail = email;
-    if (!userEmail) {
-      if (type === 'clinician') {
-        userEmail = await AsyncStorage.getItem('clinicalEmail') || await AsyncStorage.getItem('email');
-      } else if (type === 'facility') {
-        userEmail = await AsyncStorage.getItem('facilityEmail') || await AsyncStorage.getItem('contactEmail');
-      }
-    }
-    
-    // Build query string with email if available
-    let queryString = `type=${type}`;
-    if (userEmail) {
-      queryString += `&email=${encodeURIComponent(userEmail)}`;
-    }
-    
-    const response = await axios.get(`api/terms/published?${queryString}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting published terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Get all Terms (admin only)
-export const getAllTerms = async () => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.get('api/terms/all', {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error getting all terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Get Terms Overview (admin only) - returns published and drafts separately
-export const getTermsOverview = async () => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.get('api/terms/overview', {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error getting terms overview:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Get draft Terms (admin only)
-export const getDraftTerms = async () => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.get('api/terms/draft', {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error getting draft terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Get Terms by ID (admin only)
-export const getTermsById = async (id) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.get(`api/terms/${id}`, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error getting terms by ID:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Save Terms as Draft (admin only)
-export const saveDraftTerms = async (content, version, type) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const AId = await AsyncStorage.getItem('AId');
-    
-    console.log('=== saveDraftTerms API Call ===');
-    console.log('Content length:', content?.length || 0);
-    console.log('Version:', version);
-    console.log('Type:', type);
-    console.log('AId:', AId);
-    console.log('Token exists:', !!existingToken);
-    
-    const payload = { content, version, type };
-    if (AId) {
-      payload.adminId = Number(AId);
-    }
-    
-    console.log('Payload:', {
-      contentLength: payload.content?.length || 0,
-      version: payload.version,
-      type: payload.type,
-      adminId: payload.adminId
-    });
-    
-    const response = await axios.post(
-      'api/terms/save-draft',
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${existingToken}`
-        }
-      }
-    );
-    
-    console.log('API Response status:', response.status);
-    console.log('API Response data:', response.data);
-    
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error saving draft terms:', error);
-    console.error('Error response:', error.response?.data);
-    console.error('Error status:', error.response?.status);
-    return { error: error.response?.data?.error || error.message || 'Unknown error' };
-  }
-};
-
-// Publish Terms (admin only)
-export const publishTerms = async (id, content, version, type) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const AId = await AsyncStorage.getItem('AId');
-    
-    const payload = { id };
-    if (content !== undefined) payload.content = content;
-    if (version !== undefined) payload.version = version;
-    if (type !== undefined) payload.type = type;
-    if (AId) {
-      payload.adminId = Number(AId);
-    }
-    
-    const response = await axios.post(
-      'api/terms/publish',
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${existingToken}`
-        }
-      }
-    );
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error publishing terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Create new Terms (admin only)
-export const createTerms = async (content, version, type) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const AId = await AsyncStorage.getItem('AId');
-    
-    const payload = { content, version, type };
-    if (AId) {
-      payload.adminId = Number(AId);
-    }
-    
-    const response = await axios.post(
-      'api/terms/create',
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${existingToken}`
-        }
-      }
-    );
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error creating terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Update Terms (admin only)
-export const updateTerms = async (id, content, version) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const AId = await AsyncStorage.getItem('AId');
-    
-    const payload = { content, version };
-    if (AId) {
-      payload.adminId = Number(AId);
-    }
-    
-    const response = await axios.put(
-      `api/terms/${id}`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${existingToken}`
-        }
-      }
-    );
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error updating terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Delete Terms (admin only)
-export const deleteTerms = async (id) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.delete(`api/terms/${id}`, {
-      headers: {
-        Authorization: `Bearer ${existingToken}`
-      }
-    });
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Acknowledge new terms (admin only) - resets acknowledge flags and logs out users
-export const acknowledgeNewTerms = async (termsType) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    const response = await axios.post(
-      'api/terms/acknowledge',
-      { termsType },
-      {
-        headers: {
-          Authorization: `Bearer ${existingToken}`
-        }
-      }
-    );
-    if (response.data.token) {
-      await AsyncStorage.setItem('token', response.data.token);
-    }
-    return response.data;
-  } catch (error) {
-    console.error('Error acknowledging new terms:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Get terms status for all users (admin only)
-export const getTermsStatus = async () => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    if (!existingToken) {
-      return { error: 'No authentication token found' };
-    }
-    const response = await axios.get(
-      'api/terms/status',
-      {
-        headers: {
-          Authorization: `Bearer ${existingToken}`
-        }
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching terms status:', error);
-    return { error: error.response?.data?.error || error.message };
-  }
-};
-
-// Get signature history for a user (admin only)
-export const getSignatureHistory = async (aic, type) => {
-  try {
-    const existingToken = await AsyncStorage.getItem('token');
-    if (!existingToken) {
-      return { error: 'No authentication token found' };
-    }
-    const response = await axios.get(
-      `api/terms/signature-history?aic=${aic}&type=${type}`,
-      {
-        headers: {
-          Authorization: `Bearer ${existingToken}`
-        }
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching signature history:', error);
-    return { error: error.response?.data?.error || error.message };
   }
 };

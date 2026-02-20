@@ -8,8 +8,6 @@ import {
   ScrollView, 
   Dimensions 
 } from 'react-native';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 import { 
   getShiftTypes, 
   addShiftToStaff,
@@ -47,7 +45,6 @@ export default function AddNewShiftModal({
   // Facility + Degree
   const [facilities, setFacilities] = useState('');
   const [degrees, setDegrees] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // --- NEW: helper to get selected degree name (used for filtering staff)
   const selectedDegreeName = React.useMemo(() => {
@@ -56,25 +53,18 @@ export default function AddNewShiftModal({
     return (found?.degreeName || '').trim();
   }, [degrees, degreelist]);
 
-  // Reset all form fields
-  const resetForm = React.useCallback(() => {
-    setDegrees('');
-    setSelectedEmployee('');
-    setEmployeeList([]);
-    setSelectedShift(null);
-    setSelectedDate(new Date());
-    setIsSubmitting(false);
-  }, []);
-
   useEffect(() => {
     if (visible) {
       fetchShiftTypes();
-      resetForm();
+      // When opening, don't pre-populate staff until a degree is chosen
+      setSelectedEmployee('');
+      setEmployeeList([]);
     }
-  }, [visible, resetForm]);
+  }, [visible]);
 
   // --- NEW: whenever degree changes, (1) reset selected staff, (2) filter staff by userRole
   useEffect(() => {
+    // Clear any previously selected staff when degree changes
     setSelectedEmployee('');
 
     if (!degrees || !selectedDegreeName) {
@@ -82,16 +72,12 @@ export default function AddNewShiftModal({
       return;
     }
 
-    // Filter staff by userRole matching degreeName (case-insensitive, trimmed, and normalized)
-    const normalizedDegreeName = selectedDegreeName.toLowerCase().trim();
+    // Filter staff by userRole matching degreeName (case-insensitive)
     const filtered = (staffList || [])
-      .filter(emp => {
-        const userRole = (emp?.userRole || '').toLowerCase().trim();
-        return userRole === normalizedDegreeName;
-      })
+      .filter(emp => (emp?.userRole || '').trim().toLowerCase() === selectedDegreeName.toLowerCase())
       .map(emp => ({
-        label: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
-        value: String(emp.aic),
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: String(emp.id),
       }));
 
     setEmployeeList(filtered);
@@ -101,6 +87,9 @@ export default function AddNewShiftModal({
     try {
       const response = await getShiftTypes({ aic : selectedFacilitiesId }, "facilities");
       const types = Array.isArray(response?.shiftType) ? response.shiftType : [];
+      if (!types.length) {
+        console.log('ShiftTypes API returned empty or invalid list:', response);
+      }
       setShiftTypes(types);
     } catch (err) {
       setShiftTypes([]);
@@ -113,8 +102,6 @@ export default function AddNewShiftModal({
       return;
     }
 
-    if (isSubmitting) return;
-
     const selectedShiftObj = shiftTypes.find(
       (s) => String(s.id) === String(selectedShift)
     );
@@ -123,7 +110,6 @@ export default function AddNewShiftModal({
       return;
     }
 
-    setIsSubmitting(true);
     try {
       const [AIdRaw] = await Promise.all([
         AsyncStorage.getItem('AId'),
@@ -132,7 +118,6 @@ export default function AddNewShiftModal({
 
       if (!Number.isFinite(AId)) {
         console.warn('Missing AId:', {AId});
-        alert('Invalid admin ID. Please try again.');
         return;
       }
 
@@ -156,7 +141,7 @@ export default function AddNewShiftModal({
         shiftPayload,
         degreeId: degrees,
         facilityId: selectedFacilitiesId,
-        staffId: selectedEmployee || '',
+        staffId: selectedEmployee,
         adminId: AId,
         adminMade: true,
       });
@@ -165,7 +150,6 @@ export default function AddNewShiftModal({
 
       if (jobId) {
         await refreshShiftData();
-        resetForm();
         onClose();
       } else {
         const msg = result?.message || 'Failed to submit shift.';
@@ -173,9 +157,7 @@ export default function AddNewShiftModal({
       }
     } catch (err) {
       console.error('Error submitting shift:', err);
-      alert(err?.message || 'Failed to submit shift. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      alert('Failed to submit shift. Please try again.');
     }
   };
 
@@ -307,22 +289,14 @@ export default function AddNewShiftModal({
             <TouchableOpacity 
               style={[
                 styles.submitButton, 
-                { backgroundColor: (selectedShift && selectedDate && degrees && !isSubmitting) ? '#290135' : '#ccc' }
+                { backgroundColor: selectedShift && selectedDate && degrees ? '#290135' : '#ccc' }
               ]} 
               onPress={handleSubmit}
-              disabled={!selectedShift || !selectedDate || !degrees || isSubmitting}
+              disabled={!selectedShift || !selectedDate || !degrees || !selectedEmployee}
             >
-              <Text style={styles.submitText}>{isSubmitting ? 'Submitting...' : 'Submit'}</Text>
+              <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => {
-                if (!isSubmitting) {
-                  resetForm();
-                  onClose();
-                }
-              }}
-              disabled={isSubmitting}
-            >
+            <TouchableOpacity onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -343,7 +317,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
-    maxHeight: SCREEN_HEIGHT * 0.9,
+    maxHeight: '90%',
     elevation: 5,
   },
   title: {
@@ -444,7 +418,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   shiftScrollBox: {
-    maxHeight: Math.floor(Dimensions.get('window').height * 0.2), 
+    maxHeight: Math.floor(Dimensions.get('window').height * 0.3), 
     borderWidth: 1,
     borderColor: '#eee',
     borderRadius: 10,

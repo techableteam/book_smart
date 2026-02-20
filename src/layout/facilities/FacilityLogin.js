@@ -7,13 +7,12 @@ import MHeader from '../../components/Mheader';
 import MFooter from '../../components/Mfooter';
 import { useAtom } from 'jotai';
 import { facilityIdAtom, firstNameAtom, lastNameAtom, facilityAcknowledgementAtom, companyNameAtom, contactPhoneAtom, contactPasswordAtom, entryDateAtom, addressAtom,  contactEmailAtom, avatarAtom, userRoleAtom, passwordAtom } from '../../context/FacilityAuthProvider'
-import { Signin, sendFCMToken } from '../../utils/useApi';
+import { Signin } from '../../utils/useApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../Loader';
 import constStyles from '../../assets/styles';
 import { Dimensions } from 'react-native';
 import { RFValue } from "react-native-responsive-fontsize";
-import messaging from '@react-native-firebase/messaging';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,17 +38,6 @@ export default function FacilityLogin({ navigation }) {
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [checked, setChecked] = useState(false);
   const [request, setRequest] = useState(false);
-  const [fToken, setFToken] = useState('');
-
-  const getFCMMsgToken = async () => {
-    try {
-      const token = await messaging().getToken();
-      console.log("This is FCM Token => ", token);
-      setFToken(token);
-    } catch (error) {
-      console.error('Error getting FCM token:', error);
-    }
-  };
 
   useEffect(() => {
     const getCredentials = async() => {
@@ -58,7 +46,6 @@ export default function FacilityLogin({ navigation }) {
       setCredentials({...credentials, contactEmail: emails, password: password});
     }
     getCredentials();
-    getFCMMsgToken();
   }, []);
 
   const showAlert = (name) => {
@@ -154,25 +141,15 @@ export default function FacilityLogin({ navigation }) {
         setFacilityAcknowledgement(response.user.facilityAcknowledgeTerm)
         setPassword(response.user.password);
 
-        // Save FCM token
-        console.log(response.user.contactEmail, fToken);
-        if (fToken) {
-          await sendFCMToken({ email: response.user.contactEmail, token: fToken }, 'facilities');
-        }
-
-        // Always save email for terms fetching (even if not checked)
-        await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
-        await AsyncStorage.setItem('contactEmail', credentials.contactEmail); // Also save as generic contactEmail
-
         if (checked) {
+          await AsyncStorage.setItem('facilityEmail', credentials.contactEmail);
           await AsyncStorage.setItem('facilityPassword', credentials.password);
         }
 
         if (response.user.facilityAcknowledgeTerm) {
           navigation.navigate("FacilityProfile");
         } else {
-          // Navigate to new terms page that fetches from API
-          navigation.navigate("FacilityNewTerms");
+          handleSignInNavigate("FacilityPermission");
         }
       } else {
         setRequest(false);

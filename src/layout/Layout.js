@@ -33,7 +33,6 @@ import ClientPending from './client/ClientPending';
 import ClientFinishSignup from './client/ClientFinishSignUp';
 import FacilityFinishSignup from './facilities/FacilityFinishSignUp';
 import FacilityPermission from './facilities/FacilityPermission';
-import FacilityNewTerms from './facilities/FacilityNewTerms';
 import FacilityProfile from './facilities/FacilityProfile';
 import SchedulerScreen from './facilities/shedulerScreen.js';
 import FacilityEditProfile from './facilities/FacilityEditProfile';
@@ -71,7 +70,6 @@ import ClientPhone from './client/ClientPhone.js';
 import ClientPhoneVerify from './client/ClientPhoneVerify.js';
 import ClientProfile from './facilities/ClientProfile.js';
 import ClientPermission from './client/ClientPermission.js';
-import ClientNewTerms from './client/ClientNewTerms.js';
 import FileViewer from './FileViewer.js';
 import AddNewFacility from './admin/AddNewFacility.js';
 import CaregiverProfile from './admin/CaregiverProfile.js';
@@ -83,8 +81,6 @@ import AdminFileViewer from './AdminFileViewer.js';
 import BookShiftsNow from './client/BookShiftsNow.js';
 import ImageFileViewer from './ImageFileViewer.js';
 import AdminMessage from './admin/AdminMessage.js';
-import AdminTerms from './admin/AdminTerms.js';
-import AdminTermsStatus from './admin/AdminTermsStatus.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -274,18 +270,8 @@ function Layout() {
         options={{headerShown: false}}
       />
       <Stack.Screen 
-        name= 'FacilityNewTerms'
-        component = {FacilityNewTerms}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen 
         name= 'ClientPermission'
         component = {ClientPermission}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen 
-        name= 'ClientNewTerms'
-        component = {ClientNewTerms}
         options={{headerShown: false}}
       />
       <Stack.Screen 
@@ -376,16 +362,6 @@ function Layout() {
       <Stack.Screen 
         name= 'CaregiverTimeSheet'
         component = {CaregiverTimeSheet}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen 
-        name= 'AdminTerms'
-        component = {AdminTerms}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen 
-        name= 'AdminTermsStatus'
-        component = {AdminTermsStatus}
         options={{headerShown: false}}
       />
       <Stack.Screen 

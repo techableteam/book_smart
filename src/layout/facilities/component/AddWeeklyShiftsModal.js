@@ -32,51 +32,18 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
   const isSubmitDisabled =
   !degrees || Object.keys(selectedShifts).length === 0 || Object.values(selectedShifts).every((shiftsArray) => shiftsArray.length === 0);
 
-  // --- NEW: helper to get selected degree name (used for filtering staff)
-  const selectedDegreeName = React.useMemo(() => {
-    if (!degrees) return '';
-    const found = degreelist?.find(d => String(d.Did) === String(degrees));
-    return (found?.degreeName || '').trim();
-  }, [degrees, degreelist]);
-
-  // Reset all form fields
-  const resetForm = () => {
-    setDegrees('');
-    setSelectedEmployee('');
-    setEmployeeList([]);
-    setSelectedShifts({});
-  };
 
   useEffect(() => {
     if (visible) {
       fetchShiftTypes();
-      resetForm();
+      const formatted = staffList.map((emp) => ({
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: emp.id.toString(),
+      }));
+      setEmployeeList(formatted);
+      setSelectedShifts({});
     }
   }, [visible]);
-
-  // --- NEW: whenever degree changes, (1) reset selected staff, (2) filter staff by userRole
-  useEffect(() => {
-    setSelectedEmployee('');
-
-    if (!degrees || !selectedDegreeName) {
-      setEmployeeList([]);
-      return;
-    }
-
-    // Filter staff by userRole matching degreeName (case-insensitive, trimmed, and normalized)
-    const normalizedDegreeName = selectedDegreeName.toLowerCase().trim();
-    const filtered = (staffList || [])
-      .filter(emp => {
-        const userRole = (emp?.userRole || '').toLowerCase().trim();
-        return userRole === normalizedDegreeName;
-      })
-      .map(emp => ({
-        label: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
-        value: String(emp.aic),
-      }));
-
-    setEmployeeList(filtered);
-  }, [degrees, selectedDegreeName, staffList]);
 
   const fetchShiftTypes = async () => {
     try {
@@ -101,7 +68,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
       }
     } catch (err) {
       console.error('ShiftType Error:', err);
-      setShiftTypes([]);
+      setShiftTypes([]); // fail safe
     }
   };
   
@@ -118,20 +85,11 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
   };
 
   const handleSubmit = async () => {
-    if (isLoading) return;
-
     try {
-      if (!degrees) {
-        Alert.alert('Missing degree', 'Please select a degree first.');
-        return;
-      }
       if (!selectedShifts || Object.keys(selectedShifts).length === 0) {
         Alert.alert('No shifts selected', 'Please pick at least one shift.');
         return;
       }
-
-      setIsLoading(true);
-
       const [aicRaw] = await Promise.all([
         AsyncStorage.getItem('aic'),
       ]);
@@ -139,13 +97,12 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
   
       if (!Number.isFinite(managerAic)) {
         console.warn('handleSubmit: missing aic', { managerAic });
-        Alert.alert('Error', 'Invalid facility ID.');
         return;
       }
       const shifts = [];
       for (const [dayKey, shiftsArray] of Object.entries(selectedShifts)) {
         const rawDate = nextWeekDates?.[dayKey];
-        if (!rawDate) continue;
+        if (!rawDate) continue; // skip unknown day keys
   
         const formattedDate = new Date(rawDate).toLocaleDateString('en-US', {
           year: 'numeric',
@@ -166,9 +123,10 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
         Alert.alert('No valid shifts', 'Please select valid shift times.');
         return;
       }
-
       let hasError = false;
       const failedJobs = [];
+      
+      setIsLoading(true);
   
       for (const shift of shifts) {
         try {
@@ -176,7 +134,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
             shiftPayload: shift,
             degreeId: degrees,
             facilityId: managerAic,
-            staffId: selectedEmployee || '',
+            staffId: selectedEmployee,
             adminId: 0,
             adminMade: false, 
           });
@@ -191,21 +149,20 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
           hasError = true;
         }
       }
+
+      setIsLoading(false);
   
       if (hasError) {
         const msg = `Failed to create job(s) for ${failedJobs.length} shift(s).`;
         Alert.alert('Error', msg);
       } else {
         await refreshShiftData?.();
-        resetForm();
         onClose?.();
         Alert.alert('Success', 'All shifts assigned successfully!');
       }
     } catch (err) {
       console.error('Submission error:', err);
-      Alert.alert('Error', err?.message || 'Something went wrong. Please try again.');
-    } finally {
-      setIsLoading(false);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
     }
   };
   
@@ -216,9 +173,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
         <View style={styles.modalContent}>
           <Text style={styles.title}>Add next week's Shifts</Text>
 
-          <Text style={styles.label}>
-            Degree <Text style={{ color: 'red' }}>*</Text>
-          </Text>
+          <Text style={styles.label}>Degree</Text>
           <Dropdown
             style={styles.dropdown}
             containerStyle={styles.dropdownContainer}
@@ -234,32 +189,20 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
             valueField="value"
             placeholder="Select Degree"
             value={degrees}
-            onChange={item => {
-              setDegrees(item.value);
-              // selectedEmployee will be reset and list recalculated in useEffect
-            }}
+            onChange={item => setDegrees(item.value)}
             disabled={isLoading}
           />
 
           <Text style={styles.label}>Staff</Text>
           <Dropdown
-            style={[
-              styles.dropdown,
-              !degrees && { backgroundColor: '#f2f2f2' },
-            ]}
-            containerStyle={styles.dropdownContainer}
-            placeholderStyle={styles.dropdownPlaceholder}
-            selectedTextStyle={styles.dropdownSelectedText}
-            itemTextStyle={styles.dropdownItemText}
+            style={styles.dropdown}
             data={employeeList}
-            maxHeight={200}
             labelField="label"
             valueField="value"
-            placeholder={degrees ? (employeeList.length ? 'Select Staff' : 'No matching staff') : 'Select Degree first'}
+            placeholder="Select Staff"
             value={selectedEmployee}
             onChange={(item) => setSelectedEmployee(item.value)}
-            // react-native-element-dropdown uses "disable" prop (not "disabled")
-            disable={!degrees || isLoading}
+            disabled={isLoading}
           />
 
           {isLoading && (
@@ -304,15 +247,7 @@ export default function AddWeeklyShiftsModal({ visible, onClose,
                 <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              onPress={() => {
-                if (!isLoading) {
-                  resetForm();
-                  onClose();
-                }
-              }}
-              disabled={isLoading}
-            >
+            <TouchableOpacity onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -370,22 +305,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 16,
-  },
-  dropdownContainer: {
-    borderRadius: 4,
-    borderColor: '#C4C4C4',
-  },
-  dropdownPlaceholder: {
-    color: '#999',
-    fontSize: 16,
-  },
-  dropdownSelectedText: {
-    color: '#000',
-    fontSize: 16,
-  },
-  dropdownItemText: {
-    fontSize: 16,
-    color: '#000',
   },
   shiftRow: {
     flexDirection: 'row',

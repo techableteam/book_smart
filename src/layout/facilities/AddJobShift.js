@@ -629,7 +629,7 @@ export default function AddJobShift({ navigation }) {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.subtitle}> Contractor Base Rate </Text>
+              <Text style={styles.subtitle}> Hourly Rate </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""
@@ -638,7 +638,7 @@ export default function AddJobShift({ navigation }) {
               />
             </View>
             <View>
-              <Text style={styles.subtitle}> Flex Rate </Text>
+              <Text style={styles.subtitle}> Bonus </Text>
               <TextInput
                 style={[styles.input, {width: '100%'}]}
                 placeholder=""

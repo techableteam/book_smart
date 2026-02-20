@@ -46,24 +46,21 @@ export default function AddWeeklyShiftsModal({
     return (found?.degreeName || '').trim();
   }, [degrees, degreelist]);
   
-  // Reset all form fields
-  const resetForm = () => {
-    setDegrees('');
-    setSelectedEmployee('');
-    setEmployeeList([]);
-    setSelectedShifts({});
-  };
-
-  // --- UPDATED: Submit requires degree and at least one shift (staff is optional)
+  // --- UPDATED: Submit requires degree, at least one shift, and staff
   const isSubmitDisabled =
     !degrees ||
+    !selectedEmployee ||
     Object.keys(selectedShifts).length === 0 ||
     Object.values(selectedShifts).every((arr) => (arr || []).length === 0);
 
   useEffect(() => {
     if (visible) {
       fetchShiftTypes();
-      resetForm();
+      // reset weekly selection
+      setSelectedShifts({});
+      // reset staff gating each time modal opens
+      setSelectedEmployee('');
+      setEmployeeList([]);
     }
   }, [visible]);
 
@@ -75,16 +72,11 @@ export default function AddWeeklyShiftsModal({
       return;
     }
 
-    // Filter staff by userRole matching degreeName (case-insensitive, trimmed, and normalized)
-    const normalizedDegreeName = selectedDegreeName.toLowerCase().trim();
     const filtered = (staffList || [])
-      .filter(emp => {
-        const userRole = (emp?.userRole || '').toLowerCase().trim();
-        return userRole === normalizedDegreeName;
-      })
+      .filter(emp => (emp?.userRole || '').trim().toLowerCase() === selectedDegreeName.toLowerCase())
       .map(emp => ({
-        label: `${emp.firstName || ''} ${emp.lastName || ''}`.trim(),
-        value: String(emp.aic),
+        label: `${emp.firstName} ${emp.lastName}`,
+        value: String(emp.id),
       }));
 
     setEmployeeList(filtered);
@@ -98,6 +90,7 @@ export default function AddWeeklyShiftsModal({
       const AId = Number.parseInt((AIdRaw || '').trim(), 10);
   
       if (!Number.isFinite(AId)) {
+        console.log('fetchShiftTypes: missing AId', { AId});
         setShiftTypes([]);
         return;
       }
@@ -107,6 +100,7 @@ export default function AddWeeklyShiftsModal({
       if (Array.isArray(res?.shiftType)) {
         setShiftTypes(res.shiftType);
       } else {
+        console.log('fetchShiftTypes: unexpected payload', res);
         setShiftTypes([]);
       }
     } catch (err) {
@@ -127,19 +121,19 @@ export default function AddWeeklyShiftsModal({
   };
 
   const handleSubmit = async () => {
-    if (isLoading) return;
-
     try {
       if (!degrees) {
         Alert.alert('Missing degree', 'Please select a degree first.');
+        return;
+      }
+      if (!selectedEmployee) {
+        Alert.alert('Missing staff', 'Please select a staff member.');
         return;
       }
       if (!selectedShifts || Object.keys(selectedShifts).length === 0) {
         Alert.alert('No shifts selected', 'Please pick at least one shift.');
         return;
       }
-
-      setIsLoading(true);
       
       const [AIdRaw] = await Promise.all([
         AsyncStorage.getItem('AId'),
@@ -147,7 +141,6 @@ export default function AddWeeklyShiftsModal({
       const AId = Number.parseInt((AIdRaw || '').trim(), 10);
       if (!Number.isFinite(AId)) {
         console.warn('handleSubmit: missing AId', { AId });
-        Alert.alert('Error', 'Invalid admin ID.');
         return;
       }
   
@@ -178,14 +171,16 @@ export default function AddWeeklyShiftsModal({
   
       let hasError = false;
       const failedJobs = [];
+
+      setIsLoading(true);
   
       for (const shift of shifts) {
         try {
           const result = await createDJob({
-            shiftPayload: shift,
+            shiftPayload: shift, // keeping your existing API shape
             degreeId: degrees,
             facilityId: selectedFacilitiesId,
-            staffId: selectedEmployee || '',
+            staffId: selectedEmployee,
             adminId: AId,
             adminMade: true, 
           });
@@ -200,22 +195,21 @@ export default function AddWeeklyShiftsModal({
           hasError = true;
         }
       }
+
+      setIsLoading(false);
   
       if (hasError) {
         const msg = `Failed to create job(s) for ${failedJobs.length} shift(s).`;
         Alert.alert('Error', msg);
       } else {
         await refreshShiftData?.();
-        resetForm();
         onClose?.();
         Alert.alert('Success', 'All shifts assigned successfully!');
       }
   
     } catch (err) {
       console.error('Submission error:', err);
-      Alert.alert('Error', err?.message || 'Something went wrong. Please try again.');
-    } finally {
-      setIsLoading(false);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
     }
   };
   
@@ -331,15 +325,7 @@ export default function AddWeeklyShiftsModal({
               <Text style={styles.submitText}>Submit</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              onPress={() => {
-                if (!isLoading) {
-                  resetForm();
-                  onClose();
-                }
-              }}
-              disabled={isLoading}
-            >
+            <TouchableOpacity onPress={onClose}>
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>

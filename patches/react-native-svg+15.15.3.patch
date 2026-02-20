@@ -1,0 +1,734 @@
+diff --git a/node_modules/react-native-svg/android/build/generated/source/buildConfig/debug/com/horcrux/svg/BuildConfig.java b/node_modules/react-native-svg/android/build/generated/source/buildConfig/debug/com/horcrux/svg/BuildConfig.java
+new file mode 100644
+index 0000000..661b676
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/generated/source/buildConfig/debug/com/horcrux/svg/BuildConfig.java
+@@ -0,0 +1,12 @@
++/**
++ * Automatically generated file. DO NOT MODIFY
++ */
++package com.horcrux.svg;
++
++public final class BuildConfig {
++  public static final boolean DEBUG = Boolean.parseBoolean("true");
++  public static final String LIBRARY_PACKAGE_NAME = "com.horcrux.svg";
++  public static final String BUILD_TYPE = "debug";
++  // Field from default config.
++  public static final boolean IS_NEW_ARCHITECTURE_ENABLED = false;
++}
+diff --git a/node_modules/react-native-svg/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml b/node_modules/react-native-svg/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+new file mode 100644
+index 0000000..037933a
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.horcrux.svg" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-svg/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json b/node_modules/react-native-svg/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+new file mode 100644
+index 0000000..8fa1366
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/aapt_friendly_merged_manifests/debug/aapt/output-metadata.json
+@@ -0,0 +1,18 @@
++{
++  "version": 3,
++  "artifactType": {
++    "type": "AAPT_FRIENDLY_MERGED_MANIFESTS",
++    "kind": "Directory"
++  },
++  "applicationId": "com.horcrux.svg",
++  "variantName": "debug",
++  "elements": [
++    {
++      "type": "SINGLE",
++      "filters": [],
++      "attributes": [],
++      "outputFile": "AndroidManifest.xml"
++    }
++  ],
++  "elementType": "File"
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-svg/android/build/intermediates/aar_metadata/debug/aar-metadata.properties b/node_modules/react-native-svg/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+new file mode 100644
+index 0000000..776557e
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/aar_metadata/debug/aar-metadata.properties
+@@ -0,0 +1,5 @@
++aarFormatVersion=1.0
++aarMetadataVersion=1.0
++minCompileSdk=1
++minCompileSdkExtension=0
++minAndroidGradlePluginVersion=1.0.0
+diff --git a/node_modules/react-native-svg/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json b/node_modules/react-native-svg/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+new file mode 100644
+index 0000000..9e26dfe
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/annotation_processor_list/debug/annotationProcessors.json
+@@ -0,0 +1 @@
++{}
+\ No newline at end of file
+diff --git a/node_modules/react-native-svg/android/build/intermediates/compile_r_class_jar/debug/R.jar b/node_modules/react-native-svg/android/build/intermediates/compile_r_class_jar/debug/R.jar
+new file mode 100644
+index 0000000..2268cce
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/compile_r_class_jar/debug/R.jar differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/compile_symbol_list/debug/R.txt b/node_modules/react-native-svg/android/build/intermediates/compile_symbol_list/debug/R.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-svg/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties b/node_modules/react-native-svg/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+new file mode 100644
+index 0000000..f81e380
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/incremental/debug/packageDebugResources/compile-file-map.properties
+@@ -0,0 +1 @@
++#Thu Feb 12 16:47:03 CST 2026
+diff --git a/node_modules/react-native-svg/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml b/node_modules/react-native-svg/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+new file mode 100644
+index 0000000..356f554
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/incremental/debug/packageDebugResources/merger.xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\alex\book_smart -andorid\node_modules\react-native-svg\android\build\generated\res\resValues\debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="D:\alex\book_smart -andorid\node_modules\react-native-svg\android\build\generated\res\resValues\debug"/></dataSet><mergedItems/></merger>
+\ No newline at end of file
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush$BrushType.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush$BrushType.class
+new file mode 100644
+index 0000000..562a5a5
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush$BrushType.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush$BrushUnits.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush$BrushUnits.class
+new file mode 100644
+index 0000000..439c187
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush$BrushUnits.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush.class
+new file mode 100644
+index 0000000..6538a93
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Brush.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CircleView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CircleView.class
+new file mode 100644
+index 0000000..6382624
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CircleView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ClipPathView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ClipPathView.class
+new file mode 100644
+index 0000000..d727f4d
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ClipPathView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CustomFilter.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CustomFilter.class
+new file mode 100644
+index 0000000..da3d91f
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CustomFilter.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CustomFilterFunction.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CustomFilterFunction.class
+new file mode 100644
+index 0000000..69e2de1
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/CustomFilterFunction.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/DefinitionView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/DefinitionView.class
+new file mode 100644
+index 0000000..805f943
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/DefinitionView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/DefsView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/DefsView.class
+new file mode 100644
+index 0000000..c8cc28d
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/DefsView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ElementType.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ElementType.class
+new file mode 100644
+index 0000000..7f819eb
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ElementType.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/EllipseView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/EllipseView.class
+new file mode 100644
+index 0000000..b0ec720
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/EllipseView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeBlendView$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeBlendView$1.class
+new file mode 100644
+index 0000000..2d3dbf7
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeBlendView$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeBlendView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeBlendView.class
+new file mode 100644
+index 0000000..63f7746
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeBlendView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeColorMatrixView$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeColorMatrixView$1.class
+new file mode 100644
+index 0000000..8d69a54
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeColorMatrixView$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeColorMatrixView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeColorMatrixView.class
+new file mode 100644
+index 0000000..e6cbd1c
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeColorMatrixView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeCompositeView$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeCompositeView$1.class
+new file mode 100644
+index 0000000..58dbf33
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeCompositeView$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeCompositeView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeCompositeView.class
+new file mode 100644
+index 0000000..b9ab433
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeCompositeView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeFloodView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeFloodView.class
+new file mode 100644
+index 0000000..113fc44
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeFloodView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeGaussianBlurView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeGaussianBlurView.class
+new file mode 100644
+index 0000000..5d5fa33
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeGaussianBlurView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeMergeView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeMergeView.class
+new file mode 100644
+index 0000000..fb2954f
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeMergeView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeOffsetView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeOffsetView.class
+new file mode 100644
+index 0000000..b9fd463
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FeOffsetView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterPrimitiveView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterPrimitiveView.class
+new file mode 100644
+index 0000000..350bfc2
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterPrimitiveView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$EdgeMode.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$EdgeMode.class
+new file mode 100644
+index 0000000..1ecb7c8
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$EdgeMode.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeBlendMode.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeBlendMode.class
+new file mode 100644
+index 0000000..a461146
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeBlendMode.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeColorMatrixType.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeColorMatrixType.class
+new file mode 100644
+index 0000000..714709a
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeColorMatrixType.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeCompositeOperator.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeCompositeOperator.class
+new file mode 100644
+index 0000000..25a236c
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$FeCompositeOperator.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$Units.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$Units.class
+new file mode 100644
+index 0000000..54cc725
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties$Units.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties.class
+new file mode 100644
+index 0000000..613b118
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterProperties.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterRegion.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterRegion.class
+new file mode 100644
+index 0000000..ec1a60f
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterRegion.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterUtils.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterUtils.class
+new file mode 100644
+index 0000000..da0637c
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterUtils.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterView.class
+new file mode 100644
+index 0000000..8dbdebb
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FilterView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FontData$AbsoluteFontWeight.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FontData$AbsoluteFontWeight.class
+new file mode 100644
+index 0000000..dd2f1ff
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FontData$AbsoluteFontWeight.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FontData.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FontData.class
+new file mode 100644
+index 0000000..b1dd1a8
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/FontData.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ForeignObjectView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ForeignObjectView.class
+new file mode 100644
+index 0000000..d387f9d
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ForeignObjectView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GlyphContext.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GlyphContext.class
+new file mode 100644
+index 0000000..2436831
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GlyphContext.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GlyphPathBag.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GlyphPathBag.class
+new file mode 100644
+index 0000000..84261af
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GlyphPathBag.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GroupView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GroupView.class
+new file mode 100644
+index 0000000..a299d58
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/GroupView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ImageView$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ImageView$1.class
+new file mode 100644
+index 0000000..e89e940
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ImageView$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ImageView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ImageView.class
+new file mode 100644
+index 0000000..fabf6f7
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/ImageView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/LineView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/LineView.class
+new file mode 100644
+index 0000000..e0d8631
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/LineView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/LinearGradientView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/LinearGradientView.class
+new file mode 100644
+index 0000000..0969dc1
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/LinearGradientView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MarkerView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MarkerView.class
+new file mode 100644
+index 0000000..5555066
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MarkerView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MaskView$MaskType.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MaskView$MaskType.class
+new file mode 100644
+index 0000000..978f150
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MaskView$MaskType.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MaskView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MaskView.class
+new file mode 100644
+index 0000000..acc3155
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/MaskView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathElement.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathElement.class
+new file mode 100644
+index 0000000..7c06d3d
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathElement.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathParser.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathParser.class
+new file mode 100644
+index 0000000..5b42564
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathParser.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathView.class
+new file mode 100644
+index 0000000..63b56bd
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PathView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PatternView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PatternView.class
+new file mode 100644
+index 0000000..ba80a56
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PatternView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Point.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Point.class
+new file mode 100644
+index 0000000..1c3279f
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/Point.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PropHelper$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PropHelper$1.class
+new file mode 100644
+index 0000000..7b16cba
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PropHelper$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PropHelper.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PropHelper.class
+new file mode 100644
+index 0000000..bb830b7
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/PropHelper.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerPosition$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerPosition$1.class
+new file mode 100644
+index 0000000..23eb211
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerPosition$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerPosition.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerPosition.class
+new file mode 100644
+index 0000000..30bec05
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerPosition.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerType.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerType.class
+new file mode 100644
+index 0000000..2b055a1
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RNSVGMarkerType.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RadialGradientView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RadialGradientView.class
+new file mode 100644
+index 0000000..8f3aa7d
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RadialGradientView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RectView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RectView.class
+new file mode 100644
+index 0000000..466b322
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RectView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RenderableView$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RenderableView$1.class
+new file mode 100644
+index 0000000..ef74d2c
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RenderableView$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RenderableView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RenderableView.class
+new file mode 100644
+index 0000000..9d5a221
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/RenderableView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength$1.class
+new file mode 100644
+index 0000000..719245e
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength$UnitType.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength$UnitType.class
+new file mode 100644
+index 0000000..2359eea
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength$UnitType.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength.class
+new file mode 100644
+index 0000000..01b6247
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SVGLength.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SegmentData.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SegmentData.class
+new file mode 100644
+index 0000000..6213a6b
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SegmentData.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SvgView$Events.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SvgView$Events.class
+new file mode 100644
+index 0000000..b2a9461
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SvgView$Events.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SvgView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SvgView.class
+new file mode 100644
+index 0000000..a544096
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/SvgView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$AlignmentBaseline.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$AlignmentBaseline.class
+new file mode 100644
+index 0000000..a8727e5
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$AlignmentBaseline.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$Direction.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$Direction.class
+new file mode 100644
+index 0000000..7efa48d
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$Direction.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontStyle.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontStyle.class
+new file mode 100644
+index 0000000..3a4298a
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontStyle.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontVariantLigatures.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontVariantLigatures.class
+new file mode 100644
+index 0000000..ecff894
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontVariantLigatures.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontWeight.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontWeight.class
+new file mode 100644
+index 0000000..4a5ed88
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$FontWeight.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextAnchor.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextAnchor.class
+new file mode 100644
+index 0000000..63ad8cb
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextAnchor.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextDecoration.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextDecoration.class
+new file mode 100644
+index 0000000..51c66ce
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextDecoration.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextLengthAdjust.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextLengthAdjust.class
+new file mode 100644
+index 0000000..6bec321
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextLengthAdjust.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathMethod.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathMethod.class
+new file mode 100644
+index 0000000..42968b4
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathMethod.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathMidLine.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathMidLine.class
+new file mode 100644
+index 0000000..b5bbf1b
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathMidLine.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathSide.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathSide.class
+new file mode 100644
+index 0000000..6a3b495
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathSide.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathSpacing.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathSpacing.class
+new file mode 100644
+index 0000000..ec3e564
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties$TextPathSpacing.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties.class
+new file mode 100644
+index 0000000..4025816
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextProperties.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextView.class
+new file mode 100644
+index 0000000..2a1045b
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/TextView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/VirtualView$1.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/VirtualView$1.class
+new file mode 100644
+index 0000000..c045dd0
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/VirtualView$1.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/VirtualView.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/VirtualView.class
+new file mode 100644
+index 0000000..ec4701d
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/VirtualView.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/events/SvgLoadEvent.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/events/SvgLoadEvent.class
+new file mode 100644
+index 0000000..bedb28a
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/events/SvgLoadEvent.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/events/SvgOnLayoutEvent.class b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/events/SvgOnLayoutEvent.class
+new file mode 100644
+index 0000000..d439108
+Binary files /dev/null and b/node_modules/react-native-svg/android/build/intermediates/javac/debug/classes/com/horcrux/svg/events/SvgOnLayoutEvent.class differ
+diff --git a/node_modules/react-native-svg/android/build/intermediates/local_only_symbol_list/debug/R-def.txt b/node_modules/react-native-svg/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+new file mode 100644
+index 0000000..78ac5b8
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/local_only_symbol_list/debug/R-def.txt
+@@ -0,0 +1,2 @@
++R_DEF: Internal format may change without notice
++local
+diff --git a/node_modules/react-native-svg/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt b/node_modules/react-native-svg/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+new file mode 100644
+index 0000000..e764d9f
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/manifest_merge_blame_file/debug/manifest-merger-blame-debug-report.txt
+@@ -0,0 +1,7 @@
++1<?xml version="1.0" encoding="utf-8"?>
++2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++3    package="com.horcrux.svg" >
++4
++5    <uses-sdk android:minSdkVersion="24" />
++6
++7</manifest>
+diff --git a/node_modules/react-native-svg/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml b/node_modules/react-native-svg/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+new file mode 100644
+index 0000000..037933a
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/merged_manifest/debug/AndroidManifest.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="com.horcrux.svg" >
++
++    <uses-sdk android:minSdkVersion="24" />
++
++</manifest>
+\ No newline at end of file
+diff --git a/node_modules/react-native-svg/android/build/intermediates/navigation_json/debug/navigation.json b/node_modules/react-native-svg/android/build/intermediates/navigation_json/debug/navigation.json
+new file mode 100644
+index 0000000..0637a08
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/navigation_json/debug/navigation.json
+@@ -0,0 +1 @@
++[]
+\ No newline at end of file
+diff --git a/node_modules/react-native-svg/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt b/node_modules/react-native-svg/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+new file mode 100644
+index 0000000..6ba6ea2
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/intermediates/symbol_list_with_package_name/debug/package-aware-r.txt
+@@ -0,0 +1 @@
++com.horcrux.svg
+diff --git a/node_modules/react-native-svg/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/react-native-svg/android/build/outputs/logs/manifest-merger-debug-report.txt
+new file mode 100644
+index 0000000..87b8a44
+--- /dev/null
++++ b/node_modules/react-native-svg/android/build/outputs/logs/manifest-merger-debug-report.txt
+@@ -0,0 +1,16 @@
++-- Merging decision tree log ---
++manifest
++ADDED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml:1:1-71
++INJECTED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml:1:1-71
++	package
++		INJECTED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml
++	xmlns:android
++		ADDED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml:1:11-69
++uses-sdk
++INJECTED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml reason: use-sdk injection requested
++INJECTED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml
++INJECTED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml
++	android:targetSdkVersion
++		INJECTED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml
++	android:minSdkVersion
++		INJECTED from D:\alex\book_smart -andorid\node_modules\react-native-svg\android\src\main\AndroidManifest.xml
+diff --git a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/RenderableViewManager.java b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/RenderableViewManager.java
+index 06095e4..ccef85e 100644
+--- a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/RenderableViewManager.java
++++ b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/RenderableViewManager.java
+@@ -282,27 +282,43 @@ class VirtualViewManager<V extends VirtualView> extends ViewGroupManager<Virtual
+     }
+ 
+     sMatrixDecompositionContext.reset();
+-    TransformHelper.processTransform(
+-        transforms, sTransformDecompositionArray, view.getWidth(), view.getHeight(), null, false);
++    TransformHelper.processTransform(transforms, sTransformDecompositionArray);
+     MatrixMathHelper.decomposeMatrix(sTransformDecompositionArray, sMatrixDecompositionContext);
+-    view.setTranslationX(
+-        PixelUtil.toPixelFromDIP(
+-            sanitizeFloatPropertyValue((float) sMatrixDecompositionContext.translation[0])));
+-    view.setTranslationY(
+-        PixelUtil.toPixelFromDIP(
+-            sanitizeFloatPropertyValue((float) sMatrixDecompositionContext.translation[1])));
+-    view.setRotation(
+-        sanitizeFloatPropertyValue((float) sMatrixDecompositionContext.rotationDegrees[2]));
+-    view.setRotationX(
+-        sanitizeFloatPropertyValue((float) sMatrixDecompositionContext.rotationDegrees[0]));
+-    view.setRotationY(
+-        sanitizeFloatPropertyValue((float) sMatrixDecompositionContext.rotationDegrees[1]));
+-    view.setScaleX(sanitizeFloatPropertyValue((float) sMatrixDecompositionContext.scale[0]));
+-    view.setScaleY(sanitizeFloatPropertyValue((float) sMatrixDecompositionContext.scale[1]));
+-
+-    double[] perspectiveArray = sMatrixDecompositionContext.perspective;
+-
+-    if (perspectiveArray.length > PERSPECTIVE_ARRAY_INVERTED_CAMERA_DISTANCE_INDEX) {
++    
++    // Use reflection to access package-private fields
++    try {
++      java.lang.reflect.Field translationField = sMatrixDecompositionContext.getClass().getDeclaredField("translation");
++      translationField.setAccessible(true);
++      double[] translation = (double[]) translationField.get(sMatrixDecompositionContext);
++      
++      java.lang.reflect.Field rotationDegreesField = sMatrixDecompositionContext.getClass().getDeclaredField("rotationDegrees");
++      rotationDegreesField.setAccessible(true);
++      double[] rotationDegrees = (double[]) rotationDegreesField.get(sMatrixDecompositionContext);
++      
++      java.lang.reflect.Field scaleField = sMatrixDecompositionContext.getClass().getDeclaredField("scale");
++      scaleField.setAccessible(true);
++      double[] scaleArray = (double[]) scaleField.get(sMatrixDecompositionContext);
++      
++      java.lang.reflect.Field perspectiveField = sMatrixDecompositionContext.getClass().getDeclaredField("perspective");
++      perspectiveField.setAccessible(true);
++      double[] perspectiveArray = (double[]) perspectiveField.get(sMatrixDecompositionContext);
++      
++      view.setTranslationX(
++          PixelUtil.toPixelFromDIP(
++              sanitizeFloatPropertyValue((float) translation[0])));
++      view.setTranslationY(
++          PixelUtil.toPixelFromDIP(
++              sanitizeFloatPropertyValue((float) translation[1])));
++      view.setRotation(
++          sanitizeFloatPropertyValue((float) rotationDegrees[2]));
++      view.setRotationX(
++          sanitizeFloatPropertyValue((float) rotationDegrees[0]));
++      view.setRotationY(
++          sanitizeFloatPropertyValue((float) rotationDegrees[1]));
++      view.setScaleX(sanitizeFloatPropertyValue((float) scaleArray[0]));
++      view.setScaleY(sanitizeFloatPropertyValue((float) scaleArray[1]));
++
++      if (perspectiveArray.length > PERSPECTIVE_ARRAY_INVERTED_CAMERA_DISTANCE_INDEX) {
+       float invertedCameraDistance =
+           (float) perspectiveArray[PERSPECTIVE_ARRAY_INVERTED_CAMERA_DISTANCE_INDEX];
+       if (invertedCameraDistance == 0) {
+@@ -321,6 +337,17 @@ class VirtualViewManager<V extends VirtualView> extends ViewGroupManager<Virtual
+       float normalizedCameraDistance =
+           scale * scale * cameraDistance * CAMERA_DISTANCE_NORMALIZATION_MULTIPLIER;
+       view.setCameraDistance(normalizedCameraDistance);
++      }
++    } catch (Exception e) {
++      // Fallback if reflection fails
++      view.setTranslationX(PixelUtil.toPixelFromDIP(0));
++      view.setTranslationY(PixelUtil.toPixelFromDIP(0));
++      view.setRotation(0);
++      view.setRotationX(0);
++      view.setRotationY(0);
++      view.setScaleX(1);
++      view.setScaleY(1);
++      view.setCameraDistance(0);
+     }
+   }
+ 
+diff --git a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgPackage.java b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgPackage.java
+index fe81f02..201f128 100644
+--- a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgPackage.java
++++ b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgPackage.java
+@@ -11,7 +11,7 @@ package com.horcrux.svg;
+ import static com.horcrux.svg.RenderableViewManager.*;
+ 
+ import androidx.annotation.Nullable;
+-import com.facebook.react.BaseReactPackage;
++import com.facebook.react.ReactPackage;
+ import com.facebook.react.ViewManagerOnDemandReactPackage;
+ import com.facebook.react.bridge.JavaScriptModule;
+ import com.facebook.react.bridge.ModuleSpec;
+@@ -36,7 +36,7 @@ import javax.inject.Provider;
+       SvgViewModule.class,
+       RNSVGRenderableManager.class,
+     })
+-public class SvgPackage extends BaseReactPackage implements ViewManagerOnDemandReactPackage {
++public class SvgPackage implements ReactPackage, ViewManagerOnDemandReactPackage {
+ 
+   private @Nullable Map<String, ModuleSpec> mViewManagers;
+ 
+@@ -316,8 +316,20 @@ public class SvgPackage extends BaseReactPackage implements ViewManagerOnDemandR
+   }
+ 
+   @Override
+-  protected List<ModuleSpec> getViewManagers(ReactApplicationContext reactContext) {
+-    return new ArrayList<>(getViewManagersMap(reactContext).values());
++  public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
++    List<ViewManager> viewManagers = new ArrayList<>();
++    for (ModuleSpec spec : getViewManagersMap(reactContext).values()) {
++      viewManagers.add((ViewManager) spec.getProvider().get());
++    }
++    return viewManagers;
++  }
++
++  @Override
++  public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
++    List<NativeModule> modules = new ArrayList<>();
++    modules.add(new SvgViewModule(reactContext));
++    modules.add(new RNSVGRenderableManager(reactContext));
++    return modules;
+   }
+ 
+   /** {@inheritDoc} */
+@@ -328,19 +340,6 @@ public class SvgPackage extends BaseReactPackage implements ViewManagerOnDemandR
+     return spec != null ? (ViewManager) spec.getProvider().get() : null;
+   }
+ 
+-  @Override
+-  public NativeModule getModule(String name, @Nonnull ReactApplicationContext reactContext) {
+-    switch (name) {
+-      case SvgViewModule.NAME:
+-        return new SvgViewModule(reactContext);
+-      case RNSVGRenderableManager.NAME:
+-        return new RNSVGRenderableManager(reactContext);
+-      default:
+-        return null;
+-    }
+-  }
+-
+-  @Override
+   public ReactModuleInfoProvider getReactModuleInfoProvider() {
+     try {
+       Class<?> reactModuleInfoProviderClass =
+diff --git a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgViewManager.java b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgViewManager.java
+index 1ee4622..a0b1ed9 100644
+--- a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgViewManager.java
++++ b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/SvgViewManager.java
+@@ -323,66 +323,66 @@ class SvgViewManager extends ReactViewManager
+ 
+   @Override
+   public void setBorderRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 0, rawBorderRadius);
++    super.setBorderRadius(view, 0, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderTopLeftRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 1, rawBorderRadius);
++    super.setBorderRadius(view, 1, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderTopRightRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 2, rawBorderRadius);
++    super.setBorderRadius(view, 2, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderBottomRightRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 3, rawBorderRadius);
++    super.setBorderRadius(view, 3, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderBottomLeftRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 4, rawBorderRadius);
++    super.setBorderRadius(view, 4, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderTopStartRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 5, rawBorderRadius);
++    super.setBorderRadius(view, 5, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderTopEndRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 6, rawBorderRadius);
++    super.setBorderRadius(view, 6, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderBottomStartRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 7, rawBorderRadius);
++    super.setBorderRadius(view, 7, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderBottomEndRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 8, rawBorderRadius);
++    super.setBorderRadius(view, 8, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderEndEndRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 9, rawBorderRadius);
++    super.setBorderRadius(view, 9, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderEndStartRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 10, rawBorderRadius);
++    super.setBorderRadius(view, 10, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderStartEndRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 11, rawBorderRadius);
++    super.setBorderRadius(view, 11, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ 
+   @Override
+   public void setBorderStartStartRadius(SvgView view, Dynamic rawBorderRadius) {
+-    super.setBorderRadius(view, 12, rawBorderRadius);
++    super.setBorderRadius(view, 12, rawBorderRadius.getType() == ReadableType.Number ? (float) rawBorderRadius.asDouble() : 0f);
+   }
+ }

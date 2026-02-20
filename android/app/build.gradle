@@ -7,6 +7,7 @@ apply plugin: "com.facebook.react"
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
+    autolinkLibrariesWithApp()
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '..'
     // root = file("../")
@@ -69,22 +70,28 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+// Avoid duplicate classes: exclude old Support Library (use AndroidX only)
+configurations.all {
+    exclude group: 'com.android.support', module: 'support-compat'
+    exclude group: 'com.android.support', module: 'support-v4'
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.booksmartllc"
+    namespace "com.booksmartllc.healthcare"
     defaultConfig {
-        applicationId "com.booksmartllc"
+        applicationId "com.booksmartllc.healthcare"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
-        dexOptions {
-            javaMaxHeapSize "4g"
-        }
-        versionCode 1
+        versionCode 30
         versionName "1.0.0"
+        // All ABIs: keep device support. Play 16 KB requirement applies to 64-bit libs only; 32-bit can stay 4 KB.
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
     }
     signingConfigs {
         debug {
@@ -100,6 +107,11 @@ android {
             keyPassword 'booksmart'
         }
     }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -109,9 +121,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            ndk {
-                abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
-            }
+            // ndk {
+            //     abiFilters "armeabi-v7a", "arm64-v8a"
+            // }
         }
     }
 }
@@ -119,7 +131,6 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation("com.facebook.react:flipper-integration")
     implementation 'androidx.multidex:multidex:2.0.1'
 
 
@@ -130,5 +141,22 @@ dependencies {
     }
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
 apply plugin: 'com.google.gms.google-services'
+
+// Patch React Native graphicsConversions.h in Gradle transform cache (NDK has no std::format)
+def patchScript = new File(projectDir.parentFile, "patch_graphics_conversions.js")
+tasks.register("patchReactNativeGraphicsConversions") {
+    doLast {
+        exec {
+            environment "GRADLE_USER_HOME", gradle.gradleUserHomeDir.absolutePath
+            commandLine "node", patchScript.absolutePath
+            workingDir projectDir
+            ignoreExitValue false
+        }
+    }
+}
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith("buildCMake") && task.project.path == ":app") {
+        task.dependsOn patchReactNativeGraphicsConversions
+    }
+}

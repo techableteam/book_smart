@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, StatusBar, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card } from 'react-native-paper';
 import { useAtom } from 'jotai';
 import { firstNameAtom, lastNameAtom,  } from '../context/AdminAuthProvider';
@@ -11,20 +10,6 @@ export default function AHeader({currentPage, navigation}) {
   const [firstName, setFirstName] = useAtom(firstNameAtom);
   const [lastName, setLastName] = useAtom(lastNameAtom);
   const [modal, setModal] = useState(false);
-  const [isTest, setIsTest] = useState(false);
-  
-  React.useEffect(() => {
-    const checkTestMode = async () => {
-      try {
-        const testMode = await AsyncStorage.getItem('isTest');
-        setIsTest(testMode === 'true');
-      } catch (error) {
-        console.error('Error checking test mode:', error);
-      }
-    };
-    checkTestMode();
-  }, []);
-  
   const toggleModal = () => {
     setModal(!modal);
   };
@@ -36,8 +21,8 @@ export default function AHeader({currentPage, navigation}) {
 
   return (
     <Card style={styles.shadow}>
-      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: height * 0.143, zIndex: 1000}}>
-        <TouchableOpacity style={{width: 40, height: 70, flexDirection: 'column', justifyContent:'space-between', paddingTop: 50, paddingLeft: 20, zIndex: 1001}} onPress={toggleModal}>
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: height * 0.143,}}>
+        <TouchableOpacity style={{width: 40, height: 70, flexDirection: 'column', justifyContent:'space-between', paddingTop: 50, paddingLeft: 20, zIndex: 0}} onPress={toggleModal}>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
           <View style={{width: '100%', height: 4, backgroundColor: 'white', borderRadius: 2}}></View>
@@ -62,29 +47,15 @@ export default function AHeader({currentPage, navigation}) {
                 </View>
                 <View style={styles.body}>
                   <View style={styles.modalBody}>
-                    {isTest ? (
-                      // Test mode: Only show Home, Terms, and Terms Status
-                      <>
-                        <Text style={[styles.subTitle, currentPage === 3 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminHome')}>🏚️ Admin Home</Text>
-                        <Text style={[styles.subTitle, currentPage === 9 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminTerms')}>📄 Terms</Text>
-                        <Text style={[styles.subTitle, currentPage === 10 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminTermsStatus')}>📊 Terms Status</Text>
-                      </>
-                    ) : (
-                      // Production mode: Show all menu items
-                      <>
-                        <Text style={[styles.subTitle, currentPage === 0 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminDashboard')}>📊 Admin Dashboard</Text>
-                        <Text style={[styles.subTitle, currentPage === 1 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AllJobShiftListing')}>📋 All Job  / Shift Listings</Text>
-                        <Text style={[styles.subTitle, currentPage === 2 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminCompany')}>💼 Admin / Company Profile</Text>
-                        <Text style={[styles.subTitle, currentPage === 3 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminHome')}>🏚️ Admin Home</Text>
-                        <Text style={[styles.subTitle, currentPage === 4 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AllCaregivers')}>👩‍⚕️ All Caregivers</Text>
-                        <Text style={[styles.subTitle, currentPage === 5 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminAllUser')}>🎯 Admin - All Users </Text>
-                        <Text style={[styles.subTitle, currentPage === 6 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminFacilities')}>🏢 All Facilities</Text>
-                        <Text style={[styles.subTitle, currentPage === 7 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminTeamScheduler')}>Team Scheduler</Text>
-                        <Text style={[styles.subTitle, currentPage === 8 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('CaregiverTimeSheet')}>Caregiver Timesheet</Text>
-                        <Text style={[styles.subTitle, currentPage === 9 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminTerms')}>📄 Terms</Text>
-                        <Text style={[styles.subTitle, currentPage === 10 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminTermsStatus')}>📊 Terms Status</Text>
-                      </>
-                    )}
+                    <Text style={[styles.subTitle, currentPage === 0 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminDashboard')}>📊 Admin Dashboard</Text>
+                    <Text style={[styles.subTitle, currentPage === 1 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AllJobShiftListing')}>📋 All Job  / Shift Listings</Text>
+                    <Text style={[styles.subTitle, currentPage === 2 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminCompany')}>💼 Admin / Company Profile</Text>
+                    <Text style={[styles.subTitle, currentPage === 3 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminHome')}>🏚️ Admin Home</Text>
+                    <Text style={[styles.subTitle, currentPage === 4 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AllCaregivers')}>👩‍⚕️ All Caregivers</Text>
+                    <Text style={[styles.subTitle, currentPage === 5 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminAllUser')}>🎯 Admin - All Users </Text>
+                    <Text style={[styles.subTitle, currentPage === 6 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminFacilities')}>🏢 All Facilities</Text>
+                    <Text style={[styles.subTitle, currentPage === 7 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminTeamScheduler')}>Team Scheduler</Text>
+                    <Text style={[styles.subTitle, currentPage === 8 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('CaregiverTimeSheet')}>Caregiver Timesheet</Text>
                     {/* <Text style={[styles.subTitle, currentPage === 9 && {backgroundColor: 'grey'}]} onPress={() => handlePageNavigate('AdminMessage')}>Message</Text> */}
                   </View>
                 </View>
@@ -105,8 +76,6 @@ const styles = StyleSheet.create({
     minHeight: height * 0.15,
     top: 0,
     position:'absolute',
-    zIndex: 1000,
-    elevation: 1000,
   },
   text: {
     display: 'flex',

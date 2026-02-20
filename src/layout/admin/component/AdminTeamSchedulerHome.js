@@ -18,7 +18,6 @@ import WeekView from "./WeekView";
 import DayView from "./DayView";
 import AddNewShiftModal from './AddNewShiftModal';
 import AddWeeklyShiftsModal from './AddWeeklyShiftsModal';
-import ApplicantsModal from './ApplicantsModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dropdown } from 'react-native-element-dropdown';
 import {
@@ -55,27 +54,22 @@ const BusyOverlay = ({ visible, text }) => {
 };
 
 const normalizeStatus = (s) => {
-  const v = (s || '').toLowerCase().trim();
-  if (v === 'notselect') return 'AVAILABLE';
-  if (v === 'assigned-pending') return 'ASSIGNED-PENDING';
-  if (v === 'assigned-approved') return 'ASSIGNED-APPROVED';
+  const v = (s || '').toLowerCase();
   if (v === 'pending') return 'PENDING';
-  if (v === 'approved' || v === 'approve' || v === 'accept') return 'APPROVED';
-  if (v === 'rejected' || v === 'reject') return 'REJECTED';
-  if (v === 'cancelled' || v === 'cancel') return 'CANCELLED';
-  return v ? v.toUpperCase() : 'AVAILABLE';
+  if (v === 'accept' || v === 'approved' || v === 'approve') return 'APPROVED';
+  if (v === 'reject' || v === 'rejected') return 'REJECTED';
+  if (v === 'cancel' || v === 'cancelled') return 'CANCELLED';
+  return v ? v.toUpperCase() : 'PENDING';
 };
 
 const statusColors = (label) => {
   switch (label) {
-    case 'AVAILABLE':         return { bg: '#808080', fg: '#E5E7EB' };
-    case 'ASSIGNED-PENDING':  return { bg: '#DBEAFE', fg: '#1E40AF' };
-    case 'ASSIGNED-APPROVED': return { bg: '#A7F3D0', fg: '#065F46' };
-    case 'PENDING':           return { bg: '#FFC107', fg: '#A16207' };
-    case 'APPROVED':          return { bg: '#DCFCE7', fg: '#166534' };
-    case 'REJECTED':          return { bg: '#DC2626', fg: '#991B1B' };
-    case 'CANCELLED':         return { bg: '#E5E7EB', fg: '#374151' };
-    default:                  return { bg: '#EEE',    fg: '#000'     };
+    case 'NOTSELECT':   return { bg: '#808080', fg: '#E5E7EB' };
+    case 'PENDING':   return { bg: '#FFC107', fg: '#A16207' };
+    case 'APPROVED':  return { bg: '#DCFCE7', fg: '#166534' };
+    case 'REJECTED':  return { bg: '#DC2626', fg: '#991B1B' };
+    case 'CANCELLED': return { bg: '#E5E7EB', fg: '#374151' };
+    default:          return { bg: '#EEE',    fg: '#000'     };
   }
 };
 
@@ -151,15 +145,12 @@ const AdminHomeTab = ({
   const [facilityDjobList, setFacilityDjobList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [isValueOptionFocus, setIsValueOptionFocus] = useState(false);
-  const [showApplicantsModal, setShowApplicantsModal] = useState(false);
-  const [selectedJobForApplicants, setSelectedJobForApplicants] = useState(null);
 
   const [startTime, endTime] = React.useMemo(() => {
-    // Use originalTime if available (for overnight shifts that were split), otherwise use time
-    const raw = String(selectedEvent?.originalTime || selectedEvent?.time || '');
+    const raw = String(selectedEvent?.time || '');
     const [s, e] = raw.split(/[➔➜→]/).map(t => t?.trim());
     return [s || '', e || ''];
-  }, [selectedEvent?.time, selectedEvent?.originalTime]);
+  }, [selectedEvent?.time]);
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
@@ -291,12 +282,39 @@ const AdminHomeTab = ({
    
   };
 
+  // const ensurePrereqs = async () => {
+  //   if (!isDataLoaded) {
+  //     console.log("Waiting for data to load...");
+  //     return { needShiftTypes: true, needStaff: true }; 
+  //   }
+  //   setBusyText('Loading…');
+  //   setBootLoading(true);
+  //   try {
+  //     await Promise.all([
+  //       fetchStaffInfo(), 
+  //       fetchShiftTypes(), 
+  //     ]);
+  //   } finally {
+  //     setBootLoading(false);
+  //     setBusyText('');
+  //   }
+
+  //   console.log(shiftTypes);
+  //   console.log(staffList);
+
+  //   let needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
+  //   let needStaff      = !Array.isArray(staffList)  || staffList.length === 0;
+
+  //   return { needShiftTypes, needStaff };
+  // };
+
 
   const ensurePrereqs = async () => {
     if (!isDataLoaded) {
       return { needShiftTypes: true, needStaff: true }; // do not proceed if data is not loaded
     }
-  
+    console.log(shiftTypes);
+    console.log(staffList);
 
     const needShiftTypes = !Array.isArray(shiftTypes) || shiftTypes.length === 0;
     const needStaff = !Array.isArray(staffList) || staffList.length === 0;
@@ -782,30 +800,6 @@ const AdminHomeTab = ({
               style={styles.input}
             />
 
-            {/* Show applicants button if there are pending applicants */}
-            {(() => {
-              const applicants = selectedEvent?.data?.job?.applicants || [];
-              const pendingCount = applicants.filter(a => a && a.status === 'pending').length;
-              
-              if (pendingCount > 0) {
-                return (
-                  <TouchableOpacity
-                    style={styles.viewApplicantsBtn}
-                    onPress={() => {
-                      setSelectedJobForApplicants(selectedEvent.data.job);
-                      setShowEventModal(false);
-                      setTimeout(() => setShowApplicantsModal(true), 300);
-                    }}
-                  >
-                    <Text style={styles.viewApplicantsText}>
-                      👥 View {pendingCount} Applicant(s)
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }
-              return null;
-            })()}
-
             <Text style={styles.label}>Shift</Text>
             <View style={styles.shiftScrollBox}>
               <ScrollView
@@ -832,29 +826,6 @@ const AdminHomeTab = ({
           </View>
         </View>
       </Modal>
-
-      <ApplicantsModal
-        visible={showApplicantsModal}
-        onClose={() => {
-          setShowApplicantsModal(false);
-          setSelectedJobForApplicants(null);
-        }}
-        djobData={selectedJobForApplicants}
-        onApplicantReviewed={async () => {
-          try {
-            setShowApplicantsModal(false);
-            setSelectedJobForApplicants(null);
-            const selectedFacility = facilities.find(facility => facility.aic === selectedFacilityId);
-            if (selectedFacility) {
-              await handleFacilitySelect(selectedFacility);
-            }
-          } catch (error) {
-            console.error('Error refreshing after applicant review:', error);
-            setBootLoading(false);
-            setBusyText('');
-          }
-        }}
-      />
 
       <BusyOverlay
         visible={bootLoading || opLoading || deleting}
@@ -1230,19 +1201,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-  },
-  viewApplicantsBtn: {
-    backgroundColor: '#3B82F6',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  viewApplicantsText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
   },
 });
 

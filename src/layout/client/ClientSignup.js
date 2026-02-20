@@ -705,7 +705,7 @@ export default function ClientSignUp({ navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={constStyles.signUpSubtitle}> SS# <Text style={{color: 'red'}}>*</Text> </Text>
+              <Text style={constStyles.signUpSubtitle}> SSN <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   style={[constStyles.signUpinput, {width: '100%'}]}
@@ -719,7 +719,7 @@ export default function ClientSignUp({ navigation }) {
               </View>
             </View>
             <View style={styles.email}>
-              <Text style={constStyles.signUpSubtitle}> Verify SS# <Text style={{color: 'red'}}>*</Text> </Text>
+              <Text style={constStyles.signUpSubtitle}> Verify SSN <Text style={{color: 'red'}}>*</Text> </Text>
               <View style={{flexDirection: 'row', width: '100%', gap: 5}}>
                 <TextInput
                   style={[constStyles.signUpinput, {width: '100%'}]}

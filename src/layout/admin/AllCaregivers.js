@@ -1451,7 +1451,7 @@ export default function AllCaregivers({ navigation }) {
                         <Text style={styles.content}>{selectedUser?.firstName} {selectedUser?.lastName}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>
-                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>SS #</Text>
+                        <Text style={[styles.titles, {backgroundColor: '#ccc', marginBottom: 5, paddingLeft: 2}]}>SSN</Text>
                         <Text style={styles.content}>{selectedUser?.socialSecurityNumber}</Text>
                       </View>
                       <View style={{flexDirection: 'row', width: '100%', gap: 10}}>

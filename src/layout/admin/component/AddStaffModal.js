@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -8,7 +8,6 @@ import {
   FlatList,
   ActivityIndicator,
   Pressable,
-  TextInput,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -21,7 +20,6 @@ export default function AddStaffModal({ visible, onClose, onSubmit, selectedFaci
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (visible) {
@@ -68,23 +66,6 @@ export default function AddStaffModal({ visible, onClose, onSubmit, selectedFaci
     });
   };
 
-  const filteredUsers = useMemo(() => {
-    if (!searchQuery.trim()) return users;
-    
-    const query = searchQuery.toLowerCase().trim();
-    return users.filter(user => {
-      const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
-      const title = (user.title || '').toLowerCase();
-      const role = (user.userRole || '').toLowerCase();
-      const email = (user.email || '').toLowerCase();
-      
-      return fullName.includes(query) || 
-             title.includes(query) || 
-             role.includes(query) ||
-             email.includes(query);
-    });
-  }, [users, searchQuery]);
-
   const renderUser = ({ item }) => {
     const isSelected = selectedUsers.some((u) => u.aic === item.aic);
     return (
@@ -117,25 +98,14 @@ export default function AddStaffModal({ visible, onClose, onSubmit, selectedFaci
         <View style={styles.modalContent}>
           <Text style={styles.headerText}>Select Staff</Text>
 
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by name, title, role, or email..."
-            placeholderTextColor="#999"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-
           {loading ? (
             <ActivityIndicator size="large" color="#000" />
           ) : (
             <FlatList
-              data={filteredUsers}
+              data={users}
               keyExtractor={(item) => item.aic.toString()}
               renderItem={renderUser}
               style={{ marginVertical: 10 }}
-              ListEmptyComponent={
-                <Text style={styles.emptyText}>No staff found</Text>
-              }
             />
           )}
 
@@ -181,24 +151,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
     color: '#000',
-  },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginBottom: 10,
-    fontSize: 14,
-    color: '#000',
-    backgroundColor: '#fff',
-    height: 40,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#666',
-    padding: 20,
-    fontSize: 14,
   },
   userItem: {
     flexDirection: 'row',

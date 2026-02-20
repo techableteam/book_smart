@@ -59,13 +59,12 @@ export default function AdminAddShiftModal({ visible, onClose, onReload, selecte
       setError('Start and end time must be selected.');
       return;
     }
-    // Allow overnight shifts (end time can be earlier than start time, e.g., 11pm to 7am)
-    // Only prevent if times are exactly equal
-    if (endTime.getTime() === startTime.getTime()) {
-      setError('Start and end time cannot be the same.');
+    if (endTime <= startTime) {
+      setError('End time must be later than start time.');
       return;
     }
 
+    console.log(selectedFacilityId);
 
     try {
       const body = {
@@ -74,6 +73,7 @@ export default function AdminAddShiftModal({ visible, onClose, onReload, selecte
         start: formatTime(startTime),
         end: formatTime(endTime),
       };
+      console.log(body);
       const response = await addShiftType(body, "facilities");
       if (response?.error) {
         setError('Failed to add shift.');

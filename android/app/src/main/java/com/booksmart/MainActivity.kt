@@ -1,4 +1,4 @@
-package com.booksmartllc
+package com.booksmartllc.healthcare
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
